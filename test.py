@@ -1,6 +1,7 @@
 # import the opencv library
 import cv2
-  
+from pyzbar.pyzbar import decode
+
   
 # define a video capture object
 vid = cv2.VideoCapture(0)
@@ -10,7 +11,9 @@ while(True):
     # Capture the video frame
     # by frame
     ret, frame = vid.read()
-  
+    decoded_data = decode(frame)
+
+    print(decoded_data)        
     # Display the resulting frame
     cv2.imshow('frame', frame)
       

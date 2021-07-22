@@ -8,8 +8,13 @@ vid = cv2.VideoCapture(0)
 
 # define boundaries (lower)
 bound_red = np.array([110,100,139])
+upper_red = np.array([180,210,195])
 
-upper = np.array([180,255,255])
+bound_blue = np.array([80, 135, 80])
+upper_blue = np.array([165,255,230])
+
+bound_green = np.array([75,165, 121])
+upper_green = np.array([165,220,255])
 
 running = 0
 while(running < 4):

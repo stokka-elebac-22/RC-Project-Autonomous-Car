@@ -64,8 +64,8 @@ class QRCode:
 
         ##### VALUES #####
         self.values_length = values_length
-        self.angles = []
-        self.distance = []
+        self.angles = [0 for _ in range(values_length)]
+        self.distance = [0 for _ in range(values_length)]
 
     def update(self, ret_qr, decoded_info, points, rest):
         self.ret_qr = ret_qr
@@ -118,11 +118,14 @@ class QRCode:
         frame = cv.putText(frame, f'distance = {self.get_average_distance()}', (10, 50), self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
     def add_anlge(self, angle):
-        # Taking the average of the 10 last measurements
+        if angle is None:
+            return
         self.angles.pop(0)
         self.angles.append(angle)
     
     def add_distance(self, distance):
+        if distance is None:
+            return
         self.distance.pop(0) 
         self.distance.append(distance)
 

@@ -42,7 +42,7 @@ class QRCode:
                     a
         
     """
-    def __init__(self, size_px, size_mm, distance):
+    def __init__(self, size_px, size_mm, distance, values_length=10):
         self.ret_qr = None
         self.decoded_info = None 
         self.points = Points()
@@ -61,6 +61,11 @@ class QRCode:
         self.qr_size_px = size_px
         self.qr_size_mm = size_mm
         self.qr_distance = distance
+
+        ##### VALUES #####
+        self.values_length = values_length
+        self.angles = []
+        self.distance = []
 
     def update(self, ret_qr, decoded_info, points, rest):
         self.ret_qr = ret_qr
@@ -84,8 +89,6 @@ class QRCode:
         return frame
 
     def display_values(self, frame, resize=1):
-        # blankB = np.zeros(frame.shape[:2], dtype='uint8')
-        # blankD = np.zeros(frame.shape[:2], dtype='uint8')
         text_location_a = (int(min(self.points.p0[0], self.points.p1[0]) + self.sides.a/2), int(self.points.p0[1]))
         text_location_b = (int(self.points.p1[0]), int(min(self.points.p1[1], self.points.p2[1]) + self.sides.b/2))
         text_location_c = (int(min(self.points.p2[0], self.points.p3[0]) + self.sides.c/2), int(self.points.p2[1]))
@@ -96,18 +99,6 @@ class QRCode:
         cv.putText(frame, str(int(self.sides.c)), text_location_c, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA) 
         cv.putText(frame, str(int(self.sides.d)), text_location_d, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
 
-        # textBRotMat = cv.getRotationMatrix2D(text_location_B, 90, 1)
-        # textDRotMat = cv.getRotationMatrix2D(text_location_D, -90, 1)
-
-        # blankB = cv.warpAffine(blankB, textBRotMat, (blankB.shape[1], blankB.shape[0]))
-        # blankD = cv.warpAffine(blankD, textDRotMat, (blankD.shape[1], blankD.shape[0]))
-
-        # result = cv.add(blankD, blankB)
-        # frame = cv.add(frame, result)
-
-        # side0 = math.sqrt((point1[0] - point0[0])**2 + (point1[1] - point0[1])**2)
-        # side1 = math.sqrt((point3[0] - point2[0])**2 + (point3[1] - point2[1])**2)
-
         width_px = max(abs(self.points.p0[0] - self.points.p1[0]) * (1 / resize),
         abs(self.points.p2[0] - self.points.p3[0]))
         height_px = max(abs(self.points.p3[1] - self.points.p0[1]),
@@ -116,12 +107,27 @@ class QRCode:
         height_px_resize = height_px * (1/resize)
         ratio = height_px/width_px
 
-        focalLength = (self.qr_size_px * self.qr_distance) / self.qr_size_mm 
+        focalLength = (self.qr_size_px / self.qr_size_mm) * self.qr_distance
         angle = (1 - ratio) * 90
-        distance = (self.qr_size_mm * focalLength) / height_px_resize
-        # angle = (1 - (QR_SIZE_PX * height_px) / width_px) * 90
+        distance = (self.qr_size_mm * focalLength) / height_px_resize # the resize variable is only relevant if not using video
 
-        frame = cv.putText(frame, f'angle    = {int(angle)}', (10, 20), self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
-        frame = cv.putText(frame, f'distance = {int(distance)}', (10, 50), self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
+        self.add_anlge(angle)
+        self.add_distance(distance)
 
+        frame = cv.putText(frame, f'angle    = {self.get_average_angle()}', (10, 20), self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
+        frame = cv.putText(frame, f'distance = {self.get_average_distance()}', (10, 50), self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
+    def add_anlge(self, angle):
+        # Taking the average of the 10 last measurements
+        self.angles.pop(0)
+        self.angles.append(angle)
+    
+    def add_distance(self, distance):
+        self.distance.pop(0) 
+        self.distance.append(distance)
+
+    def get_average_angle(self) -> int:
+        return sum(self.angles)//self.values_length
+
+    def get_average_distance(self) -> int:
+        return sum(self.distance)//self.values_length

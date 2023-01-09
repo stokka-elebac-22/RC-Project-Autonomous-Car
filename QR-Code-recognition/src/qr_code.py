@@ -77,7 +77,8 @@ class QRCode:
 
     def display(self, frame, resize, verbose):
         self.display_qr_code(frame)
-        self.display_values(frame, resize, verbose)
+        if verbose > 0:
+            self.display_values(frame, resize, verbose=verbose)
 
     def display_qr_code(self, frame):
         for s, p in zip(self.decoded_info, self.points.points):
@@ -106,7 +107,7 @@ class QRCode:
         abs(self.points.p2[1] - self.points.p1[1]))
         # width_px_resize = width_px * (1/resize)
         height_px_resize = height_px * (1/resize)
-        ratio = height_px/width_px
+        ratio = width_px/height_px
 
         focalLength = (self.qr_size_px / self.qr_size_mm) * self.qr_distance
         angle = (1 - ratio) * 90

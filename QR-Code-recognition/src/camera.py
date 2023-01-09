@@ -11,16 +11,16 @@ class Camera:
         self.cap = cv.VideoCapture(self.camera_id)
         self.qr_code = qr_code
 
-    def run(self, name=None, resize=1):
+    def run(self, name=None, resize=1, verbose=1):
         if not name:
-            self.run_video()
+            self.run_video(verbose)
         else:
             self.run_image(name, resize)
 
-    def run_video(self):
+    def run_video(self, verbose=1):
         while True:
             frame = self.read()
-            self.detect_qr_code(frame)
+            self.detect_qr_code(frame, verbose)
             cv.imshow(self.window_name, frame)
             if cv.waitKey(self.delay) & 0xFF == ord('q'):
                 break
@@ -42,10 +42,10 @@ class Camera:
         frame = cv.resize(frame, (0, 0), fx = resize, fy = resize)
         return frame
 
-    def detect_qr_code(self, frame, resize=1):
+    def detect_qr_code(self, frame, resize=1, verbose=1):
         ret_qr, decoded_info, points, rest = self.qcd.detectAndDecodeMulti(frame)
         if not ret_qr:
             # print('Cannot detect')
             return
         self.qr_code.update(ret_qr, decoded_info, points, rest)
-        self.qr_code.display(frame, resize)
+        self.qr_code.display(frame, resize, verbose)

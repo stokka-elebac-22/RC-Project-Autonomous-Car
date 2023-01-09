@@ -10,4 +10,4 @@ QR_DISTANCE = 1000
 if "__main__" == __name__:
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE) 
     camera = Camera(qr_code) 
-    camera.run()
+    camera.run(verbose=1)

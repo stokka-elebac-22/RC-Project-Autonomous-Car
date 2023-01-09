@@ -75,9 +75,9 @@ class QRCode:
 
         self.sides.update(self.points)
 
-    def display(self, frame, resize):
+    def display(self, frame, resize, verbose):
         self.display_qr_code(frame)
-        self.display_values(frame, resize)
+        self.display_values(frame, resize, verbose)
 
     def display_qr_code(self, frame):
         for s, p in zip(self.decoded_info, self.points.points):
@@ -88,16 +88,17 @@ class QRCode:
             frame = cv.polylines(frame, [p.astype(int)], True, color, 4)
         return frame
 
-    def display_values(self, frame, resize=1):
-        text_location_a = (int(min(self.points.p0[0], self.points.p1[0]) + self.sides.a/2), int(self.points.p0[1]))
-        text_location_b = (int(self.points.p1[0]), int(min(self.points.p1[1], self.points.p2[1]) + self.sides.b/2))
-        text_location_c = (int(min(self.points.p2[0], self.points.p3[0]) + self.sides.c/2), int(self.points.p2[1]))
-        text_location_d = (int(self.points.p3[0]), int(min(self.points.p3[1], self.points.p0[1]) + self.sides.d/2))
+    def display_values(self, frame, resize=1, verbose=1):
+        if verbose > 1:
+            text_location_a = (int(min(self.points.p0[0], self.points.p1[0]) + self.sides.a/2), int(self.points.p0[1]))
+            text_location_b = (int(self.points.p1[0]), int(min(self.points.p1[1], self.points.p2[1]) + self.sides.b/2))
+            text_location_c = (int(min(self.points.p2[0], self.points.p3[0]) + self.sides.c/2), int(self.points.p2[1]))
+            text_location_d = (int(self.points.p3[0]), int(min(self.points.p3[1], self.points.p0[1]) + self.sides.d/2))
 
-        cv.putText(frame, str(int(self.sides.a)), text_location_a, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
-        cv.putText(frame, str(int(self.sides.b)), text_location_b, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
-        cv.putText(frame, str(int(self.sides.c)), text_location_c, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA) 
-        cv.putText(frame, str(int(self.sides.d)), text_location_d, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
+            cv.putText(frame, str(int(self.sides.a)), text_location_a, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
+            cv.putText(frame, str(int(self.sides.b)), text_location_b, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
+            cv.putText(frame, str(int(self.sides.c)), text_location_c, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA) 
+            cv.putText(frame, str(int(self.sides.d)), text_location_d, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
 
         width_px = max(abs(self.points.p0[0] - self.points.p1[0]) * (1 / resize),
         abs(self.points.p2[0] - self.points.p3[0]))

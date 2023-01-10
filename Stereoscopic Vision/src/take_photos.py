@@ -1,7 +1,7 @@
 import cv2 as cv
 from camera import Camera
 
-DIRECTORY = 'Stereoscopic Vision/images/'
+DIRECTORY = 'Stereoscopic Vision/images/calibrate/'
 
 cam1 = Camera(0, 'left')
 cam2 = Camera(2, 'right')

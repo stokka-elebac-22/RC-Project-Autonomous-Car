@@ -1,4 +1,8 @@
-# https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_calib3d/py_calibration/py_calibration.html#calibration
+"""
+source: https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_calib3d/py_calibration/py_calibration.html#calibration
+
+the code is highly inspired from the source, but modified to fit our use case
+"""
 
 import numpy as np
 import cv2 as cv
@@ -6,7 +10,9 @@ import glob
 
 CHESS_BOARD_DIMENSION = (7, 6)
 WINDOW_NAME = 'Chess Board'
-DIRECTORY = 'images/*.jpg'
+DIRECTORY = 'Stereoscopic Vision/images/calibrate/*.jpg'
+
+##### FINDING CORNERS #####
 
 # termination criteria
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -38,7 +44,19 @@ for name in images:
         # draw and display the corners
         cv.drawChessboardCorners(img, CHESS_BOARD_DIMENSION, corners, ret)
         cv.imshow(WINDOW_NAME, img)
-        cv.waitKEy(0)
+        cv.waitKey(0)
 
 cv.destroyAllWindows()
 
+##### CALIBRATION #####
+# calibrateCarmera returns the camera matrix, distortion coefficients, rotation and translation vectors
+ret, mtx, dist, revecs, tvecs = cv.calibrateCamera(object_points, image_points, gray.shape[::-1], None, None)
+
+##### UNDISTORTION #####
+# Undistort an image
+img = cv.imread(images[0]) # just read the first image of the collection
+h, w = img.shape[:2]
+new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+
+##### UNDISTORT AN IMAGE #####
+dst = cv.undistort(img, mtx, dist, None, new_camera_matrix)

@@ -1,11 +1,17 @@
 import cv2 as cv
 from camera import Camera
 
-DIRECTORY = 'Stereoscopic Vision/images/calibrate/'
+"""
+Assuming you take photos with two camera at the same time.
+It will work with one camera, but it will end up in the calibrate left directory
+"""
+
+DIRECTORY = 'Stereoscopic Vision/images/calibrate'
 
 cam1 = Camera(0, 'left')
 cam2 = Camera(2, 'right')
 cameras: Camera = [cam1, cam2]
+camera_sides = ['left', 'right']
 
 count = 0
 while True:
@@ -20,8 +26,8 @@ while True:
     
     if cv.waitKey(1) & 0xFF == ord('c'): # capture frame by pressing c
         print('Capturing...')
-        for frame in frames:
-            cv.imwrite(f'{DIRECTORY}{frame[1]}_{count}.jpg', frame[0])
+        for i, frame in enumerate(frames):
+            cv.imwrite(f'{DIRECTORY}_{camera_sides[i]}/{frame[1]}_{count}.jpg', frame[0])
         count += 1
 
     if cv.waitKey(1) & 0xFF == ord('s'): # stop loop by pressing s

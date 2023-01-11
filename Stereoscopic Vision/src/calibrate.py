@@ -51,7 +51,7 @@ cv.destroyAllWindows()
 
 ##### CALIBRATION #####
 # calibrateCarmera returns the camera matrix, distortion coefficients, rotation and translation vectors
-ret, mtx, dist, revecs, tvecs = cv.calibrateCamera(object_points, image_points, gray.shape[::-1], None, None)
+ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(object_points, image_points, gray.shape[::-1], None, None)
 
 ##### UNDISTORTION #####
 # Undistort an image
@@ -73,4 +73,19 @@ x, y, w, h = roi
 dst = dst[y:y+h, x:x+w]
 
 cv.imwrite(f'Stereoscopic Vision\images\calibrate_results\calibrated.png', dst)
+
+##### RE-PROJECTION ERROR #####
+"""
+From the source:
+Re-projection error gives a good estimation of just how exact is the found parameters. 
+This should be as close to 0 as possible.
+"""
+mean_error = 0
+total_error = 0
+for i in range(len(object_points)):
+    image_point, _ = cv.projectPoints(object_points[i], rvecs[i], tvecs[i], mtx, dist)
+    error = cv.norm(image_points[i], image_point, cv.NORM_L2)/len(image_point)
+    total_error += error
+
+print(f"total error: {mean_error/len(object_points)}")
 

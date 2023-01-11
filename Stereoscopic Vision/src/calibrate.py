@@ -8,8 +8,8 @@ import numpy as np
 import cv2 as cv
 import glob
 
-CHESS_BOARD_DIMENSION = (7, 6)
-WINDOW_NAME = 'Chess Board'
+CHESS_BOARD_DIMENSION = (8, 6)
+# WINDOW_NAME = 'Chess Board'
 DIRECTORY = 'Stereoscopic Vision/images/calibrate/*.jpg'
 
 ##### FINDING CORNERS #####
@@ -43,8 +43,9 @@ for name in images:
 
         # draw and display the corners
         cv.drawChessboardCorners(img, CHESS_BOARD_DIMENSION, corners, ret)
-        cv.imshow(WINDOW_NAME, img)
-        cv.waitKey(0)
+        # cv.imshow(name, img)
+        # cv.waitKey(0)
+print(f"Could find chessboard corners in {len(object_points)} out of {len(images)} images")
 
 cv.destroyAllWindows()
 
@@ -58,5 +59,18 @@ img = cv.imread(images[0]) # just read the first image of the collection
 h, w = img.shape[:2]
 new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
 
-##### UNDISTORT AN IMAGE #####
+##### UNDISTORT AN IMAGE USING CV.UNDISTORT() #####
+# undistort
 dst = cv.undistort(img, mtx, dist, None, new_camera_matrix)
+
+##### UNDISTORT AN IMAGE USING REMAPPING #####
+# undistort
+# mapx, mapy = cv.initUndistortRectifyMap(mtx, dist, None, new_camera_matrix, (w, h), 5)
+# dst = cv.remap(img, mapx, mapy, cv.INTER_LINEAR)
+
+# crop image
+x, y, w, h = roi
+dst = dst[y:y+h, x:x+w]
+
+cv.imwrite(f'Stereoscopic Vision\images\calibrate_results\calibrated.png', dst)
+

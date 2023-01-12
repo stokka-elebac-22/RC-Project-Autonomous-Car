@@ -1,7 +1,8 @@
 import cv2 as cv
 from camera import Camera
 
-class Points:
+class Points:   # class names in singular
+    """Points, used by qrcode."""
     def __init__(self, points=[0, 0, 0, 0]):
         self.points = points
         self.point0 = points[0]
@@ -16,7 +17,8 @@ class Points:
         self.point2 = points[2]
         self.point3 = points[3]
 
-class Sides:
+class Sides:    # class names in singular
+    """Sides, used by qrcode."""
     def __init__(self, sides=[0, 0, 0, 0]):
         self.side_a = sides[0]
         self.side_b = sides[1]
@@ -30,6 +32,7 @@ class Sides:
         self.side_d = abs(points.p3[1] - points.p0[1])
 
 class QRCode:
+    """QRCode, doing calculations for QR code placement estimation."""
     """
                     c
             p2 ---------- p3
@@ -90,15 +93,23 @@ class QRCode:
 
     def display_values(self, frame, resize=1, verbose=1):
         if verbose > 1:
-            text_location_a = (int(min(self.points.point0[0], self.points.point1[0]) + self.sides.side_a/2), int(self.points.point0[1]))
-            text_location_b = (int(self.points.point1[0]), int(min(self.points.point1[1], self.points.point2[1]) + self.sides.side_b/2))
-            text_location_c = (int(min(self.points.point2[0], self.points.point3[0]) + self.sides.side_c/2), int(self.points.point2[1]))
-            text_location_d = (int(self.points.point3[0]), int(min(self.points.point3[1], self.points.point0[1]) + self.sides.side_d/2))
+            text_location_a = (int(min(self.points.point0[0], self.points.point1[0]) + \
+                                    self.sides.side_a/2), int(self.points.point0[1]))
+            text_location_b = (int(self.points.point1[0]), int(min(self.points.point1[1], \
+                                    self.points.point2[1]) + self.sides.side_b/2))
+            text_location_c = (int(min(self.points.point2[0], self.points.point3[0]) + \
+                                    self.sides.side_c/2), int(self.points.point2[1]))
+            text_location_d = (int(self.points.point3[0]), int(min(self.points.point3[1], \
+                                    self.points.point0[1]) + self.sides.side_d/2))
 
-            cv.putText(frame, str(int(self.sides.side_a)), text_location_a, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
-            cv.putText(frame, str(int(self.sides.side_b)), text_location_b, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
-            cv.putText(frame, str(int(self.sides.side_c)), text_location_c, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
-            cv.putText(frame, str(int(self.sides.side_d)), text_location_d, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
+            cv.putText(frame, str(int(self.sides.side_a)), text_location_a, self.font, \
+                        self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
+            cv.putText(frame, str(int(self.sides.side_b)), text_location_b, self.font, \
+                        self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
+            cv.putText(frame, str(int(self.sides.side_c)), text_location_c, self.font, \
+                        self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
+            cv.putText(frame, str(int(self.sides.side_d)), text_location_d, self.font, \
+                        self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
 
         width_px = max(abs(self.points.point0[0] - self.points.point1[0]) * (1 / resize),
         abs(self.points.point2[0] - self.points.point3[0]))
@@ -110,13 +121,16 @@ class QRCode:
 
         focalLength = (self.qr_size_px / self.qr_size_mm) * self.qr_distance
         angle = (1 - ratio) * 90
-        distance = (self.qr_size_mm * focalLength) / height_px_resize # the resize variable is only relevant if not using video
+        # the resize variable is only relevant if not using video        
+        distance = (self.qr_size_mm * focalLength) / height_px_resize 
 
         self.add_anlge(angle)
         self.add_distance(distance)
 
-        frame = cv.putText(frame, f'angle    = {self.get_average_angle()}', (10, 20), self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
-        frame = cv.putText(frame, f'distance = {self.get_average_distance()}', (10, 50), self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
+        frame = cv.putText(frame, f'angle    = {self.get_average_angle()}', (10, 20), self.font, \
+                            self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
+        frame = cv.putText(frame, f'distance = {self.get_average_distance()}', (10, 50), self.font, \
+                            self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
     def add_anlge(self, angle):
         if angle is None:

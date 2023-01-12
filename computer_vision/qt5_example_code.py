@@ -1,8 +1,9 @@
-from PyQt6 import QtGui, QtCore, QtWidgets
 import cv2
 import sys
+from PyQt6 import QtGui, QtCore, QtWidgets
 
 class DisplayImageWidget(QtWidgets.QWidget):
+    """Qt widget."""
     def __init__(self, parent=None):
         super(DisplayImageWidget, self).__init__(parent)
 
@@ -14,11 +15,14 @@ class DisplayImageWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.button)
         self.layout.addWidget(self.image_frame)
         self.setLayout(self.layout)
+        self.image = None
 
     @QtCore.pyqtSlot()
     def show_image(self):
+        """Shows image in frame."""
         self.image = cv2.imread('placeholder4.PNG')
-        self.image = QtGui.QImage(self.image.data, self.image.shape[1], self.image.shape[0], QtGui.QImage.Format_RGB888).rgbSwapped()
+        self.image = QtGui.QImage(self.image.data, self.image.shape[1], \
+            self.image.shape[0], QtGui.QImage.Format_RGB888).rgbSwapped()
         self.image_frame.setPixmap(QtGui.QPixmap.fromImage(self.image))
 
 if __name__ == '__main__':

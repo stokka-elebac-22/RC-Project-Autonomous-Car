@@ -1,7 +1,9 @@
 import cv2 as cv
+import dataclasses
 
-class Points:   # class names in singular
-    """Points, used by qrcode."""
+@dataclasses.dataclass
+class PointSet:   # Combine to QRGeometry?
+    """PointSet, used by qrcode."""
     def __init__(self, points=[0, 0, 0, 0]):
         self.points = points
         self.point0 = points[0]
@@ -16,8 +18,9 @@ class Points:   # class names in singular
         self.point2 = points[2]
         self.point3 = points[3]
 
-class Sides:    # class names in singular
-    """Sides, used by qrcode."""
+@dataclasses.dataclass
+class SideSet:    # class names in singular
+    """SideSet, used by qrcode."""
     def __init__(self, sides=[0, 0, 0, 0]):
         self.side_a = sides[0]
         self.side_b = sides[1]
@@ -46,9 +49,9 @@ class QRCode:
     def __init__(self, size_px, size_mm, distance, values_length=10):
         self.ret_qr = None
         self.decoded_info = None
-        self.points = Points()
+        self.points = PointSet()
         self.rest = None
-        self.sides = Sides()
+        self.sides = SideSet()
 
         ##### DISPLAY #####
         self.color_frame_green = (0, 255, 0)
@@ -159,17 +162,16 @@ if "__main__" == __name__:
     QR_DISTANCE = 500
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
     camera = Camera()
-    verbose = 1
+    VERBOSE = 1
 
     qcd = cv.QRCodeDetector()
-    qr_code = qr_code
 
     while True:
         frame = camera.read()
         ret_qr, decoded_info, points, rest = qcd.detectAndDecodeMulti(frame)
         if ret_qr:
             qr_code.update(ret_qr, decoded_info, points[0], rest)
-            qr_code.display(frame, verbose=verbose)
+            qr_code.display(frame, verbose=VERBOSE)
         cv.imshow(camera.window_name, frame)
         if cv.waitKey(camera.delay) & 0xFF == ord('q'):
             break

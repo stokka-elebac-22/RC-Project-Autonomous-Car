@@ -1,6 +1,6 @@
 """QR code module."""
-import cv2 as cv
 import dataclasses
+import cv2 as cv
 
 @dataclasses.dataclass
 class PointSet:   # Combine to QRGeometry?
@@ -180,7 +180,7 @@ if __name__ == '__main__':
     qcd = cv.QRCodeDetector()
 
     while True:
-        frame = local_read_camera(video_capture=cap)
+        frame = local_read_camera()
         ret_qr, decoded_info, points, rest = qcd.detectAndDecodeMulti(frame)
         if ret_qr:
             qr_code.update(ret_qr, decoded_info, points[0], rest)

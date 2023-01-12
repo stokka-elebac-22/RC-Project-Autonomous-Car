@@ -84,9 +84,15 @@ def get_lane_lines(image, kernel_size):
     return lines
 
 
-def show_lines_and_info(image, lines):
+def show_lines(image, lines):
     if lines is not None:
-        height = image.shape[0]
+        for line in lines:
+            if line is not None:
+                x1, y1, x2, y2 = line.reshape(4)
+                cv2.line(image, (x1, y1), (x2, y2), (255, 0, 0), 20)
+
+def get_diff_from_center_info(image, lines):
+    if lines is not None:
         width = image.shape[1]
         center_car = width/2
         center_lane = 0
@@ -96,26 +102,17 @@ def show_lines_and_info(image, lines):
         real_width = 200
         for line in lines:
             if line is not None:
-                x1, y1, x2, y2 = line.reshape(4)
+                x1, _, _, _ = line.reshape(4)
                 if start is None:
                     start = x1
                 elif stop is None:
                     stop = x1
-                cv2.line(image, (x1, y1), (x2, y2), (255, 0, 0), 20)
 
-        diff = 0
+        diff = None
         if start is not None and stop is not None:
             center_lane = start + (stop-start)/2
-
-            cv2.circle(image, (int(center_car), height),
-                       5, (255, 0, 0), 10)
-            cv2.circle(image, (int(center_lane), height),
-                       5, (0, 0, 255), 10)
-
-            diff = abs(center_car - center_lane)/width * real_width
-
-        cv2.putText(
-            image, f"Diff from center: {diff}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            diff = (center_car - center_lane)/width * real_width
+        return diff
 
 
 if __name__ == "__main__":
@@ -138,7 +135,11 @@ if __name__ == "__main__":
         '''
         lines = get_lane_lines(frame, 5)
         lines = get_average_lines(frame, lines)
-        show_lines_and_info(frame, lines)
+        show_lines(frame, lines)
+        diff = get_diff_from_center_info(frame, lines)
+
+        if diff is not None:
+            cv2.putText(frame, f"Diff from center: {diff}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
 
         cv2.imshow('frame', frame)
         cv2.waitKey(0)

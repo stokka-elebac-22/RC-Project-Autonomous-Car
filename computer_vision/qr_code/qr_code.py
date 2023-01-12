@@ -25,10 +25,10 @@ class Sides:    # class names in singular
         self.side_d = sides[3]
 
     def update(self, points: Points):
-        self.side_a = abs(points.p0[0] - points.p1[0])
-        self.side_b = abs(points.p1[1] - points.p2[1])
-        self.side_c = abs(points.p2[0] - points.p3[0])
-        self.side_d = abs(points.p3[1] - points.p0[1])
+        self.side_a = abs(points.point0[0] - points.point1[0])
+        self.side_b = abs(points.point1[1] - points.point2[1])
+        self.side_c = abs(points.point2[0] - points.point3[0])
+        self.side_d = abs(points.point3[1] - points.point0[1])
 
 class QRCode:
     """QRCode, doing calculations for QR code placement estimation."""
@@ -82,12 +82,12 @@ class QRCode:
             self.display_values(frame, resize, verbose=verbose)
 
     def display_qr_code(self, frame):
-        for s, p in zip(self.decoded_info, self.points.points):
-            if s:
+        for decoded_info, pts in zip(self.decoded_info, self.points.points):
+            if decoded_info:
                 color = self.color_frame_green
             else:
                 color = self.color_frame_red
-            frame = cv.polylines(frame, [p.astype(int)], True, color, 4)
+            frame = cv.polylines(frame, [pts.astype(int)], True, color, 4)
         return frame
 
     def display_values(self, frame, resize=1, verbose=1):
@@ -118,10 +118,10 @@ class QRCode:
         height_px_resize = height_px * (1/resize)
         ratio = width_px/height_px
 
-        focalLength = (self.qr_size_px / self.qr_size_mm) * self.qr_distance
+        focal_length = (self.qr_size_px / self.qr_size_mm) * self.qr_distance
         angle = (1 - ratio) * 90
-        # the resize variable is only relevant if not using video        
-        distance = (self.qr_size_mm * focalLength) / height_px_resize 
+        # the resize variable is only relevant if not using video
+        distance = (self.qr_size_mm * focal_length) / height_px_resize
 
         self.add_anlge(angle)
         self.add_distance(distance)

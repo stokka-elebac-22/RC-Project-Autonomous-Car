@@ -26,6 +26,17 @@ jobs:
       - run: poetry install --no-interaction --no-root
         if: steps.cache-deps.outputs.cache-hit != 'true'
       - run: poetry run pytest
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Python Linter
+        uses: sunnysid3up/python-linter@v0.1-beta.7
+        with:
+          source: "computer_vision"
+          mypy-options: "--ignore-missing-imports --show-error-codes"
+          pylint-options: "--rcfile=setup.cfg"
+          isort-options: "-w 100"
+
       # - name: Set up Python 3.10
       #   uses: actions/setup-python@v4
       #   with:

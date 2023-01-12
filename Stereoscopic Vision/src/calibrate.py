@@ -11,8 +11,9 @@ import glob
 
 CHECKERBOARD_DIMENSION = (8, 6)
 CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-DIRECTORY_LEFT = 'Stereoscopic Vision/images/calibrate_left/*.jpg'
-DIRECTORY_RIGHT = 'Stereoscopic Vision/images/calibrate_right/*.jpg'
+DIRECTORY_LEFT = "Stereoscopic Vision/images/calibrate_left/*.jpg"
+DIRECTORY_RIGHT = "Stereoscopic Vision/images/calibrate_right/*.jpg"
+DESTINATION_PATH = "Stereoscopic Vision/data/stereo_rectify_maps.xml"
 
 class Calibrate:
     def __init__(self, criteria, checkerboard_dimension=(8, 6), directory_left="", directory_right=""):
@@ -62,11 +63,11 @@ class Calibrate:
                 image_points_right.append(corners_right)
                 # draw and display the corners
                 cv.drawChessboardCorners(image_left, self.checkerboard_dimension, corners_left, ret_left)
-                cv.drawChessboardCorners(image_right, self.checkerboard_dimension, corners_left, ret_left)
-                cv.imshow("left", image_left)
-                cv.imshow("right", image_right)
+                cv.drawChessboardCorners(image_right, self.checkerboard_dimension, corners_right, ret_right)
+                # cv.imshow("left", image_left)
+                # cv.imshow("right", image_right)
                 # cv.waitKey(0)
-        print(f"Could find chessboard corners in {len(object_points)} out of {len(left)} images")
+        print(f"Could find chessboard corners in {len(object_points)} out of {len(images_left)} images")
 
         cv.destroyAllWindows()
 
@@ -176,7 +177,7 @@ if "__main__" == __name__:
     stereo_map_right = cv.initUndistortRectifyMap(new_mtx_right, dist_right, rect_right, proj_mat_right, gray_right.shape[::-1], cv.CV_16SC2)
 
     print("Saving parameters...")
-    cv_file = cv.FileStorage("params.xml", cv.FILE_STORAGE_WRITE)
+    cv_file = cv.FileStorage(DESTINATION_PATH, cv.FILE_STORAGE_WRITE)
     cv_file.write("stereo_map_left_x", stereo_map_left[0])
     cv_file.write("stereo_map_left_y", stereo_map_left[1])
     cv_file.write("stereo_map_right_x", stereo_map_right[0])

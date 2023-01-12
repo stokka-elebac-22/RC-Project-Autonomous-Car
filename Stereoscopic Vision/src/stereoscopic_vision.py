@@ -27,6 +27,15 @@ class StereoscopicVision:
                 break
         cv.destroyWindow(self.window_name)
 
+    def read_stereo_map(self, path):
+        cv_file = cv.FileStorage(path, cv.FILE_STORAGE_READ)
+        stereo_map_left_x = cv_file.getNode("stereo_map_left_x").mat()
+        stereo_map_left_y = cv_file.getNode("stereo_map_left_y").mat()
+        stereo_map_right_x = cv_file.getNode("stereo_map_right_x").mat()
+        stereo_map_right_y = cv_file.getNode("stereo_map_right_y").mat()
+        cv_file.release()
+        return stereo_map_left_x, stereo_map_left_y, stereo_map_right_x, stereo_map_right_y
+
     def disparity(self, frame1, frame2):
         frame1 = cv.cvtColor(frame1, cv.COLOR_BGR2GRAY)
         frame2 = cv.cvtColor(frame2, cv.COLOR_BGR2GRAY)

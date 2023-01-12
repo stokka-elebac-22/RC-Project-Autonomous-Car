@@ -1,3 +1,0 @@
-numpy>=1.21
-opencv-python>=4.5.2
-pyzbar>=0.1.8

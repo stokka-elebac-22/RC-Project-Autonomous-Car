@@ -10,7 +10,7 @@ class Points:
 
     def update(self, points):
         self.points = points
-        points = points[0] # Because of the format from the qr code points
+        #points = points[0] # Because of the format from the qr code points
         self.p0 = points[0]
         self.p1 = points[1]
         self.p2 = points[2]

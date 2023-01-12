@@ -8,6 +8,7 @@ packages = [{include = "computer_vision"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+opencv-python = "^4.7.0.68"
 
 
 [tool.poetry.group.dev.dependencies]

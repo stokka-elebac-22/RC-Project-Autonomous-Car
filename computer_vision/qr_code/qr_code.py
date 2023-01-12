@@ -131,8 +131,8 @@ class QRCode:
 
         frame = cv.putText(frame, f'angle    = {self.get_average_angle()}', (10, 20), self.font, \
                             self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
-        frame = cv.putText(frame, f'distance = {self.get_average_distance()}', (10, 50), self.font, \
-                            self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
+        frame = cv.putText(frame, f'distance = {self.get_average_distance()}', (10, 50), \
+                self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
     def add_anlge(self, angle):
         if angle is None:
@@ -152,29 +152,41 @@ class QRCode:
     def get_average_distance(self) -> int:
         return sum(self.distance)//self.values_length
 
+def local_read_camera(name=None, resize=1):
+    if not name:
+        ret, frame = cap.read()
+        if not ret:
+            raise SystemError
+    else:
+        frame = cv.imread(name)
+    frame = cv.resize(frame, (0, 0), fx = resize, fy = resize)
+    return frame
+
 
 if "__main__" == __name__:
-    from camera import Camera
     # ----- ORIGINAL MEASUREMENTS -----
     # QR Code measured, 55mm lense
     QR_SIZE_PX = 76
     QR_SIZE_MM = 52
     QR_DISTANCE = 500
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
-    camera = Camera()
+    camera_id = 0
+    delay = 1
+    window_name = 'window'
+    cap = cv.VideoCapture(camera_id)
     VERBOSE = 1
 
     qcd = cv.QRCodeDetector()
 
     while True:
-        frame = camera.read()
+        frame = local_read_camera(video_capture=cap)
         ret_qr, decoded_info, points, rest = qcd.detectAndDecodeMulti(frame)
         if ret_qr:
             qr_code.update(ret_qr, decoded_info, points[0], rest)
             qr_code.display(frame, verbose=VERBOSE)
-        cv.imshow(camera.window_name, frame)
-        if cv.waitKey(camera.delay) & 0xFF == ord('q'):
+        cv.imshow(window_name, frame)
+        if cv.waitKey(delay) & 0xFF == ord('q'):
             break
-    cv.destroyWindow(camera.window_name)
+    cv.destroyWindow(window_name)
 
-    camera.run(verbose=2)
+    # camera.run(verbose=2)

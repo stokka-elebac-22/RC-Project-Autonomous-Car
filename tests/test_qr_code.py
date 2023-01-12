@@ -1,9 +1,9 @@
 # test_qr_code.py
-from computer_vision.qr_code.qr_code import Points, Sides
+from computer_vision.qr_code.qr_code import PointSet, SideSet
 import pytest
 
 def test_points_update():
-    points = Points()
+    points = PointSet()
     points.update([0, 1, 2, 3])
     assert points.point0 == 0
     assert points.point1 == 1
@@ -11,8 +11,8 @@ def test_points_update():
     assert points.point3 == 3
 
 def test_sides_update():
-    sides = Sides()
-    points = Points([[0, 0], [0, 2], [0, 3], [0, 1]])
+    sides = SideSet()
+    points = PointSet([[0, 0], [0, 2], [0, 3], [0, 1]])
     sides.update(points)
     assert sides.side_a == 0
     assert sides.side_b == 1

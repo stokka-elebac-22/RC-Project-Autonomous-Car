@@ -26,10 +26,10 @@ class StereoscopicVision:
         stereo_map_left_x, stereo_map_left_y, stereo_map_right_x, stereo_map_right_y = self.read_stereo_map(path)
         stereo = cv.StereoBM_create(numDisparities=self.num_disparities, blockSize=self.block_size)
 
-        cv.namedWindow('disp',cv.WINDOW_NORMAL)
-        cv.resizeWindow('disp',600,600)
+        cv.namedWindow('disp', cv.WINDOW_NORMAL)
+        cv.resizeWindow('disp', 800,600)
 
-        def nothing():
+        def nothing(x):
             pass
 
         cv.createTrackbar('numDisparities','disp',1,17, nothing)
@@ -47,6 +47,7 @@ class StereoscopicVision:
         while True:
             ret_left, frame_left = self.cam_left.read()
             ret_right, frame_right = self.cam_right.read()
+
             if ret_left and ret_right:
                 gray_left = cv.cvtColor(frame_left, cv.COLOR_BGR2GRAY)
                 gray_right = cv.cvtColor(frame_right, cv.COLOR_BGR2GRAY)
@@ -55,6 +56,35 @@ class StereoscopicVision:
                 rect_left = cv.remap(gray_left, stereo_map_left_x, stereo_map_left_y, cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
                 # Applying stereo image rectification on the right image
                 rect_right = cv.remap(gray_right, stereo_map_right_x, stereo_map_right_y, cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
+
+                # cv.imshow('left', rect_left)
+                # cv.imshow('right', rect_right)
+
+                # Updating the parameters based on the trackbar positions
+                numDisparities = cv.getTrackbarPos('numDisparities','disp')*16 + 16 # just so you do not make it 0 and program crashes
+                blockSize = cv.getTrackbarPos('blockSize','disp')*2 + 5
+                preFilterType = cv.getTrackbarPos('preFilterType','disp')
+                preFilterSize = cv.getTrackbarPos('preFilterSize','disp')*2 + 5
+                preFilterCap = cv.getTrackbarPos('preFilterCap','disp')
+                textureThreshold = cv.getTrackbarPos('textureThreshold','disp')
+                uniquenessRatio = cv.getTrackbarPos('uniquenessRatio','disp')
+                speckleRange = cv.getTrackbarPos('speckleRange','disp')
+                speckleWindowSize = cv.getTrackbarPos('speckleWindowSize','disp')*2
+                disp12MaxDiff = cv.getTrackbarPos('disp12MaxDiff','disp')
+                minDisparity = cv.getTrackbarPos('minDisparity','disp')
+
+                # Setting the updated parameters before computing disparity map
+                stereo.setNumDisparities(numDisparities)
+                stereo.setBlockSize(blockSize)
+                stereo.setPreFilterType(preFilterType)
+                stereo.setPreFilterSize(preFilterSize)
+                stereo.setPreFilterCap(preFilterCap)
+                stereo.setTextureThreshold(textureThreshold)
+                stereo.setUniquenessRatio(uniquenessRatio)
+                stereo.setSpeckleRange(speckleRange)
+                stereo.setSpeckleWindowSize(speckleWindowSize)
+                stereo.setDisp12MaxDiff(disp12MaxDiff)
+                stereo.setMinDisparity(minDisparity)
 
                 disparity = stereo.compute(rect_left, rect_right)
                 """
@@ -66,39 +96,13 @@ class StereoscopicVision:
                 disparity = disparity.astype(np.float32)
 
                 # Scaling down the disparity values and normalizing them
-                disparity = (disparity/16.0 - self.min_disparity)/self.num_disparities
+                disparity = (disparity/16.0 - minDisparity)/numDisparities
 
                 # Displaying the disparity
                 cv.imshow('disparity', disparity)
 
                 if cv.waitKey(self.delay) & 0xFF == ord('q'):
                     break
-
-                # Updating the parameters based on the trackbar positions
-            numDisparities = cv.getTrackbarPos('numDisparities','disp')*16
-            blockSize = cv.getTrackbarPos('blockSize','disp')*2 + 5
-            preFilterType = cv.getTrackbarPos('preFilterType','disp')
-            preFilterSize = cv.getTrackbarPos('preFilterSize','disp')*2 + 5
-            preFilterCap = cv.getTrackbarPos('preFilterCap','disp')
-            textureThreshold = cv.getTrackbarPos('textureThreshold','disp')
-            uniquenessRatio = cv.getTrackbarPos('uniquenessRatio','disp')
-            speckleRange = cv.getTrackbarPos('speckleRange','disp')
-            speckleWindowSize = cv.getTrackbarPos('speckleWindowSize','disp')*2
-            disp12MaxDiff = cv.getTrackbarPos('disp12MaxDiff','disp')
-            minDisparity = cv.getTrackbarPos('minDisparity','disp')
-
-            # Setting the updated parameters before computing disparity map
-            stereo.setNumDisparities(numDisparities)
-            stereo.setBlockSize(blockSize)
-            stereo.setPreFilterType(preFilterType)
-            stereo.setPreFilterSize(preFilterSize)
-            stereo.setPreFilterCap(preFilterCap)
-            stereo.setTextureThreshold(textureThreshold)
-            stereo.setUniquenessRatio(uniquenessRatio)
-            stereo.setSpeckleRange(speckleRange)
-            stereo.setSpeckleWindowSize(speckleWindowSize)
-            stereo.setDisp12MaxDiff(disp12MaxDiff)
-            stereo.setMinDisparity(minDisparity)
 
         cv.destroyWindow(self.window_name)
 
@@ -113,9 +117,9 @@ class StereoscopicVision:
 
 if "__main__" == __name__:
     '''
-    NOTE: if you also have a webcam (that you do not want to use), use id 0 and 2
+    NOTE: if you also have a webcam (that you do not want to use), use id 0 and 2 (not always the case....)
     '''
     cam_left = Camera(camera_id=0, window_name='Left camera')
-    cam_right = Camera(camera_id=2, window_name='Right camera')
+    cam_right = Camera(camera_id=1, window_name='Right camera')
     stereo_vision = StereoscopicVision(cam_left, cam_right)
     stereo_vision.run()

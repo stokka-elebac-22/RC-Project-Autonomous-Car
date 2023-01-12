@@ -63,7 +63,7 @@ class Calibrate:
         new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
         return new_camera_matrix, roi
 
-    def undistort(self, img, mtx, dist, new_camera_matrix, roi): 
+    def undistort(self, img, mtx, dist, new_camera_matrix, roi):
         # undistort
         mapx, mapy = cv.initUndistortRectifyMap(mtx, dist, None, new_camera_matrix, (w, h), 5)
         dst = cv.remap(img, mapx, mapy, cv.INTER_LINEAR)
@@ -77,7 +77,7 @@ class Calibrate:
     def re_projection_error(self, object_points, image_points, rvecs, tvecs, mtx, dist):
         ##### RE-PROJECTION ERROR #####
         # From the source:
-        # Re-projection error gives a good estimation of just how exact is the found parameters. 
+        # Re-projection error gives a good estimation of just how exact is the found parameters.
         # This should be as close to 0 as possible.
 
         mean_error = 0

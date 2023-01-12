@@ -6,7 +6,7 @@ class StereoscopicVision:
     def __init__(self, cam1: Camera, cam2: Camera, delay=1, num_disparities=0, block_size=21) -> None:
         # CAMERAS
         self.cam1 = cam1
-        self.cam2 = cam2 
+        self.cam2 = cam2
 
         self.num_disparities = num_disparities
         self.block_size = block_size
@@ -30,8 +30,7 @@ class StereoscopicVision:
     def disparity(self, frame1, frame2):
         frame1 = cv.cvtColor(frame1, cv.COLOR_BGR2GRAY)
         frame2 = cv.cvtColor(frame2, cv.COLOR_BGR2GRAY)
-            
+
         stereo = cv.StereoBM_create(numDisparities=self.num_disparities, blockSize=self.block_size)
         disparity = stereo.compute(frame1, frame2)
         return disparity
-        

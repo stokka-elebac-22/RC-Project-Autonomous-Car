@@ -23,7 +23,7 @@ while True:
             continue
         frames.append((frame, cam.window_name))
         cv.imshow(cam.window_name, frame)
-    
+
     if cv.waitKey(1) & 0xFF == ord('c'): # capture frame by pressing c
         print('Capturing...')
         for i, frame in enumerate(frames):

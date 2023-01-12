@@ -1,5 +1,4 @@
 import cv2 as cv
-import camera
 
 class Camera:
     def __init__(self, camera_id=0, delay=1, window_name='window'):

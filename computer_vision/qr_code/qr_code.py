@@ -1,5 +1,4 @@
 import cv2 as cv
-from camera import Camera
 
 class Points:   # class names in singular
     """Points, used by qrcode."""
@@ -152,6 +151,7 @@ class QRCode:
 
 
 if "__main__" == __name__:
+    from camera import Camera
     # ----- ORIGINAL MEASUREMENTS -----
     # QR Code measured, 55mm lense
     QR_SIZE_PX = 76

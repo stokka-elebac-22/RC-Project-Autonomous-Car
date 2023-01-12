@@ -1,5 +1,5 @@
-import cv2
 import sys
+import cv2
 from PyQt6 import QtGui, QtCore, QtWidgets
 
 class DisplayImageWidget(QtWidgets.QWidget):

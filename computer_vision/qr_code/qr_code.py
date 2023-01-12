@@ -1,41 +1,33 @@
 import cv2 as cv
 from camera import Camera
 
-# ----- ORIGINAL MEASUREMENTS -----
-# QR Code measured, 55mm lense
-QR_SIZE_PX = 76
-QR_SIZE_MM = 52
-QR_DISTANCE = 500
-
 class Points:
     def __init__(self, points=[0, 0, 0, 0]):
         self.points = points
-        self.p0 = points[0]
-        self.p1 = points[1]
-        self.p2 = points[2]
-        self.p3 = points[3]
+        self.point0 = points[0]
+        self.point1 = points[1]
+        self.point2 = points[2]
+        self.point3 = points[3]
 
     def update(self, points):
         self.points = points
-        #points = points[0] # Because of the format from the qr code points
-        self.p0 = points[0]
-        self.p1 = points[1]
-        self.p2 = points[2]
-        self.p3 = points[3]
+        self.point0 = points[0]
+        self.point1 = points[1]
+        self.point2 = points[2]
+        self.point3 = points[3]
 
 class Sides:
     def __init__(self, sides=[0, 0, 0, 0]):
-        self.a = sides[0]
-        self.b = sides[1]
-        self.c = sides[2]
-        self.d = sides[3]
+        self.side_a = sides[0]
+        self.side_b = sides[1]
+        self.side_c = sides[2]
+        self.side_d = sides[3]
 
     def update(self, points: Points):
-        self.a = abs(points.p0[0] - points.p1[0])
-        self.b = abs(points.p1[1] - points.p2[1])
-        self.c = abs(points.p2[0] - points.p3[0])
-        self.d = abs(points.p3[1] - points.p0[1])
-
+        self.side_a = abs(points.p0[0] - points.p1[0])
+        self.side_b = abs(points.p1[1] - points.p2[1])
+        self.side_c = abs(points.p2[0] - points.p3[0])
+        self.side_d = abs(points.p3[1] - points.p0[1])
 
 class QRCode:
     """
@@ -98,20 +90,20 @@ class QRCode:
 
     def display_values(self, frame, resize=1, verbose=1):
         if verbose > 1:
-            text_location_a = (int(min(self.points.p0[0], self.points.p1[0]) + self.sides.a/2), int(self.points.p0[1]))
-            text_location_b = (int(self.points.p1[0]), int(min(self.points.p1[1], self.points.p2[1]) + self.sides.b/2))
-            text_location_c = (int(min(self.points.p2[0], self.points.p3[0]) + self.sides.c/2), int(self.points.p2[1]))
-            text_location_d = (int(self.points.p3[0]), int(min(self.points.p3[1], self.points.p0[1]) + self.sides.d/2))
+            text_location_a = (int(min(self.points.point0[0], self.points.point1[0]) + self.sides.side_a/2), int(self.points.point0[1]))
+            text_location_b = (int(self.points.point1[0]), int(min(self.points.point1[1], self.points.point2[1]) + self.sides.side_b/2))
+            text_location_c = (int(min(self.points.point2[0], self.points.point3[0]) + self.sides.side_c/2), int(self.points.point2[1]))
+            text_location_d = (int(self.points.point3[0]), int(min(self.points.point3[1], self.points.point0[1]) + self.sides.side_d/2))
 
-            cv.putText(frame, str(int(self.sides.a)), text_location_a, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
-            cv.putText(frame, str(int(self.sides.b)), text_location_b, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
-            cv.putText(frame, str(int(self.sides.c)), text_location_c, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
-            cv.putText(frame, str(int(self.sides.d)), text_location_d, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
+            cv.putText(frame, str(int(self.sides.side_a)), text_location_a, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
+            cv.putText(frame, str(int(self.sides.side_b)), text_location_b, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
+            cv.putText(frame, str(int(self.sides.side_c)), text_location_c, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
+            cv.putText(frame, str(int(self.sides.side_d)), text_location_d, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
 
-        width_px = max(abs(self.points.p0[0] - self.points.p1[0]) * (1 / resize),
-        abs(self.points.p2[0] - self.points.p3[0]))
-        height_px = max(abs(self.points.p3[1] - self.points.p0[1]),
-        abs(self.points.p2[1] - self.points.p1[1]))
+        width_px = max(abs(self.points.point0[0] - self.points.point1[0]) * (1 / resize),
+        abs(self.points.point2[0] - self.points.point3[0]))
+        height_px = max(abs(self.points.point3[1] - self.points.point0[1]),
+        abs(self.points.point2[1] - self.points.point1[1]))
 
         height_px_resize = height_px * (1/resize)
         ratio = width_px/height_px
@@ -146,6 +138,11 @@ class QRCode:
 
 
 if "__main__" == __name__:
+    # ----- ORIGINAL MEASUREMENTS -----
+    # QR Code measured, 55mm lense
+    QR_SIZE_PX = 76
+    QR_SIZE_MM = 52
+    QR_DISTANCE = 500
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
     camera = Camera()
     verbose = 1

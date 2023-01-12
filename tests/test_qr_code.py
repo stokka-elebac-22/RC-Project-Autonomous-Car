@@ -19,5 +19,5 @@ def test_sides_update():
     assert sides.c == 0
     assert sides.d == 1
 
-# test on pictures with approx 
+# test on pictures with approx
 # https://docs.pytest.org/en/4.6.x/reference.html

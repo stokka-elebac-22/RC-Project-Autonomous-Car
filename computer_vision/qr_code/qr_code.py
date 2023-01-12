@@ -15,7 +15,7 @@ class Points:
         self.p1 = points[1]
         self.p2 = points[2]
         self.p3 = points[3]
-    
+
 class Sides:
     def __init__(self, sides=[0, 0, 0, 0]):
         self.a = sides[0]
@@ -40,11 +40,11 @@ class QRCode:
             |             |
             p1 ---------- p0
                     a
-        
+
     """
     def __init__(self, size_px, size_mm, distance, values_length=10):
         self.ret_qr = None
-        self.decoded_info = None 
+        self.decoded_info = None
         self.points = Points()
         self.rest = None
         self.sides = Sides()
@@ -98,7 +98,7 @@ class QRCode:
 
             cv.putText(frame, str(int(self.sides.a)), text_location_a, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
             cv.putText(frame, str(int(self.sides.b)), text_location_b, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
-            cv.putText(frame, str(int(self.sides.c)), text_location_c, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA) 
+            cv.putText(frame, str(int(self.sides.c)), text_location_c, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
             cv.putText(frame, str(int(self.sides.d)), text_location_d, self.font, self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
 
         width_px = max(abs(self.points.p0[0] - self.points.p1[0]) * (1 / resize),
@@ -124,11 +124,11 @@ class QRCode:
             return
         self.angles.pop(0)
         self.angles.append(angle)
-    
+
     def add_distance(self, distance):
         if distance is None:
             return
-        self.distance.pop(0) 
+        self.distance.pop(0)
         self.distance.append(distance)
 
     def get_average_angle(self) -> int:

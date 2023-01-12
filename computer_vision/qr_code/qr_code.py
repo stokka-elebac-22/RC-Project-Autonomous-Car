@@ -1,4 +1,11 @@
 import cv2 as cv
+from camera import Camera
+
+# ----- ORIGINAL MEASUREMENTS -----
+# QR Code measured, 55mm lense
+QR_SIZE_PX = 76
+QR_SIZE_MM = 52
+QR_DISTANCE = 500
 
 class Points:
     def __init__(self, points=[0, 0, 0, 0]):
@@ -75,7 +82,7 @@ class QRCode:
 
         self.sides.update(self.points)
 
-    def display(self, frame, resize, verbose):
+    def display(self, frame, resize=1, verbose=1):
         self.display_qr_code(frame)
         if verbose > 0:
             self.display_values(frame, resize, verbose=verbose)
@@ -105,7 +112,7 @@ class QRCode:
         abs(self.points.p2[0] - self.points.p3[0]))
         height_px = max(abs(self.points.p3[1] - self.points.p0[1]),
         abs(self.points.p2[1] - self.points.p1[1]))
-        # width_px_resize = width_px * (1/resize)
+
         height_px_resize = height_px * (1/resize)
         ratio = width_px/height_px
 
@@ -136,3 +143,26 @@ class QRCode:
 
     def get_average_distance(self) -> int:
         return sum(self.distance)//self.values_length
+
+
+if "__main__" == __name__:
+    qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+    camera = Camera()
+    verbose = 1
+
+    qcd = cv.QRCodeDetector()
+    qr_code = qr_code
+
+
+    while True:
+        frame = camera.read()
+        ret_qr, decoded_info, points, rest = qcd.detectAndDecodeMulti(frame)
+        if ret_qr:
+            qr_code.update(ret_qr, decoded_info, points[0], rest)
+            qr_code.display(frame, verbose=verbose)
+        cv.imshow(camera.window_name, frame)
+        if cv.waitKey(camera.delay) & 0xFF == ord('q'):
+            break
+    cv.destroyWindow(camera.window_name)
+
+    camera.run(verbose=2)

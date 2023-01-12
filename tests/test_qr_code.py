@@ -1,5 +1,5 @@
 # test_qr_code.py
-from computer_vision.QRcode.qr_code import Points, Sides
+from computer_vision.qr_code.qr_code import Points, Sides
 import pytest
 
 def test_points_update():
@@ -18,3 +18,6 @@ def test_sides_update():
     assert sides.b == 1
     assert sides.c == 0
     assert sides.d == 1
+
+# test on pictures with approx 
+# https://docs.pytest.org/en/4.6.x/reference.html

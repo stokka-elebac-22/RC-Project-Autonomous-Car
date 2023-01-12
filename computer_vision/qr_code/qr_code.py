@@ -153,7 +153,6 @@ if "__main__" == __name__:
     qcd = cv.QRCodeDetector()
     qr_code = qr_code
 
-
     while True:
         frame = camera.read()
         ret_qr, decoded_info, points, rest = qcd.detectAndDecodeMulti(frame)

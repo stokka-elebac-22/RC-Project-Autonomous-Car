@@ -1,3 +1,4 @@
+"""QR code module."""
 import cv2 as cv
 import dataclasses
 
@@ -27,7 +28,7 @@ class SideSet:    # class names in singular
         self.side_c = sides[2]
         self.side_d = sides[3]
 
-    def update(self, points: Points):
+    def update(self, points: PointSet):
         self.side_a = abs(points.point0[0] - points.point1[0])
         self.side_b = abs(points.point1[1] - points.point2[1])
         self.side_c = abs(points.point2[0] - points.point3[0])
@@ -163,17 +164,17 @@ def local_read_camera(name=None, resize=1):
     return frame
 
 
-if "__main__" == __name__:
+if __name__ == '__main__':
     # ----- ORIGINAL MEASUREMENTS -----
     # QR Code measured, 55mm lense
     QR_SIZE_PX = 76
     QR_SIZE_MM = 52
     QR_DISTANCE = 500
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
-    camera_id = 0
-    delay = 1
-    window_name = 'window'
-    cap = cv.VideoCapture(camera_id)
+    CAMERA_ID = 0
+    DELAY = 1
+    WINDOW_NAME = 'window'
+    cap = cv.VideoCapture(CAMERA_ID)
     VERBOSE = 1
 
     qcd = cv.QRCodeDetector()
@@ -184,9 +185,9 @@ if "__main__" == __name__:
         if ret_qr:
             qr_code.update(ret_qr, decoded_info, points[0], rest)
             qr_code.display(frame, verbose=VERBOSE)
-        cv.imshow(window_name, frame)
-        if cv.waitKey(delay) & 0xFF == ord('q'):
+        cv.imshow(WINDOW_NAME, frame)
+        if cv.waitKey(DELAY) & 0xFF == ord('q'):
             break
-    cv.destroyWindow(window_name)
+    cv.destroyWindow(WINDOW_NAME)
 
     # camera.run(verbose=2)

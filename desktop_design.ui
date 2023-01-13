@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>931</width>
+    <height>653</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Camera view</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1">
+        <item>
+         <layout class="QVBoxLayout" name="output_layout" stretch="1,0,1">
+          <item>
+           <widget class="QGraphicsView" name="output_img"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="lbl_output_description">
+            <property name="text">
+             <string>Output data:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="output_lbl">
+            <property name="frameShape">
+             <enum>QFrame::Box</enum>
+            </property>
+            <property name="text">
+             <string>txt_output</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="input_layout" stretch="1,2">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <item>
+               <widget class="QCheckBox" name="input_chk_enable_1">
+                <property name="text">
+                 <string>camera 1 enable</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGraphicsView" name="input_img_1"/>
+              </item>
+              <item>
+               <widget class="QComboBox" name="input_cbo_1"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_5">
+              <item>
+               <widget class="QCheckBox" name="input_chk_enable_2">
+                <property name="text">
+                 <string>camera 2 enable</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGraphicsView" name="input_img_2"/>
+              </item>
+              <item>
+               <widget class="QComboBox" name="input_cbo_2"/>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_3"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_4">
+       <attribute name="title">
+        <string>Graph view</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>Socket connection</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Configuration</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>931</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -8,6 +8,16 @@ import warnings
 # NOTE:
 # need to change paremeters through test and fail does not work for all images with the same parameters
 
+# TODO:
+#1. Warp perspective lane
+#2. Draw circle on lane image
+#3. Use circle to find intersection point 
+#    1. Two images: one circle on each
+#    2. Circle white, background black
+#    3. Check pixel for pixel which pixel that’s white on each picture
+#4. Draw back lane on original image with the circles if wanted???
+
+
 
 def get_lane_region(image):
     offset = 250
@@ -116,7 +126,7 @@ def get_diff_from_center_info(image, lines):
 
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture("./assets/challenge_video.mp4")
+    #cap = cv2.VideoCapture("./assets/challenge_video.mp4")
     frame = cv2.imread("lane_detection/assets/sykkelbane.jpg")
 
     scale_percent = 30  # percent of original size
@@ -145,5 +155,5 @@ if __name__ == "__main__":
         cv2.waitKey(0)
         break
 
-    cap.release()
+    #cap.release()
     cv2.destroyAllWindows()

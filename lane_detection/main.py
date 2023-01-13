@@ -73,9 +73,9 @@ def get_average_lines(image, lines):
 def get_lane_lines(image, kernel_size):
     #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gaussianBlur = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
-    low_treshold = 100
-    high_treshold = 200
-    canny = cv2.Canny(gaussianBlur, low_treshold, high_treshold)
+    low_threshold = 100
+    high_threshold = 200
+    canny = cv2.Canny(gaussianBlur, low_threshold, high_threshold)
     dilate = cv2.dilate(canny, (3, 3), iterations=1)
     roi = get_lane_region(dilate)
     lines = cv2.HoughLinesP(

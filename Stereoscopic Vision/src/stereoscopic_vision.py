@@ -84,7 +84,7 @@ if "__main__" == __name__:
         ret_left, frame_left = cam_left.read()
         ret_right, frame_right = cam_right.read()
         if ret_left and ret_right:
-            disparity = stereo_vision.get_disparity(frame_left, frame_right)
+            disp = stereo_vision.get_disparity(frame_left, frame_right)
             # Displaying the disparity
             # Updating the parameters based on the trackbar positions
             numDisparities = cv.getTrackbarPos('numDisparities','disp')*16 + 16
@@ -115,7 +115,7 @@ if "__main__" == __name__:
             stereo_vision.num_disp = numDisparities
             stereo_vision.min_disp = minDisparity
 
-            cv.imshow('disparity', disparity)
+            cv.imshow('disparity', disp)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
 

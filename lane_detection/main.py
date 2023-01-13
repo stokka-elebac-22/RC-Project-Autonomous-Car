@@ -9,13 +9,15 @@ import warnings
 # need to change paremeters through test and fail does not work for all images with the same parameters
 
 # TODO:
-#1. Warp perspective lane
+#1. Warp perspective lane OK!
 #2. Draw circle on lane image
 #3. Use circle to find intersection point 
 #    1. Two images: one circle on each
 #    2. Circle white, background black
 #    3. Check pixel for pixel which pixel that’s white on each picture
-#4. Draw back lane on original image with the circles if wanted???
+#4. Draw back lane on original image with the circles if wanted??? OK!
+
+
 
 
 
@@ -124,6 +126,39 @@ def get_diff_from_center_info(image, lines):
             diff = (center_car - center_lane)/width * real_width
         return diff
 
+def show_circles(image, points_coordinates):
+
+    coordinates_x = [points_coordinates[0][0], points_coordinates[1][0]]
+    coordinates_y = [points_coordinates[0][3], points_coordinates[1][3]]
+    width = max(coordinates_x) - min(coordinates_x)
+    height = image.shape[0] 
+
+
+    output = np.float32([[0,0],
+                        [0, height],
+                        [width, height],
+                        [width, 0]])
+
+    input = np.float32([[points_coordinates[0][2],points_coordinates[0][3]],
+                        [points_coordinates[0][0],points_coordinates[0][1]],
+                        [points_coordinates[1][0],points_coordinates[1][1]],
+                        [points_coordinates[1][2],points_coordinates[1][3]]])
+
+    pertransform = cv2.getPerspectiveTransform(input, output)
+    warped = cv2.warpPerspective(image, pertransform, (width, height), flags=cv2.INTER_LINEAR)
+    cv2.circle(warped, (int(warped.shape[1]/2),int(warped.shape[0]/2)), 300, (255, 0, 0), 20)
+    cv2.circle(warped, (int(warped.shape[1]/2),int(warped.shape[0]/2)), 10, (255, 0, 0), 20)
+
+    get_diff_from_center_info(frame, points_coordinates)
+
+    unwarped = cv2.warpPerspective(warped, np.linalg.inv(pertransform), (image.shape[1], height), cv2.BORDER_TRANSPARENT)
+
+    weighted = cv2.addWeighted(image,0.4,unwarped,0.2,0)
+
+    cv2.imshow("warped", warped)
+    cv2.imshow("unwarped", unwarped)
+    cv2.imshow("weighted", weighted)
+    
 
 if __name__ == "__main__":
     #cap = cv2.VideoCapture("./assets/challenge_video.mp4")
@@ -150,6 +185,8 @@ if __name__ == "__main__":
 
         if diff is not None:
             cv2.putText(frame, f"Diff from center: {diff}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
+
+        show_circles(frame, lines)
 
         cv2.imshow('frame', frame)
         cv2.waitKey(0)

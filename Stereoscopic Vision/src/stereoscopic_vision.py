@@ -1,3 +1,4 @@
+"""Importing necessary libraries"""
 import cv2 as cv
 import numpy as np
 from camera import Camera
@@ -10,55 +11,56 @@ QR_DISTANCE = 500
 
 
 class StereoscopicVision:
-    def __init__(self, path="", num_disparities=0, block_size=5, min_disparity=5) -> None:
-        # TODO: Change the variables as the one we want
-        self.num_disparities = num_disparities
+    """
+    DOC:
+    """
+    def __init__(self, path="", num_disp=0, block_size=5, min_disp=5) -> None:
+        self.num_disp = num_disp
         self.block_size = block_size
-        self.min_disparity = min_disparity
+        self.min_disp = min_disp
 
-        """The path is the path to the calibration paramters (xml file)"""
-        self.stereo_map_left_x, self.stereo_map_left_y, self.stereo_map_right_x, self.stereo_map_right_y = self.read_stereo_map(path)
-        self.stereo = cv.StereoBM_create(numDisparities=self.num_disparities, blockSize=self.block_size)
+        # The path is the path to the calibration paramters (xml file)
+        self.stereo_map_left, self.stereo_map_right = self.read_stereo_map(path)
+        self.stereo = cv.StereoBM_create(numDisparities=self.num_disp, blockSize=self.block_size)
 
     def get_disparity(self, image_left, image_right):
+        """Calculates and return the disparity"""
         gray_left = cv.cvtColor(image_left, cv.COLOR_BGR2GRAY)
         gray_right = cv.cvtColor(image_right, cv.COLOR_BGR2GRAY)
 
         # Applying stereo image rectification on the left image
-        rect_left = cv.remap(gray_left, self.stereo_map_left_x, self.stereo_map_left_y, cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
+        rect_left = cv.remap(gray_left, self.stereo_map_left[0], self.stereo_map_left[1], cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
         # Applying stereo image rectification on the right image
-        rect_right = cv.remap(gray_right, self.stereo_map_right_x, self.stereo_map_right_y, cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
+        rect_right = cv.remap(gray_right, self.stereo_map_right[0], self.stereo_map_right[1], cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
 
         disparity = self.stereo.compute(rect_left, rect_right)
-        """
-        NOTE: Code returns a 16bit signed single channel image (CV_16S), containing a disparity map scaled by 16.
-        Hence it is essential to convert it to CV_32F and scale it down 16 times.
-        """
+        # NOTE: Code returns a 16bit signed single channel image (CV_16S), containing a disparity map scaled by 16.
+        # Hence it is essential to convert it to CV_32F and scale it down 16 times.
 
         # Converting to float32
         disparity = disparity.astype(np.float32)
 
         # Scaling down the disparity values and normalizing them
-        disparity = (disparity/16.0 - self.min_disparity)/self.num_disparities
+        disparity = (disparity/16.0 - self.min_disp)/self.num_disp
 
         return disparity
 
     def read_stereo_map(self, path):
+        """Reading from stereo map xml file"""
         cv_file = cv.FileStorage(path, cv.FILE_STORAGE_READ)
         stereo_map_left_x = cv_file.getNode("stereo_map_left_x").mat()
         stereo_map_left_y = cv_file.getNode("stereo_map_left_y").mat()
         stereo_map_right_x = cv_file.getNode("stereo_map_right_x").mat()
         stereo_map_right_y = cv_file.getNode("stereo_map_right_y").mat()
         cv_file.release()
-        return stereo_map_left_x, stereo_map_left_y, stereo_map_right_x, stereo_map_right_y
+        return (stereo_map_left_x, stereo_map_left_y), (stereo_map_right_x, stereo_map_right_y)
 
-def nothing(x):
-    pass
+def nothing(_):
+    """Empty function"""
 
 if "__main__" == __name__:
-    '''
-    NOTE: if you also have a webcam (that you do not want to use), use id 0 and 2 (not always the case....)
-    '''
+    # NOTE: if you also have a webcam (that you do not want to use),
+    # use id 0 and 2 (not always the case....)
     cam_left = Camera(camera_id=0, window_name='Left camera')
     cam_right = Camera(camera_id=1, window_name='Right camera')
     stereo_vision = StereoscopicVision(path="Stereoscopic Vision/data/stereo_rectify_maps.xml")
@@ -85,7 +87,7 @@ if "__main__" == __name__:
             disparity = stereo_vision.get_disparity(frame_left, frame_right)
             # Displaying the disparity
             # Updating the parameters based on the trackbar positions
-            numDisparities = cv.getTrackbarPos('numDisparities','disp')*16 + 16 # just so you do not make it 0 and program crashes
+            numDisparities = cv.getTrackbarPos('numDisparities','disp')*16 + 16
             blockSize = cv.getTrackbarPos('blockSize','disp')*2 + 5
             preFilterType = cv.getTrackbarPos('preFilterType','disp')
             preFilterSize = cv.getTrackbarPos('preFilterSize','disp')*2 + 5
@@ -110,12 +112,11 @@ if "__main__" == __name__:
             stereo_vision.stereo.setDisp12MaxDiff(disp12MaxDiff)
             stereo_vision.stereo.setMinDisparity(minDisparity)
 
-            stereo_vision.num_disparities = numDisparities
-            stereo_vision.min_disparity = minDisparity
+            stereo_vision.num_disp = numDisparities
+            stereo_vision.min_disp = minDisparity
 
             cv.imshow('disparity', disparity)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
 
     cv.destroyWindow(stereo_vision.window_name)
-

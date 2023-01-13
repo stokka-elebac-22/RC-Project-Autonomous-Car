@@ -5,34 +5,40 @@ import cv2 as cv
 @dataclasses.dataclass
 class PointSet:   # Combine to QRGeometry?
     """PointSet, used by qrcode."""
-    def __init__(self, points=[0, 0, 0, 0]):
-        self.points = points
-        self.point0 = points[0]
-        self.point1 = points[1]
-        self.point2 = points[2]
-        self.point3 = points[3]
+    def __init__(self, pts=None):
+        if pts is None or len(pts) < 4:
+            pts = [0,0,0,0]
+        self.points = pts
+        self.point0 = pts[0]
+        self.point1 = pts[1]
+        self.point2 = pts[2]
+        self.point3 = pts[3]
 
-    def update(self, points):
-        self.points = points
-        self.point0 = points[0]
-        self.point1 = points[1]
-        self.point2 = points[2]
-        self.point3 = points[3]
+    def update(self, pts):
+        """update points, used by qrcode."""
+        self.points = pts
+        self.point0 = pts[0]
+        self.point1 = pts[1]
+        self.point2 = pts[2]
+        self.point3 = pts[3]
 
 @dataclasses.dataclass
 class SideSet:    # class names in singular
     """SideSet, used by qrcode."""
-    def __init__(self, sides=[0, 0, 0, 0]):
+    def __init__(self, sides=None):
+        if sides is None or len(sides) < 4:
+            sides = [0,0,0,0]
         self.side_a = sides[0]
         self.side_b = sides[1]
         self.side_c = sides[2]
         self.side_d = sides[3]
 
-    def update(self, points: PointSet):
-        self.side_a = abs(points.point0[0] - points.point1[0])
-        self.side_b = abs(points.point1[1] - points.point2[1])
-        self.side_c = abs(points.point2[0] - points.point3[0])
-        self.side_d = abs(points.point3[1] - points.point0[1])
+    def update(self, p_set: PointSet):
+        """update sides, used by qrcode."""
+        self.side_a = abs(p_set.point0[0] - p_set.point1[0])
+        self.side_b = abs(p_set.point1[1] - p_set.point2[1])
+        self.side_c = abs(p_set.point2[0] - p_set.point3[0])
+        self.side_d = abs(p_set.point3[1] - p_set.point0[1])
 class DisplayQRCode:
     """DisplayQRCode, QR code placement estimation."""
     def __init__(self):

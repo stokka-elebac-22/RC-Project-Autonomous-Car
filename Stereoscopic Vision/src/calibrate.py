@@ -67,7 +67,8 @@ class Calibrate:
                 cv.imshow("left", image_left)
                 cv.imshow("right", image_right)
                 cv.waitKey(0)
-        print(f"Could find chessboard corners in {len(object_points)} out of {len(images_left)} images")
+        print(f"""Could find chessboard corners in {len(object_points)}
+        out of{len(images_left)} images""")
 
         cv.destroyAllWindows()
 

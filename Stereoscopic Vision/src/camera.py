@@ -23,7 +23,7 @@ class Camera:
             if cv.waitKey(self.delay) & 0xFF == ord('q'):
                 break
         cv.destroyWindow(self.window_name)
-    
+
     def run_image(self, name, resize, verbose=1):
         img = self.read(name, resize)
         self.detect_qr_code(img, resize, verbose)

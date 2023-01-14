@@ -6,13 +6,13 @@ import cv2 as cv
 class QRGeometry:
     """PointSet, used by qrcode."""
     def __init__(self, pts=None):
-        if pts is None or len(pts) < 4:
-            pts = [[0,0],[0,0],[0,0],[0,0]]
+        if pts is None or len(pts[0]) < 4:
+            pts = [[[0,0],[0,0],[0,0],[0,0]]]
         self.update(pts)
 
     def update(self, pts):
         """update points, used by qrcode."""
-        self.points = pts
+        self.points = pts[0]
         self.side_a = abs(self.points[0][0] - self.points[1][0])
         self.side_b = abs(self.points[1][1] - self.points[2][1])
         self.side_c = abs(self.points[2][0] - self.points[3][0])
@@ -32,7 +32,7 @@ class QRCode:
     def __init__(self, size_px, size_mm, distance, values_length=10):
         self.ret_qr = None
         self.decoded_info = None
-        self.qr_code = QRGeometry()
+        self.qrg = QRGeometry()
         self.rest = None
 
         self.qr_size_px = size_px
@@ -44,16 +44,16 @@ class QRCode:
         self.angles = [0 for _ in range(values_length)]
         self.distance = [0 for _ in range(values_length)]
 
-    def update(self, ret_qr, decoded_info, points, rest, resize=1):
+    def update(self, ret_qr, decoded_info, resize=1):
         """Update values """
         self.ret_qr = ret_qr
         self.decoded_info = decoded_info
-        self.qr_code.update(points)
+        self.qrg.update(points)
         self.rest = rest
-        width_px = max(abs(self.qr_code.points[0][0] - self.qr_code.points[1][0]) * (1 / resize),
-        abs(self.qr_code.points[2][0] - self.qr_code.points[2][0]))
-        height_px = max(abs(self.qr_code.points[2][1] - self.qr_code.points[0][1]),
-        abs(self.qr_code.points[2][1] - self.qr_code.points[1][1]))
+        width_px = max(abs(self.qrg.points[0][0] - self.qrg.points[1][0]) * (1 / resize),
+        abs(self.qrg.points[2][0] - self.qrg.points[2][0]))
+        height_px = max(abs(self.qrg.points[2][1] - self.qrg.points[0][1]),
+        abs(self.qrg.points[2][1] - self.qrg.points[1][1]))
 
         height_px_resize = height_px * (1/resize)
         ratio = width_px/height_px
@@ -99,19 +99,18 @@ class DisplayQRCode:
         self.text_color = (255, 0, 255)
         self.text_thickness = 1
 
-    def display(self, frame, qrc: QRCode, qrg: QRGeometry, resize=1, verbose=1):
-        """Display """
-        for dec_info, pts in zip(qrc.decoded_info, qrc.qr_code.points):
-            if dec_info:
-                color = self.color_frame_green
-            else:
-                color = self.color_frame_red
-            frame = cv.polylines(frame, [pts.astype(int)], True, color, 4)
+    def display(self, frame, qrc: QRCode, verbose=1):
+        """Display"""
+        if qrc.decoded_info:
+            color = self.color_frame_green
+        else:
+            color = self.color_frame_red
+        frame = cv.polylines(frame, [qrc.qrg.points.astype(int)], True, color, 4)
         if verbose > 0:
-            self.display_values(frame, verbose, qrc, qrg)
+            self.display_values(frame, qrc, qrc.qrg, verbose)
         return frame
 
-    def display_values(self, img, qrc: QRCode, qrg: QRGeometry, verbose=1):
+    def display_values(self, frame, qrc: QRCode, qrg: QRGeometry, verbose=1):
         """Display values"""
         if verbose > 1:
             text_location_a = (int(min(qrg.points[0][0], qrg.points[1][0]) + \
@@ -123,18 +122,18 @@ class DisplayQRCode:
             text_location_d = (int(qrg.points[2][0]), int(min(qrg.points[2][1], \
                                     qrg.points[0][1]) + qrg.side_d/2))
 
-            cv.putText(img, str(int(qrg.side_a)), text_location_a, self.font, \
+            cv.putText(frame, str(int(qrg.side_a)), text_location_a, self.font, \
                         self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
-            cv.putText(img, str(int(qrg.side_b)), text_location_b, self.font, \
+            cv.putText(frame, str(int(qrg.side_b)), text_location_b, self.font, \
                         self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
-            cv.putText(img, str(int(qrg.side_c)), text_location_c, self.font, \
+            cv.putText(frame, str(int(qrg.side_c)), text_location_c, self.font, \
                         self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
-            cv.putText(img, str(int(qrg.side_d)), text_location_d, self.font, \
+            cv.putText(frame, str(int(qrg.side_d)), text_location_d, self.font, \
                         self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
 
-        img = cv.putText(img, f'angle    = {qrc.get_average_angle()}', (10, 20), self.font, \
+        cv.putText(frame, f'angle    = {qrc.get_average_angle()}', (10, 20), self.font, \
                             self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
-        img = cv.putText(img, f'distance = {qrc.get_average_distance()}', (10, 50), \
+        cv.putText(frame, f'distance = {qrc.get_average_distance()}', (10, 50), \
                 self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
 def local_read_camera(name=None, resize=1):
@@ -164,13 +163,15 @@ if __name__ == '__main__':
 
     qcd = cv.QRCodeDetector()
 
+    qr_code_display = DisplayQRCode()
+
     while True:
-        frame = local_read_camera()
-        ret_qr_main, decoded_info, points, rest = qcd.detectAndDecodeMulti(frame)
+        img = local_read_camera()
+        ret_qr_main, decoded_qr_info, points, rest = qcd.detectAndDecodeMulti(img)
         if ret_qr_main:
-            qr_code.update(ret_qr_main, decoded_info, points[0], rest)
-            qr_code.display(frame, verbose=VERBOSE)
-        cv.imshow(WINDOW_NAME, frame)
+            qr_code.update(ret_qr_main, decoded_qr_info)
+            qr_code_display.display(img, qr_code)
+        cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):
             break
     cv.destroyWindow(WINDOW_NAME)

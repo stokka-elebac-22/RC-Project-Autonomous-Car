@@ -68,6 +68,32 @@ class StereoscopicVision:
         cv_file.release()
         return (stereo_map_left_x, stereo_map_left_y), (stereo_map_right_x, stereo_map_right_y)
 
+    def obstacle_detection(self, frame):
+        """Detecting depth to obstacles in cm"""
+        # Mask to segment regions with depth less than threshold
+        mask = cv.inRange(depth_map, 10, DEPTH_THRESH)
+
+        # Check if a significantly large obstacle is present and filter out smalle noisy regions
+        if np.sum(mask)/255.0 > 0.01*mask.shape[0]*mask.shape[1]:
+            # Contour detection
+            contours, _ = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+            cnts = sorted(contours, key=cv.contourArea, reverse=True)
+
+            # Check if detected contour is significantly large (to avoid multiple tiny regions)
+            if cv.contourArea(cnts[0]) > 0.01*mask.shape[0]*mask.shape[1]:
+                x_pos, y_pos, w_rect, h_rect = cv.boundingRect(cnts[0])
+
+                # finding average depth of region represented by the largest contour
+
+                mask2 = np.zeros_like(mask)
+                cv.drawContours(mask2, cnts, 0, (255), -1)
+
+                # Calculating the average depth of the object closer than the safe distance
+                depth_mean, _ = cv.meanStdDev(depth_map, mask=mask2)
+
+                # Display warning text
+                cv.putText(frame, f"{depth_mean} cm", (x_pos+5, y_pos+40), 1, 2, (100, 10, 25), 2, 2)
+
 def nothing(_):
     """Empty function"""
 
@@ -92,6 +118,15 @@ if "__main__" == __name__:
     cv.createTrackbar('speckleWindowSize','disp',3,25,nothing)
     cv.createTrackbar('disp12MaxDiff','disp',5,25,nothing)
     cv.createTrackbar('minDisparity','disp',5,25,nothing)
+
+    # This measurements needs to be calculated from the setup
+    MAX_DIST = 230.0 # max distance to keep the target object (in cm)
+    MIN_DIST = 30.0 # min distance to keep the target object (in cm)
+    DEPTH_THRESH = 50.0 # Threshold for safe distance (in cm)
+
+    M = 39.075
+    Z = MAX_DIST
+    value_pairs = []
 
     while True:
         ret_left, frame_left = cam_left.read()
@@ -128,7 +163,16 @@ if "__main__" == __name__:
             stereo_vision.num_disp = numDisparities
             stereo_vision.min_disp = minDisparity
 
+            depth_map = M/disp # for depth in cm
+
+            mask_tmp = cv.inRange(depth_map, MIN_DIST, MAX_DIST)
+            depth_map = cv.bitwise_and(depth_map, depth_map, mask=mask_tmp)
+
+            stereo_vision.obstacle_detection(frame_left)
+
+            cv.imshow('frame left', frame_left)
             cv.imshow('disparity', disp)
+
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
 

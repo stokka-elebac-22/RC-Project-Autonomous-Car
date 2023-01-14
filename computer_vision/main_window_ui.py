@@ -10,6 +10,7 @@ __status__ = "Testing"
 
 from defines import *
 
+from camera_handler.camera_handler import CameraHandler
 from PyQt6 import QtWidgets, uic, QtCore
 from pyqtgraph import PlotWidget, plot
 from random import randint
@@ -19,13 +20,20 @@ import time
 class Ui(QtWidgets.QMainWindow):
     def __init__(self, ui_file, connection: tuple[str, int], fullscreen):
         self.connection_details = connection
-
+        self.camera_handler = CameraHandler()
+        self.camera_handler.refresh_camera_list()
         self.app = QtWidgets.QApplication(sys.argv) # Create an instance of QtWidgets.QApplication
 
         super(Ui, self).__init__() # Call the inherited classes __init__ method
         uic.loadUi(ui_file, self) # Load the .ui file
 
-
+        self.camera_cbo = [
+            self.findChild(QtWidgets.QComboBox, 'input_cbo_1'),
+            self.findChild(QtWidgets.QComboBox, 'input_cbo_2')
+        ]
+        for cbo in self.camera_cbo:
+            for camera in self.camera_handler.get_camera_list():
+                cbo.addItem(self.camera_handler.get_camera_string(camera["id"]))
         self.timer = QtCore.QTimer()
         self.timer.setInterval(50)
         #self.timer.timeout.connect(self.update_plot_data)

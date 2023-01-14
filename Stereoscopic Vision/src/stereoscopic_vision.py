@@ -29,12 +29,25 @@ class StereoscopicVision:
         gray_right = cv.cvtColor(image_right, cv.COLOR_BGR2GRAY)
 
         # Applying stereo image rectification on the left image
-        rect_left = cv.remap(gray_left, self.stereo_map_left[0], self.stereo_map_left[1], cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
+        rect_left = cv.remap(
+            gray_left,
+            self.stereo_map_left[0],
+            self.stereo_map_left[1],
+            cv.INTER_LANCZOS4,
+            cv.BORDER_CONSTANT,
+            0)
         # Applying stereo image rectification on the right image
-        rect_right = cv.remap(gray_right, self.stereo_map_right[0], self.stereo_map_right[1], cv.INTER_LANCZOS4, cv.BORDER_CONSTANT, 0)
+        rect_right = cv.remap(
+            gray_right,
+            self.stereo_map_right[0],
+            self.stereo_map_right[1],
+            cv.INTER_LANCZOS4,
+            cv.BORDER_CONSTANT,
+            0)
 
         disparity = self.stereo.compute(rect_left, rect_right)
-        # NOTE: Code returns a 16bit signed single channel image (CV_16S), containing a disparity map scaled by 16.
+        # NOTE: Code returns a 16bit signed single channel image (CV_16S),
+        # containing a disparity map scaled by 16.
         # Hence it is essential to convert it to CV_32F and scale it down 16 times.
 
         # Converting to float32

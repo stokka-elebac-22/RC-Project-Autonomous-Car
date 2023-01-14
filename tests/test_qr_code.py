@@ -1,6 +1,7 @@
+"""TEST"""
 # test_qr_code.py
-from computer_vision.qr_code.qr_code import QRGeometry
 import pytest
+from computer_vision.qr_code.qr_code import QRGeometry
 
 def test_points_empty():
     """Testing points"""

@@ -14,7 +14,7 @@ class StereoscopicVision:
     """
     DOC:
     """
-    def __init__(self, path="", num_disp=0, block_size=5, min_disp=5) -> None:
+    def __init__(self, path="", num_disp=16, block_size=5, min_disp=5) -> None:
         self.num_disp = num_disp
         self.block_size = block_size
         self.min_disp = min_disp
@@ -121,8 +121,8 @@ if "__main__" == __name__:
 
     # This measurements needs to be calculated from the setup
     MAX_DIST = 230.0 # max distance to keep the target object (in cm)
-    MIN_DIST = 30.0 # min distance to keep the target object (in cm)
-    DEPTH_THRESH = 50.0 # Threshold for safe distance (in cm)
+    MIN_DIST = 5.0 # min distance to keep the target object (in cm)
+    DEPTH_THRESH = 200.0 # Threshold for safe distance (in cm)
 
     M = 39.075
     Z = MAX_DIST
@@ -132,6 +132,9 @@ if "__main__" == __name__:
         ret_left, frame_left = cam_left.read()
         ret_right, frame_right = cam_right.read()
         if ret_left and ret_right:
+            # NOTE: it might help to blur the image to reduce noise
+            # frame_left = cv.blur(frame_left, (10, 10))
+            # frame_right = cv.blur(frame_right, (10, 10))
             disp = stereo_vision.get_disparity(frame_left, frame_right)
             # Displaying the disparity
             # Updating the parameters based on the trackbar positions

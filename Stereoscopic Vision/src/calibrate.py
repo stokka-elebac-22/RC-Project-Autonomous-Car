@@ -57,9 +57,9 @@ class Calibrate:
                 images_returned_left.append(left)
                 images_returned_right.append(right)
 
-                cv.cornerSubPix(gray_left, corners_left, (11, 11), (-1, -1), self.criteria)
+                corners_left = cv.cornerSubPix(gray_left, corners_left, (11, 11), (-1, -1), self.criteria)
                 image_points_left.append(corners_left)
-                cv.cornerSubPix(gray_right, corners_right, (11, 11), (-1, -1), self.criteria)
+                corners_right = cv.cornerSubPix(gray_right, corners_right, (11, 11), (-1, -1), self.criteria)
                 image_points_right.append(corners_right)
                 # draw and display the corners
                 cv.drawChessboardCorners(image_left, self.board_dim, corners_left, ret_left)
@@ -68,19 +68,12 @@ class Calibrate:
                 cv.imshow("right", image_right)
                 cv.waitKey(0)
         print(f"""Could find chessboard corners in {len(object_points)}
-        out of{len(images_left)} images""")
+        out of {len(images_left)} images""")
 
         cv.destroyAllWindows()
 
         return object_points, image_points_left, image_points_right, \
             images_returned_left, images_returned_right
-
-    def calibration(self, img, object_points, image_points):
-        """calibrateCarmera returns the camera matrix,
-        distortion coefficients, rotation and translation vectors"""
-        ret, mtx, dist, rvecs, tvecs = \
-            cv.calibrateCamera(object_points, image_points, img.shape[::-1], None, None)
-        return ret, mtx, dist, rvecs, tvecs
 
     def get_optimal_new_camera_matrix(self, img, mtx, dist):
         """return optimal camera matrix with cv.getOptimalNewCameraMatrix"""
@@ -130,15 +123,15 @@ if __name__ == '__main__':
     image_r = cv.imread(img_l[0])
     gray_r = cv.cvtColor(image_l, cv.COLOR_BGR2GRAY)
 
-    ret_l, mtx_left, left_dist, rvecs_left, tvecs_left = \
-        calibrate.calibration(gray_l, obj_pnts, img_pnts_l)
-    ret_r, mtx_right, dist_right, rvecs_right, tvecs_right = \
-        calibrate.calibration(gray_r, obj_pnts, img_pnts_r)
+    ret_1, mtx_l, dist_l, rvecs_l, tvecs_l = \
+        cv.calibrateCamera(obj_pnts, img_pnts_l, gray_l.shape[::-1], None, None)
+    ret_r, mtx_r, dist_r, rvecs_r, tvecs_r = \
+        cv.calibrateCamera(obj_pnts, img_pnts_r, gray_r.shape[::-1], None, None)
 
     new_camera_matrix_left, roi_left = \
-        calibrate.get_optimal_new_camera_matrix(gray_l, mtx_left, left_dist)
+        calibrate.get_optimal_new_camera_matrix(gray_l, mtx_l, dist_l)
     new_camera_matrix_right, roi_right = \
-        calibrate.get_optimal_new_camera_matrix(gray_r, mtx_right, dist_right)
+        calibrate.get_optimal_new_camera_matrix(gray_r, mtx_r, dist_r)
     # calibrate.undistort(img, mtx_left, left_dist, new_camera_matrix_left, roi_left)
 
     # Stereo Calibration
@@ -150,10 +143,10 @@ if __name__ == '__main__':
         img_pnts_l,
         img_pnts_r,
         new_camera_matrix_left,
-        left_dist,
+        dist_l,
         new_camera_matrix_right,
-        dist_right,
-        gray_l,
+        dist_r,
+        gray_l.shape[::-1],
         CRITERIA,
         FLAGS)
 
@@ -172,7 +165,7 @@ if __name__ == '__main__':
 
     stereo_map_left = cv.initUndistortRectifyMap(
         new_mtx_left,
-        left_dist,
+        dist_l,
         rect_l,
         proj_mat_l,
         gray_l.shape[::-1],

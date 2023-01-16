@@ -21,7 +21,7 @@ class QRGeometry:
 class QRCode:
     """QRCode, doing calculations for QR code placement estimation."""
 #                          c
-#                  p2 ---------- p3
+#            p2 ---------- p3
 #            |             |
 #         b  |             |  d
 #            |             |

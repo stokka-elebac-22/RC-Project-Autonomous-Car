@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # data
-Stereoscopic Vision/data/*.xml
+Stereoscopic Vision/data/stereo_rectify_maps.xml

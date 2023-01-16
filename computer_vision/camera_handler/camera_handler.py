@@ -20,11 +20,11 @@ class CameraHandler:
             + str(self.available_camera_list[id]["res_h"]) \
             + " (" + str(self.available_camera_list[id]["fps"]) + "fps)"
 
-    def get_camera_list(self):
+    def get_camera_list(self) -> list[dict]:
         """Return the list of cameras"""
         return self.available_camera_list
 
-    def refresh_camera_list(self):
+    def refresh_camera_list(self) -> list[dict]:
         """Test camera input to create a list of available cameras"""
         index = 0
         testing = 1
@@ -45,7 +45,7 @@ class CameraHandler:
         self.available_camera_list = arr
         return arr
 
-    def convert_cv_qt(self, cv_img, w, h):
+    def convert_cv_qt(self, cv_img, w, h) -> QPixmap:
         """Convert from an opencv image to QPixmap"""
         rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb_image.shape

@@ -33,11 +33,11 @@ class App(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Qt live label demo")
-        self.disply_width = 640
+        self.display_width = 640
         self.display_height = 480
         # create the label that holds the image
         self.image_label = QLabel(self)
-        self.image_label.resize(self.disply_width, self.display_height)
+        self.image_label.resize(self.display_width, self.display_height)
         # create a text label
         self.textLabel = QLabel('Webcam')
 

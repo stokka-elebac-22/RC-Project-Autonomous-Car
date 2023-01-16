@@ -96,9 +96,6 @@ class StereoscopicVision:
                 return True, depth_mean, (x_pos, y_pos), (w_rect, h_rect)
         return False, None, None, None
 
-def nothing(_):
-    """Empty function"""
-
 if "__main__" == __name__:
     DESTINATION_PATH = 'Stereoscopic Vision/data/stereo_parameters.xml'
     MAX_DIST = 230.0 # max distance to recognize objects (cm)
@@ -115,6 +112,9 @@ if "__main__" == __name__:
 
     cv.namedWindow('disp', cv.WINDOW_NORMAL)
     cv.resizeWindow('disp', 800,600)
+
+    def nothing(_):
+        """Empty function"""
 
     # creating trackbars for testing
     cv.createTrackbar('num_disparities','disp',1,17, nothing)

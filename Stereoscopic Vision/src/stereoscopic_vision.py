@@ -96,7 +96,7 @@ class StereoscopicVision:
                 return True, depth_mean, (x_pos, y_pos), (w_rect, h_rect)
         return False, None, None, None
 
-if "__main__" == __name__:
+if __name__ == '__main__':
     DESTINATION_PATH = 'Stereoscopic Vision/data/stereo_parameters.xml'
     MAX_DIST = 230.0 # max distance to recognize objects (cm)
     MIN_DIST = 5.0 # min distance to recognize objects (cm)

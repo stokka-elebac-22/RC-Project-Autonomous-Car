@@ -69,19 +69,19 @@ class StereoscopicVision:
         cv_file.release()
         return (stereo_map_left_x, stereo_map_left_y), (stereo_map_right_x, stereo_map_right_y)
 
-    def obstacle_detection(self, depth_map):
+    def obstacle_detection(self, depth_map, obstacle_area, contour_area):
         """Detecting depth to obstacles in cm"""
         # Mask to segment regions with depth less than threshold
         mask = cv.inRange(depth_map, MIN_DIST, THRES_DIST)
 
         # Check if a significantly large obstacle is present and filter out smalle noisy regions
-        if np.sum(mask)/255.0 > 0.01*mask.shape[0]*mask.shape[1]:
+        if np.sum(mask)/255.0 > obstacle_area*mask.shape[0]*mask.shape[1]:
             # Contour detection
             contours, _ = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
             cnts = sorted(contours, key=cv.contourArea, reverse=True)
 
             # Check if detected contour is significantly large (to avoid multiple tiny regions)
-            if cv.contourArea(cnts[0]) > 0.01*mask.shape[0]*mask.shape[1]:
+            if cv.contourArea(cnts[0]) > contour_area*mask.shape[0]*mask.shape[1]:
                 x_pos, y_pos, w_rect, h_rect = cv.boundingRect(cnts[0])
                 x_pos, y_pos, w_rect, h_rect = cv.boundingRect(cnts[0])
 
@@ -128,6 +128,8 @@ if __name__ == '__main__':
     cv.createTrackbar('speckle_window_size','disp',3,25,nothing)
     cv.createTrackbar('disparity_max_diff','disp',5,25,nothing)
     cv.createTrackbar('min_disparity','disp',5,25,nothing)
+    cv.createTrackbar('obstacle_area', 'disp', 1, 100, nothing)
+    cv.createTrackbar('contour_area', 'disp', 1, 100, nothing)
 
     # Getting parameter information from previous tests, if there is one
     if os.path.exists(DESTINATION_PATH):
@@ -154,6 +156,10 @@ if __name__ == '__main__':
             int(cv_file_read.getNode('disparity_max_diff').real()))
         cv.setTrackbarPos('min_disparity','disp',
             int(cv_file_read.getNode('min_disparity').real()))
+        cv.setTrackbarPos('obstacle_area', 'disp',
+            int(cv_file_read.getNode('obstacle_area').real()))
+        cv.setTrackbarPos('contour_area', 'disp',
+            int(cv_file_read.getNode('contour_area').real()))
         M = cv_file_read.getNode('M').real()
         cv_file_read.release()
 
@@ -181,6 +187,10 @@ if __name__ == '__main__':
             speckle_window_size = cv.getTrackbarPos('speckle_window_size','disp')*2
             disparity_max_diff = cv.getTrackbarPos('disparity_max_diff','disp')
             min_disparity = cv.getTrackbarPos('min_disparity','disp')
+            #  change how big obstacle area needs to be to be detected
+            obs_area = cv.getTrackbarPos('obstacle_area', 'disp') / 1000
+            # change how big contour area needs to be to be detected
+            cont_area = cv.getTrackbarPos('contour_area', 'disp') / 1000
 
             # Setting the updated parameters before computing disparity map
             stereo_vision.stereo.setNumDisparities(num_disparities)
@@ -204,10 +214,10 @@ if __name__ == '__main__':
             depth_map_dist = cv.bitwise_and(depth_map_dist, depth_map_dist, mask=mask_tmp)
 
             retval, depth_mean_obstacle, pos_obstacle, size_obstacle = \
-                stereo_vision.obstacle_detection(depth_map_dist)
+                stereo_vision.obstacle_detection(depth_map_dist, obs_area, cont_area)
             if retval:
-                cv.putText(frame_left, f"{depth_mean_obstacle[0][0]} cm", [pos_obstacle[0] + 5, pos_obstacle[1] + 40],
-                    1, 2, (40, 200, 40), 2, 2)
+                cv.putText(frame_left, f"{depth_mean_obstacle[0][0]} cm",
+                    [pos_obstacle[0] + 5, pos_obstacle[1] + 40], 1, 2, (40, 200, 40), 2, 2)
 
             cv.imshow('frame left', frame_left)
             cv.imshow('disparity', disp)
@@ -235,9 +245,9 @@ if __name__ == '__main__':
     print("Saving parameters...")
     cv_file_write = cv.FileStorage(DESTINATION_PATH, cv.FILE_STORAGE_WRITE)
     cv_file_write.write('num_disparities', min(num_disparities/16, 16))
-    cv_file_write.write('block_size', block_size_disp - 5)
+    cv_file_write.write('block_size', max(block_size_disp/2 - 5, 0))
     cv_file_write.write('pre_filter_type', pre_filter_type)
-    cv_file_write.write('pre_filter_size', pre_filter_size - 5)
+    cv_file_write.write('pre_filter_size', max(pre_filter_size/2 - 5, 0))
     cv_file_write.write('pre_filter_cap', pre_filter_cap - 1)
     cv_file_write.write('texture_threshold', texture_threshold)
     cv_file_write.write('uniqueness_ratio', uniqueness_ratio)
@@ -245,5 +255,7 @@ if __name__ == '__main__':
     cv_file_write.write('speckle_window_size', speckle_window_size/2)
     cv_file_write.write('disparity_max_diff', disparity_max_diff)
     cv_file_write.write('min_disparity', min_disparity)
+    cv_file_write.write('obstacle_area', obs_area * 1000)
+    cv_file_write.write('contour_area', cont_area * 1000)
     cv_file_write.write('M', M)
     cv_file_write.release()

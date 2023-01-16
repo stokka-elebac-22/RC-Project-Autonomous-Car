@@ -1,15 +1,17 @@
 <?xml version="1.0"?>
 <opencv_storage>
-<num_disparities>1.</num_disparities>
-<block_size>10</block_size>
-<pre_filter_type>1</pre_filter_type>
-<pre_filter_size>4</pre_filter_size>
-<pre_filter_cap>5</pre_filter_cap>
-<texture_threshold>10</texture_threshold>
-<uniqueness_ratio>15</uniqueness_ratio>
+<num_disparities>14.</num_disparities>
+<block_size>1.0500000000000000e+01</block_size>
+<pre_filter_type>0</pre_filter_type>
+<pre_filter_size>2.2500000000000000e+01</pre_filter_size>
+<pre_filter_cap>44</pre_filter_cap>
+<texture_threshold>0</texture_threshold>
+<uniqueness_ratio>4</uniqueness_ratio>
 <speckle_range>0</speckle_range>
-<speckle_window_size>3.</speckle_window_size>
-<disparity_max_diff>5</disparity_max_diff>
+<speckle_window_size>0.</speckle_window_size>
+<disparity_max_diff>2</disparity_max_diff>
 <min_disparity>5</min_disparity>
+<obstacle_area>0.</obstacle_area>
+<contour_area>0.</contour_area>
 <M>40</M>
 </opencv_storage>

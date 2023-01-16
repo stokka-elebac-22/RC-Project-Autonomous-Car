@@ -4,13 +4,6 @@ import cv2 as cv
 import numpy as np
 from camera import Camera
 
-# ----- ORIGINAL MEASUREMENTS -----
-# QR Code measured, 55mm lense
-QR_SIZE_PX = 76
-QR_SIZE_MM = 52
-QR_DISTANCE = 500
-
-
 class StereoscopicVision:
     """
     DOC:

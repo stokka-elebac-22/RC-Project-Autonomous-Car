@@ -159,6 +159,8 @@ if __name__ == '__main__':
 
     value_pairs = [] # used for calculating M (depth ratio)
 
+    average = [0 for _ in range(10)]
+
     while True:
         ret_left, frame_left = cam_left.read()
         ret_right, frame_right = cam_right.read()
@@ -209,8 +211,11 @@ if __name__ == '__main__':
             retval, depth_mean_obstacle, pos_obstacle, size_obstacle = \
                 stereo_vision.obstacle_detection(depth_map_dist, obs_area, cont_area)
             if retval:
-                cv.putText(frame_left, f"{depth_mean_obstacle[0][0]} cm",
-                    [pos_obstacle[0] + 5, pos_obstacle[1] + 40], 1, 2, (40, 200, 40), 2, 2)
+                average.pop()
+                average.append(depth_mean_obstacle[0][0])
+                cv.putText(frame_left, f"{int(sum(average)/len(average))} cm",
+                    # [pos_obstacle[0] + 5, pos_obstacle[1] + 40], 1, 2, (40, 200, 40), 2, 2)
+                    [5, 40], 1, 2, (40, 200, 40), 2, 2)
 
             cv.imshow('frame left', frame_left)
             cv.imshow('disparity', disp)

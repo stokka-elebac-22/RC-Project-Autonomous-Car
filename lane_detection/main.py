@@ -9,16 +9,13 @@ import warnings
 # need to change paremeters through test and fail does not work for all images with the same parameters
 
 # TODO:
-#1. Warp perspective lane OK!
-#2. Draw circle on lane image
-#3. Use circle to find intersection point 
+# 1. Warp perspective lane OK!
+# 2. Draw circle on lane image
+# 3. Use circle to find intersection point
 #    1. Two images: one circle on each
 #    2. Circle white, background black
 #    3. Check pixel for pixel which pixel that’s white on each picture
-#4. Draw back lane on original image with the circles if wanted??? OK!
-
-
-
+# 4. Draw back lane on original image with the circles if wanted??? OK!
 
 
 def get_lane_region(image):
@@ -103,6 +100,7 @@ def show_lines(image, lines):
                 x1, y1, x2, y2 = line.reshape(4)
                 cv2.line(image, (x1, y1), (x2, y2), (255, 0, 0), 20)
 
+
 def get_diff_from_center_info(image, lines):
     if lines is not None:
         width = image.shape[1]
@@ -126,39 +124,88 @@ def get_diff_from_center_info(image, lines):
             diff = (center_car - center_lane)/width * real_width
         return diff
 
-def show_circles(image, points_coordinates):
+
+def show_circles(image, points_coordinates, diff):
 
     coordinates_x = [points_coordinates[0][0], points_coordinates[1][0]]
     coordinates_y = [points_coordinates[0][3], points_coordinates[1][3]]
     width = max(coordinates_x) - min(coordinates_x)
-    height = image.shape[0] 
 
+    # NEED TO FIX HERE:: HEIGHT IS DIFF??
+    height = image.shape[0]
 
-    output = np.float32([[0,0],
+    offset = int(image.shape[1]/2 - min(coordinates_x))
+
+    output = np.float32([[0, 0],
                         [0, height],
                         [width, height],
                         [width, 0]])
 
-    input = np.float32([[points_coordinates[0][2],points_coordinates[0][3]],
-                        [points_coordinates[0][0],points_coordinates[0][1]],
-                        [points_coordinates[1][0],points_coordinates[1][1]],
-                        [points_coordinates[1][2],points_coordinates[1][3]]])
+    input = np.float32([[points_coordinates[0][2], points_coordinates[0][3]],
+                        [points_coordinates[0][0], points_coordinates[0][1]],
+                        [points_coordinates[1][0], points_coordinates[1][1]],
+                        [points_coordinates[1][2], points_coordinates[1][3]]])
 
     pertransform = cv2.getPerspectiveTransform(input, output)
-    warped = cv2.warpPerspective(image, pertransform, (width, height), flags=cv2.INTER_LINEAR)
-    cv2.circle(warped, (int(warped.shape[1]/2),int(warped.shape[0]/2)), 300, (255, 0, 0), 20)
-    cv2.circle(warped, (int(warped.shape[1]/2),int(warped.shape[0]/2)), 10, (255, 0, 0), 20)
 
-    get_diff_from_center_info(frame, points_coordinates)
+    warped = cv2.warpPerspective(
+    image, pertransform, (width, height), flags=cv2.INTER_LINEAR)
 
-    unwarped = cv2.warpPerspective(warped, np.linalg.inv(pertransform), (image.shape[1], height), cv2.BORDER_TRANSPARENT)
+    x1 = offset
+    y1 = warped.shape[0]
 
-    weighted = cv2.addWeighted(image,0.4,unwarped,0.2,0)
+    x3 = int(warped.shape[1]/2)
+    y3 = int(warped.shape[0]*0.6)
+
+    cv2.line(warped, (x3, y1), (x3, 0), (255,255,0), 20)
+
+    cv2.circle(
+        warped, (x1, y1), 10, (0, 0, 255), 20)
+    cv2.circle(
+        warped, (x3, y1), 10, (255, 0, 0), 20)
+    cv2.circle(
+        warped, (x3, y3), 10, (255, 0, 0), 20)
+    
+    x2 = int(offset + (x3 - offset)/2)
+    y2 = int(y3 + (warped.shape[0]-y3)/2)
+
+    #z = np.polyfit([x1, x1, x1, x1,x1, x1, x1, x1,x1, x1, x1, x1,x1, x1, x1, x1,x1, x1, x1, x1,x1, x1, x1, x1, x1, x1, x1, x1, x1, x1, x1, x1, x1, x1, x1, x1, x1, x3, x3, x3, x3, x3, x3, x3, x3, x3], 
+    #[y1, y1, y1,y1,y1, y1, y1,y1,y1, y1, y1,y1,y1, y1, y1,y1,y1, y1, y1,y1,y1, y1, y1,y1,y1, y1, y1,y1,y1, y1, y1,y1, y1, y1, y1, y1*0.8, y1*0.6, y3, y3*0.8, y3*0.6, 0, 0, 0, 0, 0, 0],15)
+    #z = np.polyfit([x1, x2, x3, x3, x3, x3, x3], [y1, y2, y3*0.6, y3*0.4, 0, 0, 0], 20)
+    z = np.polyfit([x1, x2, x3], [y1, y2, y1], 2)
+    lspace = np.linspace(x1, x2, 100)
+
+    draw_x = lspace
+    draw_y = np.polyval(z, draw_x)   # evaluate the polynomial
+
+    draw_points = (np.asarray([draw_x, draw_y]).T).astype(np.int32)   # needs to be int32 and transposed
+
+    cv2.polylines(warped, [draw_points], False, (0,0,0), 15)  # args: image, points, closed, color
+
+    z = np.polyfit([x1, x2, x3], [y3, y2, y3,], 2)
+    lspace = np.linspace(x2, x3, 100)
+
+    draw_x = lspace
+    draw_y = np.polyval(z, draw_x)   # evaluate the polynomial
+
+    draw_points = (np.asarray([draw_x, draw_y]).T).astype(np.int32)   # needs to be int32 and transposed
+
+    cv2.polylines(warped, [draw_points], False, (0,0,0), 15)  # args: image, points, closed, color
+
+
+    cv2.circle(
+        warped, (x2, y2), 10, (0, 255, 0), 20)
+
+
+    unwarped = cv2.warpPerspective(warped, np.linalg.inv(
+        pertransform), (image.shape[1], height), cv2.BORDER_TRANSPARENT)
+
+    weighted = cv2.addWeighted(image, 0.4, unwarped, 0.2, 0)
 
     cv2.imshow("warped", warped)
     cv2.imshow("unwarped", unwarped)
     cv2.imshow("weighted", weighted)
-    
+
 
 if __name__ == "__main__":
     #cap = cv2.VideoCapture("./assets/challenge_video.mp4")
@@ -184,13 +231,14 @@ if __name__ == "__main__":
         diff = get_diff_from_center_info(frame, lines)
 
         if diff is not None:
-            cv2.putText(frame, f"Diff from center: {diff}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
+            cv2.putText(
+                frame, f"Diff from center: {diff}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
 
-        show_circles(frame, lines)
+        show_circles(frame, lines, diff)
 
-        cv2.imshow('frame', frame)
+        #cv2.imshow('frame', frame)
         cv2.waitKey(0)
         break
 
-    #cap.release()
+    # cap.release()
     cv2.destroyAllWindows()

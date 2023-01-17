@@ -6,10 +6,10 @@ Assuming you take photos with two camera at the same time.
 It will work with one camera, but it will end up in the calibrate left directory
 """
 
-DIRECTORY = 'Stereoscopic Vision/images/calibrate'
+DIRECTORY = 'Stereoscopic Vision/images/stereo_vision'
 
 cam1 = Camera(0, 'left')
-cam2 = Camera(2, 'right')
+cam2 = Camera(1, 'right')
 cameras: Camera = [cam1, cam2]
 camera_sides = ['left', 'right']
 

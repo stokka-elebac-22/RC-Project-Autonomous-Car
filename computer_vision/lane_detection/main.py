@@ -173,6 +173,46 @@ class LaneDetector:
         return (warped.shape, perspective_transform,
                 [(x_1, y_1), (x_2, y_2), (x_3, y_3)], [poly_1, poly_2])
 
+    def show_course(self, image, warped_shape, circle_points, perspective_transform, polys):
+        """Display the points and curves for the driving course"""
+        x_1 = circle_points[0][0]
+        x_2 = circle_points[1][0]
+        x_3 = circle_points[2][0]
+        y_1 = circle_points[0][1]
+        y_2 = circle_points[1][1]
+        y_3 = circle_points[2][1]
+
+        warped = cv2.warpPerspective(
+            image, perspective_transform, (warped_shape[1], warped_shape[0]), flags=cv2.INTER_LINEAR)
+
+        cv2.line(warped, (x_3, y_1), (x_3, 0), (255,255,0), 20)
+
+        linear_space_1 = np.linspace(x_1, x_2, 100)
+        linear_space_2 = np.linspace(x_2, x_3, 100)
+        linear_spaces = [linear_space_1, linear_space_2]
+
+        for i, _ in enumerate(linear_spaces):
+            draw_x = linear_spaces[i]
+            draw_y = np.polyval(polys[i], draw_x)   # evaluate the polynomial
+            draw_points = (np.asarray([draw_x, draw_y]).T).astype(np.int32)   # needs to be int32 and transposed
+            cv2.polylines(warped, [draw_points], False, (0,0,0), 15)  # args: image, points, closed, color
+
+        cv2.circle(
+            warped, (x_1, y_1), 10, (0, 0, 255), 20)
+        cv2.circle(
+            warped, (x_3, y_1), 10, (255, 0, 0), 20)
+        cv2.circle(
+            warped, (x_3, y_3), 10, (255, 0, 0), 20)
+        cv2.circle(
+            warped, (x_2, y_2), 10, (0, 255, 0), 20)
+
+        unwarped = cv2.warpPerspective(warped, np.linalg.inv(
+        perspective_transform), (image.shape[1], image.shape[0]), cv2.BORDER_TRANSPARENT)
+
+        weighted = cv2.addWeighted(image, 0.4, unwarped, 0.2, 0)
+        
+        return warped, weighted
+
 
 if __name__ == "__main__":
     # cap = cv2.VideoCapture("./assets/challenge_video.mp4")

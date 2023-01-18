@@ -37,5 +37,9 @@ def test_sides_update(pts, exp):
     assert qr_code.side_a == exp[0] and qr_code.side_b == exp[1] and \
         qr_code.side_c == exp[2] and qr_code.side_d == exp[3]
 
+def test_distance():
+    """Testing the distance to qr code"""
+    frame = 
+
 # test on pictures with approx
 # https://docs.pytest.org/en/4.6.x/reference.html

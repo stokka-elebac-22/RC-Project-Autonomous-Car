@@ -28,7 +28,7 @@ while True:
     if cv.waitKey(1) & 0xFF == ord('c'): # capture frame by pressing c
         print('Capturing...')
         for i, frame in enumerate(frames):
-            cv.imwrite(f'{DIRECTORY}/{camera_sides[i]}/{frame[1]}_{count}_v2.jpg', frame[0])
+            cv.imwrite(f'{DIRECTORY}/{camera_sides[i]}/{frame[1]}_{count}.jpg', frame[0])
         count += 1
 
     if cv.waitKey(1) & 0xFF == ord('s'): # stop loop by pressing s

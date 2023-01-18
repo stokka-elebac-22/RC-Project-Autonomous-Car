@@ -2,7 +2,7 @@
 import cv2
 
 
-class TrafficSignDetection:
+class TrafficSignDetector:
     """
     DOC:
     """
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     dim = (img_width, img_height)
     img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
 
-    traffic_sign_detection = TrafficSignDetection()
+    traffic_sign_detection = TrafficSignDetector()
     output_signs = traffic_sign_detection.detect_signs(img)
     traffic_sign_detection.show_signs(img, output_signs)
 

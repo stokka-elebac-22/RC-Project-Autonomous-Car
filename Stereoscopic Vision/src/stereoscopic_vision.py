@@ -27,7 +27,7 @@ class StereoscopicVision:
             gray_left,
             self.stereo_map_left[0],
             self.stereo_map_left[1],
-            cv.INTER_LANCZOS4,
+            cv.INTER_LINEAR,
             cv.BORDER_CONSTANT,
             0)
         # Applying stereo image rectification on the right image
@@ -35,7 +35,7 @@ class StereoscopicVision:
             gray_right,
             self.stereo_map_right[0],
             self.stereo_map_right[1],
-            cv.INTER_LANCZOS4,
+            cv.INTER_LINEAR,
             cv.BORDER_CONSTANT,
             0)
 
@@ -161,9 +161,16 @@ if __name__ == '__main__':
 
     average = [0 for _ in range(10)]
 
+    DIRECTORY_LEFT_IMAGE = 'Stereoscopic Vision/images/depth_calibration/left/left_1.jpg'
+    DIRECTORY_RIGHT_IMAGE = 'Stereoscopic Vision/images/depth_calibration/right/right_1.jpg'
+
     while True:
-        ret_left, frame_left = cam_left.read()
-        ret_right, frame_right = cam_right.read()
+        # ret_left, frame_left = cam_left.read()
+        # ret_right, frame_right = cam_right.read()
+        frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
+        frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
+
+        ret_left, ret_right = True, True
         if ret_left and ret_right:
             # NOTE: it might help to blur the image to reduce noise
             # frame_left = cv.blur(frame_left, (10, 10))
@@ -214,10 +221,11 @@ if __name__ == '__main__':
                 average.pop()
                 average.append(depth_mean_obstacle[0][0])
                 cv.putText(frame_left, f"{int(sum(average)/len(average))} cm",
-                    # [pos_obstacle[0] + 5, pos_obstacle[1] + 40], 1, 2, (40, 200, 40), 2, 2)
-                    [5, 40], 1, 2, (40, 200, 40), 2, 2)
+                    [pos_obstacle[0] + 5, pos_obstacle[1] + 40], 1, 2, (40, 200, 40), 2, 2)
+                    # [5, 40], 1, 2, (40, 200, 40), 2, 2)
 
             cv.imshow('frame left', frame_left)
+            cv.imshow('frame right', frame_right)
             cv.imshow('disparity', disp)
 
             if cv.waitKey(1) & 0xFF == ord('q'):

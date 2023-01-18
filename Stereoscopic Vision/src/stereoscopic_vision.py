@@ -100,7 +100,7 @@ if __name__ == '__main__':
     # NOTE: if you also have a webcam (that you do not want to use),
     # use id 0 and 2 (not always the case....)
     cam_left = Camera(camera_id=0, window_name='Left camera')
-    cam_right = Camera(camera_id=1, window_name='Right camera')
+    cam_right = Camera(camera_id=2, window_name='Right camera')
     stereo_vision = StereoscopicVision(path="Stereoscopic Vision/data/stereo_rectify_maps.xml")
 
     cv.namedWindow('disp', cv.WINDOW_NORMAL)
@@ -161,14 +161,14 @@ if __name__ == '__main__':
 
     average = [0 for _ in range(10)]
 
-    DIRECTORY_LEFT_IMAGE = 'Stereoscopic Vision/images/depth_calibration/left/left_1.jpg'
-    DIRECTORY_RIGHT_IMAGE = 'Stereoscopic Vision/images/depth_calibration/right/right_1.jpg'
+    # DIRECTORY_LEFT_IMAGE = 'Stereoscopic Vision/images/depth_calibration/left/left_0.jpg'
+    # DIRECTORY_RIGHT_IMAGE = 'Stereoscopic Vision/images/depth_calibration/right/right_0.jpg'
 
     while True:
-        # ret_left, frame_left = cam_left.read()
-        # ret_right, frame_right = cam_right.read()
-        frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
-        frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
+        ret_left, frame_left = cam_left.read()
+        ret_right, frame_right = cam_right.read()
+        # frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
+        # frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
 
         ret_left, ret_right = True, True
         if ret_left and ret_right:

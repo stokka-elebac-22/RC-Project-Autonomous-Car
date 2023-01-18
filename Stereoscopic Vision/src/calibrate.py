@@ -12,8 +12,8 @@ import cv2 as cv
 
 CHECKERBOARD_DIMENSION = (8, 6)
 CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-DIRECTORY_LEFT = "Stereoscopic Vision/images/calibrate_left/*.jpg"
-DIRECTORY_RIGHT = "Stereoscopic Vision/images/calibrate_right/*.jpg"
+DIRECTORY_LEFT = "Stereoscopic Vision/images/calibrate/left/*.jpg"
+DIRECTORY_RIGHT = "Stereoscopic Vision/images/calibrate/right/*.jpg"
 DESTINATION_PATH = "Stereoscopic Vision/data/stereo_rectify_maps.xml"
 
 class Calibrate:

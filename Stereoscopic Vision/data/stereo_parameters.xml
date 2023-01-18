@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <opencv_storage>
-<num_disparities>10.</num_disparities>
-<block_size>3.0500000000000000e+01</block_size>
+<num_disparities>14.</num_disparities>
+<block_size>7.5000000000000000e+00</block_size>
 <pre_filter_type>0</pre_filter_type>
-<pre_filter_size>7.5000000000000000e+00</pre_filter_size>
-<pre_filter_cap>10</pre_filter_cap>
+<pre_filter_size>6.5000000000000000e+00</pre_filter_size>
+<pre_filter_cap>22</pre_filter_cap>
 <texture_threshold>36</texture_threshold>
 <uniqueness_ratio>10</uniqueness_ratio>
 <speckle_range>28</speckle_range>

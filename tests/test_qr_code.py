@@ -1,7 +1,8 @@
 """TEST"""
 # test_qr_code.py
 import pytest
-from computer_vision.qr_code.qr_code import QRGeometry
+import cv2 as cv
+from computer_vision.qr_code.qr_code import QRGeometry, QRCode
 
 def test_points_empty():
     """Testing points"""
@@ -37,9 +38,64 @@ def test_sides_update(pts, exp):
     assert qr_code.side_a == exp[0] and qr_code.side_b == exp[1] and \
         qr_code.side_c == exp[2] and qr_code.side_d == exp[3]
 
-def test_distance():
-    """Testing the distance to qr code"""
-    frame = 
-
+@pytest.mark.paramterize(
+    ["path", "exp"],
+    [
+        ('DC142', [True, 90]),
+        ('DC125', [True, 75]),
+        ('DC136', [True, 60]),
+        ('DC137', [True, 45]),
+        ('DC138', [False, 30]),
+        ('DC141', [False, 15]),
+    ]
+)
 # test on pictures with approx
 # https://docs.pytest.org/en/4.6.x/reference.html
+def test_angle(path, exp):
+    """Testing the angle to qr code"""
+    QR_SIZE_PX = 76
+    QR_SIZE_MM = 52
+    QR_DISTANCE = 500
+    qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+    frame = cv.imread(path)
+    retval, _, angle, _, _ = qr_code.get_measurements(frame)
+    assert retval == exp[0] and angle == pytest.approx(exp[1])
+
+@pytest.mark.parametrize(
+    ["path", "exp"],
+    [
+        ('DC148', [True, 100, 90]),
+        ('DC152', [True, 178, 90]),
+        ('DC149', [True, 200, 90]),
+        ('DC153', [True, 276, 90]),
+        ('DC150', [True, 300, 90]),
+        ('DC151', [True, 350, 90]),
+    ]
+)
+
+def test_distance(path, exp):
+    """Testing the distance to qr_code"""
+    QR_SIZE_PX = 76
+    QR_SIZE_MM = 52
+    QR_DISTANCE = 500
+    qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+    frame = cv.imread(path)
+    retval, distance, angle, _, _ = qr_code.get_measurements(frame)
+    assert retval == exp[0] and distance == pytest.approx(exp[1]) \
+        and angle == pytest.approx(exp[2])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

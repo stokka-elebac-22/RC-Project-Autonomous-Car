@@ -1,11 +1,15 @@
 """Importing needed libraries"""
 import pytest
 import cv2
+import numpy as np
 from computer_vision.lane_detection.main import LaneDetector
 PATH = "computer_vision/lane_detection/assets/"
 
 sources = ['bike_park.jpg']
-
+sources_lines_coordinates = [
+    (sources[0], [-0.8819273, 822.19240925], [-2469, 3000, -768, 1500])]
+sources_lines_avg = [(sources[0], [np.array([2407, 2273, 2650, 2234]), np.array([328, 2530, 1111, 2433]), np.array(
+    [593, 2807, 945, 2757]), np.array([ 429,2512 ,673,2529]), np.array([ 683,2411,937,2447]), np.array([ 345,2517,580,2541])], [[-2060,  3000,  8492,  1500], [ 5492,  3000, -8860,  1500]])]
 
 class TestParametrized:
     """
@@ -15,6 +19,11 @@ class TestParametrized:
     def get_image(self, source):
         """Helping function for tests to get a cv2 image from a source file"""
         image = cv2.imread(PATH + source)
+        SCALE_PERCENT = 100  # percent of original size
+        new_width = int(image.shape[1] * SCALE_PERCENT / 100)
+        new_height = int(image.shape[0] * SCALE_PERCENT / 100)
+        dim = (new_width, new_height)
+        image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
         return image
 
     @pytest.mark.parametrize('source', sources)
@@ -29,25 +38,28 @@ class TestParametrized:
         assert new_image.shape != original_image.shape or cv2.countNonZero(
             b) != 0 or cv2.countNonZero(g) != 0 or cv2.countNonZero(r) != 0
 
-    # @pytest.mark.parametrize('source, expected',cases_ok)
-    @pytest.mark.skip(reason="no way of currently testing this")
-    def test_get_line_coordinates_from_parameters(self, source, expected):
+    @pytest.mark.parametrize('source, line, expected', sources_lines_coordinates)
+    def test_get_line_coordinates_from_parameters(self, source, line, expected):
         """Test if the returned values are equal to the manual calculated values"""
         lane_detector = LaneDetector()
         image = self.get_image(source)
-        coordinates = lane_detector.get_line_coordinates_from_parameters(image, [
-                                                                         2, 3])
+        coordinates = lane_detector.get_line_coordinates_from_parameters(
+            image, line)
+        coordinates = np.sort(coordinates)
+        expected = np.sort(expected)
         assert coordinates[0] == expected[0]
         assert coordinates[1] == expected[1]
         assert coordinates[2] == expected[2]
         assert coordinates[3] == expected[3]
 
-    @pytest.mark.skip(reason="no way of currently testing this")
+    @pytest.mark.parametrize('source, lines, expected', sources_lines_avg)
     def test_get_average_lines(self, source, lines, expected):
         "Test if the returned lines are equal to the manual calculated values"
         lane_detector = LaneDetector()
         image = self.get_image(source)
         avg_lines = lane_detector.get_average_lines(image, lines)
+        print(avg_lines)
+        print(expected)
         assert avg_lines[0] == expected[0] or avg_lines[0] == expected[1]
         assert avg_lines[1] == expected[1] or avg_lines[1] == expected[0]
         assert avg_lines[0] != avg_lines[1]

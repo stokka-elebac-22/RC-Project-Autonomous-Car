@@ -48,6 +48,8 @@ class LaneDetector:
 
     def get_average_lines(self, image, lines):
         """Sort the lines into left and right and get the average for each side"""
+        print("START")
+        print(lines)
         if lines is not None:
             left_fit = []  # will hold m,c parameters for left side lines
             right_fit = []  # will hold m,c parameters for right side lines
@@ -80,6 +82,8 @@ class LaneDetector:
                 right_fit_average = np.average(right_fit, axis=0)
                 right_line = self.get_line_coordinates_from_parameters(
                     image, right_fit_average)
+            print([left_line, right_line])
+            print("END")
             return np.array([left_line, right_line], dtype=object)
         return None
 
@@ -218,7 +222,7 @@ if __name__ == "__main__":
     # cap = cv2.VideoCapture("./assets/challenge_video.mp4")
     frame = cv2.imread("computer_vision/lane_detection/assets/bike_park.jpg")
 
-    SCALE_PERCENT = 30  # percent of original size
+    SCALE_PERCENT = 100  # percent of original size
     new_width = int(frame.shape[1] * SCALE_PERCENT / 100)
     new_height = int(frame.shape[0] * SCALE_PERCENT / 100)
     dim = (new_width, new_height)

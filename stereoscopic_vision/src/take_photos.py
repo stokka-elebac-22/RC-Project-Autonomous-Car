@@ -7,12 +7,14 @@ It will work with one camera, but it will end up in the calibrate left directory
 """
 
 # DIRECTORY = 'Stereoscopic Vision/images/depth_calibration'
-DIRECTORY = 'Stereoscopic Vision/images/calibrate/qr/'
+DIRECTORY = 'stereoscopic_vision/images/qr'
 
 cam1 = Camera(0, 'left')
-cam2 = Camera(2, 'right')
-cameras: Camera = [cam1, cam2]
-camera_sides = ['left', 'right']
+cam2 = Camera(1, 'right')
+# cameras: Camera = [cam1, cam2]
+# camera_sides = ['left', 'right']
+cameras: Camera = [cam1]
+camera_sides = ['distance']
 
 count = 0
 while True:

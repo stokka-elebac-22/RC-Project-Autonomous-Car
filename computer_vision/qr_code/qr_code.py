@@ -46,6 +46,7 @@ class QRCode:
         """
         qcd = cv.QRCodeDetector()
         ret_qr, _ , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
+
         if not ret_qr:
             return False, None, None, None, None
         width_px = max(abs(points_qr[0][0] - points_qr[1][0]) * (1 / resize),
@@ -162,13 +163,13 @@ if __name__ == '__main__':
 
     qrg = QRGeometry()
 
+    img = cv.imread('computer_vision/images/DSC_0134.jpg')
     while True:
-        img = local_read_camera()
-        retval, distance, angle, points, rest = qr_code.get_measurements(img)
+        # img = local_read_camera()
+        retval, distance, angle, points, rest = qr_code.get_measurements(img, qrg)
         filter_angle(angle)
         filter_distance(distance)
         if retval:
-            qrg.update(points)
             average_angle = sum(angles)//VALUES_LENGTH
             average_distance = sum(distance)//VALUES_LENGTH
             qr_code_display.display(img, qrg, average_angle, average_distance)

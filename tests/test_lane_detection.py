@@ -6,12 +6,36 @@ from computer_vision.lane_detection.main import LaneDetector
 PATH = "computer_vision/lane_detection/assets/"
 
 sources = ['bike_park.jpg']
-sources_lines_coordinates = [
-    (sources[0], [-0.8819273, 822.19240925], [-2469, 3000, -768, 1500])]
-sources_lines_avg = [(sources[0], [np.array([2407, 2273, 2650, 2234]), np.array([328, 2530, 1111, 2433]), np.array(
-    [593, 2807, 945, 2757]), np.array([ 429,2512 ,673,2529]), np.array([ 683,2411,937,2447]), np.array([ 345,2517,580,2541])], [np.array([-2060,  3000,  8492,  1500]), np.array([ 5492,  3000, -8860,  1500])])]
-sources_lines_diffs = [(sources[0], sources_lines_avg[0][2], 14.2)]
-sources_for_course = [(sources[0], sources_lines_avg[0][2], (3000, 7552, 3))]
+sources_lines_coordinates = [(sources[0],
+    [-0.8819273, 822.19240925],
+    [-2469, 3000, -768, 1500]
+)]
+
+sources_lines_avg = [(
+    sources[0],
+    [
+        np.array([2407, 2273, 2650, 2234]),
+        np.array([328, 2530, 1111, 2433]),
+        np.array([593, 2807, 945, 2757]),
+        np.array([ 429,2512 ,673,2529]),
+        np.array([ 683,2411,937,2447]),
+        np.array([ 345,2517,580,2541])
+    ],
+    [
+        np.array([-2060,  3000,  8492,  1500]),
+        np.array([ 5492,  3000, -8860,  1500])
+    ]
+)]
+sources_lines_diffs = [(
+    sources[0],
+    sources_lines_avg[0][2],
+    14.2
+)]
+sources_for_course = [(
+    sources[0],
+    sources_lines_avg[0][2],
+    (3000, 7552, 3)
+)]
 class TestParametrized:
     """
     DOC: Testing TrafficSignDetection class from module traffic_sign_detection

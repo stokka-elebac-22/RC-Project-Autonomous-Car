@@ -7,7 +7,7 @@ It will work with one camera, but it will end up in the calibrate left directory
 """
 
 # DIRECTORY = 'Stereoscopic Vision/images/depth_calibration'
-DIRECTORY = 'stereoscopic_vision/images/qr'
+DIRECTORY = 'tests/images/qr_code'
 
 cam1 = Camera(0, 'left')
 cam2 = Camera(1, 'right')

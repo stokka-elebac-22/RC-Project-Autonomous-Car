@@ -77,7 +77,7 @@ def test_distance(path, exp):
     """Testing the distance to qr_code"""
     QR_SIZE_PX = 76
     QR_SIZE_MM = 52
-    QR_DISTANCE = 500
+    QR_DISTANCE = 522200
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
     frame = cv.imread(path)
     retval, distance, angle, _, _ = qr_code.get_measurements(frame)

@@ -65,7 +65,7 @@ class TestParametrized:
 
     @pytest.mark.skip('NOT FINISHED')
     @pytest.mark.parametrize('img_source, lines, expected', [
-        ('bike_park.jpg', [np.array([300,327,1059,600]), np.arra    y([0, 781, 272,561])], [np.array([]), np.array([]), np.array([]), np.array([])]),
+        ('bike_park.jpg', [np.array([300,327,1059,600]), np.array([0, 781, 272,561])], [np.array([]), np.array([]), np.array([]), np.array([])]),
         ('curve.jpg', [np.array([751,327,1059,500]), np.array([0, 781, 272,561])], [np.array([]), np.array([]), np.array([]), np.array([])]),
         ('1.jpg', [np.array([123,434,343,767]), np.array([0, 781, 272,561])], [np.array([]), np.array([]), np.array([]), np.array([])]),
         ('2.jpg', [np.array([100,327,509,811]), np.array([0, 781, 272,561])], [(3000, 100, 3), np.array([[ 3.55484821e-01, -3.00399363e-01,  6.26821097e+01],

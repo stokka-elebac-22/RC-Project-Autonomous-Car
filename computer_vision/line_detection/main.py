@@ -62,6 +62,7 @@ class LineDetector:
             roi, 1, np.pi / 180, 40, np.array([]),
             minLineLength=self.hough_min_line_length, maxLineGap=self.hough_max_line_gap
         )
+        print(lines)
         return lines
 
     def show_lines(self, image, lines):
@@ -76,7 +77,7 @@ class LineDetector:
 if __name__ == "__main__":
     # cap = cv2.VideoCapture("./assets/challenge_video.mp4")
     frame = cv2.imread(
-        "computer_vision/lane_detection/assets/bike_park.jpg")
+        "computer_vision/line_detection/assets/bike_park.jpg")
 
     SCALE_PERCENT = 30  # percent of original size
     new_width = int(frame.shape[1] * SCALE_PERCENT / 100)
@@ -93,7 +94,6 @@ if __name__ == "__main__":
         # if cv2.waitKey(1) == ord('q') or ret == False:
         #    break
         all_lines = line_detector.get_lines(frame)
-        avg_lines = line_detector.get_average_lines(frame, all_lines)
         line_detector.show_lines(frame, all_lines)
         cv2.imshow('image', frame)
 

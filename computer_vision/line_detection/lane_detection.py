@@ -2,7 +2,7 @@
 import warnings
 import cv2
 import numpy as np
-from main import LineDetector
+from computer_vision.line_detection.main import LineDetector
 
 
 # SOURCE
@@ -53,21 +53,16 @@ class LaneDetector(LineDetector):
                     except np.RankWarning:
                         pass
 
-            left_line = None
-            right_line = None
-
             # now we have got m,c parameters for left and right line,
             # we need to know x1,y1 x2,y2 parameters
+            left_fit_average = None
+            right_fit_average = None
             if len(left_fit) > 0:
                 left_fit_average = np.average(left_fit, axis=0)
-                left_line = self.get_line_coordinates_from_parameters(
-                    image, left_fit_average)
             if len(right_fit) > 0:
                 right_fit_average = np.average(right_fit, axis=0)
-                right_line = self.get_line_coordinates_from_parameters(
-                    image, right_fit_average)
-            return np.array([left_line, right_line], dtype=object)
-        return None
+            return np.array([left_fit_average, right_fit_average], dtype=object)
+        return np.array([None, None])
 
     def get_diff_from_center_info(self, image, lines):
         """Calculate the difference from car center to lane center"""
@@ -208,6 +203,7 @@ if __name__ == "__main__":
         #    break
         all_lines = lane_detector.get_lines(frame)
         avg_lines = lane_detector.get_average_lines(frame, all_lines)
+        avg_lines = [lane_detector.get_line_coordinates_from_parameters(frame, line) for line in avg_lines]
         lane_detector.show_lines(frame, avg_lines)
         center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)
         if center_diff is not None:

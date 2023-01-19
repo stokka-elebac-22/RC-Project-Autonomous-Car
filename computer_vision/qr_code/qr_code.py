@@ -93,9 +93,9 @@ class QRCode:
         distance = self.qr_geometry.get_distance()
         return True, distance, angle, decoded_info, points_qr, rest_qr
 
-    def display(self, frame, angle=None, distance=None, decoded_info=None):
+    def display(self, frame, angle=None, distance=None, decoded_info=None, verbose=1):
         """Displays the qr code with data"""
-        self.qr_display.display(frame, self.qr_geometry, angle, distance, decoded_info)
+        self.qr_display.display(frame, self.qr_geometry, angle, distance, decoded_info, verbose=verbose)
 class DisplayQRCode:
     """DisplayQRCode, QR code placement estimation."""
     def __init__(self):
@@ -148,9 +148,9 @@ class DisplayQRCode:
             cv.putText(frame, str(int(qrg.side_d)), text_location_d, self.font, \
                         self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
 
-        cv.putText(frame, f'angle    = {angle}', (10, 20), self.font, \
+        cv.putText(frame, f'angle    = {int(angle)}', (10, 20), self.font, \
                             self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
-        cv.putText(frame, f'distance = {distance}', (10, 50), \
+        cv.putText(frame, f'distance = {int(distance)}', (10, 50), \
                 self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
 def local_read_camera(name=None, resize=1):
@@ -200,15 +200,15 @@ if __name__ == '__main__':
         distances.append(dist)
 
     while True:
-        img = cv.imread('computer_vision/images/DSC_0134.jpg')
+        img = cv.imread('computer_vision/images/DSC_0148.jpg')
         # img = local_read_camera()
         retval, distance, angle, decoded_info, points, rest = qr_code.get_data(img)
         filter_angle(angle)
         filter_distance(distance)
         if retval:
-            average_angle = sum(angles)//VALUES_LENGTH
-            average_distance = sum(distances)//VALUES_LENGTH
-            qr_code.display(img, average_angle, average_distance, decoded_info)
+            average_angle = int(sum(angles)//VALUES_LENGTH)
+            average_distance = int(sum(distances)//VALUES_LENGTH)
+            qr_code.display(img, average_angle, average_distance, decoded_info, verbose=2)
         cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):
             break

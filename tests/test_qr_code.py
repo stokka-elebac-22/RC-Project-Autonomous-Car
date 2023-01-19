@@ -43,12 +43,12 @@ def test_sides_update(pts, exp):
 @pytest.mark.parametrize(
     ["name", "exp"],
     [
-        ('DSC_0142', [True, 90]),
-        ('DSC_0135', [True, 75]),
-        ('DSC_0136', [True, 60]),
+        ('DSC_0142', [True, 0]),
+        ('DSC_0135', [True, 15]),
+        ('DSC_0136', [True, 30]),
         ('DSC_0137', [True, 45]),
-        ('DSC_0138', [False, 30]),
-        ('DSC_0141', [False, 15]),
+        ('DSC_0138', [False, 60]),
+        ('DSC_0141', [False, 75]),
     ]
 )
 def test_angle(name, exp):
@@ -64,12 +64,12 @@ def test_angle(name, exp):
 @pytest.mark.parametrize(
     ["path", "exp"],
     [
-        ('DSC_0148', [True, 100, 90]),
-        ('DSC_0152', [True, 178, 90]),
-        ('DSC_0149', [True, 200, 90]),
-        ('DSC_0153', [True, 276, 90]),
-        ('DSC_0150', [True, 300, 90]),
-        ('DSC_0151', [True, 350, 90]),
+        ('DSC_0148', [True, 100, 0]),
+        ('DSC_0152', [True, 178, 0]),
+        ('DSC_0149', [True, 200, 0]),
+        ('DSC_0153', [True, 276, 0]),
+        ('DSC_0150', [True, 300, 0]),
+        ('DSC_0151', [True, 350, 0]),
     ]
 )
 

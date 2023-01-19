@@ -48,8 +48,6 @@ class LaneDetector:
 
     def get_average_lines(self, image, lines):
         """Sort the lines into left and right and get the average for each side"""
-        print("START")
-        print(lines)
         if lines is not None:
             left_fit = []  # will hold m,c parameters for left side lines
             right_fit = []  # will hold m,c parameters for right side lines
@@ -82,8 +80,6 @@ class LaneDetector:
                 right_fit_average = np.average(right_fit, axis=0)
                 right_line = self.get_line_coordinates_from_parameters(
                     image, right_fit_average)
-            print([left_line, right_line])
-            print("END")
             return np.array([left_line, right_line], dtype=object)
         return None
 
@@ -133,10 +129,10 @@ class LaneDetector:
                 diff = (center_car - center_lane)/width * real_width
             return diff
 
-    def get_course(self, image, points_coordinates):
+    def get_course(self, image, lines):
         """Returns polys that define the course and points used to define the polys"""
 
-        coordinates_x = [points_coordinates[0][0], points_coordinates[1][0]]
+        coordinates_x = [lines[0][0], lines[1][0]]
         # coordinates_y = [points_coordinates[0][3], points_coordinates[1][3]]
         width = max(coordinates_x) - min(coordinates_x)
 
@@ -150,10 +146,10 @@ class LaneDetector:
                                 [width, height],
                                 [width, 0]])
 
-        pt_input = np.float32([[points_coordinates[0][2], points_coordinates[0][3]],
-                               [points_coordinates[0][0], points_coordinates[0][1]],
-                               [points_coordinates[1][0], points_coordinates[1][1]],
-                               [points_coordinates[1][2], points_coordinates[1][3]]])
+        pt_input = np.float32([[lines[0][2], lines[0][3]],
+                               [lines[0][0], lines[0][1]],
+                               [lines[1][0], lines[1][1]],
+                               [lines[1][2], lines[1][3]]])
 
         perspective_transform = cv2.getPerspectiveTransform(
             pt_input, pt_output)
@@ -173,6 +169,9 @@ class LaneDetector:
         poly_1 = np.polyfit([x_1, x_2, x_3], [y_1, y_2, y_1], 2)
 
         poly_2 = np.polyfit([x_1, x_2, x_3], [y_3, y_2, y_3,], 2)
+
+        print((warped.shape, perspective_transform,
+                [(x_1, y_1), (x_2, y_2), (x_3, y_3)], [poly_1, poly_2]))
 
         return (warped.shape, perspective_transform,
                 [(x_1, y_1), (x_2, y_2), (x_3, y_3)], [poly_1, poly_2])
@@ -222,7 +221,7 @@ if __name__ == "__main__":
     # cap = cv2.VideoCapture("./assets/challenge_video.mp4")
     frame = cv2.imread("computer_vision/lane_detection/assets/bike_park.jpg")
 
-    SCALE_PERCENT = 100  # percent of original size
+    SCALE_PERCENT = 30  # percent of original size
     new_width = int(frame.shape[1] * SCALE_PERCENT / 100)
     new_height = int(frame.shape[0] * SCALE_PERCENT / 100)
     dim = (new_width, new_height)
@@ -249,6 +248,7 @@ if __name__ == "__main__":
             frame, avg_lines)
         warped_img, course_img = lane_detector.show_course(
             frame, shape, points, lane_transform, course_polys)
+        cv2.imshow('image', frame)
         cv2.imshow('warped', warped_img)
         cv2.imshow('course', course_img)
         # cv2.imshow('frame', frame)

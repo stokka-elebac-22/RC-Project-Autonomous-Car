@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "computer-vision"
+version = "0.1.0"
+description = ""
+authors = ["Asbjørn Stokka <asbjorn.stokka@lyse.net>"]
+readme = "README.md"
+packages = [{include = "computer_vision"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+opencv-python = "^4.7.0.68"
+pyqt6 = "^6.4.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.0"
+pytest-cov = "^4.0.0"
+pytest-xdist = "^3.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

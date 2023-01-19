@@ -5,18 +5,48 @@ import cv2 as cv
 @dataclasses.dataclass
 class QRGeometry:
     """PointSet, used by qrcode."""
-    def __init__(self, pts=None):
+    def __init__(self, size_px, size_mm, distance, pts=None):
+        self.qr_size_px = size_px
+        self.qr_size_mm = size_mm
+        self.qr_distance = distance
+
         if pts is None or len(pts[0]) < 4:
             pts = [[[0,0],[0,0],[0,0],[0,0]]]
         self.update(pts)
 
     def update(self, pts):
         """update points, used by qrcode."""
+        if pts is None:
+            return
         self.points = pts[0]
         self.side_a = abs(self.points[0][0] - self.points[1][0])
         self.side_b = abs(self.points[1][1] - self.points[2][1])
         self.side_c = abs(self.points[2][0] - self.points[3][0])
         self.side_d = abs(self.points[3][1] - self.points[0][1])
+
+    def get_width(self) -> int:
+        width_px = max(abs(self.points[0][0] - self.points[1][0]),
+        abs(self.points[2][0] - self.points[2][0]))
+        return width_px
+
+    def get_height(self) -> int:
+        height_px = max(abs(self.points[2][1] - self.points[0][1]),
+        abs(self.points[2][1] - self.points[1][1]))
+        return height_px
+
+    def get_angle(self) -> float:
+        width = self.get_width()
+        height = self.get_height()
+        ratio = width/height
+        angle = (1 - ratio) * 90
+        return angle
+
+    def get_distance(self) -> float:
+        height_px = self.get_height()
+        focal_length = (self.qr_size_px / self.qr_size_mm) * self.qr_distance
+        distance = (self.qr_size_mm * focal_length) / height_px
+        return distance
+
 
 class QRCode:
     """QRCode, doing calculations for QR code placement estimation."""
@@ -29,38 +59,37 @@ class QRCode:
 #            p1 ---------- p0
 #                    a
 
-    def __init__(self, size_px, size_mm, distance):
-        self.qr_size_px = size_px
-        self.qr_size_mm = size_mm
-        self.qr_distance = distance
+    def __init__(self, size_px, size_mm, distance, pts=None):
+        self.qr_geometry = QRGeometry(size_px, size_mm, distance, pts)
+        self.qr_display = DisplayQRCode()
 
-    def get_measurements(self, frame, resize=1):
+    def get_data(self, frame):
         """Update values
         The resize variable is only relevant if not using video
         This function returns:
         - bool, stating if it could detect the qr code
         - a float value for distance and angle
+        - the decoded info
         - a list of points (formatted like [[[0, 0], ..., [1, 1]]])
         - return straight value
         get_measurements(self, frame, resize=1) -> bool, float, float
         """
         qcd = cv.QRCodeDetector()
-        ret_qr, _ , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
+        ret_qr, decoded_info , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
+
+        if ret_qr:
+            self.qr_geometry.update(points_qr)
 
         if not ret_qr:
-            return False, None, None, None, None
-        width_px = max(abs(points_qr[0][0] - points_qr[1][0]) * (1 / resize),
-        abs(points_qr[2][0] - points_qr[2][0]))
-        height_px = max(abs(points_qr[2][1] - points_qr[0][1]),
-        abs(points_qr[2][1] - points_qr[1][1]))
+            return False, None, None, None, None, None
 
-        height_px_resize = height_px * (1/resize)
-        ratio = width_px/height_px
+        angle = self.qr_geometry.get_angle()
+        distance = self.qr_geometry.get_distance()
+        return True, distance, angle, decoded_info, points_qr, rest_qr
 
-        focal_length = (self.qr_size_px / self.qr_size_mm) * self.qr_distance
-        angle = (1 - ratio) * 90
-        distance = (self.qr_size_mm * focal_length) / height_px_resize
-        return True, distance, angle, points_qr, rest_qr
+    def display(self, frame, angle=None, distance=None, decoded_info=None):
+        """Displays the qr code with data"""
+        self.qr_display.display(frame, self.qr_geometry, angle, distance, decoded_info)
 class DisplayQRCode:
     """DisplayQRCode, QR code placement estimation."""
     def __init__(self):
@@ -73,18 +102,23 @@ class DisplayQRCode:
         self.text_color = (255, 0, 255)
         self.text_thickness = 1
 
-    def display(self, frame, qrc: QRCode, angle: int, dist, verbose=1):
+    def display(self, frame, qrg: QRGeometry, angle, distance, decoded_info, verbose=1):
         """
         Display
         returns a frame
         """
-        if qrc.decoded_info:
+        if angle is None:
+            angle = qrg.get_angle()
+        if distance is None:
+            angle = qrg.get_distance()
+
+        if decoded_info:
             color = self.color_frame_green
         else:
             color = self.color_frame_red
-        frame = cv.polylines(frame, [qrc.qrg.points.astype(int)], True, color, 4)
+        frame = cv.polylines(frame, [qrg.points.astype(int)], True, color, 4)
         if verbose > 0:
-            self.display_values(frame, qrc, qrc.qrg, angle, dist, verbose)
+            self.display_values(frame, qrg, angle, distance, verbose)
         return frame
 
     def display_values(self, frame, qrg: QRGeometry, angle: int, dist: int, verbose=1):
@@ -140,12 +174,10 @@ if __name__ == '__main__':
 
     qcd = cv.QRCodeDetector()
 
-    qr_code_display = DisplayQRCode()
-
     ##### VALUES #####
     VALUES_LENGTH = 10
     angles = [0 for _ in range(VALUES_LENGTH)]
-    distance = [0 for _ in range(VALUES_LENGTH)]
+    distances = [0 for _ in range(VALUES_LENGTH)]
 
     def filter_angle(angle):
         """filter angle values """
@@ -154,25 +186,23 @@ if __name__ == '__main__':
         angles.pop(0)
         angles.append(angle)
 
-    def filter_distance(distance):
+    def filter_distance(dist):
         """filter distance values """
-        if distance is None:
+        if dist is None:
             return
-        distance.pop(0)
-        distance.append(distance)
+        distances.pop(0)
+        distances.append(dist)
 
-    qrg = QRGeometry()
-
-    img = cv.imread('computer_vision/images/DSC_0134.jpg')
     while True:
+        img = cv.imread('computer_vision/images/DSC_0134.jpg')
         # img = local_read_camera()
-        retval, distance, angle, points, rest = qr_code.get_measurements(img, qrg)
+        retval, distance, angle, decoded_info, points, rest = qr_code.get_data(img)
         filter_angle(angle)
         filter_distance(distance)
         if retval:
             average_angle = sum(angles)//VALUES_LENGTH
-            average_distance = sum(distance)//VALUES_LENGTH
-            qr_code_display.display(img, qrg, average_angle, average_distance)
+            average_distance = sum(distances)//VALUES_LENGTH
+            qr_code.display(img, average_angle, average_distance, decoded_info)
         cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):
             break

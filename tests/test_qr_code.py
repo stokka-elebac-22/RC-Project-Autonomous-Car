@@ -64,12 +64,13 @@ def test_angle(name, exp):
 @pytest.mark.parametrize(
     ["path", "exp"],
     [
-        ('DSC_0148', [True, 100, 0]),
-        ('DSC_0152', [True, 178, 0]),
-        ('DSC_0149', [True, 200, 0]),
-        ('DSC_0153', [True, 276, 0]),
-        ('DSC_0150', [True, 300, 0]),
-        ('DSC_0151', [True, 350, 0]),
+        ('20', [True, 200, 0]),
+        ('25', [True, 250, 0]),
+        ('30', [True, 300, 0]),
+        ('40', [True, 400, 0]),
+        ('50', [True, 500, 0]),
+        ('70', [True, 700, 0]),
+        ('100', [True, 1000, 0]),
     ]
 )
 
@@ -79,7 +80,7 @@ def test_distance(path, exp):
     QR_SIZE_MM = 52
     QR_DISTANCE = 500
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
-    frame = cv.imread("tests/qr_test_img/" + path + ".jpg")
+    frame = cv.imread("tests/qr_code/distance/" + path + ".jpg")
     retval, distance, angle, _, _, _ = qr_code.get_data(frame)
     assert retval == exp[0] and distance == pytest.approx(exp[1]) \
         and angle == pytest.approx(exp[2])

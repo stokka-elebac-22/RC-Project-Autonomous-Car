@@ -65,10 +65,12 @@ class TestParametrized:
 
     @pytest.mark.skip('NOT FINISHED')
     @pytest.mark.parametrize('img_source, lines, expected', [
-        ('bike_park.jpg', [np.array([300,327,1059,600]), np.array([0, 781, 272,561])], []),
-        ('curve.jpg', [np.array([751,327,1059,500]), np.array([0, 781, 272,561])], []),
-        ('1.jpg', [np.array([123,434,343,767]), np.array([0, 781, 272,561])], []),
-        ('2.jpg', [np.array([100,327,509,811]), np.array([0, 781, 272,561])], [])])
+        ('bike_park.jpg', [np.array([300,327,1059,600]), np.arra    y([0, 781, 272,561])], [np.array([]), np.array([]), np.array([]), np.array([])]),
+        ('curve.jpg', [np.array([751,327,1059,500]), np.array([0, 781, 272,561])], [np.array([]), np.array([]), np.array([]), np.array([])]),
+        ('1.jpg', [np.array([123,434,343,767]), np.array([0, 781, 272,561])], [np.array([]), np.array([]), np.array([]), np.array([])]),
+        ('2.jpg', [np.array([100,327,509,811]), np.array([0, 781, 272,561])], [(3000, 100, 3), np.array([[ 3.55484821e-01, -3.00399363e-01,  6.26821097e+01],
+       [ 1.07330901e+01, -1.01749694e+01,  2.78875734e+03],
+       [ 3.16837462e-03, -3.48181553e-03,  1.00000000e+00]]), np.array( [(2000, 3000), (1025, 2400), (50, 1800)]), np.array([np.array([ 6.31163708e-04, -1.29388560e+00,  3.06311637e+03]), np.array([-6.31163708e-04,  1.29388560e+00,  1.73688363e+03])])])])
     def test_get_course(self, img_source, lines, expected):
         """Test if the output value is equal to the manual calculation value"""
         lane_detector = LaneDetector()
@@ -88,5 +90,7 @@ class TestParametrized:
         image = self.get_image(source)
         warped, weighted = lane_detector.show_course(
             image, shape, points, transform, polys)
-
-
+        difference = cv2.subtract(warped, weighted)
+        b_color, g_color, r_color = cv2.split(difference)
+        assert warped.shape != weighted.shape or cv2.countNonZero(
+            b_color) != 0 or cv2.countNonZero(g_color) != 0 or cv2.countNonZero(r_color) != 0

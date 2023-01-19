@@ -2,7 +2,7 @@
 import pytest
 import cv2
 import numpy as np
-from computer_vision.lane_detection.main import LaneDetector
+from computer_vision.line_detection.lane_detector import LaneDetector
 PATH = "computer_vision/lane_detection/assets/"
 
 sources = ['bike_park.jpg']
@@ -44,9 +44,9 @@ class TestParametrized:
     def get_image(self, source):
         """Helping function for tests to get a cv2 image from a source file"""
         image = cv2.imread(PATH + source)
-        SCALE_PERCENT = 100  # percent of original size
-        new_width = int(image.shape[1] * SCALE_PERCENT / 100)
-        new_height = int(image.shape[0] * SCALE_PERCENT / 100)
+        scale_percent = 100  # percent of original size
+        new_width = int(image.shape[1] * scale_percent / 100)
+        new_height = int(image.shape[0] * scale_percent / 100)
         dim = (new_width, new_height)
         image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
         return image
@@ -59,9 +59,9 @@ class TestParametrized:
 
         new_image = lane_detector.get_lane_region(original_image)
         difference = cv2.subtract(original_image, new_image)
-        b, g, r = cv2.split(difference)
+        b_color, g_color, r_color = cv2.split(difference)
         assert new_image.shape != original_image.shape or cv2.countNonZero(
-            b) != 0 or cv2.countNonZero(g) != 0 or cv2.countNonZero(r) != 0
+            b_color) != 0 or cv2.countNonZero(g_color) != 0 or cv2.countNonZero(r_color) != 0
 
     @pytest.mark.parametrize('source, line, expected', sources_lines_coordinates)
     def test_get_line_coordinates_from_parameters(self, source, line, expected):
@@ -112,3 +112,4 @@ class TestParametrized:
             image, lines)
         assert output_shape == shape
         assert len(coordinates) == 3
+        

@@ -5,10 +5,16 @@ import cv2 as cv
 @dataclasses.dataclass
 class QRGeometry:
     """PointSet, used by qrcode."""
-    def __init__(self, size_px, size_mm, distance, pts=None):
+    def __init__(self, size_px=None, size_mm=None, distance=None, pts=None):
         self.qr_size_px = size_px
         self.qr_size_mm = size_mm
         self.qr_distance = distance
+        if size_px is None:
+            size_px = 1
+        if size_mm is None:
+            size_mm = 1
+        if distance is None:
+            distance = 1
 
         if pts is None or len(pts[0]) < 4:
             pts = [[[0,0],[0,0],[0,0],[0,0]]]

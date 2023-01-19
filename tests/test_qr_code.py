@@ -20,7 +20,7 @@ def test_points_empty():
 )
 def test_points_update(pts, exp):
     """Testing update points"""
-    qr_code = QRGeometry(pts)
+    qr_code = QRGeometry(pts=pts)
     assert qr_code.points[0] == exp[0] and qr_code.points[1] == exp[1] and \
             qr_code.points[2] == exp[2] and qr_code.points[3] == exp[3]
 
@@ -34,10 +34,9 @@ def test_points_update(pts, exp):
 )
 def test_sides_update(pts, exp):
     """Testing sides"""
-    qr_code = QRGeometry(pts)
+    qr_code = QRGeometry(pts=pts)
     assert qr_code.side_a == exp[0] and qr_code.side_b == exp[1] and \
         qr_code.side_c == exp[2] and qr_code.side_d == exp[3]
-
 
 # test on pictures with approx
 # https://docs.pytest.org/en/4.6.x/reference.html
@@ -59,7 +58,7 @@ def test_angle(name, exp):
     QR_DISTANCE = 500
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
     frame = cv.imread("tests/qr_test_img/" + name + ".jpg")
-    retval, _, angle, _, _ = qr_code.get_measurements(frame)
+    retval, _, angle, _, _, _ = qr_code.get_data(frame)
     assert retval == exp[0] and angle == pytest.approx(exp[1])
 
 @pytest.mark.parametrize(
@@ -81,7 +80,7 @@ def test_distance(path, exp):
     QR_DISTANCE = 500
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
     frame = cv.imread("tests/qr_test_img/" + path + ".jpg")
-    retval, distance, angle, _, _ = qr_code.get_measurements(frame)
+    retval, distance, angle, _, _, _ = qr_code.get_data(frame)
     assert retval == exp[0] and distance == pytest.approx(exp[1]) \
         and angle == pytest.approx(exp[2])
 

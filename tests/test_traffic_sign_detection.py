@@ -2,7 +2,7 @@
 import pytest
 import cv2
 from computer_vision.traffic_sign_detection.src.main import TrafficSignDetector
-PATH = "computer_vision/traffic_sign_detection/images/test"
+PATH = "tests/images/traffic_sign"
 
 cases_ok = [
     ('1.jpg', 1),

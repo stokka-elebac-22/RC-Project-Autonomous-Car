@@ -200,15 +200,15 @@ if __name__ == '__main__':
         distances.append(dist)
 
     while True:
-        img = cv.imread('computer_vision/images/DSC_0148.jpg')
-        # img = local_read_camera()
+        # img = cv.imread('computer_vision/images/DSC_0148.jpg')
+        img = local_read_camera()
         retval, distance, angle, decoded_info, points, rest = qr_code.get_data(img)
         filter_angle(angle)
         filter_distance(distance)
         if retval:
             average_angle = int(sum(angles)//VALUES_LENGTH)
             average_distance = int(sum(distances)//VALUES_LENGTH)
-            qr_code.display(img, average_angle, average_distance, decoded_info, verbose=2)
+            qr_code.display(img, average_angle, average_distance, decoded_info)
         cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):
             break

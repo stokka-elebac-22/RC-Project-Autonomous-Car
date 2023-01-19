@@ -38,38 +38,39 @@ def test_sides_update(pts, exp):
     assert qr_code.side_a == exp[0] and qr_code.side_b == exp[1] and \
         qr_code.side_c == exp[2] and qr_code.side_d == exp[3]
 
-@pytest.mark.paramterize(
-    ["path", "exp"],
-    [
-        ('DC142', [True, 90]),
-        ('DC125', [True, 75]),
-        ('DC136', [True, 60]),
-        ('DC137', [True, 45]),
-        ('DC138', [False, 30]),
-        ('DC141', [False, 15]),
-    ]
-)
+
 # test on pictures with approx
 # https://docs.pytest.org/en/4.6.x/reference.html
-def test_angle(path, exp):
+@pytest.mark.parametrize(
+    ["name", "exp"],
+    [
+        ('DSC_0142', [True, 90]),
+        ('DSC_0135', [True, 75]),
+        ('DSC_0136', [True, 60]),
+        ('DSC_0137', [True, 45]),
+        ('DSC_0138', [False, 30]),
+        ('DSC_0141', [False, 15]),
+    ]
+)
+def test_angle(name, exp):
     """Testing the angle to qr code"""
     QR_SIZE_PX = 76
     QR_SIZE_MM = 52
     QR_DISTANCE = 500
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
-    frame = cv.imread(path)
+    frame = cv.imread("tests/qr_test_img/" + name + ".jpg")
     retval, _, angle, _, _ = qr_code.get_measurements(frame)
     assert retval == exp[0] and angle == pytest.approx(exp[1])
 
 @pytest.mark.parametrize(
     ["path", "exp"],
     [
-        ('DC148', [True, 100, 90]),
-        ('DC152', [True, 178, 90]),
-        ('DC149', [True, 200, 90]),
-        ('DC153', [True, 276, 90]),
-        ('DC150', [True, 300, 90]),
-        ('DC151', [True, 350, 90]),
+        ('DSC_0148', [True, 100, 90]),
+        ('DSC_0152', [True, 178, 90]),
+        ('DSC_0149', [True, 200, 90]),
+        ('DSC_0153', [True, 276, 90]),
+        ('DSC_0150', [True, 300, 90]),
+        ('DSC_0151', [True, 350, 90]),
     ]
 )
 
@@ -79,7 +80,7 @@ def test_distance(path, exp):
     QR_SIZE_MM = 52
     QR_DISTANCE = 500
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
-    frame = cv.imread(path)
+    frame = cv.imread("tests/qr_test_img/" + path + ".jpg")
     retval, distance, angle, _, _ = qr_code.get_measurements(frame)
     assert retval == exp[0] and distance == pytest.approx(exp[1]) \
         and angle == pytest.approx(exp[2])

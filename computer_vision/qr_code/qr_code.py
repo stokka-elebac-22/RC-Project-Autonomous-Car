@@ -44,6 +44,7 @@ class QRCode:
         - return straight value
         get_measurements(self, frame, resize=1) -> bool, float, float
         """
+        qcd = cv.QRCodeDetector()
         ret_qr, _ , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
         if not ret_qr:
             return False, None, None, None, None

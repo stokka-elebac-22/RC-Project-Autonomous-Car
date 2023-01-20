@@ -150,9 +150,9 @@ if __name__ == '__main__':
 
     # NOTE: if you also have a webcam (that you do not want to use),
     # use id 0 and 2 (not always the case....)
-    cam_left = Camera(camera_id=1, window_name='Left camera')
+    cam_left = Camera(camera_id=0, window_name='Left camera')
     cam_right = Camera(camera_id=2, window_name='Right camera')
-    stereo_vision = StereoscopicVision(path="computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml")
+    stereo_vision = StereoscopicVision(path="stereoscopic_vision/data/stereo_rectify_maps.xml")
 
     cv.namedWindow('disp', cv.WINDOW_NORMAL)
     cv.resizeWindow('disp', 800,600)
@@ -225,22 +225,22 @@ if __name__ == '__main__':
 
     average = [0 for _ in range(10)]
 
-    # DIRECTORY_LEFT_IMAGE = 'tests/images/qr_code/left/left_0.jpg'
-    # DIRECTORY_RIGHT_IMAGE = 'tests/images/qr_code/right/right_0.jpg'
+    DIRECTORY_LEFT_IMAGE = 'stereoscopic_vision/images/calibrate/qr/left/left_0.jpg'
+    DIRECTORY_RIGHT_IMAGE = 'stereoscopic_vision/images/calibrate/qr/right/right_0.jpg'
 
-    # if not os.path.exists(DIRECTORY_LEFT_IMAGE):
-    #     print(f'{DIRECTORY_LEFT_IMAGE} does not exists')
-    #     raise Exception
-    # if not os.path.exists(DIRECTORY_RIGHT_IMAGE):
-    #     print(f'{DIRECTORY_RIGHT_IMAGE} does not exists')
-    #     raise Exception
+    if not os.path.exists(DIRECTORY_LEFT_IMAGE):
+        print(f'{DIRECTORY_LEFT_IMAGE} does not exists')
+        raise Exception
+    if not os.path.exists(DIRECTORY_RIGHT_IMAGE):
+        print(f'{DIRECTORY_RIGHT_IMAGE} does not exists')
+        raise Exception
 
     while True:
-        ret_left, frame_left = cam_left.read()
-        ret_right, frame_right = cam_right.read()
-        # ret_left, ret_right = True, True
-        # frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
-        # frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
+        # ret_left, frame_left = cam_left.read()
+        # ret_right, frame_right = cam_right.read()
+        ret_left, ret_right = True, True
+        frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
+        frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
 
         if ret_left and ret_right:
             # NOTE: it might help to blur the image to reduce noise

@@ -62,7 +62,6 @@ class LineDetector:
             roi, 1, np.pi / 180, 40, np.array([]),
             minLineLength=self.hough_min_line_length, maxLineGap=self.hough_max_line_gap
         )
-        print(lines)
         return lines
 
     def show_lines(self, image, lines):

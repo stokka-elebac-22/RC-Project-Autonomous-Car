@@ -57,7 +57,7 @@ def test_angle(name, exp):
     QR_SIZE_MM = 190
     QR_DISTANCE = 500
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
-    frame = cv.imread("tests/qr_test_img/" + name + ".jpg")
+    frame = cv.imread("tests/images/qr_code/angle" + name + ".jpg")
     retval, _, angle, _, _, _ = qr_code.get_data(frame)
     assert retval == exp[0] and angle == pytest.approx(exp[1])
 
@@ -79,7 +79,7 @@ def test_distance(path, exp):
     QR_SIZE_CM = 19
     QR_DISTANCE_CM = 50
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_CM, QR_DISTANCE_CM)
-    frame = cv.imread("tests/qr_test_img/" + path + ".jpg")
+    frame = cv.imread("tests/qr_code/angle/" + path + ".jpg")
     retval, distance, angle, _, _, _ = qr_code.get_data(frame)
     assert retval == exp[0] and distance == pytest.approx(exp[1]) \
         and angle == pytest.approx(exp[2])

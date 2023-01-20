@@ -47,7 +47,7 @@ if __name__ == "__main__":
                     not_stopped = True
                     for cluster in clustered_lines:
                         for line in cluster:
-                            if np.isclose((slope, intercept), cluster, rtol=1).all():
+                            if np.isclose((slope, intercept), cluster, rtol=0.3).all():
                                 cluster.append((slope, intercept))
                                 not_stopped = False
                                 break

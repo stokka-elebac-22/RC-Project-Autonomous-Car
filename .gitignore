@@ -40,5 +40,19 @@ pip-wheel-metadata
 
 poetry/core/*
 
-# Data
-Stereoscopic Vision/data/*.xml
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# data
+Stereoscopic Vision/data/stereo_rectify_maps.xml

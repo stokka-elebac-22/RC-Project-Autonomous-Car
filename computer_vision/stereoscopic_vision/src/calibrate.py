@@ -12,9 +12,9 @@ import cv2 as cv
 
 CHECKERBOARD_DIMENSION = (8, 6)
 CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-DIRECTORY_LEFT = "Stereoscopic Vision/images/calibrate/left/*.jpg"
-DIRECTORY_RIGHT = "Stereoscopic Vision/images/calibrate/right/*.jpg"
-DESTINATION_PATH = "Stereoscopic Vision/data/stereo_rectify_maps.xml"
+DIRECTORY_LEFT = "tests/images/qr_code/left/*.jpg"
+DIRECTORY_RIGHT = "tests/images/qr_code/right/*.jpg"
+DESTINATION_PATH = "computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml"
 
 class Calibrate:
     """Calibrating two cameras"""
@@ -64,9 +64,9 @@ class Calibrate:
                 # draw and display the corners
                 cv.drawChessboardCorners(image_left, self.board_dim, corners_left, ret_left)
                 cv.drawChessboardCorners(image_right, self.board_dim, corners_right, ret_right)
-                cv.imshow("left", image_left)
-                cv.imshow("right", image_right)
-                cv.waitKey(0)
+                # cv.imshow("left", image_left)
+                # cv.imshow("right", image_right)
+                # cv.waitKey(0)
         print(f"""Could find chessboard corners in {len(object_points)}
         out of {len(images_left)} images""")
 

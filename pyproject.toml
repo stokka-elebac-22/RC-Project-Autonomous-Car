@@ -10,6 +10,7 @@ packages = [{include = "computer_vision"}]
 python = "^3.9"
 opencv-python = "^4.7.0.68"
 pyqt6 = "^6.4.0"
+pyqtgraph = "^0.13.1"
 
 
 [tool.poetry.group.dev.dependencies]

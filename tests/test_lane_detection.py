@@ -63,24 +63,62 @@ class TestParametrized:
         diff = np.round(lane_detector.get_diff_from_center_info(image, lines), 3)
         assert diff == expected
 
-    @pytest.mark.skip('NOT FINISHED')
+    #@pytest.mark.skip('NOT FINISHED')
     @pytest.mark.parametrize('img_source, lines, expected', [
-        ('bike_park.jpg', [np.array([300,327,1059,600]), np.array([0, 781, 272,561])], [np.array([]), np.array([]), np.array([]), np.array([])]),
-        ('curve.jpg', [np.array([751,327,1059,500]), np.array([0, 781, 272,561])], [np.array([]), np.array([]), np.array([]), np.array([])]),
-        ('1.jpg', [np.array([123,434,343,767]), np.array([0, 781, 272,561])], [np.array([]), np.array([]), np.array([]), np.array([])]),
-        ('2.jpg', [np.array([100,327,509,811]), np.array([0, 781, 272,561])], [(3000, 100, 3), np.array([[ 3.55484821e-01, -3.00399363e-01,  6.26821097e+01],
-       [ 1.07330901e+01, -1.01749694e+01,  2.78875734e+03],
-       [ 3.16837462e-03, -3.48181553e-03,  1.00000000e+00]]), np.array( [(2000, 3000), (1025, 2400), (50, 1800)]), np.array([np.array([ 6.31163708e-04, -1.29388560e+00,  3.06311637e+03]), np.array([-6.31163708e-04,  1.29388560e+00,  1.73688363e+03])])])])
+        ('bike_park.jpg', 
+        [np.array([300,327,1059,600]), np.array([0, 781, 272,561])], 
+        [(3000, 300, 3), 
+        np.array(
+            [[ 4.66628436e-02, -1.29732961e-01,  2.84238251e+01],
+            [ 1.54723157e-01, -3.12223397e+00,  1.70948856e+03],
+            [-7.81961244e-04, -1.59153913e-03,  1.00000000e+00]]), 
+        np.array([(2000, 3000), (1075, 2400), (150, 1800)]), 
+        np.array([np.array([ 7.01241782e-04, -1.50766983e+00,  3.21037253e+03]), 
+            np.array([-7.01241782e-04,  1.50766983e+00,  1.58962747e+03])])]),
+        
+        ('curve.jpg', 
+        [np.array([751,327,1059,500]), np.array([0, 781, 272,561])], 
+        [(3000, 751, 3), 
+        np.array(
+            [[-9.35875535e-02,  1.66618303e-01,  1.58000675e+01],
+            [ 2.27146016e-01,  2.93055597e+00, -1.70582562e+03],
+            [-1.13845455e-03, -1.03160965e-03,  1.00000000e+00]]
+        ), 
+        np.array([(2000, 3000), (1187, 2400), (375, 1800)]), 
+        np.array([np.array([ 9.08876084e-04, -2.15858070e+00,  3.68165706e+03]),
+        np.array([-9.08876084e-04,  2.15858070e+00,  1.11834294e+03])])]),
+        
+
+        ('1.jpg', 
+        [np.array([123,434,343,767]), np.array([0, 781, 272,561])], 
+        [(3000, 123, 3), 
+        np.array([[-7.12919550e-01,  4.70997901e-01, -1.16723984e+02],
+                    [-1.76094441e+01,  6.06927443e+00,  1.38490585e+03],
+                    [-7.81450264e-03,  1.33376405e-03,  1.00000000e+00]
+        ]), 
+        np.array([(2000, 3000), (1030, 2400), (61, 1800)]), 
+        np.array([np.array([ 6.38345409e-04, -1.31562989e+00,  3.07787814e+03]), 
+                np.array([-6.38345409e-04,  1.31562989e+00,  1.72212186e+03])])]),
+        
+        ('2.jpg',
+        [np.array([100,327,509,811]), np.array([0, 781, 272,561])],
+        [(3000, 100, 3),
+        np.array([  [ 3.55484821e-01, -3.00399363e-01,  6.26821097e+01],
+                    [ 1.07330901e+01, -1.01749694e+01,  2.78875734e+03],
+                    [ 3.16837462e-03, -3.48181553e-03,  1.00000000e+00]]),
+        np.array( [(2000, 3000), (1025, 2400), (50, 1800)]),
+        np.array([np.array([ 6.31163708e-04, -1.29388560e+00,  3.06311637e+03]),
+                np.array([-6.31163708e-04,  1.29388560e+00,  1.73688363e+03])])])])
     def test_get_course(self, img_source, lines, expected):
         """Test if the output value is equal to the manual calculation value"""
         lane_detector = LaneDetector()
         image = self.get_image(img_source)
         output_shape, matrix, coordinates, polys = lane_detector.get_course(
             image, lines)
-        assert (output_shape == expected[0]).all()
-        assert (matrix == expected[1]).all()
+        assert output_shape == expected[0]
+        assert matrix == pytest.approx(expected[1], rel=1e-3)
         assert (coordinates == expected[2]).all()
-        assert (polys == expected[3]).all()
+        assert (polys == pytest.approx(expected[3], rel=1e-3))
 
     @pytest.mark.skip('NOT FINISHED')
     @pytest.mark.parametrize('source, shape, points, transform, polys', [])

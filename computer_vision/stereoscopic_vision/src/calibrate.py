@@ -58,9 +58,9 @@ class Calibrate:
                 # draw and display the corners
                 cv.drawChessboardCorners(image_left, self.board_dim, corners_left, ret_left)
                 cv.drawChessboardCorners(image_right, self.board_dim, corners_right, ret_right)
-                cv.imshow("left", image_left)
-                cv.imshow("right", image_right)
-                cv.waitKey(0)
+                # cv.imshow("left", image_left)
+                # cv.imshow("right", image_right)
+                # cv.waitKey(0)
         print(f"""Could find chessboard corners in {len(object_points)}
         out of {len(images_left)} images""")
 

@@ -5,6 +5,7 @@ import numpy as np
 from camera import Camera
 
 class DisparityParameters:
+    '''Disparity Parameters'''
     def __init__(self, path):
         self.num_disparities = 0
         self.block_size = 0
@@ -19,7 +20,7 @@ class DisparityParameters:
         self.min_disparity = 0
         self.obstacle_area = 0
         self.contour_area = 0
-        self.m = 40
+        self.measurement = 40
 
         if os.path.exists(path):
             cv_file_read = cv.FileStorage(path, cv.FILE_STORAGE_READ)
@@ -36,7 +37,7 @@ class DisparityParameters:
             self.min_disparity = cv_file_read.getNode('min_disparity').real()
             self.obstacle_area = cv_file_read.getNode('obstacle_area').real()
             self.contour_area = cv_file_read.getNode('contour_area').real()
-            self.m = cv_file_read.getNode('M').real()
+            self.measurement = cv_file_read.getNode('M').real()
             cv_file_read.release()
         else:
             print(f"Path: '{path}' does not exists")
@@ -116,25 +117,27 @@ class StereoscopicVision:
             # cnts = sorted(contours, key=cv.contourArea, reverse=True)
 
             x_pos, y_pos, w_rect, h_rect = None, None, None, None
-            depth_mean = None
-            # Because of the huge size of cnts, a binary search method will be used instead of linear
-            for c in contours:
-                if cv.contourArea(c) > contour_area*mask.shape[0]*mask.shape[1]:
+            depth_mean = [[None]]
+            # Because of the huge size of cnts,
+            # a binary search method will be used instead of linear
+            for cnt in contours:
+                if cv.contourArea(cnt) > contour_area*mask.shape[0]*mask.shape[1]:
                     # finding average depth of the contour
                     mask2 = np.zeros_like(mask)
-                    cv.drawContours(mask2, c, 0, (255), -1)
+                    cv.drawContours(mask2, cnt, 0, (255), -1)
 
                     # Calculating the average depth of the object closer than the safe distance
                     depth_mean_new, _ = cv.meanStdDev(depth_map, mask=mask2)
                     if depth_mean is None or depth_mean_new[0][0] < depth_mean[0][0]:
                         depth_mean = depth_mean_new
-                        x_pos, y_pos, w_rect, h_rect = cv.boundingRect(c)
+                        x_pos, y_pos, w_rect, h_rect = cv.boundingRect(cnt)
             if depth_mean is None:
                 return False, None, None, None
             return True, depth_mean, (x_pos, y_pos), (w_rect, h_rect)
         return False, None, None, None
 
     def get_data(self, disparity):
+        '''Returns the return bool value, depth, position and size'''
         depth_map_dist = M/disparity # for depth in cm
         mask_tmp = cv.inRange(depth_map_dist, MIN_DIST, MAX_DIST)
         depth_map_dist = cv.bitwise_and(depth_map_dist, depth_map_dist, mask=mask_tmp)
@@ -187,7 +190,7 @@ if __name__ == '__main__':
     print('Setting trackbar positions...')
     # Getting parameter information from previous tests, if there is one
     if os.path.exists(PARAMETER_PATH):
-        cv_file_read = cv.FileStorage(PARAMETER_PATH, cv.FILE_STORAGE_READ)
+        file_read = cv.FileStorage(PARAMETER_PATH, cv.FILE_STORAGE_READ)
         cv.setTrackbarPos('num_disparities','disp',
             int(stereo_vision.parameters.num_disparities))
         cv.setTrackbarPos('block_size','disp',
@@ -214,8 +217,8 @@ if __name__ == '__main__':
             int(stereo_vision.parameters.obstacle_area))
         cv.setTrackbarPos('contour_area', 'disp',
             int(stereo_vision.parameters.contour_area))
-        M = cv_file_read.getNode('M').real()
-        cv_file_read.release()
+        M = file_read.getNode('M').real()
+        file_read.release()
 
     stereo_vision.parameters.num_disparities = cv.getTrackbarPos('num_disparities','disp')*16 + 16
     stereo_vision.parameters.block_size = cv.getTrackbarPos('block_size','disp')*2 + 5
@@ -257,21 +260,34 @@ if __name__ == '__main__':
             # NOTE: it might help to blur the image to reduce noise
             # Displaying the disparity
             # Updating the parameters based on the trackbar positions
-            stereo_vision.parameters.num_disparities = cv.getTrackbarPos('num_disparities','disp')*16 + 16
-            stereo_vision.parameters.block_size = cv.getTrackbarPos('block_size','disp')*2 + 5
-            stereo_vision.parameters.pre_filter_type = cv.getTrackbarPos('pre_filter_type','disp')
-            stereo_vision.parameters.pre_filter_size = cv.getTrackbarPos('pre_filter_size','disp')*2 + 5
-            stereo_vision.parameters.pre_filter_cap = cv.getTrackbarPos('pre_filter_cap','disp') + 1
-            stereo_vision.parameters.texture_threshold = cv.getTrackbarPos('texture_threshold','disp')
-            stereo_vision.parameters.uniqueness_ratio = cv.getTrackbarPos('uniqueness_ratio','disp')
-            stereo_vision.parameters.speckle_range = cv.getTrackbarPos('speckle_range','disp')
-            stereo_vision.parameters.speckle_window_size = cv.getTrackbarPos('speckle_window_size','disp')*2
-            stereo_vision.parameters.disparity_max_diff = cv.getTrackbarPos('disparity_max_diff','disp')
-            stereo_vision.parameters.min_disparity = cv.getTrackbarPos('min_disparity','disp')
+            stereo_vision.parameters.num_disparities = \
+                cv.getTrackbarPos('num_disparities','disp')*16 + 16
+            stereo_vision.parameters.block_size = \
+                cv.getTrackbarPos('block_size','disp')*2 + 5
+            stereo_vision.parameters.pre_filter_type = \
+                cv.getTrackbarPos('pre_filter_type','disp')
+            stereo_vision.parameters.pre_filter_size = \
+                cv.getTrackbarPos('pre_filter_size','disp')*2 + 5
+            stereo_vision.parameters.pre_filter_cap = \
+                cv.getTrackbarPos('pre_filter_cap','disp') + 1
+            stereo_vision.parameters.texture_threshold = \
+                cv.getTrackbarPos('texture_threshold','disp')
+            stereo_vision.parameters.uniqueness_ratio = \
+                cv.getTrackbarPos('uniqueness_ratio','disp')
+            stereo_vision.parameters.speckle_range = \
+                cv.getTrackbarPos('speckle_range','disp')
+            stereo_vision.parameters.speckle_window_size = \
+                cv.getTrackbarPos('speckle_window_size','disp')*2
+            stereo_vision.parameters.disparity_max_diff = \
+                cv.getTrackbarPos('disparity_max_diff','disp')
+            stereo_vision.parameters.min_disparity = \
+                cv.getTrackbarPos('min_disparity','disp')
             #  change how big obstacle area needs to be to be detected
-            stereo_vision.parameters.obstacle_area = cv.getTrackbarPos('obstacle_area', 'disp') / 1000
+            stereo_vision.parameters.obstacle_area = \
+                cv.getTrackbarPos('obstacle_area', 'disp') / 1000
             # change how big contour area needs to be to be detected
-            stereo_vision.parameters.contour_area = cv.getTrackbarPos('contour_area', 'disp') / 1000
+            stereo_vision.parameters.contour_area = \
+                cv.getTrackbarPos('contour_area', 'disp') / 1000
 
             # Setting the updated parameters before computing disparity map
             stereo_vision.stereo.setNumDisparities(stereo_vision.parameters.num_disparities)
@@ -287,13 +303,13 @@ if __name__ == '__main__':
             stereo_vision.stereo.setMinDisparity(stereo_vision.parameters.min_disparity)
 
             disp = stereo_vision.get_disparity(frame_left, frame_right)
-            retval, depth, pos, size = stereo_vision.get_data(disp)
+            ret_val, depth_val, pos_val, size_val = stereo_vision.get_data(disp)
 
-            if retval:
+            if ret_val:
                 average.pop()
-                average.append(depth[0][0])
+                average.append(depth_val[0][0])
                 cv.putText(frame_left, f"{int(sum(average)/len(average))} cm",
-                    [pos[0] + 5, pos[1] + 40], 1, 2, (40, 200, 40), 2, 2)
+                    [pos_val[0] + 5, pos_val[1] + 40], 1, 2, (40, 200, 40), 2, 2)
 
             cv.imshow('frame left', frame_left)
             cv.imshow('frame right', frame_right)
@@ -315,7 +331,7 @@ if __name__ == '__main__':
 
         # Solving for M using least square fitting with QR decomposition method
         coeff = np.vstack([disp_inv, np.ones(len(disp_inv))]).T
-        retval, dst = cv.solve(coeff, z, flags=cv.DECOMP_QR)
+        ret, dst = cv.solve(coeff, z, flags=cv.DECOMP_QR)
         M = dst[0, 0]
         C = dst[1, 0]
 

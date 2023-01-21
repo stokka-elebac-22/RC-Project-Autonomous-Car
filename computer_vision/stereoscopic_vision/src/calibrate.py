@@ -10,12 +10,6 @@ import glob
 import numpy as np
 import cv2 as cv
 
-CHECKERBOARD_DIMENSION = (8, 6)
-CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-DIRECTORY_LEFT = "Stereoscopic Vision/images/calibrate/left/*.jpg"
-DIRECTORY_RIGHT = "Stereoscopic Vision/images/calibrate/right/*.jpg"
-DESTINATION_PATH = "Stereoscopic Vision/data/stereo_rectify_maps.xml"
-
 class Calibrate:
     """Calibrating two cameras"""
     def __init__(self, criteria, board_dim=(8, 6), dir_left="", dir_right=""):
@@ -114,6 +108,12 @@ class Calibrate:
         print(f"total error: {mean_error/len(object_points)}")
 
 if __name__ == '__main__':
+    CHECKERBOARD_DIMENSION = (8, 6)
+    CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+    DIRECTORY_LEFT = "Stereoscopic Vision/images/calibrate/left/*.jpg"
+    DIRECTORY_RIGHT = "Stereoscopic Vision/images/calibrate/right/*.jpg"
+    DESTINATION_PATH = "Stereoscopic Vision/data/stereo_rectify_maps.xml"
+
     # Calibrate left camera
     calibrate = Calibrate(CRITERIA, CHECKERBOARD_DIMENSION, DIRECTORY_LEFT, DIRECTORY_RIGHT)
     obj_pnts, img_pnts_l, img_pnts_r, img_l, img_r= calibrate.calculate_object_and_image_points()

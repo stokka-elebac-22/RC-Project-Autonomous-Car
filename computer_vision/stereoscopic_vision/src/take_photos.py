@@ -11,8 +11,7 @@ if __name__ == '__main__':
     BOARD_DIMENSIONS = (8, 6)
     cam1 = cv.VideoCapture(CAMERA_ID_LEFT)
     cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)
-    # cameras = [(cam1, 'left'), (cam2, 'right')]
-    cameras = [(cam1, 'left')]
+    cameras = [(cam1, 'left'), (cam2, 'right')]
 
     qcd = cv.QRCodeDetector()
 
@@ -37,19 +36,19 @@ if __name__ == '__main__':
             print('Capturing...')
             trigger = True
 
-        if not rets:
-            continue
-
-        for frame in frames:
-            gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-            ret, _ = cv.findChessboardCorners(gray, BOARD_DIMENSIONS, None)
-            if not ret:
-                rets = False
-                break
-        if not rets:
-            continue
-
         if trigger:
+            if not rets:
+                continue
+
+            for frame, _ in frames:
+                gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+                ret, _ = cv.findChessboardCorners(gray, BOARD_DIMENSIONS, None)
+                if not ret:
+                    rets = False
+                    break
+            if not rets:
+                continue
+
             print('Done\n')
             for frame, title in frames:
                 cv.imwrite(f'{DIRECTORY}/{title}/{title}_{count}.jpg', frame)

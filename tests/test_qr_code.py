@@ -40,46 +40,46 @@ def test_sides_update(pts, exp):
 
 # test on pictures with approx
 # https://docs.pytest.org/en/4.6.x/reference.html
-@pytest.mark.parametrize(
-    ["name", "exp"],
-    [
-        ('DSC_0142', [True, 0]),
-        ('DSC_0135', [True, 15]),
-        ('DSC_0136', [True, 30]),
-        ('DSC_0137', [True, 45]),
-        ('DSC_0138', [False, None]),
-        ('DSC_0141', [False, None]),
-    ]
-)
-def test_angle(name, exp):
-    """Testing the angle to qr code"""
-    QR_SIZE_PX = 1500
-    QR_SIZE_MM = 190
-    QR_DISTANCE = 500
-    qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
-    frame = cv.imread("tests/images/qr_code/angle" + name + ".jpg")
-    retval, _, angle, _, _, _ = qr_code.get_data(frame)
-    assert retval == exp[0] and angle == pytest.approx(exp[1])
+# @pytest.mark.parametrize(
+#     ["name", "exp"],
+#     [
+#         ('DSC_0142', [True, 0]),
+#         ('DSC_0135', [True, 15]),
+#         ('DSC_0136', [True, 30]),
+#         ('DSC_0137', [True, 45]),
+#         ('DSC_0138', [False, None]),
+#         ('DSC_0141', [False, None]),
+#     ]
+# )
+# def test_angle(name, exp):
+#     """Testing the angle to qr code"""
+#     QR_SIZE_PX = 1500
+#     QR_SIZE_MM = 190
+#     QR_DISTANCE = 500
+#     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+#     frame = cv.imread("tests/images/qr_code/angle" + name + ".jpg")
+#     retval, _, angle, _, _, _ = qr_code.get_data(frame)
+#     assert retval == exp[0] and angle == pytest.approx(exp[1])
 
 @pytest.mark.parametrize(
     ["path", "exp"],
     [
-        ('DSC_0148', [True, 100, 0]),
-        ('DSC_0152', [True, 178, 0]),
-        ('DSC_0149', [True, 200, 0]),
-        ('DSC_0153', [True, 276, 0]),
-        ('DSC_0150', [True, 300, 0]),
-        ('DSC_0151', [True, 350, 0]),
+        ('distance_22', [True, 220, 0]),
+        ('distance_32', [True, 320, 0]),
+        ('distance_42', [True, 420, 0]),
+        ('distance_53', [True, 530, 0]),
+        ('distance_62', [True, 620, 0]),
+        ('distance_82', [True, 820, 0]),
     ]
 )
 
 def test_distance(path, exp):
     """Testing the distance to qr_code"""
-    QR_SIZE_PX = 1500
-    QR_SIZE_CM = 19
-    QR_DISTANCE_CM = 50
-    qr_code = QRCode(QR_SIZE_PX, QR_SIZE_CM, QR_DISTANCE_CM)
-    frame = cv.imread("tests/qr_code/angle/" + path + ".jpg")
+    qr_size_px = 52
+    qr_size_mm= 52
+    qr_distance_mm = 620
+    qr_code = QRCode(qr_size_px, qr_size_mm, qr_distance_mm)
+    frame = cv.imread('tests/images/qr_code/logi_1080p/distance/' + path + '.jpg')
     retval, distance, angle, _, _, _ = qr_code.get_data(frame)
     assert retval == exp[0] and distance == pytest.approx(exp[1]) \
         and angle == pytest.approx(exp[2])

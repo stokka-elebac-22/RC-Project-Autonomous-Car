@@ -133,9 +133,9 @@ class DisplayQRCode:
                                     qrg.side_a/2), int(qrg.points[0][1]))
             text_location_b = (int(qrg.points[1][0]), int(min(qrg.points[1][1], \
                                     qrg.points[2][1]) + qrg.side_b/2))
-            text_location_c = (int(min(qrg.points[2][0], qrg.points[2][0]) + \
+            text_location_c = (int(min(qrg.points[2][0], qrg.points[3][0]) + \
                                     qrg.side_c/2), int(qrg.points[2][1]))
-            text_location_d = (int(qrg.points[2][0]), int(min(qrg.points[2][1], \
+            text_location_d = (int(qrg.points[3][0]), int(min(qrg.points[2][1], \
                                     qrg.points[0][1]) + qrg.side_d/2))
 
             cv.putText(frame, str(int(qrg.side_a)), text_location_a, self.font, \
@@ -198,7 +198,7 @@ if __name__ == '__main__':
         distances.append(dist)
 
     while True:
-        img = cv.imread('tests/images/qr_code/distance/left/left_0.jpg')
+        img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_42.jpg')
         # img = local_read_camera()
         retval, distance, angle, decoded_info, points, rest = qr_code.get_data(img)
         filter_angle(angle)
@@ -206,7 +206,7 @@ if __name__ == '__main__':
         if retval:
             average_angle = int(sum(angles)//VALUES_LENGTH)
             average_distance = int(sum(distances)//VALUES_LENGTH)
-            qr_code.display(img, average_angle, average_distance, decoded_info)
+            qr_code.display(img, average_angle, average_distance, decoded_info, verbose=2)
         cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):
             break

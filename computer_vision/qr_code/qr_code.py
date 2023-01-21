@@ -186,7 +186,6 @@ if __name__ == '__main__':
     distances = [0 for _ in range(VALUES_LENGTH)]
 
     def filter_angle(angle):
-        """filter angle values """
         if angle is None:
             return
         angles.pop(0)

@@ -1,9 +1,9 @@
+import sys
 from PyQt6 import QtGui
+from PyQt6.QtCore import pyqtSignal, pyqtSlot, Qt, QThread
 from PyQt6.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout
 from PyQt6.QtGui import QPixmap
-import sys
 import cv2
-from PyQt6.QtCore import pyqtSignal, pyqtSlot, Qt, QThread
 import numpy as np
 # https://gist.github.com/docPhil99/ca4da12c9d6f29b9cea137b617c7b8b1
 class VideoThread(QThread):

@@ -1,38 +1,56 @@
 import cv2 as cv
-from camera import Camera
 
 """
-Assuming you take photos with two camera at the same time.
-It will work with one camera, but it will end up in the calibrate left directory
+DOC
 """
 
-# DIRECTORY = 'stereoscopic_vision/images/calibrate'
-DIRECTORY = 'tests/images/qr_code'
+if __name__ == '__main__':
+    DIRECTORY = 'tests/images/stereoscopic_vision/distance/logi_1080p'
+    CAMERA_ID_LEFT = 1
+    CAMERA_ID_RIGHT = 2
+    BOARD_DIMENSIONS = (8, 6)
+    cam1 = cv.VideoCapture(CAMERA_ID_LEFT)
+    cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)
+    cameras = [(cam1, 'left'), (cam2, 'right')]
 
-cam1 = Camera(1, 'left')
-cam2 = Camera(2, 'right')
-cameras: Camera = [cam1, cam2]
-camera_sides = ['left', 'right']
+    qcd = cv.QRCodeDetector()
 
-count = 0
-while True:
-    frames = []
-    for cam in cameras:
-        ret, frame = cam.read()
-        if not ret:
-            print('Error: Could not return the frame')
-            continue
-        frames.append((frame, cam.window_name))
-        cv.imshow(cam.window_name, frame)
+    trigger = False
+    count = 0
+    while True:
+        frames = []
+        rets = True
+        for cam in cameras:
+            ret, frame = cam[0].read()
+            if not ret:
+                rets = False
+                break
+            cv.imshow(cam[1], frame)
+            frames.append((frame, cam[1]))
 
-    if cv.waitKey(1) & 0xFF == ord('c'): # capture frame by pressing c
-        print('Capturing...')
-        for i, frame in enumerate(frames):
-            cv.imwrite(f'{DIRECTORY}/{camera_sides[i]}/{frame[1]}_{count}.jpg', frame[0])
-        count += 1
+        if cv.waitKey(1) & 0xFF == ord('s'): # stop loop by pressing s
+            print('Stopping...')
+            break
 
-    if cv.waitKey(1) & 0xFF == ord('s'): # stop loop by pressing s
-        break
+        if cv.waitKey(1) & 0xFF == ord('c'):
+            print('Capturing...')
+            trigger = True
 
-for cam in cameras:
-    cam.cap.release()
+        if trigger:
+            if not rets:
+                continue
+
+            for frame, _ in frames:
+                gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+                ret, _ = cv.findChessboardCorners(gray, BOARD_DIMENSIONS, None)
+                if not ret:
+                    rets = False
+                    break
+            if not rets:
+                continue
+
+            print('Done\n')
+            for frame, title in frames:
+                cv.imwrite(f'{DIRECTORY}/{title}/{title}_{count}.jpg', frame)
+            count += 1
+            trigger = False

@@ -83,11 +83,10 @@ class QRCode:
         qcd = cv.QRCodeDetector()
         ret_qr, decoded_info , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
 
-        if ret_qr:
-            self.qr_geometry.update(points_qr)
-
         if not ret_qr:
             return False, None, None, None, None, None
+
+        self.qr_geometry.update(points_qr)
 
         angle = self.qr_geometry.get_angle()
         distance = self.qr_geometry.get_distance()
@@ -186,7 +185,6 @@ if __name__ == '__main__':
     distances = [0 for _ in range(VALUES_LENGTH)]
 
     def filter_angle(angle):
-        """filter angle values """
         if angle is None:
             return
         angles.pop(0)
@@ -200,8 +198,8 @@ if __name__ == '__main__':
         distances.append(dist)
 
     while True:
-        # img = cv.imread('computer_vision/images/DSC_0148.jpg')
-        img = local_read_camera()
+        img = cv.imread('tests/images/qr_code/distance/left/left_0.jpg')
+        # img = local_read_camera()
         retval, distance, angle, decoded_info, points, rest = qr_code.get_data(img)
         filter_angle(angle)
         filter_distance(distance)

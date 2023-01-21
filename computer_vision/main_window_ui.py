@@ -36,7 +36,7 @@ class Ui(QtWidgets.QMainWindow):
         self.camera_handler = CameraHandler()
         self.app = QtWidgets.QApplication(sys.argv) # Create an instance of QtWidgets.QApplication
 
-        super(Ui, self).__init__() # Call the inherited classes __init__ method
+        super().__init__() # Ui, self).__init__() # Call the inherited classes __init__ method
         uic.loadUi(ui_file, self) # Load the .ui file
 
         self.camera_cbo = [
@@ -78,4 +78,3 @@ class Ui(QtWidgets.QMainWindow):
             for camera in self.camera_handler.get_camera_list():
                 cbo.addItem(self.camera_handler.get_camera_string(camera["id"]))
     #def update_plot_data(self):
-

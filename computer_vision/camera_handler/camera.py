@@ -33,8 +33,7 @@ class Camera:
     def read(self, name=None, resize=1):
         if not name:
             ret, frame = self.cap.read()
-            if not ret:
-                raise SystemError
+            return ret, frame
         else:
             frame = cv.imread(name)
         frame = cv.resize(frame, (0, 0), fx = resize, fy = resize)

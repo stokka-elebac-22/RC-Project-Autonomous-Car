@@ -38,14 +38,16 @@ class DisparityParameters:
             self.contour_area = cv_file_read.getNode('contour_area').real()
             self.m = cv_file_read.getNode('M').real()
             cv_file_read.release()
+        else:
+            print(f"Path: '{path}' does not exists")
 
 class StereoscopicVision:
     """
     DOC:
     """
-    def __init__(self, path="", disparity_parameters = None) -> None:
+    def __init__(self, path="", param_path="", disparity_parameters = None) -> None:
         if disparity_parameters is None:
-            self.parameters = DisparityParameters(path)
+            self.parameters = DisparityParameters(param_path)
         else: self.parameters = disparity_parameters
 
         # The path is the path to the calibration paramters (xml file)
@@ -109,22 +111,27 @@ class StereoscopicVision:
         if np.sum(mask)/255.0 > obstacle_area*mask.shape[0]*mask.shape[1]:
             # Contour detection
             contours, _ = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-            cnts = sorted(contours, key=cv.contourArea, reverse=True)
 
-            # Check if detected contour is significantly large (to avoid multiple tiny regions)
-            if cv.contourArea(cnts[0]) > contour_area*mask.shape[0]*mask.shape[1]:
-                x_pos, y_pos, w_rect, h_rect = cv.boundingRect(cnts[0])
-                x_pos, y_pos, w_rect, h_rect = cv.boundingRect(cnts[0])
+            # sorted have O(n log n) complexity
+            # cnts = sorted(contours, key=cv.contourArea, reverse=True)
 
-                # finding average depth of region represented by the largest contour
+            x_pos, y_pos, w_rect, h_rect = None, None, None, None
+            depth_mean = None
+            # Because of the huge size of cnts, a binary search method will be used instead of linear
+            for c in contours:
+                if cv.contourArea(c) > contour_area*mask.shape[0]*mask.shape[1]:
+                    # finding average depth of the contour
+                    mask2 = np.zeros_like(mask)
+                    cv.drawContours(mask2, c, 0, (255), -1)
 
-                mask2 = np.zeros_like(mask)
-                cv.drawContours(mask2, cnts, 0, (255), -1)
-
-                # Calculating the average depth of the object closer than the safe distance
-                depth_mean, _ = cv.meanStdDev(depth_map, mask=mask2)
-
-                return True, depth_mean, (x_pos, y_pos), (w_rect, h_rect)
+                    # Calculating the average depth of the object closer than the safe distance
+                    depth_mean_new, _ = cv.meanStdDev(depth_map, mask=mask2)
+                    if depth_mean is None or depth_mean_new[0][0] < depth_mean[0][0]:
+                        depth_mean = depth_mean_new
+                        x_pos, y_pos, w_rect, h_rect = cv.boundingRect(c)
+            if depth_mean is None:
+                return False, None, None, None
+            return True, depth_mean, (x_pos, y_pos), (w_rect, h_rect)
         return False, None, None, None
 
     def get_data(self, disparity):
@@ -141,9 +148,10 @@ class StereoscopicVision:
 
 
 if __name__ == '__main__':
-    DESTINATION_PATH = 'stereoscopic_vision/data/stereo_parameters.xml'
+    PARAMETER_PATH = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
+    MAPS_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml'
     MAX_DIST = 230.0 # max distance to recognize objects (cm)
-    MIN_DIST = 5.0 # min distance to recognize objects (cm)
+    MIN_DIST = 1.0 # min distance to recognize objects (cm)
     THRES_DIST = MAX_DIST
     M = 40 # base value, the real one is from the xml file (and is calculated in a previous test)
     Z = MAX_DIST # The depth, for used for calculating M
@@ -152,14 +160,15 @@ if __name__ == '__main__':
     # use id 0 and 2 (not always the case....)
     cam_left = Camera(camera_id=1, window_name='Left camera')
     cam_right = Camera(camera_id=2, window_name='Right camera')
-    stereo_vision = StereoscopicVision(path="computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml")
+    stereo_vision = StereoscopicVision(MAPS_PATH, PARAMETER_PATH)
 
     cv.namedWindow('disp', cv.WINDOW_NORMAL)
-    cv.resizeWindow('disp', 800,600)
+    # cv.resizeWindow('disp', 800,600)
 
     def nothing(_):
         """Empty function"""
 
+    print('Creating trackbars...')
     # creating trackbars for testing
     cv.createTrackbar('num_disparities','disp',1,17, nothing)
     cv.createTrackbar('block_size','disp',5,50,nothing)
@@ -175,9 +184,10 @@ if __name__ == '__main__':
     cv.createTrackbar('obstacle_area', 'disp', 1, 100, nothing)
     cv.createTrackbar('contour_area', 'disp', 1, 100, nothing)
 
+    print('Setting trackbar positions...')
     # Getting parameter information from previous tests, if there is one
-    if os.path.exists(DESTINATION_PATH):
-        cv_file_read = cv.FileStorage(DESTINATION_PATH, cv.FILE_STORAGE_READ)
+    if os.path.exists(PARAMETER_PATH):
+        cv_file_read = cv.FileStorage(PARAMETER_PATH, cv.FILE_STORAGE_READ)
         cv.setTrackbarPos('num_disparities','disp',
             int(stereo_vision.parameters.num_disparities))
         cv.setTrackbarPos('block_size','disp',
@@ -235,6 +245,7 @@ if __name__ == '__main__':
     #     print(f'{DIRECTORY_RIGHT_IMAGE} does not exists')
     #     raise Exception
 
+    print('Running...')
     while True:
         ret_left, frame_left = cam_left.read()
         ret_right, frame_right = cam_right.read()
@@ -309,9 +320,9 @@ if __name__ == '__main__':
         C = dst[1, 0]
 
     print("Saving parameters...")
-    cv_file_write = cv.FileStorage(DESTINATION_PATH, cv.FILE_STORAGE_WRITE)
+    cv_file_write = cv.FileStorage(PARAMETER_PATH, cv.FILE_STORAGE_WRITE)
     cv_file_write.write('num_disparities', min(stereo_vision.parameters.num_disparities/16, 16))
-    cv_file_write.write('block_size', max(stereo_vision.parameters.block_size_disp/2 - 5, 0))
+    cv_file_write.write('block_size', max(stereo_vision.parameters.block_size/2 - 5, 0))
     cv_file_write.write('pre_filter_type', stereo_vision.parameters.pre_filter_type)
     cv_file_write.write('pre_filter_size', max(stereo_vision.parameters.pre_filter_size/2 - 5, 0))
     cv_file_write.write('pre_filter_cap', stereo_vision.parameters.pre_filter_cap - 1)

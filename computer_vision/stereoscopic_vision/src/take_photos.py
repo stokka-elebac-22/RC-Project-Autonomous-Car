@@ -24,8 +24,7 @@ if __name__ == '__main__':
             ret, frame = cam[0].read()
             if not ret:
                 rets = False
-                # break
-                continue
+                break
             cv.imshow(cam[1], frame)
             frames.append((frame, cam[1]))
 
@@ -35,23 +34,23 @@ if __name__ == '__main__':
 
         if cv.waitKey(1) & 0xFF == ord('c'):
             print('Capturing...')
-            # trigger = True
+            trigger = True
 
-        # if trigger:
-        #     if not rets:
-        #         continue
+        if trigger:
+            if not rets:
+                continue
 
-        #     for frame, _ in frames:
-        #         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        #         ret, _ = cv.findChessboardCorners(gray, BOARD_DIMENSIONS, None)
-        #         if not ret:
-        #             rets = False
-        #             break
-        #     if not rets:
-        #         continue
+            for frame, _ in frames:
+                gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+                ret, _ = cv.findChessboardCorners(gray, BOARD_DIMENSIONS, None)
+                if not ret:
+                    rets = False
+                    break
+            if not rets:
+                continue
 
-        # print('Done\n')
+            print('Done\n')
             for frame, title in frames:
                 cv.imwrite(f'{DIRECTORY}/{title}/{title}_{count}.jpg', frame)
             count += 1
-            # trigger = False
+            trigger = False

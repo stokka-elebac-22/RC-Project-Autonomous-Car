@@ -5,7 +5,7 @@ DOC
 """
 
 if __name__ == '__main__':
-    DIRECTORY = 'tests/images/qr_code/distance'
+    DIRECTORY = 'tests/images/stereoscopic_vision/distance/logi_1080p'
     CAMERA_ID_LEFT = 1
     CAMERA_ID_RIGHT = 2
     BOARD_DIMENSIONS = (8, 6)
@@ -22,10 +22,11 @@ if __name__ == '__main__':
         rets = True
         for cam in cameras:
             ret, frame = cam[0].read()
-            cv.imshow(cam[1], frame)
             if not ret:
                 rets = False
-                break
+                # break
+                continue
+            cv.imshow(cam[1], frame)
             frames.append((frame, cam[1]))
 
         if cv.waitKey(1) & 0xFF == ord('s'): # stop loop by pressing s
@@ -34,23 +35,23 @@ if __name__ == '__main__':
 
         if cv.waitKey(1) & 0xFF == ord('c'):
             print('Capturing...')
-            trigger = True
+            # trigger = True
 
-        if trigger:
-            if not rets:
-                continue
+        # if trigger:
+        #     if not rets:
+        #         continue
 
-            for frame, _ in frames:
-                gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-                ret, _ = cv.findChessboardCorners(gray, BOARD_DIMENSIONS, None)
-                if not ret:
-                    rets = False
-                    break
-            if not rets:
-                continue
+        #     for frame, _ in frames:
+        #         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        #         ret, _ = cv.findChessboardCorners(gray, BOARD_DIMENSIONS, None)
+        #         if not ret:
+        #             rets = False
+        #             break
+        #     if not rets:
+        #         continue
 
-            print('Done\n')
+        # print('Done\n')
             for frame, title in frames:
                 cv.imwrite(f'{DIRECTORY}/{title}/{title}_{count}.jpg', frame)
             count += 1
-            trigger = False
+            # trigger = False

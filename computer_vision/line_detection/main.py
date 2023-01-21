@@ -37,18 +37,7 @@ class LineDetector:
         can overwrite this method
         '''
         return image
-
-    def get_line_coordinates_from_parameters(self, image, line_parameters):
-        """Get line coordinates from line parameters"""
-        slope = line_parameters[0]
-        intercept = line_parameters[1]
-        # since line will always start from bottom of image
-        y_1 = image.shape[0]
-        y_2 = int(y_1 * (2.3 / 5))
-        x_1 = int((y_1 - intercept) / slope)
-        x_2 = int((y_2 - intercept) / slope)
-        return np.array([x_1, y_1, x_2, y_2])
-
+        
     def get_lines(self, image):
         """Extract lines on the lane from image"""
         # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)

@@ -11,7 +11,6 @@ if __name__ == '__main__':
     BOARD_DIMENSIONS = (8, 6)
     cam1 = cv.VideoCapture(CAMERA_ID_LEFT)
     cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)
-    # cameras = [(cam1, 'left'), (cam2, 'right')]
     cameras = [(cam1, 'left')]
 
     qcd = cv.QRCodeDetector()
@@ -37,18 +36,18 @@ if __name__ == '__main__':
             print('Capturing...')
             trigger = True
 
-        if not rets:
-            continue
-
-        for frame in frames:
-            ret, _, _, _ = qcd.detectAndDecodeMulti(frame[0])
-            if not ret:
-                rets = False
-                break
-        if not rets:
-            continue
-
         if trigger:
+            if not rets:
+                continue
+
+            for frame in frames:
+                ret, _, _, _ = qcd.detectAndDecodeMulti(frame[0])
+                if not ret:
+                    rets = False
+                    break
+            if not rets:
+                continue
+
             print('Done\n')
             for frame, title in frames:
                 cv.imwrite(f'{DIRECTORY}/{title}/{title}_{count}.jpg', frame)

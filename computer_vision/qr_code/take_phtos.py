@@ -1,8 +1,7 @@
 import cv2 as cv
 
 """
-Assuming you take photos with two camera at the same time.
-It will work with one camera, but it will end up in the calibrate left directory
+DOC
 """
 
 if __name__ == '__main__':

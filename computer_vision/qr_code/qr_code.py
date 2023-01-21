@@ -198,7 +198,7 @@ if __name__ == '__main__':
         distances.append(dist)
 
     while True:
-        img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_42.jpg')
+        img = cv.imread('tests/images/qr_code/webcam/distance/distance_51.jpg')
         # img = local_read_camera()
         retval, distance, angle, decoded_info, points, rest = qr_code.get_data(img)
         filter_angle(angle)

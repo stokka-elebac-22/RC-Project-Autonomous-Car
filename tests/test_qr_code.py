@@ -1,17 +1,17 @@
-"""TEST"""
+'''TEST'''
 # test_qr_code.py
 import pytest
 import cv2 as cv
 from computer_vision.qr_code.qr_code import QRGeometry, QRCode
 
 def test_points_empty():
-    """Testing points"""
+    '''Testing points'''
     qr_code = QRGeometry()
     assert qr_code.points[0] == [0, 0] and qr_code.points[1] == [0, 0] and \
             qr_code.points[2] == [0, 0] and qr_code.points[3] == [0, 0]
 
 @pytest.mark.parametrize(
-    ["pts", "exp"],
+    ['pts', 'exp'],
     [
         ([[[0, 0], [0, 1], [1, 1], [1, 0]]], [[0, 0], [0, 1], [1, 1], [1, 0]]),
         ([[[3, 1], [2, 4], [1, 4], [4, 1]]], [[3, 1], [2, 4], [1, 4], [4, 1]]),
@@ -19,13 +19,13 @@ def test_points_empty():
     ]
 )
 def test_points_update(pts, exp):
-    """Testing update points"""
+    '''Testing update points'''
     qr_code = QRGeometry(pts=pts)
     assert qr_code.points[0] == exp[0] and qr_code.points[1] == exp[1] and \
             qr_code.points[2] == exp[2] and qr_code.points[3] == exp[3]
 
 @pytest.mark.parametrize(
-    ["pts", "exp"],
+    ['pts', 'exp'],
     [
         ([[[0, 0], [1, 0], [1, 1], [0, 1]]], [1, 1, 1, 1]),
         ([[[2,-2], [-1, -1], [-2, 2], [1, 3]]], [3, 3, 3, 5]),
@@ -33,7 +33,7 @@ def test_points_update(pts, exp):
     ]
 )
 def test_sides_update(pts, exp):
-    """Testing sides"""
+    '''Testing sides'''
     qr_code = QRGeometry(pts=pts)
     assert qr_code.side_a == exp[0] and qr_code.side_b == exp[1] and \
         qr_code.side_c == exp[2] and qr_code.side_d == exp[3]
@@ -62,7 +62,7 @@ def test_sides_update(pts, exp):
 #     assert retval == exp[0] and angle == pytest.approx(exp[1])
 
 @pytest.mark.parametrize(
-    ["path", "exp"],
+    ['path', 'exp'],
     [
         ('distance_22', [True, 220, 0]),
         ('distance_32', [True, 320, 0]),
@@ -73,8 +73,8 @@ def test_sides_update(pts, exp):
     ]
 )
 
-def test_distance(path, exp):
-    """Testing the distance to qr_code"""
+def test_distance_logi_1080p(path, exp):
+    '''Testing the distance to qr_code'''
     qr_size_px = 52
     qr_size_mm= 52
     qr_distance_mm = 620
@@ -84,18 +84,24 @@ def test_distance(path, exp):
     assert retval == exp[0] and distance == pytest.approx(exp[1]) \
         and angle == pytest.approx(exp[2])
 
+@pytest.mark.parametrize(
+    ['path', 'exp'],
+    [
+        ('distance_22', [True, 220, 0]),
+        ('distance_32', [True, 320, 0]),
+        ('distance_42', [True, 420, 0]),
+        ('distance_51', [True, 510, 0]),
+        ('distance_53', [True, 530, 0]),
+    ]
+)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def test_distance_webcam(path, exp):
+    '''Testing the distance to qr code for the small webcam'''
+    qr_size_px = 120
+    qr_size_mm= 52
+    qr_distance_mm = 320
+    qr_code = QRCode(qr_size_px, qr_size_mm, qr_distance_mm)
+    frame = cv.imread('tests/images/qr_code/webcam/distance/' + path + '.jpg')
+    retval, distance, angle, _, _, _ = qr_code.get_data(frame)
+    assert retval == exp[0] and distance == pytest.approx(exp[1]) \
+        and angle == pytest.approx(exp[2])

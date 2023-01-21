@@ -23,7 +23,9 @@ jobs:
         with:
           path: .venv
           key: pydeps-${{ hashFiles('**/poetry.lock') }}
-      - run: poetry install --no-interaction --no-root
+      - run: |
+          poetry install --no-interaction --no-root
+          sudo apt-get install libegl
         if: steps.cache-deps.outputs.cache-hit != 'true'
       - run: poetry run pytest
   lint:

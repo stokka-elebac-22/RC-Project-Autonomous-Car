@@ -5,12 +5,12 @@ DOC
 """
 
 if __name__ == '__main__':
-    DIRECTORY = 'tests/images/qr_code/distance'
-    CAMERA_ID_LEFT = 1
+    DIRECTORY = 'tests/images/qr_code/webcam'
+    CAMERA_ID_LEFT = 0
     CAMERA_ID_RIGHT = 2
     cam1 = cv.VideoCapture(CAMERA_ID_LEFT)
     cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)
-    cameras = [(cam1, 'left')]
+    cameras = [(cam1, 'distance')]
 
     qcd = cv.QRCodeDetector()
 

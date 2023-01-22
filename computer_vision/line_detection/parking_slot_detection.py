@@ -76,7 +76,8 @@ class ParkingSlotDetector(LineDetector):
             qr_slope, qr_intercept = np.polyfit(points[0][0], points[0][1], 1)
 
             for i, line in enumerate(avg_lines):
-                if np.isclose(qr_slope, line[0], atol=10, rtol=1e-9) and np.isclose(qr_intercept, line[1], atol=50, rtol=1e-9):
+                # intercept atol = 20 ok for picture 7 and 8 but not for picture 4 need it for 150
+                if np.isclose(qr_slope, line[0], atol=20, rtol=1e-9) and np.isclose(qr_intercept, line[1], atol=50, rtol=1e-9):
                     avg_lines.pop(i)
                     avg_lines_coords.pop(i)
                     
@@ -94,11 +95,13 @@ class ParkingSlotDetector(LineDetector):
                 closest_line = avg_lines_coords.pop(closest_line_index)
                 lines.append(closest_line)
 
-                if len(lines) > 1:
-                    if max(lines[0][0], lines[0][2]) >= points[0][0][0] and max(lines[1][0], lines[1][2]) <= points[0][1][0]:
-                        break
-                    else:
-                        lines.pop(0)
+                #if len(lines) > 1:
+                 #   if ((max(lines[0][0], lines[0][2]) >= points[0][0][0] and max(lines[1][0], lines[1][2]) <= points[0][1][0]) or 
+                  #  (max(lines[1][0], lines[1][2]) >= points[0][0][0] and max(lines[0][0], lines[0][2]) <= points[0][1][0])
+                   # ):
+                    #    break
+                    #else:
+                    #    lines.pop(0)
 
             return lines
         return None
@@ -115,7 +118,11 @@ class ParkingSlotDetector(LineDetector):
 
 if __name__ == "__main__":
     parking_slot_detector = ParkingSlotDetector(hough=[200, 5])
-    img = cv2.imread('computer_vision/line_detection/assets/parking/2.png')
+    
+    #Tests image: 4, 7, 8
+    # 4: DATA 20, 10, 50 (910 × 597)
+    # 7, 8: DATA: 60, 20, 150 (880 × 495)
+    img = cv2.imread('computer_vision/line_detection/assets/parking/8.png')
     copy = img.copy()
     all_lines = parking_slot_detector.get_lines(copy)
     parking_slot_detector.show_lines(copy, all_lines)

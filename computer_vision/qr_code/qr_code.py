@@ -150,7 +150,7 @@ class DisplayQRCode:
 
         cv.putText(frame, f'angle    = {int(angle)}', (10, 20), self.font, \
                             self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
-        cv.putText(frame, f'distance = {int(distance)}', (10, 50), \
+        cv.putText(frame, f'distance = {int(dist)}', (10, 50), \
                 self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
 def local_read_camera(name=None, resize=1):

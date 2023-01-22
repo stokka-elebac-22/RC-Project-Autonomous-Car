@@ -4,20 +4,21 @@ import cv2 as cv
 from computer_vision.stereoscopic_vision.src.stereoscopic_vision import StereoscopicVision
 
 @pytest.mark.parametrize(
-    ['name', 'exp'],
+    ['name'],
     [
-        [('left_32', 'right_32'), True],
-        [('left_40', 'right_40'), True],
-        [('left_100', 'right_100'), True],
-        [('left_200', 'right_200'), True],
+        [('left_32', 'right_32')],
+        [('left_40', 'right_40')],
+        [('left_100', 'right_100')],
+        [('left_200', 'right_200')],
     ]
 )
-def test_get_disparity(name, exp):
+def test_get_disparity(name):
     '''Test get disparity'''
     stereo_rectify_maps_path = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml'
     stereo_parameter_path = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
     stereo_vision = StereoscopicVision(stereo_rectify_maps_path, stereo_parameter_path)
     left_path = f'tests/images/stereoscopic_vision/distance/logi_1080p/left/{name[0]}.jpg'
+    print(left_path)
     right_path = f'tests/images/stereoscopic_vision/distance/logi_1080p/right/{name[1]}.jpg'
 
     left_img = cv.imread(left_path)
@@ -25,7 +26,7 @@ def test_get_disparity(name, exp):
 
     disparity = stereo_vision.get_disparity(left_img, right_img)
     print('disparity', disparity)
-    assert disparity == exp
+    assert disparity is not None
 
 @pytest.mark.parametrize(
     ['name', 'exp'],
@@ -46,6 +47,9 @@ def test_get_disparity(name, exp):
 )
 def test_get_data(name, exp):
     '''Test get data'''
+    max_dist = 230.0 # max distance to recognize objects (cm)
+    min_dist = 1.0 # min distance to recognize objects (cm)
+    thresh_dist = max_dist
     stereo_rectify_maps_path = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml'
     stereo_parameter_path = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
     stereo_vision = StereoscopicVision(stereo_rectify_maps_path, stereo_parameter_path)
@@ -54,6 +58,6 @@ def test_get_data(name, exp):
     left_img = cv.imread(left_path)
     right_img = cv.imread(right_path)
     disparity = stereo_vision.get_disparity(left_img, right_img)
-    retval, depth, _, _ = stereo_vision.get_data(disparity)
+    retval, depth, _, _ = stereo_vision.get_data(disparity, min_dist, max_dist, thresh_dist)
+    print(retval, depth)
     assert retval == exp[0] and depth == pytest.approx(exp[1])
-

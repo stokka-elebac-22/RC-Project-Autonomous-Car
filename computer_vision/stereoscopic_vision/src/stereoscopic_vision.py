@@ -2,7 +2,6 @@
 import os.path
 import cv2 as cv
 import numpy as np
-from camera import Camera
 
 class DisparityParameters:
     '''Disparity Parameters'''
@@ -151,6 +150,7 @@ class StereoscopicVision:
 
 
 if __name__ == '__main__':
+    from camera import Camera
     PARAMETER_PATH = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
     MAPS_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml'
     MAX_DIST = 230.0 # max distance to recognize objects (cm)

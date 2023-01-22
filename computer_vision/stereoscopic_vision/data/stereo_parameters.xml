@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <opencv_storage>
-<num_disparities>9.</num_disparities>
+<num_disparities>16.</num_disparities>
 <block_size>2.6500000000000000e+01</block_size>
 <pre_filter_type>0</pre_filter_type>
 <pre_filter_size>1.5000000000000000e+00</pre_filter_size>

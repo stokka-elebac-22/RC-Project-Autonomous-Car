@@ -110,9 +110,9 @@ class Calibrate:
 if __name__ == '__main__':
     CHECKERBOARD_DIMENSION = (8, 6)
     CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-    DIRECTORY_LEFT = "Stereoscopic Vision/images/calibrate/left/*.jpg"
-    DIRECTORY_RIGHT = "Stereoscopic Vision/images/calibrate/right/*.jpg"
-    DESTINATION_PATH = "Stereoscopic Vision/data/stereo_rectify_maps.xml"
+    DIRECTORY_LEFT = "computer_vision/stereoscopic_vision/images/calibrate/left/*.jpg"
+    DIRECTORY_RIGHT = "computer_vision/stereoscopic_vision/images/calibrate/right/*.jpg"
+    DESTINATION_PATH = "computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml"
 
     # Calibrate left camera
     calibrate = Calibrate(CRITERIA, CHECKERBOARD_DIMENSION, DIRECTORY_LEFT, DIRECTORY_RIGHT)
@@ -120,8 +120,8 @@ if __name__ == '__main__':
 
     image_l = cv.imread(img_l[0])
     gray_l = cv.cvtColor(image_l, cv.COLOR_BGR2GRAY)
-    image_r = cv.imread(img_l[0])
-    gray_r = cv.cvtColor(image_l, cv.COLOR_BGR2GRAY)
+    image_r = cv.imread(img_r[0])
+    gray_r = cv.cvtColor(image_r, cv.COLOR_BGR2GRAY)
 
     ret_1, mtx_l, dist_l, rvecs_l, tvecs_l = \
         cv.calibrateCamera(obj_pnts, img_pnts_l, gray_l.shape[::-1], None, None)

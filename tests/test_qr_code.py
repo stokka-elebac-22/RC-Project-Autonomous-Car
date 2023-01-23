@@ -15,13 +15,13 @@ class TestQRCode:
     @pytest.mark.parametrize(
         ['pts', 'exp'],
         [
-            ([[[0, 0], [0, 1], [1, 1], [1, 0]]], [[0, 0], [0, 1], [1, 1], [1, 0]]),
-            ([[[3, 1], [2, 4], [1, 4], [4, 1]]], [[3, 1], [2, 4], [1, 4], [4, 1]]),
-            ([[[4, 6], [7, 1], [1, 2], [4, 4]]], [[4, 6], [7, 1], [1, 2], [4, 4]]),
+            ([[0, 0], [0, 1], [1, 1], [1, 0]], [[0, 0], [0, 1], [1, 1], [1, 0]]),
+            ([[3, 1], [2, 4], [1, 4], [4, 1]], [[3, 1], [2, 4], [1, 4], [4, 1]]),
+            ([[4, 6], [7, 1], [1, 2], [4, 4]], [[4, 6], [7, 1], [1, 2], [4, 4]]),
         ]
     )
-    def test_points_update(self, pts, exp):
-        '''Testing update points'''
+    def test_points_init(self, pts, exp):
+        '''Testing init points'''
         qr_code = QRGeometry(pts=pts)
         assert qr_code.points[0] == exp[0] and qr_code.points[1] == exp[1] and \
                 qr_code.points[2] == exp[2] and qr_code.points[3] == exp[3]
@@ -29,9 +29,24 @@ class TestQRCode:
     @pytest.mark.parametrize(
         ['pts', 'exp'],
         [
-            ([[[0, 0], [1, 0], [1, 1], [0, 1]]], [1, 1, 1, 1]),
-            ([[[2,-2], [-1, -1], [-2, 2], [1, 3]]], [3, 3, 3, 5]),
-            ([[[18, 7], [7, 3], [4, 9], [17, 14]]], [11, 6, 13, 7])
+            ([[0, 0], [0, 1], [1, 1], [1, 0]], [[0, 0], [0, 1], [1, 1], [1, 0]]),
+            ([[3, 1], [2, 4], [1, 4], [4, 1]], [[3, 1], [2, 4], [1, 4], [4, 1]]),
+            ([[4, 6], [7, 1], [1, 2], [4, 4]], [[4, 6], [7, 1], [1, 2], [4, 4]]),
+        ]
+    )
+    def test_points_update(self, pts, exp):
+        '''Testing update points'''
+        qr_code = QRGeometry()
+        qr_code.update(pts=pts)
+        assert qr_code.points[0] == exp[0] and qr_code.points[1] == exp[1] and \
+                qr_code.points[2] == exp[2] and qr_code.points[3] == exp[3]
+
+    @pytest.mark.parametrize(
+        ['pts', 'exp'],
+        [
+            ([[0, 0], [1, 0], [1, 1], [0, 1]], [1, 1, 1, 1]),
+            ([[2,-2], [-1, -1], [-2, 2], [1, 3]], [3, 3, 3, 5]),
+            ([[18, 7], [7, 3], [4, 9], [17, 14]], [11, 6, 13, 7])
         ]
     )
     def test_sides_update(self, pts, exp):
@@ -113,13 +128,13 @@ class TestQRCode:
     @pytest.mark.parametrize(
         ['path', 'exp'],
         [
-            [('qrcode.png'), [True, 3]]
+            ('qrcode.png', [True, 3])
         ]
     )
 
     def test_multiple(self, path, exp):
         '''Testing if the code can detect multiple qr codes'''
-        qr_code = QRCode(0, 0, 0)
+        qr_code = QRCode(1, 1, 1)
         frame = cv.imread('tests/images/qr_code/multi/' + path)
-        retval, distance, _, _, _, _ = qr_code.get_data(frame)
-        assert retval == exp[0] and len(distance) == exp[1]
+        retval, distances, _, _, _, _ = qr_code.get_data(frame)
+        assert retval == exp[0] and len(distances) == exp[1]

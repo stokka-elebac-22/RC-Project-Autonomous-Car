@@ -1,5 +1,4 @@
 """Import libraries"""
-from qr_code.qr_code import QRCode
 import warnings
 import cv2
 import numpy as np
@@ -9,6 +8,7 @@ import os
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
+from qr_code.qr_code import QRCode
 
 
 class ParkingSlotDetector(LineDetector):
@@ -29,9 +29,9 @@ class ParkingSlotDetector(LineDetector):
         retval, distance, angle, decoded_info, points, _ = qr_code.get_data(
             img)
         if retval:
+            # display QR-code on image
             qr_code.display(img, angle, distance, decoded_info)
-
-            qr_slope, qr_intercept = np.polyfit(points[0][0], points[0][1], 1)
+            qr_slope, qr_intercept = np.polyfit((points[0][0][0], points[0][1][0]), (points[0][0][1], points[0][1][1]), 1)
             lines = self.get_lines(image)
             if lines is None:
                 return None
@@ -52,22 +52,24 @@ class ParkingSlotDetector(LineDetector):
                                 [np.array([x_1, y_1, x_2, y_2])])
                         else:
                             not_stopped = True
+                            # Check which cluster the line fits into
                             for i, cluster in enumerate(clustered_lines):
-                                for line in cluster:
-                                    if np.isclose((slope, intercept), cluster, atol=20, rtol=1e-9).all():
-                                        cluster.append((slope, intercept))
-                                        clustered_coords[i].append(
-                                            np.array([x_1, y_1, x_2, y_2]))
-                                        not_stopped = False
-                                        break
-
+                                cluster_line_avg = np.average(cluster, axis=0)
+                                if np.isclose(cluster_line_avg, (slope, intercept), atol=20, rtol=1e-9).all():
+                                    cluster.append((slope, intercept))
+                                    clustered_coords[i].append(
+                                        np.array([x_1, y_1, x_2, y_2]))
+                                    not_stopped = False
+                                    break
+                            # If not, a new cluster
                             if not_stopped:
                                 clustered_lines.append([(slope, intercept)])
                                 clustered_coords.append(
                                     [np.array([x_1, y_1, x_2, y_2])])
                     except np.RankWarning:
                         pass
-
+            
+            # calculate average line and coordinates of the clustered lines
             avg_lines_coords = []
             avg_lines = []
             for i, cluster in enumerate(clustered_lines):
@@ -83,14 +85,16 @@ class ParkingSlotDetector(LineDetector):
                     min_x, max_x, line)
                 avg_lines_coords.append(coordinates)
 
+            # filter away lines that are close to the QR-code
             for i, line in enumerate(avg_lines):
                 # intercept atol = 20 ok for picture 7 and 8 but not for picture 4 need it for 150
-                if np.isclose(qr_slope, line[0], atol=20, rtol=1e-9) and np.isclose(qr_intercept, line[1], atol=50, rtol=1e-9):
+                if np.isclose(qr_slope, line[0], atol=20, rtol=1e-9) and np.isclose(qr_intercept, line[1], atol=20, rtol=1e-9):
                     avg_lines.pop(i)
                     avg_lines_coords.pop(i)
 
-            # TODO: might not need this, detect check coordinates with QR-codes
+            # find the two closest lines to the QR-code
             lines = []
+            count = 0
             for i in range(len(avg_lines_coords)):
                 max_values = np.argmax(avg_lines_coords, axis=0)
                 max_y = max(
@@ -102,6 +106,7 @@ class ParkingSlotDetector(LineDetector):
 
                 closest_line = avg_lines_coords.pop(closest_line_index)
                 lines.append(closest_line)
+                count += 1
 
                 if len(lines) > 1:
                     if ((max(lines[0][0], lines[0][2]) >= points[0][0][0] and max(lines[1][0], lines[1][2]) <= points[0][1][0]) or
@@ -111,7 +116,6 @@ class ParkingSlotDetector(LineDetector):
                         break
                     else:
                         lines.pop(0)
-
             return lines
         return None
 
@@ -128,11 +132,10 @@ class ParkingSlotDetector(LineDetector):
 
 if __name__ == "__main__":
     parking_slot_detector = ParkingSlotDetector(hough=[200, 5])
-
     # Tests image: 4, 7, 8
     # 4: DATA 20, 10, 50 (910 × 597)
     # 7, 8: DATA: 60, 20, 150 (880 × 495)
-    img = cv2.imread('computer_vision/line_detection/assets/parking/8.png')
+    img = cv2.imread('computer_vision/line_detection/assets/parking/2.png')
     copy = img.copy()
     all_lines = parking_slot_detector.get_lines(copy)
     parking_slot_detector.show_lines(copy, all_lines)

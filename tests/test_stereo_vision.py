@@ -22,14 +22,12 @@ class TestStereoVision:
         stereo_parameter_path = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
         stereo_vision = StereoscopicVision(stereo_rectify_maps_path, stereo_parameter_path)
         left_path = f'tests/images/stereoscopic_vision/distance/logi_1080p/left/{name[0]}.jpg'
-        print(left_path)
         right_path = f'tests/images/stereoscopic_vision/distance/logi_1080p/right/{name[1]}.jpg'
 
         left_img = cv.imread(left_path)
         right_img = cv.imread(right_path)
 
         disparity = stereo_vision.get_disparity(left_img, right_img)
-        print('disparity', disparity)
         assert disparity is not None
 
     @pytest.mark.parametrize(
@@ -65,5 +63,4 @@ class TestStereoVision:
         right_img = cv.imread(right_path)
         disparity = stereo_vision.get_disparity(left_img, right_img)
         retval, depth, _, _ = stereo_vision.get_data(disparity, min_dist, max_dist, thresh_dist)
-        print(retval, depth)
         assert retval == exp[0] and depth == pytest.approx(exp[1])

@@ -222,9 +222,22 @@ if __name__ == '__main__':
         M = file_read.getNode('M').real()
         file_read.release()
 
+    CURRENT_DEPTH = MAX_DIST
+    STEP_SIZE = 500 # Reduce the current depth by step size for every mouse press
     value_pairs = [] # used for calculating M (depth ratio)
 
     average = [0 for _ in range(10)]
+
+    # Defining callback functions for mouse events
+    def mouse_click(event, x_pos, y_pos, flags, param):
+        '''Recognize when the mouse is pressed'''
+        if event == cv.EVENT_LBUTTONDBLCLK:
+            if current_disparity[y_pos,x_pos] > 0:
+                value_pairs.append([CURRENT_DEPTH, current_disparity[y_pos, x_pos]])
+                print('Distance: {CURRENT_DEPTH} cm  | \
+                    Disparity: {current_disparity[y_pos, x_pos]}')
+                CURRENT_DEPTH -= STEP_SIZE
+    cv.setMouseCallback('disp',mouse_click)
 
     # DIRECTORY_LEFT_IMAGE = \
     #     'tests/images/stereoscopic_vision/distance/logi_1080p/left/left_300.jpg'
@@ -295,23 +308,26 @@ if __name__ == '__main__':
             stereo_vision.stereo.setDisp12MaxDiff(stereo_vision.parameters.disparity_max_diff)
             stereo_vision.stereo.setMinDisparity(stereo_vision.parameters.min_disparity)
 
-            disp = stereo_vision.get_disparity(frame_left, frame_right)
+            current_disparity = stereo_vision.get_disparity(frame_left, frame_right)
             ret_val, depth_val, pos_val, size_val = stereo_vision.get_data(
-                disp, MIN_DIST, MAX_DIST, THRESH_DIST)
+                current_disparity, MIN_DIST, MAX_DIST, THRESH_DIST)
 
             if ret_val and depth_val[0][0] is not None:
                 average.pop()
                 average.append(depth_val[0][0])
                 cv.putText(frame_left, f'{int(sum(average)/len(average))} cm',
                     [pos_val[0] + 5, pos_val[1] + 40], 1, 2, (40, 200, 40), 2, 2)
-                cv.rectangle(disp,
+                cv.rectangle(current_disparity,
                     pos_val,
                     (pos_val[0] + size_val[0], pos_val[1] + size_val[1]),
                     color=(40, 200, 40))
 
             cv.imshow('frame left', frame_left)
             cv.imshow('frame right', frame_right)
-            cv.imshow('disparity', disp)
+            cv.imshow('disparity', current_disparity)
+
+            if CURRENT_DEPTH < MIN_DIST:
+                break
 
             if cv.waitKey(1) & 0xFF == ord('q'):
                 print('Quitting...')

@@ -1,8 +1,5 @@
+'''DOC'''
 import cv2 as cv
-
-"""
-DOC
-"""
 
 if __name__ == '__main__':
     DIRECTORY = 'tests/images/qr_code/webcam'

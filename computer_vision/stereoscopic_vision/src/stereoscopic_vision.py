@@ -226,10 +226,14 @@ if __name__ == '__main__':
 
     average = [0 for _ in range(10)]
 
+    # DIRECTORY_LEFT_IMAGE = \
+    #     'tests/images/stereoscopic_vision/distance/logi_1080p/left/left_300.jpg'
+    # DIRECTORY_RIGHT_IMAGE = \
+    #     'tests/images/stereoscopic_vision/distance/logi_1080p/right/right_300.jpg'
     DIRECTORY_LEFT_IMAGE = \
-        'tests/images/stereoscopic_vision/distance/logi_1080p/left/left_300.jpg'
+        'computer_vision/stereoscopic_vision/images/test/test_left.png'
     DIRECTORY_RIGHT_IMAGE = \
-        'tests/images/stereoscopic_vision/distance/logi_1080p/right/right_300.jpg'
+        'computer_vision/stereoscopic_vision/images/test/test_right.png'
 
     if not os.path.exists(DIRECTORY_LEFT_IMAGE):
         print(f'{DIRECTORY_LEFT_IMAGE} does not exists')

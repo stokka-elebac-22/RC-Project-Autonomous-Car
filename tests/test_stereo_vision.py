@@ -17,7 +17,8 @@ class TestStereoVision:
     @pytest.mark.skip(reason='No way of testing atm')
     def test_get_disparity(self, name):
         '''Test get disparity'''
-        stereo_rectify_maps_path = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml'
+        stereo_rectify_maps_path = \
+            'computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml'
         stereo_parameter_path = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
         stereo_vision = StereoscopicVision(stereo_rectify_maps_path, stereo_parameter_path)
         left_path = f'tests/images/stereoscopic_vision/distance/logi_1080p/left/{name[0]}.jpg'
@@ -54,7 +55,8 @@ class TestStereoVision:
         max_dist = 230.0 # max distance to recognize objects (cm)
         min_dist = 1.0 # min distance to recognize objects (cm)
         thresh_dist = max_dist
-        stereo_rectify_maps_path = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml'
+        stereo_rectify_maps_path = \
+            'computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml'
         stereo_parameter_path = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
         stereo_vision = StereoscopicVision(stereo_rectify_maps_path, stereo_parameter_path)
         left_path = f'tests/images/stereoscopic_vision/distance/logi_1080p/left/{name[0]}.jpg'

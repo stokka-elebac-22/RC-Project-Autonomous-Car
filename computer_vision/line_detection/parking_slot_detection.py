@@ -122,7 +122,7 @@ if __name__ == "__main__":
     #Tests image: 4, 7, 8
     # 4: DATA 20, 10, 50 (910 × 597)
     # 7, 8: DATA: 60, 20, 150 (880 × 495)
-    img = cv2.imread('computer_vision/line_detection/assets/parking/7.png')
+    img = cv2.imread('computer_vision/line_detection/assets/parking/8.png')
     copy = img.copy()
     all_lines = parking_slot_detector.get_lines(copy)
     parking_slot_detector.show_lines(copy, all_lines)

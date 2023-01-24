@@ -82,11 +82,11 @@ class QRCode:
         """Update values
         The resize variable is only relevant if not using video
         This function returns in a dict:
-        - bool, stating if it could detect the qr code
-        - a float value for distance and angle
-        - the decoded info
-        - a list of points (formatted like [[[0, 0], ..., [1, 1]]])
-        - return straight value
+        - ret: bool, stating if it could detect the qr code
+        - distances, angles: a float value for distance and angle
+        - info: the decoded info
+        - points: a list of points (formatted like [[[0, 0], ..., [1, 1]]])
+        - rest: return straight value
         get_measurements(self, frame, resize=1) -> bool, float, float
         """
         qcd = cv.QRCodeDetector()
@@ -148,7 +148,7 @@ class DisplayQRCode:
             if data['distances'] is None:
                 distance = qrgs[i].get_distance()
             else:
-                distance = data['distance'][i]
+                distance = data['distances'][i]
 
             if data['decoded_info'][i] is None:
                 color = self.color_frame_green
@@ -215,36 +215,48 @@ if __name__ == '__main__':
 
     ##### VALUES #####
     VALUES_LENGTH = 10
-    angles_list = [0 for _ in range(VALUES_LENGTH)]
-    distances_list = [0 for _ in range(VALUES_LENGTH)]
 
-    def filter_angle(angle):
+    def filter_angle(angles):
         '''Filter angle'''
-        if angle is None:
-            return
-        angles_list.pop(0)
-        angles_list.append(angle)
+        for i, angle in enumerate(angles):
+            if angle is None:
+                return
+            angles_lists[i].pop(0)
+            angles_lists[i].append(angle)
 
-    def filter_distance(distance):
+    def filter_distance(distances):
         '''filter distance values'''
-        if distance is None:
-            return
-        distances_list.pop(0)
-        distances_list.append(distance)
+        for i, distance in enumerate(distances):
+            if distance is None:
+                return
+            distances_lists[i].pop(0)
+            distances_lists[i].append(distance)
+
+    angles_lists = [[0 for _ in range(VALUES_LENGTH)]]
+    distances_lists = [[0 for _ in range(VALUES_LENGTH)]]
 
     while True:
-        img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_82.jpg')
+        img = cv.imread('tests/images/qr_code/multi/qrcode.png')
         # img = local_read_camera()
-        retval, dist, angl, d_info, pnts, rest = qr_code.get_data(img)
-        filter_angle(angl)
-        filter_distance(dist)
-        if retval:
-            average_angle = int(sum(angles_list)//VALUES_LENGTH)
-            average_distance = int(sum(distances_list)//VALUES_LENGTH)
+        qr_data = qr_code.get_data(img)
+
+        if len(angles_lists) < len(qr_data['angles']):
+            for _ in range(len(qr_data['angles']) - len(angles_lists)):
+                angles_lists.append([0 for _ in range(VALUES_LENGTH)])
+        if len(distances_lists) < len(qr_data['distances']):
+            for _ in range(len(qr_data['distances']) - len(distances_lists)):
+                distances_lists.append([0 for _ in range(VALUES_LENGTH)])
+        filter_angle(qr_data['angles'])
+        filter_distance(qr_data['distances'])
+        if qr_data['ret']:
+            average_angles = [int(sum(angles_list)//VALUES_LENGTH) \
+                for angles_list in angles_lists]
+            average_distance = [int(sum(distances_list)//VALUES_LENGTH) \
+                for distances_list in distances_lists]
             qr_code_measurements = {
                 'distances': average_distance,
-                'angles': average_angle,
-                'decoded_info': d_info}
+                'angles': average_angles,
+                'decoded_info': qr_data['info']}
             qr_code.display(img, qr_code_measurements, verbose=2)
         cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):

@@ -1,6 +1,6 @@
 '''Creating the board'''
 import pygame as pg
-from lib import Colors, Objects
+from lib import Objects
 
 class Board:
     '''Display Board'''
@@ -13,7 +13,7 @@ class Board:
 
     def draw_squares(self, window):
         '''Draw the squares'''
-        window.fill(Colors().white)
+        window.fill(pg.Color(255, 255, 255))
 
     def create_board(self):
         '''Creating the board'''

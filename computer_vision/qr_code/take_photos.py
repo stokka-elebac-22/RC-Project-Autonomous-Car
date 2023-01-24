@@ -1,5 +1,6 @@
 '''DOC'''
 import cv2 as cv
+from qr_code import QRCode
 
 if __name__ == '__main__':
     DIRECTORY = 'tests/images/qr_code/webcam'
@@ -9,18 +10,20 @@ if __name__ == '__main__':
     cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)
     cameras = [(cam1, 'distance')]
 
-    qcd = cv.QRCodeDetector()
+    qr_code = QRCode()
 
-    trigger = False
-    count = 0
+    TRIGGER = False
+    COUNT = 0
     while True:
         frames = []
-        rets = True
+        RETS = True
         for cam in cameras:
             ret, frame = cam[0].read()
+            retval, distances, angles, points, _ = qr_code.get_data(frame)
             cv.imshow(cam[1], frame)
-            if not ret:
-                rets = False
+            qr_code.display(frame)
+            if not all(ret):
+                RETS = False
                 break
             frames.append((frame, cam[1]))
 
@@ -30,22 +33,14 @@ if __name__ == '__main__':
 
         if cv.waitKey(1) & 0xFF == ord('c'):
             print('Capturing...')
-            trigger = True
+            TRIGGER = True
 
-        if trigger:
-            if not rets:
-                continue
-
-            for frame in frames:
-                ret, _, _, _ = qcd.detectAndDecodeMulti(frame[0])
-                if not ret:
-                    rets = False
-                    break
-            if not rets:
+        if TRIGGER:
+            if not RETS:
                 continue
 
             print('Done\n')
             for frame, title in frames:
-                cv.imwrite(f'{DIRECTORY}/{title}/{title}_{count}.jpg', frame)
-            count += 1
-            trigger = False
+                cv.imwrite(f'{DIRECTORY}/{title}/{title}_{COUNT}.jpg', frame)
+            COUNT += 1
+            TRIGGER = False

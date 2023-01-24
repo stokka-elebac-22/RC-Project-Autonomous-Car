@@ -1,5 +1,4 @@
 '''Library'''
-import dataclasses
 import pygame as pg
 
 class Objects:

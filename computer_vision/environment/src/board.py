@@ -1,6 +1,6 @@
 '''Creating the board'''
 import pygame as pg
-from lib import Colors
+from lib import Colors, Objects
 
 class Board:
     '''Display Board'''
@@ -26,4 +26,12 @@ class Board:
         '''Draw'''
         for row in self.board:
             for col in self.board[row]:
-                pg.draw.rect(surface, pg.Rect)
+                color = Objects().get_color([self.board[row][col]])
+                pg.draw.rect(
+                    surface,
+                    color,
+                    pg.Rect(
+                        self.square_size * row,
+                        self.square_size * col,
+                        self.square_size,
+                        self.square_size))

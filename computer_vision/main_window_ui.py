@@ -11,11 +11,12 @@ __status__ = "Testing"
 import sys
 # import time
 # from defines import *
-from camera_handler.camera_handler import CameraHandler
+from camera_handler.camera_handler import CameraHandler, VideoThread
 from PyQt6 import QtWidgets, uic, QtCore
-from PyQt6.QtCore import QThread, pyqtSignal, QObject
+from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
 # from pyqtgraph import PlotWidget, plot
 # from random import randint
+import numpy as np
 
 class Worker(QObject, ):
     """Worker thread"""
@@ -43,9 +44,14 @@ class Ui(QtWidgets.QMainWindow):
             self.findChild(QtWidgets.QComboBox, 'input_cbo_1'),
             self.findChild(QtWidgets.QComboBox, 'input_cbo_2')
         ]
+        self.img_input = [
+            self.findChild(QtWidgets.QLabel, 'input_img_1'),
+            self.findChild(QtWidgets.QLabel, 'input_img_2')
+        ]
         self.refresh_webcam_list()
 
-
+        
+        
         self.timer = QtCore.QTimer()
         self.timer.setInterval(50)
         #self.timer.timeout.connect(self.update_plot_data)
@@ -57,6 +63,13 @@ class Ui(QtWidgets.QMainWindow):
             self.showFullScreen()
         self.show()
         self.app.exec()
+
+    @pyqtSlot(np.ndarray)    
+    def update_image(self, cv_img):
+        """Updates the image_label with a new opencv image"""
+        qt_img = self.camera_handler.convert_cv_qt(cv_img, self.img_input[0].width(), self.img_input[0].height())
+        # print("Setting new image")
+        self.img_input[0].setPixmap(qt_img)
 
     def refresh_webcam_list(self):
         """Run a Qthread to check possible webcams and create a list"""
@@ -77,4 +90,10 @@ class Ui(QtWidgets.QMainWindow):
         for cbo in self.camera_cbo:
             for camera in self.camera_handler.get_camera_list():
                 cbo.addItem(self.camera_handler.get_camera_string(camera["id"]))
+                # create the video capture thread
+        self.thread2 = VideoThread(1)
+        # connect its signal to the update_image slot
+        self.thread2.change_pixmap_signal.connect(self.update_image)
+        # start the thread
+        self.thread2.start()
     #def update_plot_data(self):

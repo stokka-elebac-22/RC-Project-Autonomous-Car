@@ -4,9 +4,9 @@ __license__ = "Apache-2.0"
 __version__ = "0.1.0"
 __status__ = "Testing"
 from PyQt6.QtGui import QPixmap, QColor, QImage
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import pyqtSignal, Qt, QThread
 import cv2
-
+import numpy as np
 class CameraHandler:
     """Camera functionality"""
     def __init__(self):
@@ -45,14 +45,41 @@ class CameraHandler:
         self.available_camera_list = arr
         return arr
 
-    def convert_cv_qt(self, cv_img, w, h) -> QPixmap:
+    def get_cv_frame(self, cam_id: int):
+        """Returns a new CV frame"""
+        print(cam_id)
+    
+    def convert_cv_qt(self, cv_img, scale_w: int, scale_h: int) -> QPixmap:
         """Convert from an opencv image to QPixmap"""
         rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb_image.shape
         bytes_per_line = ch * w
         convert_to_Qt_format = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
-        p = convert_to_Qt_format.scaled(w, h, Qt.AspectRatioMode.KeepAspectRatio)
+        p = convert_to_Qt_format.scaled(scale_w, scale_h, Qt.AspectRatioMode.KeepAspectRatio)
         return QPixmap.fromImage(p)
+class VideoThread(QThread):
+    change_pixmap_signal = pyqtSignal(np.ndarray)
+    camera_id = 0
+
+    def __init__(self, camera_id: int):
+        super().__init__()
+        self._run_flag = True
+        self.camera_id = camera_id
+
+    def run(self):
+        # capture from web cam
+        cap = cv2.VideoCapture(0)
+        while self._run_flag:
+            ret, cv_img = cap.read()
+            if ret:
+                self.change_pixmap_signal.emit(cv_img)
+        # shut down capture system
+        cap.release()
+
+    def stop(self):
+        """Sets run flag to False and waits for thread to finish"""
+        self._run_flag = False
+        self.wait()
 
 if __name__ == "__main__":
     camera_handler = CameraHandler()

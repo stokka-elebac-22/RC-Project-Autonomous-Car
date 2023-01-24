@@ -121,20 +121,19 @@ class TestQRCode:
         qr_distance_mm = 320
         qr_code = QRCode(qr_size_px, qr_size_mm, qr_distance_mm)
         frame = cv.imread('tests/images/qr_code/webcam/distance/' + path + '.jpg')
-        retval, distance, angle, _, _, _ = qr_code.get_data(frame)
-        assert retval == exp[0] and distance == pytest.approx(exp[1]) \
-            and angle == pytest.approx(exp[2])
+        data = qr_code.get_data(frame)
+        assert data['ret'] == exp[0] and data['distances']== pytest.approx(exp[1]) \
+            and data['angles'] == pytest.approx(exp[2])
 
     @pytest.mark.parametrize(
         ['path', 'exp'],
-        [
-            ('qrcode.png', [True, 3])
-        ]
+        [('qrcode.png', [True, 3])]
     )
 
     def test_multiple(self, path, exp):
         '''Testing if the code can detect multiple qr codes'''
         qr_code = QRCode(1, 1, 1)
         frame = cv.imread('tests/images/qr_code/multi/' + path)
-        retval, distances, _, _, _, _ = qr_code.get_data(frame)
-        assert retval == exp[0] and len(distances) == exp[1]
+        data = qr_code.get_data(frame)
+        print(data['ret'])
+        assert data['ret'] == exp[0] and len(data['distances']) == exp[1]

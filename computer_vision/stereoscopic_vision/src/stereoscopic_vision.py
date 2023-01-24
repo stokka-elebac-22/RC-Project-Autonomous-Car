@@ -1,9 +1,13 @@
 """Importing necessary libraries"""
+import dataclasses
 import os.path
 import cv2 as cv
 import numpy as np
 
+@dataclasses.dataclass
 class DisparityParameters:
+    # pylint: disable=too-many-instance-attributes
+    # it seem reasonable in this case
     '''Disparity Parameters'''
     def __init__(self, path):
         self.num_disparities = 0
@@ -102,13 +106,13 @@ class StereoscopicVision:
         cv_file.release()
         return (stereo_map_left_x, stereo_map_left_y), (stereo_map_right_x, stereo_map_right_y)
 
-    def obstacle_detection(self, depth_map, obstacle_area, contour_area, min_dist, thresh_dist):
+    def obstacle_detection(self, depth_map, area, min_dist, thresh_dist):
         """Detecting depth to obstacles in cm"""
         # Mask to segment regions with depth less than threshold
         mask = cv.inRange(depth_map, min_dist, thresh_dist)
 
         # Check if a significantly large obstacle is present and filter out smalle noisy regions
-        if np.sum(mask)/255.0 > obstacle_area*mask.shape[0]*mask.shape[1]:
+        if np.sum(mask)/255.0 > area['obstacle']*mask.shape[0]*mask.shape[1]:
             # Contour detection
             contours, _ = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
@@ -120,7 +124,7 @@ class StereoscopicVision:
             # Because of the huge size of cnts,
             # a binary search method will be used instead of linear
             for cnt in contours:
-                if cv.contourArea(cnt) > contour_area*mask.shape[0]*mask.shape[1]:
+                if cv.contourArea(cnt) > area['contour']*mask.shape[0]*mask.shape[1]:
                     # finding average depth of the contour
                     mask2 = np.zeros_like(mask)
                     cv.drawContours(mask2, cnt, 0, (255), -1)
@@ -141,10 +145,13 @@ class StereoscopicVision:
         mask_tmp = cv.inRange(depth_map_dist, min_dist, max_dist)
         depth_map_dist = cv.bitwise_and(depth_map_dist, depth_map_dist, mask=mask_tmp)
 
+        area = {
+            'obstacle': self.parameters.obstacle_area,
+            'contour': self.parameters.contour_area
+        }
         retval, depth, pos, size = self.obstacle_detection(
             depth_map_dist,
-            self.parameters.obstacle_area,
-            self.parameters.contour_area,
+            area,
             min_dist,
             thresh_dist)
 

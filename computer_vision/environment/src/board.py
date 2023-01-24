@@ -1,6 +1,6 @@
 '''Creating the board'''
 import pygame as pg
-from lib import Objects
+from .lib import Objects
 
 class Board:
     '''Display Board'''
@@ -8,8 +8,7 @@ class Board:
         self.rows = dimensions[0]
         self.cols = dimensions[1]
         self.square_size = square_size
-        self.board = []
-        self.create_board()
+        self.board = self.create_board()
 
     def draw_squares(self, window):
         '''Draw the squares'''
@@ -17,10 +16,13 @@ class Board:
 
     def create_board(self):
         '''Creating the board'''
-        for row in range(self.rows):
-            self.board.append([])
+        board = []
+        for _ in range(self.rows):
+            tmp = []
             for _ in range(self.cols):
-                self.board[row].append(0)
+                tmp.append(0)
+            board.append(tmp)
+        return board
 
     def draw(self, surface):
         '''Draw'''

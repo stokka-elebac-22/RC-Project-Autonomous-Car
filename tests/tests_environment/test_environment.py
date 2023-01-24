@@ -7,7 +7,7 @@ class TestEnvironment:
     @pytest.mark.parametrize(
         ['size', 'exp'],
         [
-            (10, 10)
+            ((10, 10), 10)
         ]
     )
     def test_init(self, size, exp):

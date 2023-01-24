@@ -27,9 +27,9 @@ class Objects:
 
     def get_color(self, obj):
         '''Get the color of the object'''
-        if isinstance(obj, int):
-            obj = self.objects[object]
-        return self.objects_color.get(object)
+        if not isinstance(obj, int):
+            obj = self.objects[obj] # convert to correct keyname
+        return self.object_color[obj]
 
 
 

@@ -7,7 +7,7 @@ class TestDisplayEnvironment:
     @pytest.mark.parametrize(
         ['param', 'exp'],
         [
-            ([(50, 100), (10, 10)], [(50, 100), (10, 10)])
+            ([(1, 2), (10, 10)], [(1, 2), (10, 10)])
         ]
     )
     def test_init(self, param, exp):
@@ -20,7 +20,7 @@ class TestBoard:
     @pytest.mark.parametrize(
         ['param', 'exp'],
         [
-            [(10, 10), 1], (10, 10)
+            ([(10, 10), 1], [10, 10])
         ]
     )
     def test_init(self, param, exp):
@@ -30,7 +30,9 @@ class TestBoard:
 
     @pytest.mark.parametrize(
         ['param', 'exp'],
-        [[(10, 10), 1], (10, 10)]
+        [
+            ([(10, 10), 1], [10, 10])
+        ]
     )
     def test_create_board(self, param, exp):
         '''Testing creating board'''

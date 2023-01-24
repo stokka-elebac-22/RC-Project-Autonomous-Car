@@ -2,25 +2,36 @@
 import dataclasses
 import pygame as pg
 
-@dataclasses.dataclass
-class Colors:
-    '''Pygame colors'''
-    def __init__(self):
-        self.black = pg.Color(0, 0, 0)
-        self.white = pg.Color(255, 255, 255)
-        self.red = pg.Color(255, 0, 0)
-        self.green = pg.Color(0, 255, 0)
-        self.blue = pg.Color(0, 0, 255)
-
-
 class Objects:
     '''Class over all the objects'''
     def __init__(self):
         self.objects = TwoWayDict()
+        self._init_objects()
+        self.object_color = {}
+        self._init_object_colors()
 
-    def get_color(self, object):
+    def _init_objects(self):
+        '''Initializing the object dict'''
+        obj = [
+            ('None', 0)
+        ]
+        for i in obj:
+            self.objects[i[0]] = i[1]
+
+    def _init_object_colors(self):
+        obj = [
+            (0, pg.Color(255, 255, 255))
+        ]
+        for i in obj:
+            self.object_color[i[0]] = i[1]
+
+
+    def get_color(self, obj):
         '''Get the color of the object'''
-        
+        if isinstance(obj, int):
+            obj = self.objects[object]
+        return self.objects_color.get(object)
+
 
 
 class TwoWayDict(dict):

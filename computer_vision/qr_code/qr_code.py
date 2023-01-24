@@ -156,10 +156,11 @@ class DisplayQRCode:
                 color = self.color_frame_red
             frame = cv.polylines(frame, [qrgs[i].points.astype(int)], True, color, 4)
             if verbose > 0:
-                self.display_values(frame, qrg, angle, distance, verbose)
+                display_data = {'distance': distance, 'angle': angle}
+                self.display_values(frame, qrg, display_data, verbose)
         return frame
 
-    def display_values(self, frame, qrg: QRGeometry, angle: int, distance: int, verbose=1):
+    def display_values(self, frame, qrg: QRGeometry, data, verbose=1):
         """Display values"""
         if verbose > 1:
             text_location_a = (int(min(qrg.points[0][0], qrg.points[1][0]) + \
@@ -180,6 +181,8 @@ class DisplayQRCode:
             cv.putText(frame, str(int(qrg.side_d)), text_location_d, self.font, \
                         self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
 
+        angle = data['angle']
+        distance = data['distance']
         cv.putText(frame, f'angle    = {int(angle)}', (10, 20), self.font, \
                             self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
         cv.putText(frame, f'distance = {int(distance)}', (10, 50), \

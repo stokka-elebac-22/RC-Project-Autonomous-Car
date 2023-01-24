@@ -51,16 +51,18 @@ class Calibrate:
                 images_returned_left.append(left)
                 images_returned_right.append(right)
 
-                corners_left = cv.cornerSubPix(gray_left, corners_left, (11, 11), (-1, -1), self.criteria)
+                corners_left = cv.cornerSubPix(
+                    gray_left, corners_left, (11, 11), (-1, -1), self.criteria)
                 image_points_left.append(corners_left)
-                corners_right = cv.cornerSubPix(gray_right, corners_right, (11, 11), (-1, -1), self.criteria)
+                corners_right = cv.cornerSubPix(
+                    gray_right, corners_right, (11, 11), (-1, -1), self.criteria)
                 image_points_right.append(corners_right)
                 # draw and display the corners
                 cv.drawChessboardCorners(image_left, self.board_dim, corners_left, ret_left)
                 cv.drawChessboardCorners(image_right, self.board_dim, corners_right, ret_right)
-                # cv.imshow("left", image_left)
-                # cv.imshow("right", image_right)
-                # cv.waitKey(0)
+                cv.imshow("left", image_left)
+                cv.imshow("right", image_right)
+                cv.waitKey(0)
         print(f"""Could find chessboard corners in {len(object_points)}
         out of {len(images_left)} images""")
 
@@ -110,8 +112,8 @@ class Calibrate:
 if __name__ == '__main__':
     CHECKERBOARD_DIMENSION = (8, 6)
     CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-    DIRECTORY_LEFT = "computer_vision/stereoscopic_vision/images/calibrate/left/*.jpg"
-    DIRECTORY_RIGHT = "computer_vision/stereoscopic_vision/images/calibrate/right/*.jpg"
+    DIRECTORY_LEFT = "computer_vision/stereoscopic_vision/images/calibrate_small/left/*.jpg"
+    DIRECTORY_RIGHT = "computer_vision/stereoscopic_vision/images/calibrate_small/right/*.jpg"
     DESTINATION_PATH = "computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml"
 
     # Calibrate left camera

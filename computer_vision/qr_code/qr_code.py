@@ -5,6 +5,8 @@ import cv2 as cv
 @dataclasses.dataclass
 class QRGeometry:
     """PointSet, used by qrcode."""
+    # pylint: disable=too-many-instance-attributes
+    # 8 instances seem reasonable in this case
     def __init__(self, size_px=None, size_mm=None, distance=None, pts=None):
         self.qr_size_px = size_px
         self.qr_size_mm = size_mm
@@ -79,7 +81,7 @@ class QRCode:
     def get_data(self, frame):
         """Update values
         The resize variable is only relevant if not using video
-        This function returns:
+        This function returns in a dict:
         - bool, stating if it could detect the qr code
         - a float value for distance and angle
         - the decoded info
@@ -104,16 +106,21 @@ class QRCode:
             self.qr_geometries[i].update(points)
             angles.append(self.qr_geometries[i].get_angle())
             distances.append(self.qr_geometries[i].get_distance())
-        return ret_qr, distances, angles, decoded_info, points_qr, rest_qr
+        return {
+            'ret': ret_qr,
+            'distances': distances,
+            'angles': angles,
+            'info': decoded_info,
+            'points': points_qr,
+            'rest': rest_qr
+            }
 
-    def display(self, frame, angles=None, distances=None, decoded_info=None, verbose=1):
+    def display(self, frame, data, verbose=1):
         """Displays the qr code with data"""
         self.qr_display.display(
             frame,
             self.qr_geometries,
-            angles,
-            distances,
-            decoded_info,
+            data,
             verbose=verbose
         )
 class DisplayQRCode:
@@ -128,24 +135,28 @@ class DisplayQRCode:
         self.text_color = (255, 0, 255)
         self.text_thickness = 1
 
-    def display(self, frame, qrgs: QRGeometry, angles, distances, decoded_infos, verbose=1):
+    def display(self, frame, qrgs: QRGeometry, data, verbose=1):
         """
         Display
         returns a frame
         """
         for i, qrg in enumerate(qrgs):
-            if angle is None:
+            if data['angles'] is None:
                 angle = qrgs[i].get_angle()
-            if distances is None:
-                angle = qrgs[i].get_distance()
+            else:
+                angle = data['angles'][i]
+            if data['distances'] is None:
+                distance = qrgs[i].get_distance()
+            else:
+                distance = data['distance'][i]
 
-            if decoded_infos:
+            if data['decoded_info'][i] is None:
                 color = self.color_frame_green
             else:
                 color = self.color_frame_red
             frame = cv.polylines(frame, [qrgs[i].points.astype(int)], True, color, 4)
             if verbose > 0:
-                self.display_values(frame, qrg, angles[i], distances[i], verbose)
+                self.display_values(frame, qrg, angle, distance, verbose)
         return frame
 
     def display_values(self, frame, qrg: QRGeometry, angle: int, distance: int, verbose=1):
@@ -227,7 +238,11 @@ if __name__ == '__main__':
         if retval:
             average_angle = int(sum(angles_list)//VALUES_LENGTH)
             average_distance = int(sum(distances_list)//VALUES_LENGTH)
-            qr_code.display(img, average_angle, average_distance, d_info, verbose=2)
+            qr_code_measurements = {
+                'distances': average_distance,
+                'angles': average_angle,
+                'decoded_info': d_info}
+            qr_code.display(img, qr_code_measurements, verbose=2)
         cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):
             break

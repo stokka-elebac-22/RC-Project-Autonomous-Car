@@ -112,7 +112,7 @@ class ParkingSlotDetector(LineDetector):
             image, qr_size_px, qr_size_mm, qr_distance)
         if retval:
             # display QR-code on image
-            qrc.display(img, angle, distance, decoded_info)
+            qrc.display(image, angle, distance, decoded_info)
             qr_slope, qr_intercept = np.polyfit(
                 (points[0][0][0], points[0][1][0]), (points[0][0][1], points[0][1][1]), 1)
             lines = self.get_lines(image)
@@ -127,7 +127,7 @@ class ParkingSlotDetector(LineDetector):
                 line = np.average(cluster, axis=0)
                 avg_lines.append(line)
                 min_x, max_x = self.get_min_max_x(clustered_coords[i])
-                coordinates = parking_slot_detector.get_line_coordinates_from_parameters(
+                coordinates = self.get_line_coordinates_from_parameters(
                     min_x, max_x, line)
                 avg_lines_coords.append(coordinates)
 

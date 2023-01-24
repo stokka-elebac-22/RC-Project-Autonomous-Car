@@ -47,7 +47,7 @@ class TestParametrized:
         assert coordinates[2] == expected[2]
         assert coordinates[3] == expected[3]
 
-    @pytest.mark.parametrize('img_source, lines, expected', [
+    @pytest.mark.parametrize('lines, expected', [
         ([np.array([300, 327, 1059, 600]), np.array([0, 781, 272, 561]),
           np.array([573, 339, 780, 336])],
          [np.array([-0.412, 564.152]),

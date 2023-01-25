@@ -91,6 +91,15 @@ class QRCode:
         ret_qr, decoded_info , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
 
         # add more QRGeometry if needed or delete if too many
+        if not ret_qr:
+            return {
+            'ret': ret_qr,
+            'distances': None,
+            'angles': None,
+            'info': None,
+            'points': None,
+            'rest': None
+            }
         if len(self.qr_geometries) > len(points_qr):
             for _ in range(len(self.qr_geometries) - len(points_qr)):
                 self.qr_geometries.pop()

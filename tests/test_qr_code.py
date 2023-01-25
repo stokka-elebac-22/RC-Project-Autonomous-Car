@@ -79,7 +79,6 @@ class TestQRCode:
         frame = cv.imread("tests/images/qr_code/logi_1080p/angle/" + name + ".jpg")
         data = qr_code.get_data(frame)
         # Tolerance of 5
-        print(data['angles'][0])
         assert data['ret'] == exp[0] and data['angles'][0] == pytest.approx(exp[1], abs=abs(5))
 
     @pytest.mark.parametrize(

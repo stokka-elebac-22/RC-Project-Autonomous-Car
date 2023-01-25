@@ -3,6 +3,16 @@ import dataclasses
 import pygame as pg
 
 @dataclasses.dataclass
+class Object:
+    '''Object'''
+    def __init__(self, id, name, param):
+        self.id = id # pylint: disable=C0103
+        self.name = name
+        self.color = param['color']
+        self.thickness = param['thickness']
+
+
+@dataclasses.dataclass
 class Objects:
     '''Class over all the objects'''
     def __init__(self):
@@ -14,7 +24,8 @@ class Objects:
     def _init_objects(self):
         '''Initializing the object dict'''
         obj = [
-            ('None', 0)
+            ('None', 0),
+            ('Stop', 1)
         ]
         for i in obj:
             self.objects[i[0]] = i[1]
@@ -26,14 +37,26 @@ class Objects:
         color, thickness
         '''
         obj = [
-            (0,
             {
-                'color': pg.Color(0, 0, 0),
-                'thickness': 1
-            })
+                'id': 0,
+                'name': 'None',
+                'param': {
+                    'color': pg.Color(0, 0, 0),
+                    'thickness': 1
+                }
+            },
+            {
+                'id': 1,
+                'name': 'Stop',
+                'param': {
+                    'color': pg.Color(255, 0, 0),
+                    'thickness': 0
+                }
+            },
         ]
         for i in obj:
-            self.object_data[i[0]] = i[1]
+            new_object = Object(i['id'], i['name'], i['param'])
+            self.object_data[i['id']] = new_object
 
     def get_data(self, obj):
         '''

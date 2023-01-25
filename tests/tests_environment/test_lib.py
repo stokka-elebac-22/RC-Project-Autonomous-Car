@@ -23,8 +23,8 @@ class TestObjects:
         obj.object_data[0]['color'] = param[2]
         obj.object_data[0]['thickness'] = param[3]
         assert obj.get_data('foo')['color'] == exp[0] and \
-            obj.get_data(0)['color'] == exp[0] and \
-            obj.get_data(0)['thickness'] == exp[1]
+            obj.get_data('None')['color'] == exp[0] and \
+            obj.get_data('None')['thickness'] == exp[1]
 
 
 class TestTwoWayDict:

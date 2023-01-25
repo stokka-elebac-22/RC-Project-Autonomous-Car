@@ -23,7 +23,7 @@ class DisplayEnvironment:
         Display the matrix
         The input should be the data (matrix)
         '''
-        self.draw_grid()
+        self.draw_grid(data)
 
     def update(self, data):
         '''Update the display'''
@@ -33,6 +33,6 @@ class DisplayEnvironment:
     def insert(self, object=None):
         '''Insert a object into the map'''
 
-    def draw_grid(self):
+    def draw_grid(self, data):
         '''Draw the grid on the screen'''
-        self.board.draw_squares(self.display_window)
+        self.board.draw(self.display_window, data)

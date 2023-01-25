@@ -15,9 +15,9 @@ class Board:
         window.fill(pg.Color(255, 255, 255))
         for i, row in enumerate(self.board):
             for j, col in enumerate(row):
-                data = Objects().get_data(col)
-                color = data['color']
-                thickness = data['thickness']
+                data = Objects().get_data(int(col))
+                color = data.color
+                thickness = data.thickness
                 pg.draw.rect(
                     window,
                     color,
@@ -38,6 +38,7 @@ class Board:
             board.append(tmp)
         return board
 
-    def draw(self, window):
+    def draw(self, window, new_board):
         '''Draw'''
+        self.board = new_board
         self.draw_squares(window)

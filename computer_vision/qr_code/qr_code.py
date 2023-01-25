@@ -48,6 +48,8 @@ class QRGeometry:
         '''Return the angle'''
         width = self.get_width()
         height = self.get_height()
+        if height == 0:
+            return None
         ratio = width/height
         angle = (1 - ratio) * 90
         return angle
@@ -159,7 +161,7 @@ class DisplayQRCode:
             else:
                 distance = data['distances'][i]
 
-            if data['decoded_info'][i] is None:
+            if data['info'][i] is None:
                 color = self.color_frame_green
             else:
                 color = self.color_frame_red

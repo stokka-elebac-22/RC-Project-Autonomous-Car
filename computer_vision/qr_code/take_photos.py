@@ -3,12 +3,12 @@ import cv2 as cv
 from qr_code import QRCode
 
 if __name__ == '__main__':
-    DIRECTORY = 'tests/images/qr_code/webcam'
+    DIRECTORY = 'tests/images/qr_code/logi_1080p'
     CAMERA_ID_LEFT = 0
     CAMERA_ID_RIGHT = 2
     cam1 = cv.VideoCapture(CAMERA_ID_LEFT)
     cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)
-    cameras = [(cam1, 'distance')]
+    cameras = [(cam1, 'angle')]
 
     QR_SIZE_PX = 76
     QR_SIZE_MM = 52
@@ -23,12 +23,15 @@ if __name__ == '__main__':
         RETS = True
         for cam in cameras:
             ret, frame = cam[0].read()
-            retval, distances, angles, points, _ = qr_code.get_data(frame)
-            qr_code.display(frame, verbose=2)
-            if not all(ret):
+            _, frame_copy = cam[0].read()
+            data = qr_code.get_data(frame)
+            if data['ret']:
+                qr_code.display(frame, data, verbose=2)
+            cv.imshow('qr-code', frame)
+            if not ret:
                 RETS = False
                 break
-            frames.append((frame, cam[1]))
+            frames.append((frame_copy, cam[1]))
 
         if cv.waitKey(1) & 0xFF == ord('s'): # stop loop by pressing s
             print('Stopping...')

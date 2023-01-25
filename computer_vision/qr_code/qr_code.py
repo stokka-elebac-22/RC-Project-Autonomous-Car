@@ -247,7 +247,7 @@ if __name__ == '__main__':
     distances_lists = [[0 for _ in range(VALUES_LENGTH)]]
 
     while True:
-        img = cv.imread('tests/images/qr_code/multi/qrcode.png')
+        img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
         # img = local_read_camera()
         qr_data = qr_code.get_data(img)
 
@@ -267,7 +267,7 @@ if __name__ == '__main__':
             qr_code_measurements = {
                 'distances': average_distance,
                 'angles': average_angles,
-                'decoded_info': qr_data['info']}
+                'info': qr_data['info']}
             qr_code.display(img, qr_code_measurements, verbose=2)
         cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):

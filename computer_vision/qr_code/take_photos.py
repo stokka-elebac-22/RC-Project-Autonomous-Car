@@ -10,7 +10,11 @@ if __name__ == '__main__':
     cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)
     cameras = [(cam1, 'distance')]
 
-    qr_code = QRCode()
+    QR_SIZE_PX = 76
+    QR_SIZE_MM = 52
+    QR_DISTANCE = 500
+
+    qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
 
     TRIGGER = False
     COUNT = 0
@@ -20,8 +24,7 @@ if __name__ == '__main__':
         for cam in cameras:
             ret, frame = cam[0].read()
             retval, distances, angles, points, _ = qr_code.get_data(frame)
-            cv.imshow(cam[1], frame)
-            qr_code.display(frame)
+            qr_code.display(frame, verbose=2)
             if not all(ret):
                 RETS = False
                 break

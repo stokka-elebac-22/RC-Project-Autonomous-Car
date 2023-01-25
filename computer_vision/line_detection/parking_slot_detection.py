@@ -15,9 +15,9 @@ class ParkingSlotDetector(LineDetector):
     """
     DOC: Detects parking slot
     """
-    def __init__(self, canny=None, blur=3, hough=None):
+    def __init__(self, canny=None, blur=3, hough=None, iterations=None):
         '''Initialize the Line Detector'''
-        LineDetector.__init__(self, canny, blur, hough)
+        LineDetector.__init__(self, canny, blur, hough, iterations)
 
     def __get_qr_code_info(self, image, qr_size_px, qr_size_mm, qr_distance):
         '''Use the QR-code module to get the info needed'''
@@ -152,11 +152,11 @@ class ParkingSlotDetector(LineDetector):
 
 
 if __name__ == "__main__":
-    parking_slot_detector = ParkingSlotDetector(hough=[200, 5])
+    parking_slot_detector = ParkingSlotDetector(hough=[200, 5], iterations=[3, 3])
     # Tests image: 4, 7, 8
     # 4: DATA 20, 10, 50 (910 × 597)
     # 7, 8: DATA: 60, 20, 150 (880 × 495)
-    img = cv2.imread('computer_vision/line_detection/assets/parking/8.png')
+    img = cv2.imread('computer_vision/line_detection/assets/parking/7.png')
     copy = img.copy()
     all_lines = parking_slot_detector.get_lines(copy)
     parking_slot_detector.show_lines(copy, all_lines)

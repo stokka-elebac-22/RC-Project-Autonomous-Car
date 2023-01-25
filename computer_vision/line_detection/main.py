@@ -12,7 +12,7 @@ class LineDetector:
     DOC: Detecting lines
     """
 
-    def __init__(self, canny=None, blur=5, hough=None):
+    def __init__(self, canny=None, blur=5, hough=None, iterations=None):
         """
         CANNY: [low_threshold, high_threshold, kernel_size]
         HOUGH_LINES: [min_line_length, max_line_gap]
@@ -21,6 +21,8 @@ class LineDetector:
             canny = [100, 200]
         if hough is None:
             hough = [200, 30]
+        if iterations is None:
+            iterations = [1, 0]
 
         self.canny_low_thr = canny[0]
         self.canny_high_thr = canny[1]
@@ -29,6 +31,8 @@ class LineDetector:
 
         self.hough_min_line_length = hough[0]
         self.hough_max_line_gap = hough[1]
+
+        self.iterations = iterations
 
     def get_region_of_interest(self, image):
         '''
@@ -45,8 +49,9 @@ class LineDetector:
             image, (self.blur_kernel_size, self.blur_kernel_size), 0)
         canny = cv2.Canny(gaussian_blur, self.canny_low_thr,
                           self.canny_high_thr)
-        dilate = cv2.dilate(canny, (3, 3), iterations=1)
-        roi = self.get_region_of_interest(dilate)
+        dilate = cv2.dilate(canny, (3, 3) , iterations=self.iterations[0])
+        erode = cv2.erode(dilate, (3,3), iterations=self.iterations[1])
+        roi = self.get_region_of_interest(erode)
         lines = cv2.HoughLinesP(
             roi, 1, np.pi / 180, 40, np.array([]),
             minLineLength=self.hough_min_line_length, maxLineGap=self.hough_max_line_gap

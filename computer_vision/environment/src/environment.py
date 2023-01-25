@@ -20,13 +20,13 @@ class Environment:
 
     def insert_object(self, distance_x, distance_y, object_id):
         '''Insert object'''
-        if distance_x == 0:
-            row = -1
-        else:
-            row = -self.size[0]*self.real_size//distance_x
         if distance_y == 0:
+            row = self.size[1]//2
+        else:
+            row = -(self.size[1]*self.real_size/2)//distance_y
+        if distance_x == 0:
             col = -1
         else:
-            col = -(self.size[1]*self.real_size/2)//distance_y
+            col = -self.size[0]*self.real_size//distance_x
         self.map[row][col] = object_id
         print(self.map)

@@ -8,10 +8,6 @@ class Board:
         self.rows = dimensions[0]
         self.cols = dimensions[1]
         self.square_size = square_size
-        if parameters['thickness'] is None:
-            self.thickness = 1
-        else:
-            self.thickness = parameters['thickness']
         self.board = self.create_board()
 
     def draw_squares(self, window):
@@ -45,6 +41,7 @@ class Board:
         for i, row in enumerate(self.board):
             for j, col in enumerate(row):
                 color = Objects().get_color(col)
+                thickness = Objects.get_data(col)
                 pg.draw.rect(
                     window,
                     color,

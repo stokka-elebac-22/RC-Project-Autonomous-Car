@@ -9,13 +9,22 @@ class TestObjects:
         obj = Objects()
         assert obj.objects['None'] == 0
 
+    @pytest.mark.parametrize(
+        ['param', 'exp'],
+        [
+            (['foo', 0, 'green', 1], ['green', 1])
+        ]
+    )
 
-    def test_get_color(self):
+    def test_get_data(self, param, exp):
         '''Testing getting the objects color'''
         obj = Objects()
-        obj.objects['foo'] = 0
-        obj.object_color[0] = 'green'
-        assert obj.get_color('foo') == 'green' and obj.get_color(0) == 'green'
+        obj.objects[param[0]] = param[1]
+        obj.object_data[0]['color'] = param[2]
+        obj.object_data[0]['thickness'] = param[3]
+        assert obj.get_data('foo')['color'] == exp[0] and \
+            obj.get_data(0)['color'] == exp[0] and \
+            obj.get_data(0)['thickness'] == exp[1]
 
 
 class TestTwoWayDict:

@@ -5,11 +5,6 @@ from board import Board
 class DisplayEnvironment:
     '''Displaying the environment with pygame'''
     def __init__(self, window_size, board_size, parameters, caption=''):
-        '''Parameters =
-        {
-            thickness,
-        }
-        '''
         self.window_size = window_size
         self.board_size = board_size
 

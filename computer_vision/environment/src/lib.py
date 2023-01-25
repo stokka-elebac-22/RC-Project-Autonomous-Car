@@ -7,7 +7,7 @@ class Objects:
         self.objects = TwoWayDict()
         self._init_objects()
         self.object_color = {}
-        self._init_object_colors()
+        self._init_object_data()
 
     def _init_objects(self):
         '''Initializing the object dict'''
@@ -17,19 +17,28 @@ class Objects:
         for i in obj:
             self.objects[i[0]] = i[1]
 
-    def _init_object_colors(self):
+    def _init_object_data(self):
+        '''
+        Init object data
+        Each object have:
+        color, thickness
+        '''
         obj = [
-            (0, pg.Color(255, 255, 255))
+            (0, (pg.Color(255, 255, 255), 1))
         ]
         for i in obj:
             self.object_color[i[0]] = i[1]
 
-
-    def get_color(self, obj):
-        '''Get the color of the object'''
+    def get_data(self, obj):
+        '''
+        Get the data of the object
+        Each object have:
+        color, thickness
+        '''
         if not isinstance(obj, int):
             obj = self.objects[obj] # convert to correct keyname
-        return self.object_color[obj]
+        return self.object_data[obj]
+
 
 
 

@@ -5,7 +5,7 @@ import os
 import cv2
 import numpy as np
 #from main import LineDetector
-from computer_vision.line_detection.main import LineDetector
+from main import LineDetector
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -95,32 +95,36 @@ class ParkingSlotDetector(LineDetector):
 
             closest_line = line_coords.pop(closest_line_index)
             lines.append(closest_line)
-            if len(lines) > amount-1:
-                if angle >= 0:
-                    line_one_values = max(lines[0][0], lines[0][2])
-                    line_two_values = max(lines[1][0], lines[1][2])
-                else:
-                    line_one_values = min(lines[0][0], lines[0][2])
-                    line_two_values = min(lines[1][0], lines[1][2])
-                if ((line_one_values >= points[0][0]
-                    and line_two_values <= points[1][0]) or
-                        (line_two_values >= points[0][0] and line_one_values <= points[1][0])):
-                    break
-                else:
-                    lines.pop(0)
+            # if len(lines) > amount-1:
+            #     if angle[0] >= 0:
+            #         line_one_values = max(lines[0][0], lines[0][2])
+            #         line_two_values = max(lines[1][0], lines[1][2])
+            #     else:
+            #         line_one_values = min(lines[0][0], lines[0][2])
+            #         line_two_values = min(lines[1][0], lines[1][2])
+            #     if ((line_one_values >= points[0][0]
+            #         and line_two_values <= points[1][0]) or
+            #             (line_two_values >= points[0][0] and line_one_values <= points[1][0])):
+            #         break
+            #     else:
+            #         lines.pop(0)
 
         
         return lines
 
     def detect_parking_lines(self, image, qr_size_px, qr_size_mm, qr_distance):
         "Detect the parking lines in the image"
-        qrc, [retval, distance, angle, decoded_info, points, _] = self.__get_qr_code_info(
+        qrc,  data = self.__get_qr_code_info(
             image, qr_size_px, qr_size_mm, qr_distance)
-        if retval:
+        if data['ret']:
             # display QR-code on image
-            qrc.display(image, angle, distance, decoded_info)
+            qr_code_measurements = {
+                'distances': data['distances'],
+                'angles': data['angles'],
+                'decoded_info': data['info']}
+            qrc.display(img, qr_code_measurements, verbose=2)
             qr_slope, qr_intercept = np.polyfit(
-                (points[0][0][0], points[0][1][0]), (points[0][0][1], points[0][1][1]), 1)
+                (data['points'][0][0][0], data['points'][0][1][0]), (data['points'][0][0][1], data['points'][0][1][1]), 1)
             lines = self.get_lines(image)
             if lines is None:
                 return None
@@ -142,7 +146,7 @@ class ParkingSlotDetector(LineDetector):
                              qr_slope, qr_intercept)
 
             # find the two closest lines to the QR-code
-            lines = self.get_closest_line(avg_lines_coords, points[0], 2, angle)
+            lines = self.get_closest_line(avg_lines_coords, data['points'][0], 2, data['angles'])
 
             return lines
         return None
@@ -163,7 +167,7 @@ if __name__ == "__main__":
     # Tests image: 4, 7, 8
     # 4: DATA 20, 10, 50 (910 × 597)
     # 7, 8: DATA: 60, 20, 150 (880 × 495)
-    img = cv2.imread('computer_vision/line_detection/assets/parking/4.png')
+    img = cv2.imread('computer_vision/line_detection/assets/parking/8.png')
     copy = img.copy()
     all_lines = parking_slot_detector.get_lines(copy)
     parking_slot_detector.show_lines(copy, all_lines)

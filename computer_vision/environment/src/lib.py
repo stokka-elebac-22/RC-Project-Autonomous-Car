@@ -1,12 +1,14 @@
 '''Library'''
+import dataclasses
 import pygame as pg
 
+@dataclasses.dataclass
 class Objects:
     '''Class over all the objects'''
     def __init__(self):
         self.objects = TwoWayDict()
         self._init_objects()
-        self.object_color = {}
+        self.object_data = {}
         self._init_object_data()
 
     def _init_objects(self):
@@ -24,10 +26,14 @@ class Objects:
         color, thickness
         '''
         obj = [
-            (0, (pg.Color(255, 255, 255), 1))
+            (0,
+            {
+                'color': pg.Color(0, 0, 0),
+                'thickness': 1
+            })
         ]
         for i in obj:
-            self.object_color[i[0]] = i[1]
+            self.object_data[i[0]] = i[1]
 
     def get_data(self, obj):
         '''

@@ -4,7 +4,7 @@ from lib import Objects
 
 class Board:
     '''Display Board'''
-    def __init__(self, dimensions, square_size, parameters):
+    def __init__(self, dimensions, square_size):
         self.rows = dimensions[0]
         self.cols = dimensions[1]
         self.square_size = square_size
@@ -14,8 +14,10 @@ class Board:
         '''Draw the squares'''
         window.fill(pg.Color(255, 255, 255))
         for i, row in enumerate(self.board):
-            for j in range(len(row)):
-                color = pg.Color(0, 0, 0)
+            for j, col in enumerate(row):
+                data = Objects().get_data(col)
+                color = data['color']
+                thickness = data['thickness']
                 pg.draw.rect(
                     window,
                     color,
@@ -24,7 +26,7 @@ class Board:
                         self.square_size * j,
                         self.square_size,
                         self.square_size),
-                        self.thickness)
+                        thickness)
 
     def create_board(self):
         '''Creating the board'''
@@ -38,17 +40,4 @@ class Board:
 
     def draw(self, window):
         '''Draw'''
-        for i, row in enumerate(self.board):
-            for j, col in enumerate(row):
-                color = Objects().get_color(col)
-                thickness = Objects.get_data(col)
-                pg.draw.rect(
-                    window,
-                    color,
-                    pg.Rect(
-                        self.square_size * i,
-                        self.square_size * j,
-                        self.square_size,
-                        self.square_size),
-                        self.thickness)
         self.draw_squares(window)

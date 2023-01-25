@@ -48,6 +48,8 @@ class QRGeometry:
         '''Return the angle'''
         width = self.get_width()
         height = self.get_height()
+        if height == 0:
+            return None
         ratio = width/height
         angle = (1 - ratio) * 90
         return angle
@@ -93,6 +95,15 @@ class QRCode:
         ret_qr, decoded_info , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
 
         # add more QRGeometry if needed or delete if too many
+        if not ret_qr:
+            return {
+            'ret': ret_qr,
+            'distances': None,
+            'angles': None,
+            'info': None,
+            'points': None,
+            'rest': None
+            }
         if len(self.qr_geometries) > len(points_qr):
             for _ in range(len(self.qr_geometries) - len(points_qr)):
                 self.qr_geometries.pop()
@@ -150,7 +161,7 @@ class DisplayQRCode:
             else:
                 distance = data['distances'][i]
 
-            if data['decoded_info'][i] is None:
+            if data['info'][i] is None:
                 color = self.color_frame_green
             else:
                 color = self.color_frame_red
@@ -236,7 +247,7 @@ if __name__ == '__main__':
     distances_lists = [[0 for _ in range(VALUES_LENGTH)]]
 
     while True:
-        img = cv.imread('tests/images/qr_code/multi/qrcode.png')
+        img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
         # img = local_read_camera()
         qr_data = qr_code.get_data(img)
 
@@ -256,7 +267,7 @@ if __name__ == '__main__':
             qr_code_measurements = {
                 'distances': average_distance,
                 'angles': average_angles,
-                'decoded_info': qr_data['info']}
+                'info': qr_data['info']}
             qr_code.display(img, qr_code_measurements, verbose=2)
         cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):

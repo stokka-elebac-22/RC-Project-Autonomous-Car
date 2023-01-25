@@ -95,19 +95,19 @@ class ParkingSlotDetector(LineDetector):
 
             closest_line = line_coords.pop(closest_line_index)
             lines.append(closest_line)
-            # if len(lines) > amount-1:
-            #     if angle[0] >= 0:
-            #         line_one_values = max(lines[0][0], lines[0][2])
-            #         line_two_values = max(lines[1][0], lines[1][2])
-            #     else:
-            #         line_one_values = min(lines[0][0], lines[0][2])
-            #         line_two_values = min(lines[1][0], lines[1][2])
-            #     if ((line_one_values >= points[0][0]
-            #         and line_two_values <= points[1][0]) or
-            #             (line_two_values >= points[0][0] and line_one_values <= points[1][0])):
-            #         break
-            #     else:
-            #         lines.pop(0)
+            if len(lines) > amount-1:
+                if angle[0] >= 0:
+                    line_one_values = max(lines[0][0], lines[0][2])
+                    line_two_values = max(lines[1][0], lines[1][2])
+                else:
+                    line_one_values = min(lines[0][0], lines[0][2])
+                    line_two_values = min(lines[1][0], lines[1][2])
+                if ((line_one_values >= points[0][0]
+                    and line_two_values <= points[1][0]) or
+                        (line_two_values >= points[0][0] and line_one_values <= points[1][0])):
+                    break
+                else:
+                    lines.pop(0)
 
         
         return lines

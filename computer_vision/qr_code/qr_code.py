@@ -45,6 +45,10 @@ class QRGeometry:
         height = self.get_height()
         ratio = width/height
         angle = (1 - ratio) * 90
+        d = self.points[0][1] - self.points[3][1]
+        b = self.points[1][1] - self.points[2][1]
+        if (d < b):
+            angle = -angle
         return angle
 
     def get_distance(self) -> float:

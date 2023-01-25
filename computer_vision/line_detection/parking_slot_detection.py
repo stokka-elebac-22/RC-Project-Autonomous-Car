@@ -24,7 +24,7 @@ class ParkingSlotDetector(LineDetector):
         qr_code = QRCode(qr_size_px, qr_size_mm, qr_distance)
         return qr_code, qr_code.get_data(image)
 
-    def cluster_lines(self, lines, atol=20):
+    def cluster_lines(self, lines, atol=10):
         '''Cluster lines that are close to each other'''
         clustered_lines = []
         clustered_coords = []
@@ -81,14 +81,14 @@ class ParkingSlotDetector(LineDetector):
                         [0], coordinates[min_values[2]][2]])
         return min_x, max_x
 
-    def get_closest_line(self, line_coords, points, amount):
+    def get_closest_line(self, line_coords, points, amount, angle):
         """Get the closest line based on the Y value"""
         lines = []
         for _ in range(len(line_coords)):
             max_values = np.argmax(line_coords, axis=0)
-            max_y = max(
-            line_coords[max_values[1]][1], line_coords[max_values[3]][3])
-            if max_y == line_coords[max_values[1]][1]:
+            max_y_value = max(
+                line_coords[max_values[1]][1], line_coords[max_values[3]][3])
+            if max_y_value == line_coords[max_values[1]][1]:
                 closest_line_index = max_values[1]
             else:
                 closest_line_index = max_values[3]
@@ -96,14 +96,20 @@ class ParkingSlotDetector(LineDetector):
             closest_line = line_coords.pop(closest_line_index)
             lines.append(closest_line)
             if len(lines) > amount-1:
-                if ((max(lines[0][0], lines[0][2]) >= points[0][0]
-                    and max(lines[1][0], lines[1][2]) <= points[1][0]) or
-                        (max(lines[1][0], lines[1][2]) >= points[0][0] and max(
-                        lines[0][0], lines[0][2]) <= points[1][0])
-                ):
+                if angle >= 0:
+                    line_one_values = max(lines[0][0], lines[0][2])
+                    line_two_values = max(lines[1][0], lines[1][2])
+                else:
+                    line_one_values = min(lines[0][0], lines[0][2])
+                    line_two_values = min(lines[1][0], lines[1][2])
+                if ((line_one_values >= points[0][0]
+                    and line_two_values <= points[1][0]) or
+                        (line_two_values >= points[0][0] and line_one_values <= points[1][0])):
                     break
                 else:
                     lines.pop(0)
+
+        
         return lines
 
     def detect_parking_lines(self, image, qr_size_px, qr_size_mm, qr_distance):
@@ -133,10 +139,11 @@ class ParkingSlotDetector(LineDetector):
 
             # filter away lines that are close to the QR-code
             self.filter_lines(avg_lines, avg_lines_coords,
-                              qr_slope, qr_intercept)
+                             qr_slope, qr_intercept)
 
             # find the two closest lines to the QR-code
-            lines = self.get_closest_line(avg_lines_coords, points[0], 2)
+            lines = self.get_closest_line(avg_lines_coords, points[0], 2, angle)
+
             return lines
         return None
 
@@ -156,7 +163,7 @@ if __name__ == "__main__":
     # Tests image: 4, 7, 8
     # 4: DATA 20, 10, 50 (910 × 597)
     # 7, 8: DATA: 60, 20, 150 (880 × 495)
-    img = cv2.imread('computer_vision/line_detection/assets/parking/7.png')
+    img = cv2.imread('computer_vision/line_detection/assets/parking/4.png')
     copy = img.copy()
     all_lines = parking_slot_detector.get_lines(copy)
     parking_slot_detector.show_lines(copy, all_lines)

@@ -61,17 +61,17 @@ class TestParametrized:
         assert min_x == expected[0]
         assert max_x == expected[1]
 
-    @pytest.mark.parametrize('line_coords, points, amount, expected', [
+    @pytest.mark.parametrize('line_coords, points, amount, angle, expected', [
         ([np.array([100, 200, 300, 400]), np.array([200, 300, 400, 500])],
-         [[10, 20], [20, 30], [40, 50], [50, 60]], 2, [np.array([100, 200, 300, 400])]),
+         [[10, 20], [20, 30], [40, 50], [50, 60]], 2, 20, [np.array([100, 200, 300, 400])]),
         ([np.array([200, 100, 300, 400]), np.array([300, 200, 400, 500])],
-         [[25, 20], [20, 30], [40, 50], [50, 60]], 2, [np.array([200, 100, 300, 400])])
+         [[25, 20], [20, 30], [40, 50], [50, 60]], 2, -20, [np.array([200, 100, 300, 400])])
     ])
-    def test_get_closest_line(self, line_coords, points, amount, expected):
+    def test_get_closest_line(self, line_coords, points, amount, angle, expected):
         """Test get_closest_line method of ParkingSlotDetector"""
         parking_slot_detector = ParkingSlotDetector()
         lines = parking_slot_detector.get_closest_line(
-            line_coords, points, amount)
+            line_coords, points, amount, angle)
         for i, line in enumerate(lines):
             assert (line == expected[i]).all()
 

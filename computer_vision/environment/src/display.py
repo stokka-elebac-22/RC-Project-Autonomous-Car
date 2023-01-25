@@ -1,11 +1,15 @@
 '''Display environment'''
 import pygame as pg
-from .environment import Environment
-from .board import Board
+from board import Board
 
 class DisplayEnvironment:
     '''Displaying the environment with pygame'''
-    def __init__(self, window_size, board_size, caption=''):
+    def __init__(self, window_size, board_size, parameters, caption=''):
+        '''Parameters =
+        {
+            thickness,
+        }
+        '''
         self.window_size = window_size
         self.board_size = board_size
 
@@ -17,27 +21,23 @@ class DisplayEnvironment:
         self.fps = pg.time.Clock()
 
         square_size = self.window_size[0] / self.board_size[0]
-        self.board = Board((self.board_size[0], self.board_size[1]), square_size)
+        self.board = Board((self.board_size[0], self.board_size[1]), square_size, parameters)
 
-    def display(self, mat):
+    def display(self, data):
         '''
         Display the matrix
         The input should be the data (matrix)
         '''
-        self.draw_grid((len(mat), len(mat[0])))
+        self.draw_grid()
 
-    def update(self, env: Environment):
+    def update(self, data):
         '''Update the display'''
+        self.display(data)
+        pg.display.update()
 
     def insert(self, object=None):
         '''Insert a object into the map'''
 
-    def draw_grid(self, size):
+    def draw_grid(self):
         '''Draw the grid on the screen'''
-
-if __name__ == '__main__':
-    environment = Environment(10)
-
-    # Game loop
-    while True:
-        pass
+        self.board.draw_squares(self.display_window)

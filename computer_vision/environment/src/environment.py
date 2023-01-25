@@ -15,3 +15,4 @@ class Environment:
         Returns the data
         map: the matrix
         '''
+        return self.map

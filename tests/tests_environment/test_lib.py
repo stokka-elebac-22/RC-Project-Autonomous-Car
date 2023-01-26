@@ -128,6 +128,15 @@ class TestBinarySearchList:
                 Node((0,0), 1, f_value=5),
                 Node((0,0), 1, f_value=8)],
                 ),
+            ([
+                [Node((0,0), 1, f_value=1),
+                Node((0,0), 1, f_value=3),
+                Node((0,0), 1, f_value=4)],
+                [Node((0,0), 1, f_value=1),
+                Node((0,0), 1, f_value=2),
+                Node((0,0), 1, f_value=3),
+                Node((0,0), 1, f_value=4)],
+            ])
         ]
     )
     def test_insert(self, param, exp):

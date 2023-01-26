@@ -24,6 +24,7 @@ class AStar:
             if len(open_list) == 0:
                 break
             # find the node in the open list with lowest f value
+            print([node.f_value for node in open_list.get()])
             cur = open_list.pop(0)
             # check all the surounding tiles
             pos = cur.position

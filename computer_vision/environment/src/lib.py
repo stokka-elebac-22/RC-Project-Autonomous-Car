@@ -127,8 +127,11 @@ class Node:
             self.f_value = f_value
 
     def __eq__(self, other):
-        return self.position == other.position
-
+        if self.position != other.position or \
+            self.g_value != other.g_value or \
+            self.h_value != other.h_value or \
+            self.f_value != other.f_value:
+            return False
 
 class BinarySearchList:
     '''
@@ -203,3 +206,10 @@ class BinarySearchList:
     def __len__(self):
         '''Returns the length'''
         return len(self.__items)
+
+    def __eq__(self, other):
+        '''Equal'''
+        for val1, val2 in zip(self.__items, other):
+            if val1 != val2:
+                return False
+        return True

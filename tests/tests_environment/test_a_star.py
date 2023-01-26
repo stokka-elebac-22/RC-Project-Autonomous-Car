@@ -19,23 +19,23 @@ class TestAStar:
     @pytest.mark.parametrize(
         ['param', 'exp'],
         [
-            ((2, 1), (0, 1),
+            ([(2, 1), (0, 1),
             [[
                 [0, 0, 0],
                 [0, 0, 0],
                 [0, 0, 0],
-            ]],
+            ]]],
             [
                 Node((2, 1), parent=
                 Node((1, 1), parent=
                 Node((0, 1), parent=None)))
             ]),
-            ((2, 2), (0, 2),
+            ([(2, 2), (0, 2),
                 [[
                     [0, 0, 0],
                     [0, 1, 1],
                     [0, 0, 0],
-                ]],
+                ]]],
                 [
                     Node((2, 2), parent=
                     Node((2, 1), parent=

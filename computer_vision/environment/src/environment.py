@@ -29,4 +29,3 @@ class Environment:
         else:
             col = -self.size[0]*self.real_size//distance_x
         self.map[row][col] = object_id
-        print(self.map)

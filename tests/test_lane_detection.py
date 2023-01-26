@@ -28,31 +28,45 @@ class TestParametrized:
         assert new_image.shape != original_image.shape or cv2.countNonZero(
             b_color) != 0 or cv2.countNonZero(g_color) != 0 or cv2.countNonZero(r_color) != 0
 
-    @pytest.mark.parametrize('img_source, lines, expected', [
-        ('bike_park.jpg',
-         [np.array([300, 327, 1059, 600]), np.array([0, 781, 272, 561]),
+    @pytest.mark.parametrize('img_source, line, expected', [
+        ('bike_park.jpg', [-0.8819273, 822.19240925],
+         [-2469, 3000, -632, 1380]),
+        ('curve.jpg', [-0.123, 423.], [-20951, 3000, -7780, 1380]),
+        ('1.jpg', [1.881, -0.493], [1595, 3000, 733, 1380]),
+        ('2.jpg', [2.34, 423.1924], [1101, 3000, 408, 1380])])
+    def test_get_line_coordinates_from_parameters(self, img_source, line, expected):
+        '''Test if the output coordinates are equal to the expected coordinates'''
+        lane_detector = LaneDetector()
+        image = self.get_image(img_source)
+
+        coordinates = lane_detector.get_line_coordinates_from_parameters(
+            image, line)
+
+        assert coordinates[0] == expected[0]
+        assert coordinates[1] == expected[1]
+        assert coordinates[2] == expected[2]
+        assert coordinates[3] == expected[3]
+
+    @pytest.mark.parametrize('lines, expected', [
+        ([np.array([300, 327, 1059, 600]), np.array([0, 781, 272, 561]),
           np.array([573, 339, 780, 336])],
          [np.array([-0.412, 564.152]),
           np.array([0.3596837944664031, 219.09486166007926])]),
 
-        ('curve.jpg',
-         [np.array([751, 327, 1059, 500]), np.array([0, 781, 272, 561])],
+        ([np.array([751, 327, 1059, 500]), np.array([0, 781, 272, 561])],
          [np.array([-0.809, 781.0]), np.array([0.5616883116883115, -94.82792207792211])]),
 
-        ('1.jpg',
-         [np.array([123, 434, 343, 767]), np.array([0, 781, 272, 561]),
+        ([np.array([123, 434, 343, 767]), np.array([0, 781, 272, 561]),
           np.array([394, 781, 122, 561]), np.array([573, 339, 780, 336])],
          [np.array([-0.4116581415174767, 564.1521739130434]),
           np.array([1.161229946524065, 355.0731283422457])]),
 
-        ('2.jpg',
-         [np.array([100, 327, 509, 811])],
+        ([np.array([100, 327, 509, 811])],
          [None, np.array([1.18337408, 208.66259169])])])
-    def test_get_average_lines(self, img_source, lines, expected):
+    def test_get_average_lines(self, lines, expected):
         """Test if the output average lines is equal to the expected average lines"""
         lane_detector = LaneDetector()
-        image = self.get_image(img_source)
-        avg_lines = lane_detector.get_average_lines(image, lines)
+        avg_lines = lane_detector.get_average_lines(lines)
 
         if expected[0] is None:
             assert avg_lines[0] is None

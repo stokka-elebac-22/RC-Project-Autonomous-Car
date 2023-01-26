@@ -32,7 +32,19 @@ class LaneDetector(LineDetector):
                              (width, height), (255, 255, 255), -1)
         return cv2.bitwise_and(image, mask)
 
-    def get_average_lines(self, image, lines):
+    def get_line_coordinates_from_parameters(self, image, line_parameters):
+        """Get line coordinates from line parameters"""
+        slope = line_parameters[0]
+        intercept = line_parameters[1]
+        # since line will always start from bottom of image
+        y_1 = image.shape[0]
+        y_2 = int(y_1 * (2.3 / 5))
+        x_1 = int((y_1 - intercept) / slope)
+        x_2 = int((y_2 - intercept) / slope)
+        return np.array([x_1, y_1, x_2, y_2])
+
+
+    def get_average_lines(self, lines):
         """Sort the lines into left and right and get the average for each side"""
         if lines is not None:
             left_fit = []  # will hold m,c parameters for left side lines
@@ -202,7 +214,7 @@ if __name__ == "__main__":
         # if cv2.waitKey(1) == ord('q') or ret == False:
         #    break
         all_lines = lane_detector.get_lines(frame)
-        avg_lines = lane_detector.get_average_lines(frame, all_lines)
+        avg_lines = lane_detector.get_average_lines(all_lines)
         avg_lines = [lane_detector.get_line_coordinates_from_parameters(frame, line) for line in avg_lines]
         lane_detector.show_lines(frame, avg_lines)
         center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)

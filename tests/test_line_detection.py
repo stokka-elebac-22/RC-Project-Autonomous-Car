@@ -28,25 +28,6 @@ class TestParametrized:
         assert new_image.shape == original_image.shape and cv2.countNonZero(
             b_color) == 0 and cv2.countNonZero(g_color) == 0 and cv2.countNonZero(r_color) == 0
 
-    @pytest.mark.parametrize('img_source, line, expected', [
-        ('bike_park.jpg', [-0.8819273, 822.19240925],
-         [-2469, 3000, -632, 1380]),
-        ('curve.jpg', [-0.123, 423.], [-20951, 3000, -7780, 1380]),
-        ('1.jpg', [1.881, -0.493], [1595, 3000, 733, 1380]),
-        ('2.jpg', [2.34, 423.1924], [1101, 3000, 408, 1380])])
-    def test_get_line_coordinates_from_parameters(self, img_source, line, expected):
-        '''Test if the output coordinates are equal to the expected coordinates'''
-        line_detector = LineDetector()
-        image = self.get_image(img_source)
-
-        coordinates = line_detector.get_line_coordinates_from_parameters(
-            image, line)
-
-        assert coordinates[0] == expected[0]
-        assert coordinates[1] == expected[1]
-        assert coordinates[2] == expected[2]
-        assert coordinates[3] == expected[3]
-
     @pytest.mark.parametrize('img_source, expected', [
         ('bike_park.jpg', 3852),
         ('curve.jpg', 4292),

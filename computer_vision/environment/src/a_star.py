@@ -59,7 +59,6 @@ class AStar:
                     continue
                 # if not in the list, create a node with cur note as parent
                 h_value = (pos[0]-end_pos[0])**2 + (pos[1]-end_pos[1])**2
-                print(pos, end_pos, h_value)
                 new_node = Node(pos, h_value, parent=cur)
                 # add the new node to the open list
                 open_list.insert(new_node)

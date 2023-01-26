@@ -19,6 +19,7 @@ class AStar:
         size = (len(mat[0]), len(mat))
         h_value = (start_pos[0]-end_pos[0])**2 + (start_pos[1]-end_pos[1])**2
         start_node = Node(position=start_pos, h_value=h_value)
+        black_list = []
         open_list = BinarySearchList() # a list of possible candidates to be the next current node
         open_list.insert(start_node)
 
@@ -39,6 +40,7 @@ class AStar:
                 (pos_x-1, pos_y+1),
                 (pos_x+1, pos_y+1),
             ]
+            no_valid_options = False
             for pos in positions:
                 # checks if position is out of bounds
                 if pos[0] > size[0] - 1 or \
@@ -59,11 +61,17 @@ class AStar:
                 # check if node already in the list
                 if open_list.contains(pos):
                     continue
+                no_valid_options = True
                 # if not in the list, create a node with cur note as parent
                 h_value = (pos[0]-end_pos[0])**2 + (pos[1]-end_pos[1])
                 new_node = Node(pos, h_value, parent=cur)
                 # add the new node to the open list
                 open_list.insert(new_node)
+            # if all the 8 neighbour squares were not valid
+            if not no_valid_options:
+                # sets the value to 1 (hindrance) so it can not be used again
+                mat[cur.position[0]][cur.position[1]] = 1
+
 
         return cur
 

@@ -47,6 +47,14 @@ class Objects:
                 }
             },
             {
+                'id': 1,
+                'name': 'Hindrance',
+                'param': {
+                    'color': pg.Color(255, 255, 255),
+                    'thickness': 0
+                }
+            },
+            {
                 'id': 3,
                 'name': 'Stop',
                 'param': {

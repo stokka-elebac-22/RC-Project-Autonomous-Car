@@ -110,7 +110,7 @@ class Node:
         return self.position == other.position
 
 
-def binary_search_node(arr: Node, value):
+def binary_search_node(arr: Node, value: Node):
     '''
     Binary Search
     https://www.geeksforgeeks.org/python-program-for-binary-search/
@@ -119,15 +119,16 @@ def binary_search_node(arr: Node, value):
     high = len(arr) - 1
     mid = 0
 
-    while low >= high:
+    while low <= high:
         mid = (high+low) // 2
-
-        if arr[mid] < value:
-            if arr[mid + 1] > value:
+        if arr[mid].f_value < value.f_value:
+            if mid + 1 > high or arr[mid + 1].f_value > value.f_value:
                 return mid + 1
             low = mid + 1
-        elif arr[mid] > value:
-            if arr[mid - 1] < value:
+        elif arr[mid].f_value > value.f_value:
+            if mid - 1 < low:
+                return mid
+            if arr[mid - 1].f_value < value.f_value:
                 return mid - 1
             high = mid - 1
         else:

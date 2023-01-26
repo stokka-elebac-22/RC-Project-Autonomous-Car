@@ -54,16 +54,17 @@ class TestTwoWayDict:
         twd = TwoWayDict()
         twd['foo'] = 'bar'
         assert len(twd) == 1
+
 class TestNode:
     '''Test node'''
     def test_node(self):
         '''Test Node'''
-        node = Node((0, 0))
+        node = Node((0, 0), 1)
         assert node.parent is None
-        parent = Node((0, 1))
+        parent = Node((0, 1), 1)
         node.parent = parent
         assert node.parent.position == (0, 1)
-        node_dup = Node((0, 0))
+        node_dup = Node((0, 0), 1)
         assert node == node_dup
 
 @pytest.mark.parametrize(
@@ -77,7 +78,10 @@ class TestNode:
             Node((0,0), 1, f_value=3)], 3),
         ([
             [Node((0,0), 1, f_value=1)],
-            Node((0,0), 1, f_value=0)], 0)
+            Node((0,0), 1, f_value=0)], 0),
+        ([
+            [Node((0,0), 1, f_value=0)],
+            Node((0,0), 1, f_value=1)], 1)
     ]
 )
 def test_binary_search_node(arr, exp):

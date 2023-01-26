@@ -95,9 +95,9 @@ class TwoWayDict(dict):
 @dataclasses.dataclass
 class Node:
     '''Node'''
-    newid = itertools.count().__next__
+    # newid = itertools.count().__next__
     def __init__(self, position, h_value, parent=None, f_value=None) -> None:
-        self.id = Node.newid() # pylint: disable=C0103
+        # self.id = Node.newid() # pylint: disable=C0103
         self.position = position
         self.parent: Node = parent
 
@@ -113,7 +113,7 @@ class Node:
         return self.position == other.position
 
 
-class BinarySearchNode:
+class BinarySearchList:
     '''
     This is a binary search class (just because I could not find a library
     that contained this type of list where you could sort by a key from another class
@@ -121,7 +121,7 @@ class BinarySearchNode:
     def __init__(self):
         self.__items = []
 
-    def __binary_search_node(self, value: Node):
+    def __binary_search(self, value: Node):
         '''
         Binary Search
         https://www.geeksforgeeks.org/python-program-for-binary-search/
@@ -149,17 +149,16 @@ class BinarySearchNode:
 
     def insert(self, new_node: Node):
         '''Inserting the Node object'''
-        index = self.__binary_search_node(new_node)
+        index = self.__binary_search(new_node)
         self.__items.insert(index, new_node)
 
-    def delete(self, item_id: int):
+    def delete(self, pos: int):
         '''
         Removes the Node with specific id
         Per now, it is gonna be O(n)
         '''
         for i, item in enumerate(self.__items):
-            print(item.id)
-            if item.id == item_id:
+            if item.position == pos:
                 del self.__items[i]
                 return
 
@@ -174,9 +173,18 @@ class BinarySearchNode:
         '''
         return self.__items.pop(index)
 
-    def get(self):
+    def contains(self, pos):
+        '''Check if a Node exist in the list (same position)'''
+        for node in self.__items:
+            if node.position == pos:
+                return True
+        return False
+
+    def get(self, index: int=None):
         '''Returns the list'''
-        return self.__items
+        if index is None:
+            return self.__items
+        return self.__items[index]
 
     def __len__(self):
         '''Returns the length'''

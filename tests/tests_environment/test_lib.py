@@ -1,7 +1,7 @@
 '''Test the library'''
 import pytest
 from computer_vision.environment.src.lib import \
-    Objects, Object, TwoWayDict, Node, BinarySearchNode
+    Objects, Object, TwoWayDict, Node, BinarySearchList
 
 class TestObjects:
     '''Testing the objects'''
@@ -66,8 +66,8 @@ class TestNode:
         node_dup = Node((0, 0), 1)
         assert node == node_dup
 
-class TestBinarySearchNode:
-    '''Test Binary Search Node class'''
+class TestBinarySearchList:
+    '''Test Binary Search List class'''
     # @pytest.mark.parametrize(
 
     #     ['param', 'exp'],
@@ -88,8 +88,8 @@ class TestBinarySearchNode:
     # )
     # def test_binary_search_node(self, param, exp):
     #     '''Test binary search for nodes'''
-    #     bsn = BinarySearchNode()
-    #     assert bsn.__binary_search_node(param[0], param[1]) == exp # pylint: disable=protected-access
+    #     bsn = BinarySearchList()
+    #     assert bsn.__binary_search(param[0], param[1]) == exp # pylint: disable=protected-access
 
     @pytest.mark.parametrize(
         ['param', 'exp'],
@@ -132,7 +132,7 @@ class TestBinarySearchNode:
     )
     def test_insert(self, param, exp):
         '''Test insert'''
-        bsn = BinarySearchNode()
+        bsn = BinarySearchList()
         for node in param[0]:
             bsn.insert(node)
         bsn.insert(param[1])
@@ -143,7 +143,7 @@ class TestBinarySearchNode:
         [
             (
             [Node((0,0), 1, f_value=4),
-            Node((0,0), 1, f_value=2),
+            Node((1,1), 1, f_value=2),
             Node((0,0), 1, f_value=3),
             Node((0,0), 1, f_value=8),
             Node((0,0), 1, f_value=5)],
@@ -158,11 +158,7 @@ class TestBinarySearchNode:
         ]
     )
     def data1(self):
-        '''
-        A data function that generates data
-        Each node gets a new id when generated and hence need to be 'reused' to get
-        correct result/comparison
-        '''
+        '''A method to generate data'''
         node2 = Node((0,0), 1, f_value=2)
         node3 = Node((0,0), 1, f_value=3)
         node4 = Node((0,0), 1, f_value=4)
@@ -181,20 +177,33 @@ class TestBinarySearchNode:
     def test_delete(self):
         '''Test delete'''
         param, exp = self.data1()
-        bsn = BinarySearchNode()
+        bsn = BinarySearchList()
         for node in param:
             bsn.insert(node)
         values = bsn.get()
-        bsn.delete(values[0].id) # deleting the first element in the list
+        bsn.delete(values[0].position) # deleting the first element in the list
         assert bsn.get() == exp[0]
 
     def test_pop(self):
         '''Test pop'''
         param, exp = self.data1()
-        bsn = BinarySearchNode()
+        bsn = BinarySearchList()
         for node in param:
             bsn.insert(node)
         node = bsn.pop()
         assert bsn.get() == exp[0] and node is not None
         bsn.pop(1)
         assert bsn.get() == exp[1]
+
+    @pytest.mark.parametrize(
+        ['param', 'exp'],
+        [
+            ([Node((0, 0), 1), (0, 0), (0, 1)], [True, False])
+        ]
+    )
+
+    def test_contains(self, param, exp):
+        '''Test contains'''
+        bsn = BinarySearchList()
+        bsn.insert(param[0])
+        assert bsn.contains(param[1]) == exp[0] and bsn.contains(param[2]) == exp[1]

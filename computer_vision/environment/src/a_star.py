@@ -18,7 +18,6 @@ class AStar:
             # For now this is done with a linear search method O(N) but can be
             # optimized by always have the list sorted log(N)
             break
-            pass
 
 
         return start_node

@@ -110,27 +110,40 @@ class Node:
         return self.position == other.position
 
 
-def binary_search_node(arr: Node, value: Node):
+class BinarySearchNode:
     '''
-    Binary Search
-    https://www.geeksforgeeks.org/python-program-for-binary-search/
+    This is a binary search class (just because I could not find a library
+    that contained this type of list where you could sort by a key from another class
     '''
-    low = 0
-    high = len(arr) - 1
-    mid = 0
+    def __init__(self):
+        self.__item = []
 
-    while low <= high:
-        mid = (high+low) // 2
-        if arr[mid].f_value < value.f_value:
-            if mid + 1 > high or arr[mid + 1].f_value > value.f_value:
-                return mid + 1
-            low = mid + 1
-        elif arr[mid].f_value > value.f_value:
-            if mid - 1 < low:
+    def __binary_search_node(self, arr: Node, value: Node):
+        '''
+        Binary Search
+        https://www.geeksforgeeks.org/python-program-for-binary-search/
+        '''
+        low = 0
+        high = len(arr) - 1
+        mid = 0
+
+        while low <= high:
+            mid = (high+low) // 2
+            if arr[mid].f_value < value.f_value:
+                if mid + 1 > high or arr[mid + 1].f_value > value.f_value:
+                    return mid + 1
+                low = mid + 1
+            elif arr[mid].f_value > value.f_value:
+                if mid - 1 < low:
+                    return mid
+                if arr[mid - 1].f_value < value.f_value:
+                    return mid - 1
+                high = mid - 1
+            else:
                 return mid
-            if arr[mid - 1].f_value < value.f_value:
-                return mid - 1
-            high = mid - 1
-        else:
-            return mid
-    return -1
+        return -1
+
+    def insert(self, arr: Node, new_node: Node):
+        '''Inserting the Node object'''
+        index = self.__binary_search_node(arr, new_node)
+        self.__item[index] = new_node

@@ -1,7 +1,7 @@
 '''Test the library'''
 import pytest
 from computer_vision.environment.src.lib import \
-    Objects, Object, TwoWayDict, Node, binary_search_node
+    Objects, Object, TwoWayDict, Node, BinarySearchNode
 
 class TestObjects:
     '''Testing the objects'''
@@ -67,23 +67,59 @@ class TestNode:
         node_dup = Node((0, 0), 1)
         assert node == node_dup
 
-@pytest.mark.parametrize(
-    ['arr', 'exp'],
-    [
-        ([
-            [Node((0,0), 1, f_value=0),
-            Node((0,0), 1, f_value=1),
-            Node((0,0), 1, f_value=2),
-            Node((0,0), 1, f_value=4)],
-            Node((0,0), 1, f_value=3)], 3),
-        ([
-            [Node((0,0), 1, f_value=1)],
-            Node((0,0), 1, f_value=0)], 0),
-        ([
-            [Node((0,0), 1, f_value=0)],
-            Node((0,0), 1, f_value=1)], 1)
-    ]
-)
-def test_binary_search_node(arr, exp):
-    '''Test binary search for nodes'''
-    assert binary_search_node(arr[0], arr[1]) == exp
+class TestBinarySearchNode:
+    '''Test Binary Search Node class'''
+    # @pytest.mark.parametrize(
+
+    #     ['param', 'exp'],
+    #     [
+    #         ([
+    #             [Node((0,0), 1, f_value=0),
+    #             Node((0,0), 1, f_value=1),
+    #             Node((0,0), 1, f_value=2),
+    #             Node((0,0), 1, f_value=4)],
+    #             Node((0,0), 1, f_value=3)], 3),
+    #         ([
+    #             [Node((0,0), 1, f_value=1)],
+    #             Node((0,0), 1, f_value=0)], 0),
+    #         ([
+    #             [Node((0,0), 1, f_value=0)],
+    #             Node((0,0), 1, f_value=1)], 1)
+    #     ]
+    # )
+    # def test_binary_search_node(self, param, exp):
+    #     '''Test binary search for nodes'''
+    #     bsn = BinarySearchNode()
+    #     assert bsn.__binary_search_node(param[0], param[1]) == exp # pylint: disable=protected-access
+
+    @pytest.mark.parametrize(
+        ['param', 'exp'],
+        [
+            ([
+                [Node((0,0), 1, f_value=0),
+                Node((0,0), 1, f_value=1),
+                Node((0,0), 1, f_value=2),
+                Node((0,0), 1, f_value=4)],
+                Node((0,0), 1, f_value=3)],
+                [Node((0,0), 1, f_value=0),
+                Node((0,0), 1, f_value=1),
+                Node((0,0), 1, f_value=2),
+                Node((0,0), 1, f_value=3),
+                Node((0,0), 1, f_value=4)],
+                ),
+            ([
+                [Node((0,0), 1, f_value=1)],
+                Node((0,0), 1, f_value=0)],
+                [Node((0,0), 1, f_value=1),
+                Node((0,0), 1, f_value=0)]),
+            ([
+                [Node((0,0), 1, f_value=0)],
+                Node((0,0), 1, f_value=1)],
+                [Node((0,0), 1, f_value=0),
+                Node((0,0), 1, f_value=1)])
+        ]
+    )
+    def test_insert(self, param, exp):
+        '''Test insert'''
+        bsn = BinarySearchNode()
+        assert bsn.insert(param[0], param[1]) == exp

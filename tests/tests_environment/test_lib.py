@@ -28,7 +28,6 @@ class TestObjects:
         obj.object_data[param[1]] = Object(param[1], param[0], params)
         assert obj.get_data(param[0]).color == exp[0]
 
-
 class TestTwoWayDict:
     '''Testing two way dict'''
     def test_setitem(self):
@@ -116,10 +115,86 @@ class TestBinarySearchNode:
                 [Node((0,0), 1, f_value=0)],
                 Node((0,0), 1, f_value=1)],
                 [Node((0,0), 1, f_value=0),
-                Node((0,0), 1, f_value=1)])
+                Node((0,0), 1, f_value=1)]),
+            ([
+                [Node((0,0), 1, f_value=4),
+                Node((0,0), 1, f_value=2),
+                Node((0,0), 1, f_value=3),
+                Node((0,0), 1, f_value=8)],
+                Node((0,0), 1, f_value=5)],
+                [Node((0,0), 1, f_value=2),
+                Node((0,0), 1, f_value=3),
+                Node((0,0), 1, f_value=4),
+                Node((0,0), 1, f_value=5),
+                Node((0,0), 1, f_value=8)],
+                ),
         ]
     )
     def test_insert(self, param, exp):
         '''Test insert'''
         bsn = BinarySearchNode()
-        assert bsn.insert(param[0], param[1]) == exp
+        for node in param[0]:
+            bsn.insert(node)
+        bsn.insert(param[1])
+        assert bsn.get() == exp
+
+    @pytest.mark.parametrize(
+        ['param', 'exp'],
+        [
+            (
+            [Node((0,0), 1, f_value=4),
+            Node((0,0), 1, f_value=2),
+            Node((0,0), 1, f_value=3),
+            Node((0,0), 1, f_value=8),
+            Node((0,0), 1, f_value=5)],
+            [[Node((0,0), 1, f_value=3),
+            Node((0,0), 1, f_value=4),
+            Node((0,0), 1, f_value=5),
+            Node((0,0), 1, f_value=8)],
+            [Node((0,0), 1, f_value=3),
+            Node((0,0), 1, f_value=5),
+            Node((0,0), 1, f_value=8)]],
+            ),
+        ]
+    )
+    def data1(self):
+        '''
+        A data function that generates data
+        Each node gets a new id when generated and hence need to be 'reused' to get
+        correct result/comparison
+        '''
+        node2 = Node((0,0), 1, f_value=2)
+        node3 = Node((0,0), 1, f_value=3)
+        node4 = Node((0,0), 1, f_value=4)
+        node5 = Node((0,0), 1, f_value=5)
+        node8 = Node((0,0), 1, f_value=8)
+
+        param = [node4, node2, node3, node5, node8]
+
+        exp = [
+            [node3, node4, node5, node8],
+            [node4, node5, node8],
+        ]
+
+        return param, exp
+
+    def test_delete(self):
+        '''Test delete'''
+        param, exp = self.data1()
+        bsn = BinarySearchNode()
+        for node in param:
+            bsn.insert(node)
+        values = bsn.get()
+        bsn.delete(values[0].id) # deleting the first element in the list
+        assert bsn.get() == exp[0]
+
+    def test_pop(self):
+        '''Test pop'''
+        param, exp = self.data1()
+        bsn = BinarySearchNode()
+        for node in param:
+            bsn.insert(node)
+        node = bsn.pop()
+        assert bsn.get() == exp[0] and node is not None
+        bsn.pop(1)
+        assert bsn.get() == exp[1]

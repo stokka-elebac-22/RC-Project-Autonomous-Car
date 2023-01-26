@@ -1,5 +1,6 @@
 '''Library'''
 import dataclasses
+import itertools
 import pygame as pg
 
 @dataclasses.dataclass
@@ -88,13 +89,15 @@ class TwoWayDict(dict):
         dict.__delitem__(self, key)
 
     def __len__(self):
-        """Returns the number of connections"""
+        '''Returns the number of connections'''
         return dict.__len__(self) // 2
 
 @dataclasses.dataclass
 class Node:
     '''Node'''
+    newid = itertools.count().__next__
     def __init__(self, position, h_value, parent=None, f_value=None) -> None:
+        self.id = Node.newid() # pylint: disable=C0103
         self.position = position
         self.parent: Node = parent
 
@@ -116,13 +119,14 @@ class BinarySearchNode:
     that contained this type of list where you could sort by a key from another class
     '''
     def __init__(self):
-        self.__item = []
+        self.__items = []
 
-    def __binary_search_node(self, arr: Node, value: Node):
+    def __binary_search_node(self, value: Node):
         '''
         Binary Search
         https://www.geeksforgeeks.org/python-program-for-binary-search/
         '''
+        arr = self.__items
         low = 0
         high = len(arr) - 1
         mid = 0
@@ -143,7 +147,37 @@ class BinarySearchNode:
                 return mid
         return -1
 
-    def insert(self, arr: Node, new_node: Node):
+    def insert(self, new_node: Node):
         '''Inserting the Node object'''
-        index = self.__binary_search_node(arr, new_node)
-        self.__item[index] = new_node
+        index = self.__binary_search_node(new_node)
+        self.__items.insert(index, new_node)
+
+    def delete(self, item_id: int):
+        '''
+        Removes the Node with specific id
+        Per now, it is gonna be O(n)
+        '''
+        for i, item in enumerate(self.__items):
+            print(item.id)
+            if item.id == item_id:
+                del self.__items[i]
+                return
+
+    def pop(self, index: int=0):
+        '''
+        Removes the element at a specific index
+        and returns it
+        By default it will remove the first element
+        Normally it would be first, but since the
+        lowest value is at the first index it will get
+        popped
+        '''
+        return self.__items.pop(index)
+
+    def get(self):
+        '''Returns the list'''
+        return self.__items
+
+    def __len__(self):
+        '''Returns the length'''
+        return len(self.__items)

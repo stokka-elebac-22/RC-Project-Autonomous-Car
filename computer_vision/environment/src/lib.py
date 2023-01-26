@@ -170,14 +170,11 @@ class BinarySearchList:
                 del self.__items[i]
                 return
 
-    def pop(self, index: int=0):
+    def pop(self, index: int=-1):
         '''
         Removes the element at a specific index
         and returns it
-        By default it will remove the first element
-        Normally it would be first, but since the
-        lowest value is at the first index it will get
-        popped
+        By default it will remove the last element
         '''
         return self.__items.pop(index)
 

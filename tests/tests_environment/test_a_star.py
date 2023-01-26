@@ -39,8 +39,10 @@ class TestAStar:
 
         assert cur_node == cur_exp
         while True:
+            # print(cur_node.position, cur_exp.position)
             cur_node = cur_node.parent
             cur_exp = cur_exp.parent
+            # print(cur_node.position, cur_exp.position)
             if cur_exp is None:
                 return
             assert cur_node == cur_exp

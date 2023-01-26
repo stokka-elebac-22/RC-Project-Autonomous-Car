@@ -65,8 +65,8 @@ class TestQRCode:
             ('angle_16_38_r', [True, 16]),
             ('angle_20_38_r', [True, 20]),
             ('angle_30_38_r', [True, 30]),
-            ('angle_10_43_l', [True, 10]),
-            ('angle_20_44_l', [True, 20]),
+            ('angle_10_43_l', [True, -10]),
+            ('angle_20_44_l', [True, -20]),
             # ('angle_30_36_l', [True, 30]), # not sure if that photo is correct
         ]
     )

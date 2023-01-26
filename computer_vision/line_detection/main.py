@@ -2,19 +2,18 @@
 import cv2
 import numpy as np
 
-# NOTE:
-# need to change parameters through test and fail
-# does not work for all images with the same parameters
-
 
 class LineDetector:
     """
     DOC: Detecting lines
     """
 
-    def __init__(self, canny=None, blur=5, hough=None, iterations=None):
+    def __init__(self, canny: list[int, int] = None,
+                 blur: int = 5,
+                 hough: list[int, int] = None,
+                 iterations: list[int, int] = None):
         """
-        CANNY: [low_threshold, high_threshold, kernel_size]
+        CANNY: [low_threshold, high_threshold]
         HOUGH_LINES: [min_line_length, max_line_gap]
         """
         if canny is None:
@@ -34,23 +33,23 @@ class LineDetector:
 
         self.iterations = iterations
 
-    def get_region_of_interest(self, image):
+    def get_region_of_interest(self, image: np.ndarray) -> np.ndarray:
         '''
         Everything is region of interest,
         each detector type who inherits this
         can overwrite this method
         '''
         return image
-        
-    def get_lines(self, image):
+
+    def get_lines(self, image: np.ndarray) -> np.ndarray:
         """Extract lines on the lane from image"""
-        # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         gaussian_blur = cv2.GaussianBlur(
-            image, (self.blur_kernel_size, self.blur_kernel_size), 0)
+            gray, (self.blur_kernel_size, self.blur_kernel_size), 0)
         canny = cv2.Canny(gaussian_blur, self.canny_low_thr,
                           self.canny_high_thr)
-        dilate = cv2.dilate(canny, (3, 3) , iterations=self.iterations[0])
-        erode = cv2.erode(dilate, (3,3), iterations=self.iterations[1])
+        dilate = cv2.dilate(canny, (3, 3), iterations=self.iterations[0])
+        erode = cv2.erode(dilate, (3, 3), iterations=self.iterations[1])
         roi = self.get_region_of_interest(erode)
         lines = cv2.HoughLinesP(
             roi, 1, np.pi / 180, 40, np.array([]),
@@ -58,7 +57,7 @@ class LineDetector:
         )
         return lines
 
-    def show_lines(self, image, lines):
+    def show_lines(self, image: np.ndarray, lines: np.ndarray) -> None:
         """Show the lines on image"""
         if lines is not None:
             for line in lines:
@@ -68,7 +67,6 @@ class LineDetector:
 
 
 if __name__ == "__main__":
-    # cap = cv2.VideoCapture("./assets/challenge_video.mp4")
     frame = cv2.imread(
         "computer_vision/line_detection/assets/bike_park.jpg")
 
@@ -82,17 +80,8 @@ if __name__ == "__main__":
 
     line_detector = LineDetector()
 
-    while True:
-        # ret, frame = cap.read()
-        # if cv2.waitKey(1) == ord('q') or ret == False:
-        #    break
-        all_lines = line_detector.get_lines(frame)
-        line_detector.show_lines(frame, all_lines)
-        cv2.imshow('image', frame)
-
-        # cv2.imshow('frame', frame)
-        cv2.waitKey(0)
-        break
-
-    # cap.release()
+    all_lines = line_detector.get_lines(frame)
+    line_detector.show_lines(frame, all_lines)
+    cv2.imshow('image', frame)
+    cv2.waitKey(0)
     cv2.destroyAllWindows()

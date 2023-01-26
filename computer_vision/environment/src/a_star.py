@@ -67,5 +67,6 @@ class AStar:
 
         return cur
 
-    def get_data(self):
+    def get_data(self, mat, start_pos, end_pos):
         '''Returns the data'''
+        node = self.find_path(mat, start_pos, end_pos)

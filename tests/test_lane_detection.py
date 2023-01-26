@@ -147,12 +147,12 @@ class TestParametrized:
         """Test if the output value is equal to the manual calculation value"""
         lane_detector = LaneDetector()
         image = self.get_image(img_source)
-        output_shape, matrix, coordinates, polys = lane_detector.get_course(
+        data = lane_detector.get_course(
             image, lines)
-        assert output_shape == expected[0]
-        assert matrix == pytest.approx(expected[1], rel=1e-3)
-        assert (coordinates == expected[2]).all()
-        assert polys == pytest.approx(expected[3], rel=1e-3)
+        assert data['warped_shape'] == expected[0]
+        assert data['perspective_transform'] == pytest.approx(expected[1], rel=1e-3)
+        assert (data['points'] == expected[2]).all()
+        assert data['polys'] == pytest.approx(expected[3], rel=1e-3)
 
     # @pytest.mark.skip('NOT FINISHED')
     @pytest.mark.parametrize('img_source, shape, transform, points, polys', [
@@ -200,10 +200,10 @@ class TestParametrized:
         """Test if the output value is equal to the manual calculation value"""
         lane_detector = LaneDetector()
         image = self.get_image(img_source)
-        warped, weighted = lane_detector.show_course(
+        images = lane_detector.show_course(
             image, shape, points, transform, polys)
-        difference = cv2.subtract(image, weighted)
+        difference = cv2.subtract(image, images['weighted'])
         b_color, g_color, r_color = cv2.split(difference)
-        assert image.shape != warped.shape
-        assert image.shape != weighted.shape or cv2.countNonZero(
+        assert image.shape != images['warped'].shape
+        assert image.shape != images['weighted'].shape or cv2.countNonZero(
             b_color) != 0 or cv2.countNonZero(g_color) != 0 or cv2.countNonZero(r_color) != 0

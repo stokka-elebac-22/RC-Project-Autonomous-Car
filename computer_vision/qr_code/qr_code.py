@@ -52,9 +52,9 @@ class QRGeometry:
             return None
         ratio = width/height
         angle = (1 - ratio) * 90
-        d = self.points[0][1] - self.points[3][1]
-        b = self.points[1][1] - self.points[2][1]
-        if (d < b):
+        d_side = self.points[0][1] - self.points[3][1]
+        b_side = self.points[1][1] - self.points[2][1]
+        if d_side < b_side:
             angle = -angle
         return angle
 

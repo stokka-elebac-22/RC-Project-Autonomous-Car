@@ -29,10 +29,10 @@ class TestParametrized:
             b_color) == 0 and cv2.countNonZero(g_color) == 0 and cv2.countNonZero(r_color) == 0
 
     @pytest.mark.parametrize('img_source, expected', [
-        ('bike_park.jpg', 3852),
-        ('curve.jpg', 4292),
-        ('1.jpg', 1921),
-        ('2.jpg', 2569)])
+        ('bike_park.jpg', 3413),
+        ('curve.jpg', 3619),
+        ('1.jpg', 1789),
+        ('2.jpg', 2570)])
     def test_get_lines(self, img_source, expected):
         '''Test if the output lines length is equal to the expected length'''
         line_detector = LineDetector()

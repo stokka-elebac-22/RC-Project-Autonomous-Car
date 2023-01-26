@@ -1,8 +1,10 @@
 """Import libraries"""
+from typing import TypedDict
 import warnings
 import cv2
 import numpy as np
 from computer_vision.line_detection.main import LineDetector
+#from main import LineDetector
 
 
 # SOURCE
@@ -13,11 +15,11 @@ class LaneDetector(LineDetector):
     DOC: Detects driving lane
     """
 
-    def __init__(self, canny=None, blur=5, hough=None):
+    def __init__(self, canny: list[int, int] = None, blur: int = 5, hough: list[int, int] = None):
         '''Initialize the Line Detector'''
         LineDetector.__init__(self, canny, blur, hough)
 
-    def get_region_of_interest(self, image):
+    def get_region_of_interest(self, image: np.ndarray) -> np.ndarray:
         """Get the region of interest from image"""
         offset = 250
         height = image.shape[0]
@@ -32,7 +34,8 @@ class LaneDetector(LineDetector):
                              (width, height), (255, 255, 255), -1)
         return cv2.bitwise_and(image, mask)
 
-    def get_line_coordinates_from_parameters(self, image, line_parameters):
+    def get_line_coordinates_from_parameters(self, image: np.ndarray,
+                                             line_parameters: list[float, float]) -> np.ndarray:
         """Get line coordinates from line parameters"""
         slope = line_parameters[0]
         intercept = line_parameters[1]
@@ -43,12 +46,11 @@ class LaneDetector(LineDetector):
         x_2 = int((y_2 - intercept) / slope)
         return np.array([x_1, y_1, x_2, y_2])
 
-
-    def get_average_lines(self, lines):
+    def get_average_lines(self, lines: np.ndarray) -> np.ndarray:
         """Sort the lines into left and right and get the average for each side"""
         if lines is not None:
-            left_fit = []  # will hold m,c parameters for left side lines
-            right_fit = []  # will hold m,c parameters for right side lines
+            left_fit = []  # will hold intercept and slope parameters for the left side lines
+            right_fit = []  # will hold intercept and slope parameters for the right side lines
 
             for line in lines:
                 x_1, y_1, x_2, y_2 = line.reshape(4)
@@ -76,7 +78,7 @@ class LaneDetector(LineDetector):
             return np.array([left_fit_average, right_fit_average], dtype=object)
         return np.array([None, None])
 
-    def get_diff_from_center_info(self, image, lines):
+    def get_diff_from_center_info(self, image: np.ndarray, lines: np.ndarray) -> float:
         """Calculate the difference from car center to lane center"""
         if lines is not None:
             width = image.shape[1]
@@ -100,7 +102,16 @@ class LaneDetector(LineDetector):
                 diff = (center_car - center_lane)/width * real_width
             return diff
 
-    def get_course(self, image, lines):
+    CirclePoints = list[tuple[int, int], tuple[int, int], tuple[int, int]]
+    CoursePolys = list[list[float, float], list[float, float]]
+    CourseData = TypedDict('CourseData', {
+        'warped_shape': np.ndarray,
+        'perspective_transform': np.ndarray,
+        'points': CirclePoints,
+        'polys': CoursePolys
+    })
+
+    def get_course(self, image: np.ndarray, lines: np.ndarray) -> CourseData:
         """Returns polys that define the course and points used to define the polys"""
         if lines is None:
             return (None, None, None, None)
@@ -144,13 +155,25 @@ class LaneDetector(LineDetector):
 
         poly_2 = np.polyfit([x_1, x_2, x_3], [y_3, y_2, y_3,], 2)
 
-        print((warped.shape, perspective_transform,
-               [(x_1, y_1), (x_2, y_2), (x_3, y_3)], [poly_1, poly_2]))
+        data = {
+            "warped_shape": warped.shape,
+            "perspective_transform": perspective_transform,
+            "points": [(x_1, y_1), (x_2, y_2), (x_3, y_3)],
+            "polys": [poly_1, poly_2]
+        }
 
-        return (warped.shape, perspective_transform,
-                [(x_1, y_1), (x_2, y_2), (x_3, y_3)], [poly_1, poly_2])
+        return data
 
-    def show_course(self, image, warped_shape, circle_points, perspective_transform, polys):
+    CourseImages = TypedDict('CourseImages', {
+        'warped': np.ndarray,
+        'weighted': np.ndarray
+    })
+
+    def show_course(self, image: np.ndarray,
+                    warped_shape: np.ndarray,
+                    circle_points: CirclePoints,
+                    perspective_transform: np.ndarray,
+                    polys: CoursePolys) -> CourseImages:
         """Display the points and curves for the driving course"""
         x_1 = circle_points[0][0]
         x_2 = circle_points[1][0]
@@ -171,10 +194,9 @@ class LaneDetector(LineDetector):
 
         for i, _ in enumerate(linear_spaces):
             draw_x = linear_spaces[i]
-            draw_y = np.polyval(polys[i], draw_x)   # evaluate the polynomial
+            draw_y = np.polyval(polys[i], draw_x)
             draw_points = (np.asarray([draw_x, draw_y]).T).astype(
-                np.int32)   # needs to be int32 and transposed
-            # args: image, points, closed, color
+                np.int32)
             cv2.polylines(warped, [draw_points], False, (0, 0, 0), 15)
 
         cv2.circle(
@@ -191,7 +213,12 @@ class LaneDetector(LineDetector):
 
         weighted = cv2.addWeighted(image, 0.4, un_warped, 0.2, 0)
 
-        return warped, weighted
+        data = {
+            'warped': warped,
+            'weighted': weighted
+        }
+
+        return data
 
 
 if __name__ == "__main__":
@@ -215,7 +242,8 @@ if __name__ == "__main__":
         #    break
         all_lines = lane_detector.get_lines(frame)
         avg_lines = lane_detector.get_average_lines(all_lines)
-        avg_lines = [lane_detector.get_line_coordinates_from_parameters(frame, line) for line in avg_lines]
+        avg_lines = [lane_detector.get_line_coordinates_from_parameters(
+            frame, line) for line in avg_lines]
         lane_detector.show_lines(frame, avg_lines)
         center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)
         if center_diff is not None:
@@ -223,14 +251,26 @@ if __name__ == "__main__":
                 frame, f"Diff from center: {center_diff}", (50, 50),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
 
-        shape, lane_transform, points, course_polys = lane_detector.get_course(
+        course_data = lane_detector.get_course(
             frame, avg_lines)
-        if (shape is not None and lane_transform is not None
-                and points is not None and course_polys is not None):
-            warped_img, course_img = lane_detector.show_course(
-                frame, shape, points, lane_transform, course_polys)
-            cv2.imshow('warped', warped_img)
-            cv2.imshow('course', course_img)
+
+        NO_NONE = True
+
+        for key, value in course_data.items():
+            if value is None:
+                NO_NONE = False
+                break
+
+        if NO_NONE:
+            images = lane_detector.show_course(
+                    frame,
+                    course_data['warped_shape'],
+                    course_data['points'],
+                    course_data['perspective_transform'],
+                    course_data['polys']
+                )
+            cv2.imshow('warped', images['warped'])
+            cv2.imshow('course', images['weighted'])
         cv2.imshow('image', frame)
 
         # cv2.imshow('frame', frame)

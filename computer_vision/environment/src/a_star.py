@@ -26,16 +26,16 @@ class AStar:
             # find the node in the open list with lowest f value
             cur = open_list.pop(0)
             # check all the surounding tiles
-            pos_x, pos_y = cur.position
+            pos = cur.position
             positions = [
-                (pos_x-1, pos_y),
-                (pos_x+1, pos_y),
-                (pos_x, pos_y-1),
-                (pos_x-1, pos_y-1),
-                (pos_x+1, pos_y-1),
-                (pos_x, pos_y+1),
-                (pos_x-1, pos_y+1),
-                (pos_x+1, pos_y+1),
+                (pos[0]-1, pos[1]),
+                (pos[0]+1, pos[1]),
+                (pos[0], pos[1]-1),
+                (pos[0]-1, pos[1]-1),
+                (pos[0]+1, pos[1]-1),
+                (pos[0], pos[1]+1),
+                (pos[0]-1, pos[1]+1),
+                (pos[0]+1, pos[1]+1),
             ]
             for pos in positions:
                 # checks if position is out of bounds
@@ -68,5 +68,11 @@ class AStar:
         return cur
 
     def get_data(self, mat, start_pos, end_pos):
-        '''Returns the data'''
+        '''Returns a path list'''
         node = self.find_path(mat, start_pos, end_pos)
+        path_list = []
+        while node is not None:
+            path_list.append(node.position)
+            node = node.parent
+
+        return path_list

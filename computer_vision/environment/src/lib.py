@@ -1,6 +1,5 @@
 '''Library'''
 import dataclasses
-import itertools
 import pygame as pg
 
 @dataclasses.dataclass
@@ -51,6 +50,14 @@ class Objects:
                 'name': 'Hindrance',
                 'param': {
                     'color': pg.Color(255, 255, 255),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 2,
+                'name': 'Path',
+                'param': {
+                    'color': pg.Color(50, 80, 180),
                     'thickness': 0
                 }
             },

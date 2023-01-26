@@ -3,6 +3,7 @@ import pygame as pg
 from pygame.locals import QUIT # pylint: disable=no-name-in-module
 from environment import Environment
 from display import DisplayEnvironment
+from a_star import AStar
 
 if __name__ == '__main__':
     SIZE = (10, 10)
@@ -20,3 +21,7 @@ if __name__ == '__main__':
                     environment.insert_object(5, 0, 1)
 
         display.update(environment.get_data())
+        path = AStar().get_data(environment.get_data(), (0, 0), (9, 9))
+
+        for values in path:
+            display.insert(values, 'Path')

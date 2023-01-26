@@ -42,3 +42,7 @@ class Board:
         '''Draw'''
         self.board = new_board
         self.draw_squares(window)
+
+    def insert(self, pos, value):
+        '''Insert in board matrix'''
+        self.board[pos[0]][pos[1]] = value

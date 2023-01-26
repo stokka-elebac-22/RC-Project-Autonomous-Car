@@ -2,6 +2,7 @@
 import pytest
 from computer_vision.environment.src.a_star import AStar
 from computer_vision.environment.src.lib import Node
+
 class TestAStar:
     '''Test A*'''
     @pytest.mark.parametrize(

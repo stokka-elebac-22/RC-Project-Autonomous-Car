@@ -19,7 +19,7 @@ class TestEnvironment:
     @pytest.mark.parametrize(
         ['param', 'exp'],
         [
-            ([(3, 3), 2, 0, 0], [[0,1,0],[0,0,0],[0,0,0]])
+            ([(3, 3), 0, 2, 1], [[0,1,0],[0,0,0],[0,0,0]])
         ]
     )
     def test_insert(self, param, exp):
@@ -34,6 +34,7 @@ def are_same(mat1: np.array, mat2: np.array):
     if len(mat1) != len(mat2) or len(mat1[0]) != len(mat2[0]):
         return False
 
+    print(mat1, mat2)
     for row1, row2 in zip(mat1, mat2):
         for col1, col2 in zip(row1, row2):
             if col1 != col2:

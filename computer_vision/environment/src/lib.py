@@ -100,7 +100,7 @@ class Node:
 
         self.g_value = 0
         if self.parent is not None:
-            self.g_value = self.parent.g_value
+            self.g_value = self.parent.g_value + 1
         self.h_value = h_value
         self.f_value = self.g_value + self.h_value
         if f_value is not None: # this is rarly the case, but might want to change it

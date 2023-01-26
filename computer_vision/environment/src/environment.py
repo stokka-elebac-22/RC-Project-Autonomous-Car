@@ -23,9 +23,9 @@ class Environment:
         if distance_y == 0:
             row = self.size[1]//2
         else:
-            row = -(self.size[1]*self.real_size/2)//distance_y
+            row = (self.size[1]*self.real_size/2)//distance_y
         if distance_x == 0:
-            col = -1
+            col = self.size[0]//2
         else:
-            col = -self.size[0]*self.real_size//distance_x
-        self.map[row][col] = object_id
+            col = self.size[0]*self.real_size//distance_x
+        self.map[int(row)][int(col)] = object_id

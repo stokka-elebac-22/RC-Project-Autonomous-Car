@@ -13,9 +13,9 @@ class TestAStar:
                 [0, 0, 0],
                 [0, 0, 0],
             ]],
-                Node((2, 1), parent=
-                Node((1, 1), parent=
-                Node((0, 1), parent=None)))
+                Node((2, 1), 1, parent=
+                Node((1, 1), 1, parent=
+                Node((0, 1), 1, parent=None)))
             ),
             ([(2, 2), (0, 2),
                 [
@@ -23,11 +23,11 @@ class TestAStar:
                     [0, 1, 1],
                     [0, 0, 0],
                 ]],
-                    Node((2, 2), parent=
-                    Node((2, 1), parent=
-                    Node((1, 0), parent=
-                    Node((0, 1), parent=
-                    Node((0, 2), parent=None)))))
+                    Node((2, 2), 1, parent=
+                    Node((2, 1), 1, parent=
+                    Node((1, 0), 1, parent=
+                    Node((0, 1), 1, parent=
+                    Node((0, 2), 1, parent=None)))))
             )
         ]
     )
@@ -38,7 +38,9 @@ class TestAStar:
         cur_exp: Node = exp
 
         assert cur_node == cur_exp
-        while cur_exp.parent is not None:
+        while True:
             cur_node = cur_node.parent
             cur_exp = cur_exp.parent
+            if cur_exp is None:
+                return
             assert cur_node == cur_exp

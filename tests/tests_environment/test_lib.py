@@ -70,10 +70,14 @@ class TestNode:
     ['arr', 'exp'],
     [
         ([
-            [Node(f_value=0), Node(f_value=1), Node(f_value=2), Node(f_value=4)],
-            Node(f_value=3)], 3),
+            [Node((0,0), 1, f_value=0),
+            Node((0,0), 1, f_value=1),
+            Node((0,0), 1, f_value=2),
+            Node((0,0), 1, f_value=4)],
+            Node((0,0), 1, f_value=3)], 3),
         ([
-            [Node(f_value=1)], Node(f_value=0)], 0)
+            [Node((0,0), 1, f_value=1)],
+            Node((0,0), 1, f_value=0)], 0)
     ]
 )
 def test_binary_search_node(arr, exp):

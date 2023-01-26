@@ -8,8 +8,8 @@ class AStar:
         '''Returns the start node'''
         # The f_value will be the total distance and calculated with pythagoras
         # without the square root
-        f_value = abs(start_pos[0]-end_pos[0])**2 + abs(start_pos[1]-end_pos[1])**2
-        start_node = Node(position=start_pos, f_value=f_value)
+        h_value = abs(start_pos[0]-end_pos[0])**2 + abs(start_pos[1]-end_pos[1])**2
+        start_node = Node(position=start_pos, h_value=h_value)
         valid = ['None'] # a list of object names that are valid
         open_list = [start_node] # a list of possible candidates to be the next current node
 
@@ -17,8 +17,8 @@ class AStar:
             # find the node in the open list with lowest f value
             # For now this is done with a linear search method O(N) but can be
             # optimized by always have the list sorted log(N)
-            current_node =
-
+            break
+            pass
 
 
         return start_node

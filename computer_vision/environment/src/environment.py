@@ -7,7 +7,7 @@ class Environment:
     def __init__(self, size, real_size):
         self.size = size
         self.real_size = real_size # the real unit size per square
-        self.__map = np.zeros(size)
+        self.map = np.zeros(size)
 
     def update(self):
         '''Update the map'''
@@ -18,7 +18,7 @@ class Environment:
         map: the matrix
         '''
         # needs do send a copy of the map, else it will get modified
-        return copy.copy(self.__map)
+        return copy.copy(self.map)
 
     def insert_object(self, distance_x, distance_y, object_id):
         '''Insert object'''
@@ -30,4 +30,4 @@ class Environment:
             col = self.size[0]//2
         else:
             col = self.size[0]*self.real_size//distance_x
-        self.__map[int(row)][int(col)] = object_id
+        self.map[int(row)][int(col)] = object_id

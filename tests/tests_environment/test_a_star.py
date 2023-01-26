@@ -13,9 +13,9 @@ class TestAStar:
                 [0, 0, 0],
                 [0, 0, 0],
             ]],
-                Node((2, 1), 1, parent=
+                Node((0, 1), 1, parent=
                 Node((1, 1), 1, parent=
-                Node((0, 1), 1, parent=None)))
+                Node((2, 1), 1, parent=None)))
             ),
             ([(2, 2), (0, 2),
                 [
@@ -23,11 +23,11 @@ class TestAStar:
                     [0, 1, 1],
                     [0, 0, 0],
                 ]],
-                    Node((2, 2), 1, parent=
-                    Node((2, 1), 1, parent=
-                    Node((1, 0), 1, parent=
+                    Node((0, 2), 1, parent=
                     Node((0, 1), 1, parent=
-                    Node((0, 2), 1, parent=None)))))
+                    Node((1, 0), 1, parent=
+                    Node((2, 1), 1, parent=
+                    Node((2, 2), 1, parent=None)))))
             )
         ]
     )

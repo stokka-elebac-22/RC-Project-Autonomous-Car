@@ -34,7 +34,7 @@ class ParkingSlotDetector(LineDetector):
         qr_code = QRCode(qr_size_px, qr_size_mm, qr_distance)
         return qr_code, qr_code.get_data(image)
 
-    def cluster_lines(self, lines: np.ndarray, atol: int =15) -> list[np.ndarray, np.ndarray]:
+    def cluster_lines(self, lines: np.ndarray, atol: int =0) -> list[np.ndarray, np.ndarray]:
         '''Cluster lines that are close to each other'''
         clustered_lines = []
         clustered_coords = []
@@ -78,11 +78,14 @@ class ParkingSlotDetector(LineDetector):
                      slope: float,
                      intercept: float) -> None:
         'Filter lines that are close to the qr-code'
+        temp_coords = []
+        temp_lines = []
         for i, line in enumerate(lines):
-            if (np.isclose(slope, line[0], atol=20, rtol=1e-9) and
-                    np.isclose(intercept, line[1], atol=20, rtol=1e-9)):
-                lines.pop(i)
-                coords.pop(i)
+            if not (np.isclose(slope, line[0], atol=20, rtol=1e-9) and
+                    np.isclose(intercept, line[1], atol=40, rtol=1e-9)):
+                temp_lines.append(line)
+                temp_coords.append(coords[i])
+        return temp_lines, temp_coords
 
     def get_min_max_x(self, coordinates: list[np.ndarray]) -> list[int, int]:
         """Get the minimum and maximum x values from a set of coordinates"""
@@ -107,60 +110,29 @@ class ParkingSlotDetector(LineDetector):
         right_diff = None
 
         for i, coords in enumerate(line_coords):
-            if coords[0] - points[3][0] < 0:
-                if left_diff is None:
-                    left_diff = coords[0] - points[3][0]
-                else:
-                    if coords[0] - points[3][0] > left_diff:
-                        left_index = i
-                        left_diff = coords[0] - points[3][0]
-            elif coords[2] - points[3][0] < 0:
-                if left_diff is None:
-                    left_diff = coords[0] - points[3][0]
-                else:
-                    if coords[2] - points[3][0] > left_diff:
-                        left_index = i
-                        left_diff = coords[2] - points[3][0]
-            elif coords[0] - points[2][0] > 0:
-                if right_diff is None:
-                    right_diff = coords[0] - points[2][0]
-                else:
-                    if coords[0] - points[2][0] < right_diff:
-                        right_index = i
-                        right_diff = coords[0] - points[2][0]
-            elif coords[2] - points[2][0] > 0:
-                if right_diff is None:
-                    right_diff = coords[0] - points[2][0]
-                else:
-                    if coords[2] - points[3][0] < right_diff:
-                        right_index = i
-                        right_diff = coords[2] - points[2][0]
 
+            min_value = min(coords[1], coords[3])
+            min_index=np.where(coords==min_value)[0][0]
+            if min_index == 1:
+                point = [coords[0], coords[1]]
+            else: 
+                point = [coords[2], coords[3]]
+
+            if point[0] - points[3][0] <= 0:
+                if left_diff is None:
+                    left_diff = point[0] - points[3][0]
+                else:
+                    if point[0] - points[3][0] > left_diff:
+                        left_index = i
+                        left_diff = point[0]- points[3][0]
+            elif point[0] - points[2][0] >= 0:
+                if right_diff is None:
+                    right_diff = point[0] - points[2][0]
+                else:
+                    if point[0] - points[2][0] < right_diff:
+                        right_index = i
+                        right_diff = point[0]- points[2][0]
         lines=[line_coords[left_index], line_coords[right_index]]
-        # for _ in range(len(line_coords)):
-        #     max_values = np.argmax(line_coords, axis=0)
-        #     max_y_value = max(
-        #         line_coords[max_values[1]][1], line_coords[max_values[3]][3])
-        #     if max_y_value == line_coords[max_values[1]][1]:
-        #         closest_line_index = max_values[1]
-        #     else:
-        #         closest_line_index = max_values[3]
-
-        #     closest_line = line_coords.pop(closest_line_index)
-        #     lines.append(closest_line)
-        #     if len(lines) > amount-1:
-        #         if angle >= 0:
-        #             line_one_values = max(lines[0][0], lines[0][2])
-        #             line_two_values = max(lines[1][0], lines[1][2])
-        #         else:
-        #             line_one_values = min(lines[0][0], lines[0][2])
-        #             line_two_values = min(lines[1][0], lines[1][2])
-        #         if ((line_one_values >= points[0][0]
-        #             and line_two_values <= points[1][0]) or
-        #                 (line_two_values >= points[0][0] and line_one_values <= points[1][0])):
-        #             break
-        #         else:
-        #             lines.pop(0)
         return lines
 
     def detect_parking_lines(self,
@@ -177,7 +149,6 @@ class ParkingSlotDetector(LineDetector):
                 'distances': data['distances'],
                 'angles': data['angles'],
                 'info': data['info']}
-            qrc.display(image, qr_code_measurements, verbose=2)
 
             qr_slope, qr_intercept = np.polyfit(
                 (data['points'][0][2][0],
@@ -190,9 +161,14 @@ class ParkingSlotDetector(LineDetector):
             mask = cv2.fillPoly(black_image, mask_points, (255, 255, 255))
             roi = cv2.bitwise_and(image, mask)
             cv2.imshow("roi", roi)
+            qrc.display(image, qr_code_measurements, verbose=2)
             lines = self.get_lines(roi)
             if lines is None:
                 return None
+
+            test_img = image.copy()
+            self.show_lines(test_img, lines)
+            cv2.imshow("test", test_img)
             clustered_lines, clustered_coords = self.cluster_lines(lines)
 
             # calculate average line and coordinates of the clustered lines
@@ -205,12 +181,15 @@ class ParkingSlotDetector(LineDetector):
                 coordinates = self.get_line_coordinates_from_parameters(
                     min_x, max_x, line)
                 avg_lines_coords.append(coordinates)
-
             # filter away lines that are close to the QR-code
-            self.filter_lines(avg_lines, avg_lines_coords,
+            avg_lines, avg_lines_coords = self.filter_lines(avg_lines, avg_lines_coords,
                               qr_slope, qr_intercept)
 
-            # find the two closest lines to the QR-code
+            # find the two closesqt lines to the QR-code
+            copy = image.copy()
+            self.show_lines(copy, avg_lines_coords)
+            cv2.imshow("avg lines", copy)
+
             lines = self.get_closest_line(
                 avg_lines_coords, data['points'][0], 2, data['angles'][0])
             return lines
@@ -233,8 +212,8 @@ class ParkingSlotDetector(LineDetector):
 if __name__ == "__main__":
     # ORIGINAL: hough=[200,5]
     parking_slot_detector = ParkingSlotDetector(
-        hough=[30, 5], iterations=[0, 0])
-    img = cv2.imread('computer_vision/line_detection/assets/parking/13.png')
+        hough=[30, 5], iterations=[2, 1])
+    img = cv2.imread('computer_vision/line_detection/assets/parking/11.png')
     copy = img.copy()
     all_lines = parking_slot_detector.get_lines(copy)
     parking_slot_detector.show_lines(copy, all_lines)

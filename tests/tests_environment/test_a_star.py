@@ -47,6 +47,20 @@ class TestAStar:
                     Node((0, 2), 1, parent=
                     Node((0, 3), 1, parent=
                     Node((0, 4), 1, parent=None)))))))))
+            ),
+            ([(0, 0), (0, 4),
+                [
+                    [0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0],
+                ]],
+                    Node((0, 4), 1, parent=
+                    Node((0, 3), 1, parent=
+                    Node((0, 2), 1, parent=
+                    Node((0, 1), 1, parent=
+                    Node((0, 0), 1, parent=None)))))
             )
         ]
     )
@@ -56,7 +70,6 @@ class TestAStar:
         cur_node: Node = a_star.find_path(param[2], param[0], param[1])
         cur_exp: Node = exp
 
-        print(cur_node.position, cur_exp.position)
         assert cur_node == cur_exp
         while True:
             cur_node = cur_node.parent

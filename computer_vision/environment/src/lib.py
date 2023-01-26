@@ -25,7 +25,9 @@ class Objects:
         '''Initializing the object dict'''
         obj = [
             ('None', 0),
-            ('Stop', 3)
+            ('Hindrance', 1),
+            ('Path', 2),
+            ('Stop', 3),
         ]
         for i in obj:
             self.objects[i[0]] = i[1]
@@ -49,7 +51,7 @@ class Objects:
                 'id': 1,
                 'name': 'Hindrance',
                 'param': {
-                    'color': pg.Color(255, 255, 255),
+                    'color': pg.Color(0, 0, 0),
                     'thickness': 0
                 }
             },
@@ -80,9 +82,9 @@ class Objects:
         Each object have:
         color, thickness
         '''
-        if not isinstance(obj, int):
+        if not isinstance(obj, (int, float)):
             obj = self.objects[obj] # convert to correct keyname
-        return self.object_data[obj]
+        return self.object_data[int(obj)]
 
 
 class TwoWayDict(dict):

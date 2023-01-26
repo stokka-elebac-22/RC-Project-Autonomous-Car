@@ -1,6 +1,6 @@
 '''Creating the board'''
 import pygame as pg
-from .lib import Objects
+from lib import Objects
 
 class Board:
     '''Display Board'''
@@ -15,9 +15,9 @@ class Board:
         window.fill(pg.Color(255, 255, 255))
         for i, row in enumerate(self.board):
             for j, col in enumerate(row):
-                data = Objects().get_data(int(col))
-                color = data.color
-                thickness = data.thickness
+                object_data = Objects().get_data(int(col))
+                color = object_data.color
+                thickness = object_data.thickness
                 pg.draw.rect(
                     window,
                     color,

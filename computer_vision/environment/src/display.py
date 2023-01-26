@@ -1,7 +1,7 @@
 '''Display environment'''
 import pygame as pg
-from .board import Board
-from .lib import Objects
+from board import Board
+from lib import Objects
 
 class DisplayEnvironment:
     '''Displaying the environment with pygame'''
@@ -33,8 +33,8 @@ class DisplayEnvironment:
 
     def insert(self, pos, name):
         '''Insert a object into the map'''
-        data = Objects().get_data(name)
-        self.board.insert(pos, data.id)
+        object_data = Objects().get_data(name)
+        self.board.insert(pos, object_data.id)
 
     def draw_grid(self, data):
         '''Draw the grid on the screen'''

@@ -20,8 +20,14 @@ if __name__ == '__main__':
                 if event.key == pg.K_a:
                     environment.insert_object(5, 0, 1)
 
-        display.update(environment.get_data())
-        path = AStar().get_data(environment.get_data(), (0, 0), (9, 9))
+        cur_mat = environment.get_data()
+        path = AStar().get_data(cur_mat, (1, 1), (9, 1))
 
-        for values in path:
+        print(path)
+
+        for values in path[1:-1]:
             display.insert(values, 'Path')
+
+        display.update(cur_mat)
+
+        break

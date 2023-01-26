@@ -69,8 +69,6 @@ class Objects:
         return self.object_data[obj]
 
 
-
-
 class TwoWayDict(dict):
     '''
     A two way dict
@@ -92,3 +90,46 @@ class TwoWayDict(dict):
     def __len__(self):
         """Returns the number of connections"""
         return dict.__len__(self) // 2
+
+@dataclasses.dataclass
+class Node:
+    '''Node'''
+    def __init__(self, position, h_value, parent=None, f_value=None) -> None:
+        self.position = position
+        self.parent: Node = parent
+
+        self.g_value = 0
+        if self.parent is not None:
+            self.g_value = self.parent.g_value
+        self.h_value = h_value
+        self.f_value = self.g_value + self.h_value
+        if f_value is not None: # this is rarly the case, but might want to change it
+            self.f_value = f_value
+
+    def __eq__(self, other):
+        return self.position == other.position
+
+
+def binary_search_node(arr: Node, value):
+    '''
+    Binary Search
+    https://www.geeksforgeeks.org/python-program-for-binary-search/
+    '''
+    low = 0
+    high = len(arr) - 1
+    mid = 0
+
+    while low >= high:
+        mid = (high+low) // 2
+
+        if arr[mid] < value:
+            if arr[mid + 1] > value:
+                return mid + 1
+            low = mid + 1
+        elif arr[mid] > value:
+            if arr[mid - 1] < value:
+                return mid - 1
+            high = mid - 1
+        else:
+            return mid
+    return -1

@@ -1,19 +1,7 @@
 '''A star'''
 import pytest
-from computer_vision.environment.src.a_star import Node, AStar
-
-class TestNode:
-    '''Test node'''
-    def test_node(self):
-        '''Test Node'''
-        node = Node((0, 0))
-        assert node.parent is None
-        parent = Node((0, 1))
-        node.parent = parent
-        assert node.parent.position == (0, 1)
-        node_dup = Node((0, 0))
-        assert node == node_dup
-
+from computer_vision.environment.src.a_star import AStar
+from computer_vision.environment.src.lib import Node
 class TestAStar:
     '''Test A*'''
     @pytest.mark.parametrize(

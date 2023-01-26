@@ -19,9 +19,10 @@ class AStar:
     '''A* Algorithm'''
     def find_path(self, mat, start_pos, end_pos) -> Node:
         '''Returns the start node'''
-        # The f_value will be the total distance and calculated with pythagoras without the sqare root
+        # The f_value will be the total distance and calculated with pythagoras
+        # without the square root
         f_value = abs(start_pos[0]-end_pos[0])**2 + abs(start_pos[1]-end_pos[1])**2
-        start_node = Node(start_pos, f_value=f_value)
+        start_node = Node(position=start_pos, f_value=f_value)
         valid = ['None'] # a list of object names that are valid
         open_list = [] # a list of possible candidates to be the next current node
 

@@ -25,7 +25,7 @@ class Objects:
         '''Initializing the object dict'''
         obj = [
             ('None', 0),
-            ('Stop', 1)
+            ('Stop', 3)
         ]
         for i in obj:
             self.objects[i[0]] = i[1]
@@ -46,7 +46,7 @@ class Objects:
                 }
             },
             {
-                'id': 1,
+                'id': 3,
                 'name': 'Stop',
                 'param': {
                     'color': pg.Color(255, 0, 0),

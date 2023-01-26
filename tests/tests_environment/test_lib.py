@@ -1,6 +1,6 @@
 '''Test the library'''
 import pytest
-from computer_vision.environment.src.lib import Objects, TwoWayDict
+from computer_vision.environment.src.lib import Objects, Object, TwoWayDict
 
 class TestObjects:
     '''Testing the objects'''
@@ -12,7 +12,7 @@ class TestObjects:
     @pytest.mark.parametrize(
         ['param', 'exp'],
         [
-            (['foo', 0, 'green', 1], ['green', 1])
+            (['foo', 1000, 'green', 1], ['green', 1])
         ]
     )
 
@@ -20,11 +20,12 @@ class TestObjects:
         '''Testing getting the objects color'''
         obj = Objects()
         obj.objects[param[0]] = param[1]
-        obj.object_data[0]['color'] = param[2]
-        obj.object_data[0]['thickness'] = param[3]
-        assert obj.get_data('foo')['color'] == exp[0] and \
-            obj.get_data('None')['color'] == exp[0] and \
-            obj.get_data('None')['thickness'] == exp[1]
+        params = {
+            'color': param[2],
+            'thickness': param[3]
+        }
+        obj.object_data[param[1]] = Object(param[1], param[0], params)
+        assert obj.get_data(param[0]).color == exp[0]
 
 
 class TestTwoWayDict:
@@ -33,7 +34,9 @@ class TestTwoWayDict:
         '''Testing inserting item'''
         twd = TwoWayDict()
         twd['foo'] = 'bar'
-        assert twd['foo'] == 'bar' and twd['bar'] == 'foo'
+        twd[0] = 'foo0'
+        assert twd['foo'] == 'bar' and twd['bar'] == 'foo' and \
+            twd[0] == 'foo0'
 
     def test_delitem(self):
         '''Testing deleting item'''

@@ -12,7 +12,7 @@ if __name__ == '__main__':
     env= Environment(SIZE, 1, {'view_point': None, 'object_id': 10})
     display = DisplayEnvironment(WINDOW_SIZE, SIZE)
 
-    env.insert_object((6, 8), 11)
+    env.insert_object((-2, 6), 11)
 
     RUN = True
     while RUN:
@@ -27,9 +27,10 @@ if __name__ == '__main__':
         end_pos_path = env.get_pos(11)
         cur_mat = env.get_data()
         display.update(cur_mat)
-        path = AStar().get_data(cur_mat, start_pos_path, end_pos_path)
+        ret, path = AStar().get_data(cur_mat, start_pos_path, end_pos_path)
 
-        for pos in path[1:-1]:
-            display.insert(pos, 'Path')
+        if ret:
+            for pos in path[1:-1]:
+                display.insert(pos, 'Path')
 
         display.display()

@@ -69,10 +69,11 @@ class AStar:
 
     def get_data(self, mat, start_pos, end_pos):
         '''Returns a path list'''
+        if start_pos is None or end_pos is None:
+            return False, None
         node = self.find_path(mat, start_pos, end_pos)
         path_list = []
         while node is not None:
             path_list.append(node.position)
             node = node.parent
-
-        return path_list
+        return True, path_list

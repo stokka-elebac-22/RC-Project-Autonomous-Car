@@ -61,6 +61,16 @@ class Environment:
         self.map[int(row)][int(col)] = object_id
         return True
 
+    def remove(self, object_id: int, remove_all=False):
+        '''Remove an object'''
+        for i, row in enumerate(self.map):
+            for j, col in enumerate(row):
+                if col == object_id:
+                    self.map[i][j] = 0
+                    if remove_all:
+                        continue
+                    return
+
     def insert_by_index(self, pos: int, object_id: int):
         '''Insert object by index'''
         if pos[0] < 0 or pos[0] >= self.size[0] or pos[1] < 0 or pos[1] > self.size[1]:

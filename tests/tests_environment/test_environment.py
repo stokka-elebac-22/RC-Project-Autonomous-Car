@@ -40,8 +40,32 @@ class TestEnvironment:
         env = Environment(param[0], param[2], param[1])
         ret = env.insert(param[3], param[4])
         data = env.get_data()
-        print(data)
         assert ret == exp[0] and are_same(data, exp[1])
+
+    @pytest.mark.parametrize(
+        ['param', 'exp'],
+        [
+            ([(3, 3), None, 1, [(0, 2)], [1], 1, False], [[0,0,0],[0,0,0],[0,0,0]]),
+            ([(3, 3), None, 1, [(0, 1), (1, 1), (1, 0)], [1, 1, 1], 1, True],
+                [[0,0,0],[0,0,0],[0,0,0]]),
+            ([(3, 3), None, 1, [(0, 1), (1, 1), (0, 2)], [1, 1, 1], 1, False],
+                [[0,0,0],[0,1,1],[0,0,0]]),
+            ([(3, 3), None, 1, [(0, 1), (1, 1), (1, 2)], [1, 1, 2], 1, True],
+                [[0,0,2],[0,0,0],[0,0,0]]),
+        ]
+    )
+
+    def test_remove(self, param, exp):
+        '''Testing removing object(s)'''
+        env = Environment(param[0], param[2], param[1])
+        for pos, obj_id in zip(param[3], param[4]):
+            env.insert(pos, obj_id)
+        env.remove(param[5], param[6])
+        data = env.get_data()
+        print(data)
+        assert are_same(data, exp)
+
+
 
     @pytest.mark.parametrize(
         ['param', 'exp'],

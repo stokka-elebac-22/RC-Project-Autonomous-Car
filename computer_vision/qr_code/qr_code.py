@@ -252,7 +252,7 @@ if __name__ == '__main__':
 
     while True:
         img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
-        # img = local_read_camera()
+        img = local_read_camera()
         qr_data = qr_code.get_data(img)
 
         if len(angles_lists) < len(qr_data['angles']):

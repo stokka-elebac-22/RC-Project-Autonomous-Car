@@ -36,7 +36,7 @@ class Environment:
                     return (i, j)
         return None
 
-    def insert_object(self, distance: float, object_id: int) -> bool:
+    def insert(self, distance: float, object_id: int) -> bool:
         '''
         Insert object
         The distance contains a x and y value (direction)
@@ -56,4 +56,11 @@ class Environment:
         if row >= self.size[0] or row < 0 or col < 0 or col >= self.size[1]:
             return False
         self.map[int(row)][int(col)] = object_id
+        return True
+
+    def insert_by_index(self, pos: int, object_id: int):
+        '''Insert object by index'''
+        if pos[0] < 0 or pos[1] >= self.size[1] or pos[1] > 0 or pos[1] > self.size[1]:
+            return False
+        self.map[pos[0]][pos[1]] = object_id
         return True

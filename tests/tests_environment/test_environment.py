@@ -31,7 +31,27 @@ class TestEnvironment:
     def test_insert(self, param, exp):
         '''Testing inserting object into the environment'''
         env = Environment(param[0], param[2], param[1])
-        ret = env.insert_object(param[3], param[4])
+        ret = env.insert(param[3], param[4])
+        data = env.get_data()
+        assert ret == exp[0] and are_same(data, exp[1])
+
+    @pytest.mark.parametrize(
+        ['param', 'exp'],
+        [
+            ([(3, 3), None, 1, (0, 0), 1], [True, [[1,0,0],[0,0,0],[0,0,0]]]),
+            ([(3, 3), None, 1, (1, 1), 1], [True, [[0,0,0],[0,1,0],[0,0,0]]]),
+            ([(3, 3), None, 1, (3, 3), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
+            ([(3, 3), None, 2.5, (0, 2), 1], [True, [[0,0,1],[0,0,0],[0,0,0]]]),
+            ([(3, 3), (3, 2), 2.5, (3, 6), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
+            ([(3, 3), None, 2.5, (-2, 5), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
+            ([(3, 3), (3, 2), 2.5, (3, -1), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
+        ]
+    )
+
+    def test_insert_by_index(self, param, exp):
+        '''Testing inserting object by index into the environment'''
+        env = Environment(param[0], param[2], param[1])
+        ret = env.insert_by_index(param[3], param[4])
         data = env.get_data()
         assert ret == exp[0] and are_same(data, exp[1])
 

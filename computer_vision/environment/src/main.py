@@ -12,7 +12,7 @@ if __name__ == '__main__':
     env= Environment(SIZE, 1, {'view_point': None, 'object_id': 10})
     display = DisplayEnvironment(WINDOW_SIZE, SIZE)
 
-    env.insert_object((-2, 6), 11)
+    env.insert((-2, 6), 11)
 
     RUN = True
     while RUN:

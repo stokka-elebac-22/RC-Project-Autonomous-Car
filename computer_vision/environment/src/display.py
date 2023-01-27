@@ -1,7 +1,11 @@
 '''Display environment'''
 import pygame as pg
-from .board import Board
-from .lib import Objects
+try:
+    from board import Board
+    from lib import Objects
+except ImportError:
+    from .board import Board
+    from .lib import Objects
 
 class DisplayEnvironment:
     '''Displaying the environment with pygame'''

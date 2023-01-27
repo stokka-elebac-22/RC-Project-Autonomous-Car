@@ -1,7 +1,10 @@
 '''
 A star algorithm
 '''
-from .lib import Node, BinarySearchList, Objects
+try:
+    from lib import Node, BinarySearchList, Objects
+except ImportError:
+    from .lib import Node, BinarySearchList, Objects
 
 class AStar:
     '''A* Algorithm'''

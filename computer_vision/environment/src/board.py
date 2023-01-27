@@ -1,6 +1,9 @@
 '''Creating the board'''
 import pygame as pg
-from .lib import Objects
+try:
+    from lib import Objects
+except ImportError:
+    from .lib import Objects
 
 class Board:
     '''Display Board'''

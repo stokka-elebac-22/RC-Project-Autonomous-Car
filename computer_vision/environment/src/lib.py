@@ -141,14 +141,24 @@ class Node:
         self.parent: Node = parent
 
         self.g_value = 0
+        self.h_value = h_value
+
         if self.parent is not None:
             self.g_value = self.parent.g_value + math.sqrt(
                 abs(self.parent.position[0]-self.position[0])**2 +
                 abs(self.parent.position[1]-self.position[1]))
-        self.h_value = h_value
+        self.f_value = f_value
+        if f_value is None: # rarly used
+            self.f_value = self.g_value + self.h_value
+
+    def update(self):
+        '''Update the node'''
+        self.g_value = 0
+        if self.parent is not None:
+            self.g_value = self.parent.g_value + math.sqrt(
+                abs(self.parent.position[0]-self.position[0])**2 +
+                abs(self.parent.position[1]-self.position[1]))
         self.f_value = self.g_value + self.h_value
-        if f_value is not None: # this is rarly the case, but might want to change it
-            self.f_value = f_value
 
     def __eq__(self, other):
         return self.position == other.position
@@ -211,14 +221,16 @@ class BinarySearchList:
         '''
         return self.__items.pop(index)
 
-    def contains(self, pos):
+    def get(self, pos: int=None):
         '''Check if a Node exist in the list (same position)'''
+        if pos is None:
+            return True, self.__items
         for node in self.__items:
             if node.position == pos:
-                return True
-        return False
+                return True, node
+        return False, None
 
-    def get(self, index: int=None):
+    def get_by_index(self, index: int=None):
         '''Returns the list'''
         if index is None:
             return self.__items

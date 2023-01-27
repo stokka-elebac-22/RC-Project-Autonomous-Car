@@ -59,8 +59,17 @@ class AStar:
                 if object_data.name not in self.valid:
                     continue
                 # check if node already in the list
-                if open_list.contains(pos):
-                    continue
+                ret, node = open_list.get(pos)
+                if ret:
+                    old_f_value = node.f_value
+                    new_h_value = math.sqrt((pos[0]-end_pos[0])**2 + (pos[1]-end_pos[1])**2)
+                    new_g_value = cur.g_value + math.sqrt(
+                        abs(cur.position[0]-node.position[0])**2 +
+                        abs(cur.position[1]-node.position[1]))
+                    new_f_value = new_h_value + new_g_value
+                    if new_f_value > old_f_value:
+                        continue
+                    open_list.delete(node.position)
                 # if not in the list, create a node with cur note as parent
                 h_value = math.sqrt((pos[0]-end_pos[0])**2 + (pos[1]-end_pos[1])**2)
                 new_node = Node(pos, h_value, parent=cur)

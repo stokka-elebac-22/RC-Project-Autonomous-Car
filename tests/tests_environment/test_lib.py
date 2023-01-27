@@ -136,7 +136,8 @@ class TestBinarySearchList:
         for node in param[0]:
             bsn.insert(node)
         bsn.insert(param[1])
-        assert bsn.get() == exp
+        _, nodes = bsn.get()
+        assert nodes == exp
 
     @pytest.mark.parametrize(
         ['param', 'exp'],
@@ -180,9 +181,10 @@ class TestBinarySearchList:
         bsn = BinarySearchList()
         for node in param:
             bsn.insert(node)
-        values = bsn.get()
+        _, values = bsn.get()
         bsn.delete(values[0].position) # deleting the first element in the list
-        assert bsn.get() == exp[0]
+        _, nodes = bsn.get()
+        assert nodes == exp[0]
 
     def test_pop(self):
         '''Test pop'''
@@ -191,19 +193,22 @@ class TestBinarySearchList:
         for node in param:
             bsn.insert(node)
         node = bsn.pop()
-        assert bsn.get() == exp[0] and node is not None
+        _, nodes = bsn.get()
+        assert nodes == exp[0] and node is not None
         bsn.pop(1)
-        assert bsn.get() == exp[1]
+        _, nodes = bsn.get()
+        assert nodes == exp[1]
 
     @pytest.mark.parametrize(
         ['param', 'exp'],
         [
-            ([Node((0, 0), 1), (0, 0), (0, 1)], [True, False])
+            ([Node((0, 0), 1), (0, 0), (0, 1)], [True, Node((0, 0), 1), False])
         ]
     )
 
-    def test_contains(self, param, exp):
+    def test_get(self, param, exp):
         '''Test contains'''
         bsn = BinarySearchList()
         bsn.insert(param[0])
-        assert bsn.contains(param[1]) == exp[0] and bsn.contains(param[2]) == exp[1]
+        ret, node = bsn.get(param[1])
+        assert ret == exp[0] and node == exp[1] and bsn.get(param[2])[0] == exp[2]

@@ -24,10 +24,15 @@ class Objects:
     def _init_objects(self):
         '''Initializing the object dict'''
         obj = [
+            # Basic stars at 0
             ('None', 0),
             ('Hindrance', 1),
             ('Path', 2),
-            ('Stop', 3),
+            # Optional in map but necessary in a* start at 10
+            ('Car', 10),
+            ('QR', 11),
+            # Signs start at 20
+            ('Stop', 20),
         ]
         for i in obj:
             self.objects[i[0]] = i[1]
@@ -64,7 +69,23 @@ class Objects:
                 }
             },
             {
-                'id': 3,
+                'id': 10,
+                'name': 'Car',
+                'param': {
+                    'color': pg.Color(50, 200, 180),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 11,
+                'name': 'QR',
+                'param': {
+                    'color': pg.Color(150, 80, 180),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 20,
                 'name': 'Stop',
                 'param': {
                     'color': pg.Color(255, 0, 0),

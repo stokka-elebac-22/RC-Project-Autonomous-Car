@@ -29,6 +29,23 @@ class TestEnvironment:
         data = env.get_data()
         assert are_same(data, exp)
 
+    @pytest.mark.parametrize(
+        ['param', 'exp'],
+        [
+            (
+                [(3, 4), 1],
+                (3, 4)
+            )
+        ]
+    )
+
+    def test_find_pos(self, param, exp):
+        '''Test find position of object'''
+        env = Environment((5, 5), 1)
+        env.insert_object(param[0][0], param[0][1], param[1])
+        pos = env.find_pos(param[1])
+        assert pos == exp
+
 def are_same(mat1: np.array, mat2: np.array):
     '''Checks if matrix 1 and matrix 2 are identical'''
     if len(mat1) != len(mat2) or len(mat1[0]) != len(mat2[0]):

@@ -20,6 +20,14 @@ class Environment:
         # needs do send a copy of the map, else it will get modified
         return copy.copy(self.map)
 
+    def find_pos(self, object_id):
+        '''Find the position of the tile with corresponding id'''
+        for i, row in enumerate(self.map):
+            for j, col in enumerate(row):
+                if col == object_id:
+                    return (i, j)
+        return None
+
     def insert_object(self, distance_x, distance_y, object_id):
         '''Insert object'''
         if distance_y == 0:

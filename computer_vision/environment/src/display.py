@@ -19,23 +19,19 @@ class DisplayEnvironment:
         square_size = self.window_size[1] / self.board_size[0]
         self.board = Board((self.board_size[1], self.board_size[0]), square_size)
 
-    def display(self, data):
+    def display(self):
         '''
         Display the matrix
-        The input should be the data (matrix)
         '''
-        self.draw_grid(data)
+        # Draw the grid on the screen
+        self.board.draw(self.display_window)
 
     def update(self, data):
         '''Update the display'''
-        self.display(data)
+        self.board.reset(data)
         pg.display.update()
 
     def insert(self, pos, name):
         '''Insert a object into the map'''
         object_data = Objects().get_data(name)
         self.board.insert(pos, object_data.id)
-
-    def draw_grid(self, data):
-        '''Draw the grid on the screen'''
-        self.board.draw(self.display_window, data)

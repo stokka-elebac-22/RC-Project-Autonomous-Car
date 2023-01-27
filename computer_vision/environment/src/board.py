@@ -38,10 +38,13 @@ class Board:
             board.append(tmp)
         return board
 
-    def draw(self, window, new_board):
+    def draw(self, window):
         '''Draw'''
-        self.board = new_board
         self.draw_squares(window)
+
+    def reset(self, new_board):
+        '''Reset'''
+        self.board = new_board
 
     def insert(self, pos, value):
         '''Insert in board matrix'''

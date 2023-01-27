@@ -16,7 +16,6 @@ class Environment:
         if object_id is None:
             object_id = 0
         self.map[self.view_point[0], self.view_point[1]] = object_id
-        print(self.map)
 
     def update(self):
         '''Update the map'''
@@ -29,7 +28,7 @@ class Environment:
         # needs do send a copy of the map, else it will get modified
         return copy.copy(self.map)
 
-    def find_pos(self, object_id: int):
+    def get_pos(self, object_id: int):
         '''Find the position of the tile with corresponding id'''
         for i, row in enumerate(self.map):
             for j, col in enumerate(row):

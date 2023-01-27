@@ -39,9 +39,9 @@ class AStar:
             ]
             for pos in positions:
                 # checks if position is out of bounds
-                if pos[0] > size[0] - 1 or \
+                if pos[0] > size[1] - 1 or \
                     pos[0] < 0 or \
-                    pos[1] > size[1] - 1 or \
+                    pos[1] > size[0] - 1 or \
                     pos[1] < 0:
                     continue
                 # if finish node

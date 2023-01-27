@@ -43,11 +43,11 @@ class TestEnvironment:
         ]
     )
 
-    def test_find_pos(self, param, exp):
+    def test_get_pos(self, param, exp):
         '''Test find position of object'''
         env = Environment((5, 5), 1)
         env.insert_object(param[0], param[1])
-        pos = env.find_pos(param[1])
+        pos = env.get_pos(param[1])
         assert pos == exp
 
 def are_same(mat1: np.array, mat2: np.array):

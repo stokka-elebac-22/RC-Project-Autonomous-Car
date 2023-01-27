@@ -29,7 +29,7 @@ class Environment:
         map: the matrix
         '''
         # needs do send a copy of the map, else it will get modified
-        return copy.copy(self.map)
+        return copy.deepcopy(self.map)
 
     def get_pos(self, object_id: int):
         '''Find the position of the tile with corresponding id'''

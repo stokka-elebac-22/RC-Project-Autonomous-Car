@@ -1,6 +1,7 @@
 '''
 A star algorithm
 '''
+import math
 try:
     from lib import Node, BinarySearchList, Objects
 except ImportError:
@@ -18,7 +19,7 @@ class AStar:
         if mat is None:
             return None
         size = (len(mat[0]), len(mat))
-        h_value = (start_pos[0]-end_pos[0])**2 + (start_pos[1]-end_pos[1])**2
+        h_value = math.sqrt((start_pos[0]-end_pos[0])**2 + (start_pos[1]-end_pos[1])**2)
         start_node = Node(position=start_pos, h_value=h_value)
         open_list = BinarySearchList() # a list of possible candidates to be the next current node
         open_list.insert(start_node)
@@ -61,7 +62,7 @@ class AStar:
                 if open_list.contains(pos):
                     continue
                 # if not in the list, create a node with cur note as parent
-                h_value = (pos[0]-end_pos[0])**2 + (pos[1]-end_pos[1])**2
+                h_value = math.sqrt((pos[0]-end_pos[0])**2 + (pos[1]-end_pos[1])**2)
                 new_node = Node(pos, h_value, parent=cur)
                 # add the new node to the open list
                 open_list.insert(new_node)

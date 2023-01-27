@@ -158,7 +158,7 @@ class BinarySearchList:
                 if mid - 1 < low:
                     return mid
                 if arr[mid - 1].f_value < value.f_value:
-                    return mid - 1
+                    return mid
                 high = mid - 1
             else:
                 return mid

@@ -11,6 +11,9 @@ if __name__ == '__main__':
     environment = Environment(SIZE, 1)
     display = DisplayEnvironment(WINDOW_SIZE, SIZE)
 
+    # adding the 'car'
+    environment.insert_object(9, 5, )
+
     RUN = True
     while RUN:
         for event in pg.event.get():
@@ -21,7 +24,7 @@ if __name__ == '__main__':
                     environment.insert_object(5, 0, 1)
 
         cur_mat = environment.get_data()
-        path = AStar().get_data(cur_mat, (1, 1), (9, 1))
+        path = AStar().get_data(cur_mat, (1, 1), (9, 4))
 
         print(path)
 
@@ -29,5 +32,3 @@ if __name__ == '__main__':
             display.insert(values, 'Path')
 
         display.update(cur_mat)
-
-        break

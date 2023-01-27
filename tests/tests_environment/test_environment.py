@@ -38,14 +38,15 @@ class TestEnvironment:
     @pytest.mark.parametrize(
         ['param', 'exp'],
         [
-            # ([(3, 4), 1], (3, 4))
+            ([(3, 4), 1], None),
+            ([(2, 4), 1], (0, 4)),
         ]
     )
 
     def test_find_pos(self, param, exp):
         '''Test find position of object'''
         env = Environment((5, 5), 1)
-        env.insert_object(param[0][0], param[0][1], param[1])
+        env.insert_object(param[0], param[1])
         pos = env.find_pos(param[1])
         assert pos == exp
 

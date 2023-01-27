@@ -4,10 +4,14 @@ import numpy as np
 
 class Environment:
     '''Creating a 2 dimensional map of the 3 dimensional world'''
-    def __init__(self, size, real_size):
+    def __init__(self, size, real_size, view_point=None):
+        '''View point is the position in a 2d matrix where everyting should be relativ too'''
         self.size = size
         self.real_size = real_size # the real unit size per square
         self.map = np.zeros(size)
+        self.view_point = view_point
+        if view_point is None:
+            self.view_point = (self.size[0]-1, self.size[1]//2)
 
     def update(self):
         '''Update the map'''
@@ -20,22 +24,30 @@ class Environment:
         # needs do send a copy of the map, else it will get modified
         return copy.copy(self.map)
 
-    def find_pos(self, object_id):
+    def find_pos(self, object_id: int):
         '''Find the position of the tile with corresponding id'''
         for i, row in enumerate(self.map):
             for j, col in enumerate(row):
                 if col == object_id:
+                    print(col, i, j)
                     return (i, j)
         return None
 
-    def insert_object(self, distance_x, distance_y, object_id):
+    def insert_object(self, distance: float, object_id: int) -> bool:
         '''Insert object'''
-        if distance_y == 0:
-            row = self.size[1]//2
+        if distance[1] < 0:
+            # distance in y direction needs to be positive
+            return False
+        if distance[1] == 0:
+            row = self.view_point[0]-1 # so it does not collide with view point
         else:
-            row = (self.size[1]*self.real_size/2)//distance_y
-        if distance_x == 0:
-            col = self.size[0]//2
+            # Move it up the matrix (down in index), because assuming the viewpoint is upward
+            row = self.view_point[0] - distance[1]//self.real_size
+        if distance[0] == 0:
+            col = self.view_point[1]
         else:
-            col = self.size[0]*self.real_size//distance_x
+            col = self.view_point[1] + distance[0]//self.real_size
+        if row >= self.size[0] or row < 0 or col < 0 or col >= self.size[1]:
+            return False
         self.map[int(row)][int(col)] = object_id
+        return True

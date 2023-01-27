@@ -19,23 +19,26 @@ class TestEnvironment:
     @pytest.mark.parametrize(
         ['param', 'exp'],
         [
-            ([(3, 3), 0, 2, 1], [[0,1,0],[0,0,0],[0,0,0]])
+            ([(3, 3), None, 1, (0, 2), 1], [True, [[0,1,0],[0,0,0],[0,0,0]]]),
+            ([(3, 3), None, 1, (0, 1), 1], [True, [[0,0,0],[0,1,0],[0,0,0]]]),
+            ([(3, 3), None, 1, (3, 3), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
+            ([(3, 3), None, 2.5, (3, 5), 1], [True, [[0,0,1],[0,0,0],[0,0,0]]]),
+            ([(3, 3), (3, 2), 2.5, (3, 6), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
+            ([(3, 3), None, 2.5, (-2, 5), 1], [True, [[1,0,0],[0,0,0],[0,0,0]]]),
+            ([(3, 3), (3, 2), 2.5, (3, -1), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
         ]
     )
     def test_insert(self, param, exp):
         '''Testing inserting object into the environment'''
-        env = Environment(param[0], 1)
-        env.insert_object(param[1], param[2], param[3])
+        env = Environment(param[0], param[2], param[1])
+        ret = env.insert_object(param[3], param[4])
         data = env.get_data()
-        assert are_same(data, exp)
+        assert ret == exp[0] and are_same(data, exp[1])
 
     @pytest.mark.parametrize(
         ['param', 'exp'],
         [
-            (
-                [(3, 4), 1],
-                (3, 4)
-            )
+            # ([(3, 4), 1], (3, 4))
         ]
     )
 
@@ -51,7 +54,6 @@ def are_same(mat1: np.array, mat2: np.array):
     if len(mat1) != len(mat2) or len(mat1[0]) != len(mat2[0]):
         return False
 
-    print(mat1, mat2)
     for row1, row2 in zip(mat1, mat2):
         for col1, col2 in zip(row1, row2):
             if col1 != col2:

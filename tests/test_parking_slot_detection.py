@@ -20,8 +20,8 @@ class TestParametrized:
     @pytest.mark.parametrize('lines, expected', [
         ([np.array((20, 120, 400, 20)), np.array((20, 120, 400, 20)),
         np.array((123, 232, 234, 100))],
-         [[[(-0.26315789473684204, 125.26315789473685),
-            (-0.26315789473684204, 125.26315789473685)],
+         [[[(-0.26315789473684215, 125.26315789473688),
+            (-0.26315789473684215, 125.26315789473688)],
              [(-1.1891891891891888, 378.27027027027015)]],
             [[np.array([20, 120, 400,  20]), np.array([20, 120, 400,  20])],
              [np.array([123, 232, 234, 100])]]]),
@@ -35,16 +35,16 @@ class TestParametrized:
         for i, coords in enumerate(clustered_coords):
             assert (np.array(coords) == np.array(expected[1][i])).all()
 
-    @pytest.mark.parametrize('lines, coords, slope, intercept, expected', [
+    @pytest.mark.parametrize('lines, coords, expected', [
         ([[-1, 100], [1, 2]], [[123, 123, 321, 321], [123, 123, 321, 321]],
-         1, 1, [[[-1, 100], [1, 2]], [[123, 123, 321, 321], [123, 123, 321, 321]]]),
-        ([[-1, 100], [1, 200]], [[123, 123, 321, 321], [123, 123, 321, 321]], 1,
-         1, [[[-1, 100], [1, 200]], [[123, 123, 321, 321], [123, 123, 321, 321]]])
+         [[[-1, 100], [1, 2]], [[123, 123, 321, 321], [123, 123, 321, 321]]]),
+        ([[-1, 100], [1, 200]], [[123, 123, 321, 321], [123, 123, 321, 321]],
+        [[[-1, 100], [1, 200]], [[123, 123, 321, 321], [123, 123, 321, 321]]])
     ])
-    def test_filter_lines(self, lines, coords, slope, intercept, expected):
+    def test_filter_lines(self, lines, coords, expected):
         """Test filter_lines method of ParkingSlotDetector"""
         parking_slot_detector = ParkingSlotDetector()
-        parking_slot_detector.filter_lines(lines, coords, slope, intercept)
+        parking_slot_detector.filter_lines(lines, coords)
         assert lines == expected[0]
         assert coords == expected[1]
 

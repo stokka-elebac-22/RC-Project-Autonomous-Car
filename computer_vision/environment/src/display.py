@@ -1,7 +1,7 @@
 '''Display environment'''
 import pygame as pg
-from .board import Board
-from .lib import Objects
+from board import Board
+from lib import Objects
 
 class DisplayEnvironment:
     '''Displaying the environment with pygame'''
@@ -16,8 +16,8 @@ class DisplayEnvironment:
 
         self.fps = pg.time.Clock()
 
-        square_size = self.window_size[0] / self.board_size[0]
-        self.board = Board((self.board_size[0], self.board_size[1]), square_size)
+        square_size = self.window_size[1] / self.board_size[0]
+        self.board = Board((self.board_size[1], self.board_size[0]), square_size)
 
     def display(self, data):
         '''

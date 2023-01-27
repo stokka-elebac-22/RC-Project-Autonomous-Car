@@ -4,14 +4,19 @@ import numpy as np
 
 class Environment:
     '''Creating a 2 dimensional map of the 3 dimensional world'''
-    def __init__(self, size, real_size, view_point=None):
+    def __init__(self, size, real_size, view_point_object=None):
         '''View point is the position in a 2d matrix where everyting should be relativ too'''
         self.size = size
         self.real_size = real_size # the real unit size per square
         self.map = np.zeros(size)
-        self.view_point = view_point
-        if view_point is None:
+        self.view_point = view_point_object['view_point']
+        if self.view_point is None:
             self.view_point = (self.size[0]-1, self.size[1]//2)
+        object_id = view_point_object['object_id']
+        if object_id is None:
+            object_id = 0
+        self.map[self.view_point[0], self.view_point[1]] = object_id
+        print(self.map)
 
     def update(self):
         '''Update the map'''
@@ -29,12 +34,14 @@ class Environment:
         for i, row in enumerate(self.map):
             for j, col in enumerate(row):
                 if col == object_id:
-                    print(col, i, j)
                     return (i, j)
         return None
 
     def insert_object(self, distance: float, object_id: int) -> bool:
-        '''Insert object'''
+        '''
+        Insert object
+        The distance contains a x and y value (direction)
+        '''
         if distance[1] < 0:
             # distance in y direction needs to be positive
             return False

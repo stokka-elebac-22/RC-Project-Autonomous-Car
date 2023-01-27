@@ -1,6 +1,6 @@
 '''Creating the board'''
 import pygame as pg
-from .lib import Objects
+from lib import Objects
 
 class Board:
     '''Display Board'''
@@ -22,8 +22,8 @@ class Board:
                     window,
                     color,
                     pg.Rect(
-                        self.square_size * i,
                         self.square_size * j,
+                        self.square_size * i,
                         self.square_size,
                         self.square_size),
                         thickness)

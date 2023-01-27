@@ -6,14 +6,13 @@ from display import DisplayEnvironment
 from a_star import AStar
 
 if __name__ == '__main__':
-    SIZE = (10, 10)
-    WINDOW_SIZE = (500, 500)
-    environment = Environment(SIZE, 1)
+    SIZE = (10, 11)
+    WINDOW_SIZE = (660, 600)
+    # create the environment and adding the 'car'
+    environment = Environment(SIZE, 1, {'view_point': None, 'object_id': 10})
     display = DisplayEnvironment(WINDOW_SIZE, SIZE)
 
-    # adding the 'car'
-    environment.insert_object(9, 5, 10)
-    environment.insert_object(0, 8, 11)
+    environment.insert_object((0, 8), 11)
 
     RUN = True
     while RUN:
@@ -23,7 +22,6 @@ if __name__ == '__main__':
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_a:
                     pass
-                    # environment.insert_object(5, 0, 1)
 
         cur_mat = environment.get_data()
         path = AStar().get_data(cur_mat, (1, 1), (9, 4))

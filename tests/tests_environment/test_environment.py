@@ -23,9 +23,16 @@ class TestEnvironment:
             ([(3, 3), None, 1, (0, 1), 1], [True, [[0,0,0],[0,1,0],[0,0,0]]]),
             ([(3, 3), None, 1, (3, 3), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
             ([(3, 3), None, 2.5, (3, 5), 1], [True, [[0,0,1],[0,0,0],[0,0,0]]]),
-            ([(3, 3), (3, 2), 2.5, (3, 6), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
+            ([(3, 3), {'view_point': (2, 1),
+                        'object_id': 2},
+                        2.5, (3, 8), 1], [False, [[0,0,0],[0,0,0],[0,2,0]]]),
+            ([(3, 3), {'view_point': (2, 1),
+                        'object_id': 2},
+                        2.5, (3, 7), 1], [True, [[0,0,1],[0,0,0],[0,2,0]]]),
             ([(3, 3), None, 2.5, (-2, 5), 1], [True, [[1,0,0],[0,0,0],[0,0,0]]]),
-            ([(3, 3), (3, 2), 2.5, (3, -1), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
+            ([(3, 3), {'view_point': (2, 1),
+                        'object_id':2},
+                        2.5, (3, -1), 1], [False, [[0,0,0],[0,0,0],[0,2,0]]]),
         ]
     )
     def test_insert(self, param, exp):
@@ -33,6 +40,7 @@ class TestEnvironment:
         env = Environment(param[0], param[2], param[1])
         ret = env.insert(param[3], param[4])
         data = env.get_data()
+        print(data)
         assert ret == exp[0] and are_same(data, exp[1])
 
     @pytest.mark.parametrize(
@@ -42,9 +50,11 @@ class TestEnvironment:
             ([(3, 3), None, 1, (1, 1), 1], [True, [[0,0,0],[0,1,0],[0,0,0]]]),
             ([(3, 3), None, 1, (3, 3), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
             ([(3, 3), None, 2.5, (0, 2), 1], [True, [[0,0,1],[0,0,0],[0,0,0]]]),
-            ([(3, 3), (3, 2), 2.5, (3, 6), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
+            ([(3, 3), {'view_point': (2,1),
+                        'object_id': 2}, 2.5, (3, 6), 1], [False, [[0,0,0],[0,0,0],[0,2,0]]]),
             ([(3, 3), None, 2.5, (-2, 5), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
-            ([(3, 3), (3, 2), 2.5, (3, -1), 1], [False, [[0,0,0],[0,0,0],[0,0,0]]]),
+            ([(3, 3), {'view_point': (2,1),
+                        'object_id': 2}, 2.5, (3, -1), 1], [False, [[0,0,0],[0,0,0],[0,2,0]]]),
         ]
     )
 
@@ -66,7 +76,7 @@ class TestEnvironment:
     def test_get_pos(self, param, exp):
         '''Test find position of object'''
         env = Environment((5, 5), 1)
-        env.insert_object(param[0], param[1])
+        env.insert(param[0], param[1])
         pos = env.get_pos(param[1])
         assert pos == exp
 

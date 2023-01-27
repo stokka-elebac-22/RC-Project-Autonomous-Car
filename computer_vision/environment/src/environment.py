@@ -9,13 +9,16 @@ class Environment:
         self.size = size
         self.real_size = real_size # the real unit size per square
         self.map = np.zeros(size)
-        self.view_point = view_point_object['view_point']
-        if self.view_point is None:
-            self.view_point = (self.size[0]-1, self.size[1]//2)
-        object_id = view_point_object['object_id']
-        if object_id is None:
-            object_id = 0
-        self.map[self.view_point[0], self.view_point[1]] = object_id
+
+        self.view_point = (self.size[0]-1, self.size[1]//2)
+        object_id = 0
+
+        if view_point_object is not None:
+            if view_point_object['view_point'] is not None:
+                self.view_point = view_point_object['view_point']
+            if view_point_object['object_id'] is not None:
+                object_id = view_point_object['object_id']
+        self.map[self.view_point[0]][self.view_point[1]] = object_id
 
     def update(self):
         '''Update the map'''
@@ -60,7 +63,7 @@ class Environment:
 
     def insert_by_index(self, pos: int, object_id: int):
         '''Insert object by index'''
-        if pos[0] < 0 or pos[1] >= self.size[1] or pos[1] > 0 or pos[1] > self.size[1]:
+        if pos[0] < 0 or pos[0] >= self.size[0] or pos[1] < 0 or pos[1] > self.size[1]:
             return False
         self.map[pos[0]][pos[1]] = object_id
         return True

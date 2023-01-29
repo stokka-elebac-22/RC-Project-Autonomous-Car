@@ -1,6 +1,9 @@
 '''Creating the board'''
 import pygame as pg
-from lib import Objects
+try:
+    from lib import Objects
+except ImportError:
+    from .lib import Objects
 
 class Board:
     '''Display Board'''
@@ -15,15 +18,15 @@ class Board:
         window.fill(pg.Color(255, 255, 255))
         for i, row in enumerate(self.board):
             for j, col in enumerate(row):
-                data = Objects().get_data(int(col))
-                color = data.color
-                thickness = data.thickness
+                object_data = Objects().get_data(int(col))
+                color = object_data.color
+                thickness = object_data.thickness
                 pg.draw.rect(
                     window,
                     color,
                     pg.Rect(
-                        self.square_size * i,
                         self.square_size * j,
+                        self.square_size * i,
                         self.square_size,
                         self.square_size),
                         thickness)
@@ -38,7 +41,14 @@ class Board:
             board.append(tmp)
         return board
 
-    def draw(self, window, new_board):
+    def draw(self, window):
         '''Draw'''
-        self.board = new_board
         self.draw_squares(window)
+
+    def reset(self, new_board):
+        '''Reset'''
+        self.board = new_board
+
+    def insert(self, pos, value):
+        '''Insert in board matrix'''
+        self.board[pos[0]][pos[1]] = value

@@ -1,12 +1,24 @@
 '''Environment'''
+import copy
 import numpy as np
 
 class Environment:
     '''Creating a 2 dimensional map of the 3 dimensional world'''
-    def __init__(self, size, real_size):
+    def __init__(self, size, real_size, view_point_object=None):
+        '''View point is the position in a 2d matrix where everyting should be relativ too'''
         self.size = size
         self.real_size = real_size # the real unit size per square
         self.map = np.zeros(size)
+
+        self.view_point = (self.size[0]-1, self.size[1]//2)
+        object_id = 0
+
+        if view_point_object is not None:
+            if view_point_object['view_point'] is not None:
+                self.view_point = view_point_object['view_point']
+            if view_point_object['object_id'] is not None:
+                object_id = view_point_object['object_id']
+        self.map[self.view_point[0]][self.view_point[1]] = object_id
 
     def update(self):
         '''Update the map'''
@@ -16,17 +28,52 @@ class Environment:
         Returns the data
         map: the matrix
         '''
-        return self.map
+        # needs do send a copy of the map, else it will get modified
+        return copy.deepcopy(self.map)
 
-    def insert_object(self, distance_x, distance_y, object_id):
-        '''Insert object'''
-        if distance_y == 0:
-            row = self.size[1]//2
+    def get_pos(self, object_id: int):
+        '''Find the position of the tile with corresponding id'''
+        for i, row in enumerate(self.map):
+            for j, col in enumerate(row):
+                if col == object_id:
+                    return (i, j)
+        return None
+
+    def insert(self, distance: float, object_id: int) -> bool:
+        '''
+        Insert object
+        The distance contains a x and y value (direction)
+        '''
+        if distance[1] < 0:
+            # distance in y direction needs to be positive
+            return False
+        if distance[1] == 0:
+            row = self.view_point[0]-1 # so it does not collide with view point
         else:
-            row = -(self.size[1]*self.real_size/2)//distance_y
-        if distance_x == 0:
-            col = -1
+            # Move it up the matrix (down in index), because assuming the viewpoint is upward
+            row = self.view_point[0] - distance[1]//self.real_size
+        if distance[0] == 0:
+            col = self.view_point[1]
         else:
-            col = -self.size[0]*self.real_size//distance_x
-        self.map[row][col] = object_id
-        print(self.map)
+            col = self.view_point[1] + distance[0]//self.real_size
+        if row >= self.size[0] or row < 0 or col < 0 or col >= self.size[1]:
+            return False
+        self.map[int(row)][int(col)] = object_id
+        return True
+
+    def remove(self, object_id: int, remove_all=False):
+        '''Remove an object'''
+        for i, row in enumerate(self.map):
+            for j, col in enumerate(row):
+                if col == object_id:
+                    self.map[i][j] = 0
+                    if remove_all:
+                        continue
+                    return
+
+    def insert_by_index(self, pos: int, object_id: int):
+        '''Insert object by index'''
+        if pos[0] < 0 or pos[0] >= self.size[0] or pos[1] < 0 or pos[1] > self.size[1]:
+            return False
+        self.map[pos[0]][pos[1]] = object_id
+        return True

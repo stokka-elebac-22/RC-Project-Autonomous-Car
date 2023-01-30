@@ -58,7 +58,7 @@ class Ui(QtWidgets.QMainWindow):
         self.stop_sign_detector = TrafficSignDetector("stop_sign_model.xml")
 
         self.img_output = self.findChild(QtWidgets.QLabel, 'output_img')
-        
+        self.output_text = self.findChild(QtWidgets.QLabel, 'output_lbl')
         self.refresh_webcam_list()
 
         
@@ -81,18 +81,26 @@ class Ui(QtWidgets.QMainWindow):
         output_frame = cv_img
         qt_img = self.camera_handler.convert_cv_qt(cv_img, self.img_input[0].width(), self.img_input[0].height())
         current_qr_data = self.qr_code.get_data(cv_img)
+        output_data = "Data: \n"
         # print(current_qr_data)
         if (current_qr_data["ret"]):
-            self.qr_code.display(output_frame, current_qr_data)
+            self.qr_code.display(output_frame, current_qr_data, verbose=0)
+            for i in range(len(current_qr_data["distances"])):
+                output_data += \
+                    "QR-Code " + str(i) + "\n" + "Distance: {:.2f} \n Angle: {:.2f} \n".format(
+                        current_qr_data["distances"][i], current_qr_data["angles"][i])
+
+                output_data += "Data: " + current_qr_data["info"][i] + "\n"
         
         current_stop_sign = self.stop_sign_detector.detect_signs(cv_img)
         self.stop_sign_detector.show_signs(output_frame, current_stop_sign)
-        
+
         output_img = self.camera_handler.convert_cv_qt(cv_img, self.img_output.width(), self.img_output.height())
 
         # print("Setting new image")
         self.img_input[0].setPixmap(qt_img)
-        self.img_output.setPixmap(output_img)
+        self.img_output.setPixmap(output_img)	
+        self.output_text.setText(output_data)
 
     def refresh_webcam_list(self):
         """Run a Qthread to check possible webcams and create a list"""

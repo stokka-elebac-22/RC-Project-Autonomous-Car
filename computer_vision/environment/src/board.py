@@ -7,7 +7,7 @@ except ImportError:
 
 class Board:
     '''Display Board'''
-    def __init__(self, dimensions: tuple(int, int), square_size: int):
+    def __init__(self, dimensions: tuple[int, int], square_size: int):
         self.rows = dimensions[0]
         self.cols = dimensions[1]
         self.square_size = square_size
@@ -49,6 +49,6 @@ class Board:
         '''Reset'''
         self.board = new_board
 
-    def insert(self, pos: tuple(int, int), value: int):
+    def insert(self, pos: tuple[int, int], value: int):
         '''Insert in board matrix'''
         self.board[pos[0]][pos[1]] = value

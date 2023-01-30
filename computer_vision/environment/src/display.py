@@ -10,7 +10,7 @@ except ImportError:
 
 class DisplayEnvironment:
     '''Displaying the environment with pygame'''
-    def __init__(self, window_size: tuple(int, int), board_size: tuple(int, int), caption: str=''):
+    def __init__(self, window_size: tuple[int, int], board_size: tuple[int, int], caption: str=''):
         self.window_size = window_size
         self.board_size = board_size
 
@@ -31,7 +31,7 @@ class DisplayEnvironment:
         # Draw the grid on the screen
         self.board.draw(self.display_window)
 
-    def update(self, board: np.dnarray):
+    def update(self, board: np.ndarray):
         '''Update the display'''
         self.board.reset(board)
         pg.display.update()

@@ -1,8 +1,8 @@
 '''Library'''
+from typing import TypedDict
 import dataclasses
 import math
 import pygame as pg
-from typing import TypedDict
 
 ObjectParam = TypedDict('ObjectParam', {
     'color': pg.Color,
@@ -140,7 +140,7 @@ class TwoWayDict(dict):
 @dataclasses.dataclass
 class Node:
     '''Node'''
-    def __init__(self, position: tuple(int, int),
+    def __init__(self, position: tuple[int, int],
                 h_value: float, parent=None, f_value: int=None) -> None:
         self.position = position
         self.parent: Node = parent

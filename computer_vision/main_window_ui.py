@@ -12,6 +12,8 @@ import sys
 # import time
 # from defines import *
 from camera_handler.camera_handler import CameraHandler, VideoThread
+from traffic_sign_detection.main import TrafficSignDetector
+from qr_code.qr_code import QRCode, DisplayQRCode
 from PyQt6 import QtWidgets, uic, QtCore
 from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
 # from pyqtgraph import PlotWidget, plot
@@ -48,6 +50,15 @@ class Ui(QtWidgets.QMainWindow):
             self.findChild(QtWidgets.QLabel, 'input_img_1'),
             self.findChild(QtWidgets.QLabel, 'input_img_2')
         ]
+
+        QR_SIZE_PX = 76
+        QR_SIZE_MM = 52
+        QR_DISTANCE = 500
+        self.qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+        self.stop_sign_detector = TrafficSignDetector("stop_sign_model.xml")
+
+        self.img_output = self.findChild(QtWidgets.QLabel, 'output_img')
+        
         self.refresh_webcam_list()
 
         
@@ -67,9 +78,21 @@ class Ui(QtWidgets.QMainWindow):
     @pyqtSlot(np.ndarray)    
     def update_image(self, cv_img):
         """Updates the image_label with a new opencv image"""
+        output_frame = cv_img
         qt_img = self.camera_handler.convert_cv_qt(cv_img, self.img_input[0].width(), self.img_input[0].height())
+        current_qr_data = self.qr_code.get_data(cv_img)
+        # print(current_qr_data)
+        if (current_qr_data["ret"]):
+            self.qr_code.display(output_frame, current_qr_data)
+        
+        current_stop_sign = self.stop_sign_detector.detect_signs(cv_img)
+        self.stop_sign_detector.show_signs(output_frame, current_stop_sign)
+        
+        output_img = self.camera_handler.convert_cv_qt(cv_img, self.img_output.width(), self.img_output.height())
+
         # print("Setting new image")
         self.img_input[0].setPixmap(qt_img)
+        self.img_output.setPixmap(output_img)
 
     def refresh_webcam_list(self):
         """Run a Qthread to check possible webcams and create a list"""

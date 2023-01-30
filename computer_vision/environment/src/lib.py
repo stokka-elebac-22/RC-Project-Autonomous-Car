@@ -1,5 +1,6 @@
 '''Library'''
 import dataclasses
+import math
 import pygame as pg
 
 @dataclasses.dataclass
@@ -24,8 +25,15 @@ class Objects:
     def _init_objects(self):
         '''Initializing the object dict'''
         obj = [
+            # Basic stars at 0
             ('None', 0),
-            ('Stop', 1)
+            ('Hindrance', 1),
+            ('Path', 2),
+            # Optional in map but necessary in a* start at 10
+            ('Car', 10),
+            ('QR', 11),
+            # Signs start at 20
+            ('Stop', 20),
         ]
         for i in obj:
             self.objects[i[0]] = i[1]
@@ -47,6 +55,38 @@ class Objects:
             },
             {
                 'id': 1,
+                'name': 'Hindrance',
+                'param': {
+                    'color': pg.Color(0, 0, 0),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 2,
+                'name': 'Path',
+                'param': {
+                    'color': pg.Color(50, 80, 180),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 10,
+                'name': 'Car',
+                'param': {
+                    'color': pg.Color(50, 200, 180),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 11,
+                'name': 'QR',
+                'param': {
+                    'color': pg.Color(150, 80, 180),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 20,
                 'name': 'Stop',
                 'param': {
                     'color': pg.Color(255, 0, 0),
@@ -64,11 +104,9 @@ class Objects:
         Each object have:
         color, thickness
         '''
-        if not isinstance(obj, int):
+        if not isinstance(obj, (int, float)):
             obj = self.objects[obj] # convert to correct keyname
-        return self.object_data[obj]
-
-
+        return self.object_data[int(obj)]
 
 
 class TwoWayDict(dict):
@@ -90,5 +128,114 @@ class TwoWayDict(dict):
         dict.__delitem__(self, key)
 
     def __len__(self):
-        """Returns the number of connections"""
+        '''Returns the number of connections'''
         return dict.__len__(self) // 2
+
+@dataclasses.dataclass
+class Node:
+    '''Node'''
+    # newid = itertools.count().__next__
+    def __init__(self, position, h_value, parent=None, f_value=None) -> None:
+        # self.id = Node.newid() # pylint: disable=C0103
+        self.position = position
+        self.parent: Node = parent
+
+        self.g_value = 0
+        self.h_value = h_value
+
+        if self.parent is not None:
+            self.g_value = self.parent.g_value + math.sqrt(
+                abs(self.parent.position[0]-self.position[0])**2 +
+                abs(self.parent.position[1]-self.position[1]))
+        self.f_value = f_value
+        if f_value is None: # rarly used
+            self.f_value = self.g_value + self.h_value
+
+    def update(self):
+        '''Update the node'''
+        self.g_value = 0
+        if self.parent is not None:
+            self.g_value = self.parent.g_value + math.sqrt(
+                abs(self.parent.position[0]-self.position[0])**2 +
+                abs(self.parent.position[1]-self.position[1]))
+        self.f_value = self.g_value + self.h_value
+
+    def __eq__(self, other):
+        return self.position == other.position
+
+
+class BinarySearchList:
+    '''
+    This is a binary search class (just because I could not find a library
+    that contained this type of list where you could sort by a key from another class
+    '''
+    def __init__(self):
+        self.__items = []
+
+    def __binary_search(self, value: Node):
+        '''
+        Binary Search
+        https://www.geeksforgeeks.org/python-program-for-binary-search/
+        '''
+        arr = self.__items
+        low = 0
+        high = len(arr) - 1
+        mid = 0
+
+        while low <= high:
+            mid = (high+low) // 2
+            if arr[mid].f_value < value.f_value:
+                if mid + 1 > high or arr[mid + 1].f_value > value.f_value:
+                    return mid + 1
+                low = mid + 1
+            elif arr[mid].f_value > value.f_value:
+                if mid - 1 < low:
+                    return mid
+                if arr[mid - 1].f_value < value.f_value:
+                    return mid
+                high = mid - 1
+            else:
+                return mid
+        return -1
+
+    def insert(self, new_node: Node):
+        '''Inserting the Node object'''
+        index = self.__binary_search(new_node)
+        self.__items.insert(index, new_node)
+
+    def delete(self, pos: int):
+        '''
+        Removes the Node with specific id
+        Per now, it is gonna be O(n)
+        '''
+        for i, item in enumerate(self.__items):
+            if item.position == pos:
+                del self.__items[i]
+                return
+
+    def pop(self, index: int=-1):
+        '''
+        Removes the element at a specific index
+        and returns it
+        By default it will remove the last element
+        '''
+        return self.__items.pop(index)
+
+    def get(self, pos: int=None):
+        '''Check if a Node exist in the list (same position)'''
+        if pos is None:
+            return True, self.__items
+        for node in self.__items:
+            if node.position == pos:
+                return True, node
+        return False, None
+
+    def get_by_index(self, index: int=None):
+        '''Returns the list'''
+        if index is None:
+            return self.__items
+        return self.__items[index]
+
+    def __len__(self):
+        '''Returns the length'''
+        return len(self.__items)

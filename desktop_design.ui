@@ -28,7 +28,7 @@
         <item>
          <layout class="QVBoxLayout" name="output_layout" stretch="1,0,1">
           <item>
-           <widget class="QGraphicsView" name="output_img"/>
+           <widget class="QLabel" name="output_img"/>
           </item>
           <item>
            <widget class="QLabel" name="lbl_output_description">
@@ -69,7 +69,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QGraphicsView" name="input_img_1"/>
+               <widget class="QLabel" name="input_img_1"/>
               </item>
               <item>
                <widget class="QComboBox" name="input_cbo_1"/>
@@ -86,7 +86,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QGraphicsView" name="input_img_2"/>
+               <widget class="QLabel" name="input_img_2"/>
               </item>
               <item>
                <widget class="QComboBox" name="input_cbo_2"/>

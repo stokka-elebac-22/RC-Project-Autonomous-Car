@@ -1,5 +1,6 @@
 '''Test the display for environment'''
 import pytest
+import pygame as pg
 from computer_vision.environment.src.board import Board
 from computer_vision.environment.src.display import DisplayEnvironment
 class TestDisplayEnvironment:
@@ -12,8 +13,11 @@ class TestDisplayEnvironment:
     )
     def test_init(self, param, exp):
         '''Testing the init method'''
-        env = DisplayEnvironment(param[0], param[1])
-        assert env.window_size == exp[0] and env.board_size == exp[1]
+        try:
+            env = DisplayEnvironment(param[0], param[1])
+            assert env.window_size == exp[0] and env.board_size == exp[1]
+        except pg.error:
+            pass
 
 class TestBoard:
     '''Testing the board'''

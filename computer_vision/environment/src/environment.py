@@ -1,10 +1,15 @@
 '''Environment'''
+from typing import TypedDict
 import copy
 import numpy as np
 
+ViewPointObject = TypedDict('ViewPointObject', {
+    'view_point': tuple[int, int],
+    'object_id': int,
+})
 class Environment:
     '''Creating a 2 dimensional map of the 3 dimensional world'''
-    def __init__(self, size, real_size, view_point_object=None):
+    def __init__(self, size: tuple[int, int], real_size: float, view_point_object=None):
         '''View point is the position in a 2d matrix where everyting should be relativ too'''
         self.size = size
         self.real_size = real_size # the real unit size per square
@@ -39,7 +44,7 @@ class Environment:
                     return (i, j)
         return None
 
-    def insert(self, distance: float, object_id: int) -> bool:
+    def insert(self, distance: tuple[float, float], object_id: int) -> bool:
         '''
         Insert object
         The distance contains a x and y value (direction)
@@ -61,7 +66,7 @@ class Environment:
         self.map[int(row)][int(col)] = object_id
         return True
 
-    def remove(self, object_id: int, remove_all=False):
+    def remove(self, object_id: int, remove_all: bool=False):
         '''Remove an object'''
         for i, row in enumerate(self.map):
             for j, col in enumerate(row):
@@ -71,7 +76,7 @@ class Environment:
                         continue
                     return
 
-    def insert_by_index(self, pos: int, object_id: int):
+    def insert_by_index(self, pos: tuple[int, int], object_id: int):
         '''Insert object by index'''
         if pos[0] < 0 or pos[0] >= self.size[0] or pos[1] < 0 or pos[1] > self.size[1]:
             return False

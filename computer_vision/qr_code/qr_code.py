@@ -1,5 +1,7 @@
 """QR code module."""
 import dataclasses
+from typing import TypedDict
+import numpy as np
 import cv2 as cv
 
 @dataclasses.dataclass
@@ -65,6 +67,20 @@ class QRGeometry:
         distance = (self.qr_size_mm * focal_length) / height_px
         return distance
 
+QRData = TypedDict('QRData', {
+    'ret': bool,
+    'distances': list[float],
+    'angles': list[float],
+    'info': list[str],
+    'points': list[tuple()],
+    'rest': int,
+})
+
+DisplayData = TypedDict('DisplayData', {
+    'distances': list[float],
+    'angles': list[float],
+    'info': list[str],
+})
 
 class QRCode:
     """QRCode, doing calculations for QR code placement estimation."""
@@ -77,14 +93,16 @@ class QRCode:
 #            p1 ---------- p0
 #                    a
 
-    def __init__(self, size_px, size_mm, distance, pts=None):
+    def __init__(self, size_px: int, size_mm: int, distance, pts=None):
         self.size_px = size_px
         self.size_mm = size_mm
         self.distance = distance
         self.qr_geometries = [QRGeometry(size_px, size_mm, distance, pts)]
         self.qr_display = DisplayQRCode()
 
-    def get_data(self, frame):
+
+
+    def get_data(self, frame: np.ndarray) -> QRData:
         """Update values
         The resize variable is only relevant if not using video
         This function returns in a dict:
@@ -130,7 +148,7 @@ class QRCode:
             'rest': rest_qr
             }
 
-    def display(self, frame, data, verbose=1):
+    def display(self, frame: np.ndarray, data: DisplayData, verbose=1):
         """Displays the qr code with data"""
         self.qr_display.display(
             frame,
@@ -150,7 +168,7 @@ class DisplayQRCode:
         self.text_color = (255, 0, 255)
         self.text_thickness = 1
 
-    def display(self, frame, qrgs: QRGeometry, data, verbose=1):
+    def display(self, frame: np.ndarray, qrgs: QRGeometry, data: DisplayData, verbose: int=1):
         """
         Display
         returns a frame
@@ -175,7 +193,12 @@ class DisplayQRCode:
                 self.display_values(frame, qrg, display_data, verbose)
         return frame
 
-    def display_values(self, frame, qrg: QRGeometry, data, verbose=1):
+    DisplayInfoData = TypedDict('DisplayInfoData', {
+        'distance': int,
+        'angle': int,
+    })
+
+    def display_values(self, frame, qrg: QRGeometry, data: DisplayData, verbose: int=1):
         """Display values"""
         if verbose > 1:
             text_location_a = (int(min(qrg.points[0][0], qrg.points[1][0]) + \
@@ -203,7 +226,7 @@ class DisplayQRCode:
         cv.putText(frame, f'distance = {int(distance)}', (10, 50), \
                 self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
-def local_read_camera(name=None, resize=1):
+def local_read_camera(name: str=None, resize: int=1):
     """Local read camera """
     if not name:
         ret, frame = cap.read()

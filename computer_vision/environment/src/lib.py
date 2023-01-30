@@ -32,6 +32,7 @@ class Objects:
             # Optional in map but necessary in a* start at 10
             ('Car', 10),
             ('QR', 11),
+            ('EndPoint', 12),
             # Signs start at 20
             ('Stop', 20),
         ]
@@ -82,6 +83,14 @@ class Objects:
                 'name': 'QR',
                 'param': {
                     'color': pg.Color(150, 80, 180),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 12,
+                'name': 'EndPoint',
+                'param': {
+                    'color': pg.Color(22, 80, 22),
                     'thickness': 0
                 }
             },

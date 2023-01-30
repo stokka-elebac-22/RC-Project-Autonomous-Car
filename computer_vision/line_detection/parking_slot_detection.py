@@ -5,8 +5,10 @@ import sys
 import os
 import cv2
 import numpy as np
-#from main import LineDetector
-from computer_vision.line_detection.main import LineDetector
+try:
+    from main import LineDetector
+except ImportError:
+    from computer_vision.line_detection.main import LineDetector
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)

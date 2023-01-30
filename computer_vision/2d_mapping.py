@@ -1,4 +1,3 @@
-
 '''Main'''
 import cv2 as cv
 import pygame as pg

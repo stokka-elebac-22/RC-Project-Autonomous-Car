@@ -73,7 +73,7 @@ QRData = TypedDict('QRData', {
     'angles': list[float],
     'info': list[str],
     'points': list[tuple()],
-    'rest': tuple(),
+    'rest': int,
 })
 
 DisplayData = TypedDict('DisplayData', {

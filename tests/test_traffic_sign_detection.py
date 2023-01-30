@@ -1,7 +1,7 @@
 """Importing needed libraries"""
 import pytest
 import cv2
-from computer_vision.traffic_sign_detection.src.main import TrafficSignDetector
+from computer_vision.traffic_sign_detection.main import TrafficSignDetector
 PATH = "tests/images/traffic_sign"
 
 cases_ok = [

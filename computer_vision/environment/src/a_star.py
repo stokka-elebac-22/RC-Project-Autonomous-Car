@@ -2,6 +2,7 @@
 A star algorithm
 '''
 import math
+import numpy as np
 try:
     from lib import Node, BinarySearchList, Objects
 except ImportError:
@@ -12,7 +13,8 @@ class AStar:
     def __init__(self):
         self.valid = ['None'] # a list of object names that are valid
 
-    def find_path(self, mat, start_pos, end_pos) -> Node:
+    def find_path(self, mat: np.ndarray, start_pos: tuple(int, int),
+        end_pos: tuple(int, int)) -> Node:
         '''Returns the start node'''
         # The f_value will be the total distance and calculated with pythagoras
         # without the square root
@@ -80,7 +82,7 @@ class AStar:
 
         return cur
 
-    def get_data(self, mat, start_pos, end_pos):
+    def get_data(self, mat: np.ndarray, start_pos: tuple(int, int), end_pos: tuple(int, int)):
         '''Returns a path list'''
         if start_pos is None or end_pos is None:
             return False, None

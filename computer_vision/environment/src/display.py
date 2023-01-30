@@ -1,5 +1,6 @@
 '''Display environment'''
 import pygame as pg
+import numpy as np
 try:
     from board import Board
     from lib import Objects
@@ -9,7 +10,7 @@ except ImportError:
 
 class DisplayEnvironment:
     '''Displaying the environment with pygame'''
-    def __init__(self, window_size, board_size, caption=''):
+    def __init__(self, window_size: tuple(int, int), board_size: tuple(int, int), caption: str=''):
         self.window_size = window_size
         self.board_size = board_size
 
@@ -30,9 +31,9 @@ class DisplayEnvironment:
         # Draw the grid on the screen
         self.board.draw(self.display_window)
 
-    def update(self, data):
+    def update(self, board: np.dnarray):
         '''Update the display'''
-        self.board.reset(data)
+        self.board.reset(board)
         pg.display.update()
 
     def insert(self, pos, name):

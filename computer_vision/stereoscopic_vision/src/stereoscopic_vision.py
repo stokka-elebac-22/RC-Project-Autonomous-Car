@@ -170,8 +170,8 @@ if __name__ == '__main__':
 
     # NOTE: if you also have a webcam (that you do not want to use),
     # use id 0 and 2 (not always the case....)
-    cam_left = Camera(camera_id=1, window_name='Left camera')
-    cam_right = Camera(camera_id=0, window_name='Right camera')
+    cam_left = Camera(camera_id=2, window_name='Right camera')
+    cam_right = Camera(camera_id=1, window_name='Left camera')
     stereo_vision = StereoscopicVision(MAPS_PATH, PARAMETER_PATH)
 
     cv.namedWindow('disp', cv.WINDOW_NORMAL)

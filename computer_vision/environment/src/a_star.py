@@ -13,7 +13,7 @@ class AStar:
     def __init__(self, weight: int=0, penalty: int=1):
         self.valid = ['None'] # a list of object names that are valid
         self.weight = weight
-        self.penalty = 1
+        self.penalty = penalty
 
     def find_path(self, mat: np.ndarray, start_pos: tuple[int, int],
         end_pos: tuple[int, int]) -> list[Node]:
@@ -88,7 +88,8 @@ class AStar:
                 # if not in the list, create a node with cur note as parent
                 h_value = math.sqrt((pos[0]-end_pos[0])**2 + (pos[1]-end_pos[1])**2)
                 new_node = Node(pos, h_value, parent=cur)
-                new_node.f_value += weighted_mat[pos[0]][pos[1]]
+                if weighted_mat is not None:
+                    new_node.f_value += weighted_mat[pos[0]][pos[1]]
                 # add the new node to the open list
                 open_list.insert(new_node)
             # sets the value to 1 (hindrance) so it can not be used again

@@ -108,7 +108,6 @@ class AStar:
                     positions.add((pos[0]*i, pos[1]*j))
 
         objects = Objects()
-        valid_id = [objects.get_data(obj).id for obj in self.valid]
 
         # NEED TO IMPROVE THIS!
         for row in range(size[0]):
@@ -125,9 +124,9 @@ class AStar:
                             idx_y > size[0] - 1 or \
                             idx_y < 0:
                             continue
-                        if mat[idx_y][idx_x] in valid_id:
-                            weighted_mat[idx_y][idx_x][1] += \
-                                self.weight - max(abs(pos[0]), abs(pos[1])) + 1
+                        weighted_mat[idx_y][idx_x] += \
+                            self.weight - max(abs(pos[0]), abs(pos[1])) + 1
+        print(weighted_mat)
         return weighted_mat
 
 

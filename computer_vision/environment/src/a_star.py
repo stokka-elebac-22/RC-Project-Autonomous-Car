@@ -23,8 +23,9 @@ class AStar:
             return None
 
         # if weight is not 0, create a weight matrix
+        weighted_mat = None
         if self.weight != 0:
-            mat = self.create_weight_matrix(mat)
+            weighted_mat = self.create_weight_matrix(mat)
 
         size = (len(mat[0]), len(mat))
         h_value = math.sqrt((start_pos[0]-end_pos[0])**2 + (start_pos[1]-end_pos[1])**2)
@@ -96,13 +97,8 @@ class AStar:
         if mat is None or len(mat) == 0 or len(mat[0]) == 0:
             return
         size = (len(mat), len(mat[0]))
-        # new_matrix = np.full((size[0], size[1]), (0,0), dtype=(int,int))
-        new_matrix = []
-        # create the new matrix
-        for row in range(size[0]):
-            new_matrix.append([])
-            for col in range(size[1]):
-                new_matrix[row].append([0,0])
+        # weighted_mat = np.full((size[0], size[1]), (0,0), dtype=(int,int))
+        weighted_mat = np.zeros((size[0], size[1]), dtype=int)
 
         diff_pos = [(1,-1),(1,0),(1,1),(0,-1),(0,0),(0,1),(-1,-1),(-1,0),(-1,1)]
         positions = set()
@@ -119,9 +115,6 @@ class AStar:
             for col in range(size[1]):
                 # checks if it is a hindrance and then applies a weight to the tiles around
                 if mat[row][col] == 1:
-                    # add the value to the new matrix
-                    new_matrix[row][col][0] = 1
-                    # row and col of the mini matrix
                     # checks all surronding positions
                     for pos in positions:
                         idx_x = col + pos[0]
@@ -133,10 +126,9 @@ class AStar:
                             idx_y < 0:
                             continue
                         if mat[idx_y][idx_x] in valid_id:
-                            new_matrix[idx_y][idx_x][1] += \
+                            weighted_mat[idx_y][idx_x][1] += \
                                 self.weight - max(abs(pos[0]), abs(pos[1])) + 1
-        print(new_matrix)
-        return new_matrix
+        return weighted_mat
 
 
     def get_data(self, mat: np.ndarray, start_pos: tuple[int, int], end_pos: tuple[int, int]):

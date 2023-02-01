@@ -10,21 +10,29 @@ except ImportError:
 
 class AStar:
     '''A* Algorithm'''
-    def __init__(self):
+    def __init__(self, weight: int=0):
         self.valid = ['None'] # a list of object names that are valid
+        self.weight = weight
 
     def find_path(self, mat: np.ndarray, start_pos: tuple[int, int],
-        end_pos: tuple[int, int]) -> Node:
+        end_pos: tuple[int, int]) -> list[Node]:
         '''Returns the start node'''
         # The f_value will be the total distance and calculated with pythagoras
         # without the square root
         if mat is None:
             return None
+
+        # if weight is not 0, create a weight matrix
+        if self.weight != 0:
+            mat = self.create_weight_matrix(mat)
+
         size = (len(mat[0]), len(mat))
         h_value = math.sqrt((start_pos[0]-end_pos[0])**2 + (start_pos[1]-end_pos[1])**2)
         start_node = Node(position=start_pos, h_value=h_value)
         open_list = BinarySearchList() # a list of possible candidates to be the next current node
         open_list.insert(start_node)
+
+        objects = Objects()
 
         while True:
             if len(open_list) == 0:
@@ -56,7 +64,7 @@ class AStar:
                     return finish_node
                 # checks if tile is valid
                 object_id = mat[pos[0]][pos[1]]
-                object_data = Objects().get_data(object_id)
+                object_data = objects.get_data(object_id)
                 # if the object is a hindrance(not valid)
                 if object_data.name not in self.valid:
                     continue
@@ -81,6 +89,55 @@ class AStar:
             mat[cur.position[0]][cur.position[1]] = 1
 
         return cur
+
+    def create_weight_matrix(self, mat: np.ndarray) -> np.ndarray:
+        '''Creating a weighted matrix'''
+        # checks if the matrix is valid
+        if mat is None or len(mat) == 0 or len(mat[0]) == 0:
+            return
+        size = (len(mat), len(mat[0]))
+        # new_matrix = np.full((size[0], size[1]), (0,0), dtype=(int,int))
+        new_matrix = []
+        # create the new matrix
+        for row in range(size[0]):
+            new_matrix.append([])
+            for col in range(size[1]):
+                new_matrix[row].append([0,0])
+
+        diff_pos = [(1,-1),(1,0),(1,1),(0,-1),(0,0),(0,1),(-1,-1),(-1,0),(-1,1)]
+        positions = set()
+        for i in range(self.weight+1):
+            for j in range(self.weight+1):
+                for pos in diff_pos:
+                    positions.add((pos[0]*i, pos[1]*j))
+
+        objects = Objects()
+        valid_id = [objects.get_data(obj).id for obj in self.valid]
+
+        # NEED TO IMPROVE THIS!
+        for row in range(size[0]):
+            for col in range(size[1]):
+                # checks if it is a hindrance and then applies a weight to the tiles around
+                if mat[row][col] == 1:
+                    # add the value to the new matrix
+                    new_matrix[row][col][0] = 1
+                    # row and col of the mini matrix
+                    # checks all surronding positions
+                    for pos in positions:
+                        idx_x = col + pos[0]
+                        idx_y = row + pos[1]
+                        # checks if position is out of bounds
+                        if idx_x > size[1] - 1 or \
+                            idx_x < 0 or \
+                            idx_y > size[0] - 1 or \
+                            idx_y < 0:
+                            continue
+                        if mat[idx_y][idx_x] in valid_id:
+                            new_matrix[idx_y][idx_x][1] += \
+                                self.weight - max(abs(pos[0]), abs(pos[1])) + 1
+        print(new_matrix)
+        return new_matrix
+
 
     def get_data(self, mat: np.ndarray, start_pos: tuple[int, int], end_pos: tuple[int, int]):
         '''Returns a path list'''

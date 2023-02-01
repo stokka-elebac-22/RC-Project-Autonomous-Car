@@ -104,7 +104,7 @@ class Objects:
             new_object = Object(i['id'], i['name'], i['param'])
             self.object_data[i['id']] = new_object
 
-    def get_data(self, obj: Object):
+    def get_data(self, obj: Object) -> Object:
         '''
         Get the data of the object
         Each object have:

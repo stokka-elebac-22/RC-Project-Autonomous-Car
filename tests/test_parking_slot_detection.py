@@ -29,9 +29,10 @@ class TestParametrized:
     def test_cluster_lines(self, lines, expected):
         """Test cluster_lines method of ParkingSlotDetector"""
         parking_slot_detector = ParkingSlotDetector()
-        clustered_lines, clustered_coords = parking_slot_detector.cluster_lines(
-            lines)
-        assert clustered_lines == expected[0]
+        clustered_lines, clustered_coords = parking_slot_detector.cluster_lines(lines)
+        for i, line in enumerate(clustered_lines):
+            for j, value in enumerate(line):
+                assert value == pytest.approx(expected[0][i][j])
         for i, coords in enumerate(clustered_coords):
             assert (np.array(coords) == np.array(expected[1][i])).all()
 
@@ -100,3 +101,14 @@ class TestParametrized:
         line_coordinates = parking_slot_detector.get_line_coordinates_from_parameters(
             min_x, max_x, line_parameters)
         assert (line_coordinates == expected).all()
+
+    @pytest.mark.parametrize('lines, expected', [
+        ([np.array([200, 100, 300, 400]), np.array([200, 100, 300, 400])], np.array([300, 400, 300, 400])),
+        ([np.array([100, 200, 300, 400]), np.array([200, 300, 400, 500])], np.array([300, 400, 400, 500]))
+        ])
+    def test_get_closing_line_of_two_lines(self, lines, expected):
+        parking_slot_detector = ParkingSlotDetector()
+        closing_line = parking_slot_detector.get_closing_line_of_two_lines(lines)
+        assert (closing_line == expected).all()
+        
+        

@@ -2,6 +2,7 @@
 A star algorithm
 '''
 import math
+import numpy as np
 try:
     from lib import Node, BinarySearchList, Objects
 except ImportError:
@@ -12,7 +13,8 @@ class AStar:
     def __init__(self):
         self.valid = ['None'] # a list of object names that are valid
 
-    def find_path(self, mat, start_pos, end_pos) -> Node:
+    def find_path(self, mat: np.ndarray, start_pos: tuple[int, int],
+        end_pos: tuple[int, int]) -> Node:
         '''Returns the start node'''
         # The f_value will be the total distance and calculated with pythagoras
         # without the square root
@@ -35,13 +37,23 @@ class AStar:
                 (pos[0]-1, pos[1]),
                 (pos[0]+1, pos[1]),
                 (pos[0], pos[1]-1),
+                (pos[0], pos[1]+1),
                 (pos[0]-1, pos[1]-1),
                 (pos[0]+1, pos[1]-1),
-                (pos[0], pos[1]+1),
                 (pos[0]-1, pos[1]+1),
                 (pos[0]+1, pos[1]+1),
             ]
-            for pos in positions:
+            constraints = [
+                [],
+                [],
+                [],
+                [],
+                [0, 2],
+                [2, 1],
+                [0, 3],
+                [1, 3]
+            ]
+            for i, pos in enumerate(positions):
                 # checks if position is out of bounds
                 if pos[0] > size[1] - 1 or \
                     pos[0] < 0 or \
@@ -53,6 +65,24 @@ class AStar:
                     finish_node = Node(pos, 0, parent=cur)
                     return finish_node
                 # checks if tile is valid
+
+                obstacles_detected = []
+                for con in constraints[i]:
+                    pos_x = positions[con][0]
+                    pos_y = positions[con][1]
+                    if pos_x > size[1] - 1 or \
+                        pos_x < 0 or \
+                        pos_y > size[0] - 1 or \
+                        pos_y < 0:
+                        obstacles_detected.append(True)
+                        continue
+                    con_object_id = mat[pos_x][pos_y]
+                    if con_object_id == 1:
+                        obstacles_detected.append(True)
+
+                if len(obstacles_detected) > 0 and all(obstacles_detected):
+                    continue
+
                 object_id = mat[pos[0]][pos[1]]
                 object_data = Objects().get_data(object_id)
                 # if the object is a hindrance(not valid)
@@ -80,7 +110,7 @@ class AStar:
 
         return cur
 
-    def get_data(self, mat, start_pos, end_pos):
+    def get_data(self, mat: np.ndarray, start_pos: tuple[int, int], end_pos: tuple[int, int]):
         '''Returns a path list'''
         if start_pos is None or end_pos is None:
             return False, None

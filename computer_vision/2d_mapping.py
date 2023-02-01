@@ -8,7 +8,7 @@ from environment.src.a_star import AStar
 from qr_code.qr_code import QRCode
 
 if __name__ == '__main__':
-    SIZE = (10, 11)
+    SIZE = (40, 41)
     W_SIZE = 600
     WINDOW_SIZE = (W_SIZE* (SIZE[1]/SIZE[0]), W_SIZE)
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     env= Environment(SIZE, 70, {'view_point': None, 'object_id': 10})
     display = DisplayEnvironment(WINDOW_SIZE, SIZE)
 
-    a_star = AStar(weight=1)
+    a_star = AStar(weight=20, penalty=1)
 
     env.insert_by_index((1,1), 11)
 

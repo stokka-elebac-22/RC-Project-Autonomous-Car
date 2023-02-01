@@ -10,9 +10,10 @@ except ImportError:
 
 class AStar:
     '''A* Algorithm'''
-    def __init__(self, weight: int=0):
+    def __init__(self, weight: int=0, penalty: int=1):
         self.valid = ['None'] # a list of object names that are valid
         self.weight = weight
+        self.penalty = 1
 
     def find_path(self, mat: np.ndarray, start_pos: tuple[int, int],
         end_pos: tuple[int, int]) -> list[Node]:
@@ -78,12 +79,16 @@ class AStar:
                         abs(cur.position[0]-node.position[0])**2 +
                         abs(cur.position[1]-node.position[1]))
                     new_f_value = new_h_value + new_g_value
+                    if weighted_mat is not None:
+                        # adding a weight
+                        new_f_value += weighted_mat[pos[0]][pos[1]]
                     if new_f_value > old_f_value:
                         continue
                     open_list.delete(node.position)
                 # if not in the list, create a node with cur note as parent
                 h_value = math.sqrt((pos[0]-end_pos[0])**2 + (pos[1]-end_pos[1])**2)
                 new_node = Node(pos, h_value, parent=cur)
+                new_node.f_value += weighted_mat[pos[0]][pos[1]]
                 # add the new node to the open list
                 open_list.insert(new_node)
             # sets the value to 1 (hindrance) so it can not be used again
@@ -107,8 +112,6 @@ class AStar:
                 for pos in diff_pos:
                     positions.add((pos[0]*i, pos[1]*j))
 
-        objects = Objects()
-
         # NEED TO IMPROVE THIS!
         for row in range(size[0]):
             for col in range(size[1]):
@@ -124,9 +127,8 @@ class AStar:
                             idx_y > size[0] - 1 or \
                             idx_y < 0:
                             continue
-                        weighted_mat[idx_y][idx_x] += \
-                            self.weight - max(abs(pos[0]), abs(pos[1])) + 1
-        print(weighted_mat)
+                        weight = self.weight - max(abs(pos[0]), abs(pos[1])) + 1
+                        weighted_mat[idx_y][idx_x] += weight * self.penalty
         return weighted_mat
 
 

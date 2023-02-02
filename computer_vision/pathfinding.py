@@ -1,15 +1,24 @@
 '''Main'''
 import cv2
 import pygame as pg
+from typing import TypedDict
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
-from environment.src.environment import Environment
-from environment.src.display import DisplayEnvironment
-from environment.src.a_star import AStar
-from line_detection.parking_slot_detection import ParkingSlotDetector
-from line_detection.lane_detection import LaneDetector
-from traffic_sign_detection.main import TrafficSignDetector
+try:
+    from environment.src.environment import Environment
+    from environment.src.display import DisplayEnvironment
+    from environment.src.a_star import AStar
+    from line_detection.parking_slot_detection import ParkingSlotDetector
+    from line_detection.lane_detection import LaneDetector
+    from traffic_sign_detection.main import TrafficSignDetector
+except ImportError:
+    from computer_vision.environment.src.environment import Environment
+    from computer_vision.environment.src.display import DisplayEnvironment
+    from computer_vision.environment.src.a_star import AStar
+    from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
+    from computer_vision.line_detection.lane_detection import LaneDetector
+    from computer_vision.traffic_sign_detection.main import TrafficSignDetector
 
-def bresenham(x_0, y_0, x_1, y_1):
+def bresenham(x_0: int, y_0: int, x_1: int, y_1: int) -> list[tuple[int, int]]:
     """
     Returns a list of coordinates
     representing a line from (x1, y1) to (x2, y2)
@@ -50,9 +59,8 @@ class PathFinding:
     Class using 2D environment mapping to calculate shortest
     path with objects that can be hindrances
     '''
-
-    def __init__(self, size, w_size, pixel_width, pixel_height
-                ,cam_width, cam_height, cam_center, object_id=10):
+    def __init__(self, size: tuple[int, int], w_size:int, pixel_width:int, pixel_height:int
+                ,cam_width:int, cam_height:int, cam_center:list[int, int], object_id:int=10):
         self.ratio_width = cam_width/pixel_width
         self.ratio_height = cam_height/pixel_height
         self.size = size
@@ -61,9 +69,9 @@ class PathFinding:
         self.env = Environment(
             size, 20, {'view_point': None, 'object_id': object_id})
         self.center = cam_center
-        self.a_star = AStar(weight=10, penalty=1)
+        self.a_star = AStar(weight=2, penalty=100)
 
-    def point_to_distance(self, point):
+    def point_to_distance(self, point:tuple[int, int]) -> tuple[int, int]:
         '''Converts point to distance'''
         offset_x = point[0] - self.center[0]/2
         offset_y = self.center[1] - point[1]
@@ -71,14 +79,22 @@ class PathFinding:
         y_distance = offset_y*self.ratio_height
         return (x_distance, y_distance)
 
-    def insert_objects(self, objects):
+    Objects = TypedDict('Objects', {
+        'points': list[tuple[int, int]],
+        'distances': list[tuple[int, int]],
+        'object_id': int
+    })
+    def insert_objects(self, objects: Objects) -> None:
         '''Insert objects into environment'''
         for groups in objects:
             coords = []
-            if groups['points'] is not None:
-                for group in groups['points']:
-                    _, coord = self.env.insert(
-                        self.point_to_distance(group), groups['object_id'])
+            if groups['values'] is not None:
+                for group in groups['values']:
+                    if groups['distance']:
+                        _, coord = self.env.insert(group, groups['object_id'])
+                    else:
+                        _, coord = self.env.insert(
+                            self.point_to_distance(group), groups['object_id'])
                     if coord is not None:
                         coords.append(coord[0])
                         coords.append(coord[1])
@@ -90,22 +106,8 @@ class PathFinding:
                         for point in result:
                             self.env.insert_by_index(point, 1)
 
-            coords = []
-            if groups['distances'] is not None:
-                for group in groups['distances']:
-                    _, coord = self.env.insert(group, groups['object_id'])
-                    if coord is not None:
-                        coords.append(coord[0])
-                        coords.append(coord[1])
 
-                if len(coords) == 4:
-                    result = bresenham(
-                        coords[0], coords[1], coords[2], coords[3])
-                    if result is not None:
-                        for point in result:
-                            self.env.insert_by_index(point, 1)
-
-    def calculate_path(self, point):
+    def calculate_path(self, point: tuple[int, int]) -> None:
         '''Calculate the shortest path to a specific point using AStar algorithm'''
         self.env.remove(12)
         converted_point = self.point_to_distance(point)
@@ -176,9 +178,9 @@ if __name__ == "__main__":
             parking_lines.append(
                 parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
             for lines in parking_lines:
-                obstacles.append({'points': [
+                obstacles.append({'values': [
                                  (lines[0], lines[1]), (lines[2], lines[3])],
-                                 'distances': None, 'object_id': 3})
+                                 'distance': False, 'object_id': 3})
 
         # Use lane Module
         all_lines = lane_detector.get_lines(frame)
@@ -189,9 +191,9 @@ if __name__ == "__main__":
         if avg_lines is not None:
             for line in avg_lines:
                 if line is not None:
-                    obstacles.append({'points': [
+                    obstacles.append({'values': [
                                      (line[0], line[1]), (line[2], line[3])],
-                                     'distances': None, 'object_id': 4})
+                                     'distance': False, 'object_id': 4})
 
         # Use Traffic Sign module
         signs = traffic_sign_detector.detect_signs(frame)
@@ -201,8 +203,8 @@ if __name__ == "__main__":
                     (sign[0]+sign[2]/2, sign[1]))
                 distance_x = distances[0]
                 distance_y = traffic_sign_detector.get_distance()
-                obstacles.append({'points': [], 'distances': [
-                                 (distance_x, distance_y)], 'object_id': 5})
+                obstacles.append({'values': [
+                                 (distance_x, distance_y)], 'distance': False,'object_id': 5})
 
         path_finding.insert_objects(obstacles)
         path_finding.calculate_path((460, 120))

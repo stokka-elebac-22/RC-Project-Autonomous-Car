@@ -16,7 +16,6 @@ class TestParametrized:
         image = cv2.imread(PATH + source)
         return image
 
-    # @pytest.mark.skip("NOT FINISHED")
     @pytest.mark.parametrize('lines, expected', [
         ([np.array((20, 120, 400, 20)), np.array((20, 120, 400, 20)),
         np.array((123, 232, 234, 100))],

@@ -6,7 +6,15 @@ import os
 import cv2
 import numpy as np
 #from main import LineDetector
-from computer_vision.line_detection.main import LineDetector
+try:
+    from computer_vision.line_detection.lane_detector import LineDetector
+except ImportError:
+    try:
+        from line_detection.main import LineDetector
+    except ImportError:
+        from main import LineDetector
+
+
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -21,9 +29,16 @@ class ParkingSlotDetector(LineDetector):
                  canny: list[int, int] = None,
                  blur: int = 3,
                  hough: list[int, int] = None,
-                 iterations: list[int, int] = None):
+                 iterations: list[int, int] = None,
+                 filter_atol: list[int, int]= None,
+                 cluster_atol: int = 5):
         '''Initialize the Line Detector'''
         LineDetector.__init__(self, canny, blur, hough, iterations)
+
+        if filter_atol is None:
+            filter_atol = [20, 20]
+        self.cluster_atol = cluster_atol
+        self.filter_atol = filter_atol
         self.qr_slope = 0
         self.qr_intercept = 0
 
@@ -48,7 +63,7 @@ class ParkingSlotDetector(LineDetector):
         roi = cv2.bitwise_and(image, mask)
         return roi
 
-    def cluster_lines(self, lines: np.ndarray, atol: int =5) -> list[np.ndarray, np.ndarray]:
+    def cluster_lines(self, lines: np.ndarray) -> list[np.ndarray, np.ndarray]:
         '''Cluster lines that are close to each other'''
         clustered_lines = []
         clustered_coords = []
@@ -71,7 +86,7 @@ class ParkingSlotDetector(LineDetector):
                         for i, cluster in enumerate(clustered_lines):
                             cluster_line_avg = np.average(cluster, axis=0)
                             if np.isclose(cluster_line_avg, (slope, intercept),
-                                          atol=atol, rtol=1e-9).all():
+                                          atol=self.cluster_atol, rtol=1e-9).all():
                                 cluster.append((slope, intercept))
                                 clustered_coords[i].append(
                                     np.array([x_1, y_1, x_2, y_2]))
@@ -93,8 +108,8 @@ class ParkingSlotDetector(LineDetector):
         temp_coords = []
         temp_lines = []
         for i, line in enumerate(lines):
-            if not (np.isclose(self.qr_slope, line[0], atol=20, rtol=1e-9) and
-                    np.isclose(self.qr_intercept, line[1], atol=20, rtol=1e-9)):
+            if not (np.isclose(self.qr_slope, line[0], atol=self.filter_atol[0], rtol=1e-9) and
+                    np.isclose(self.qr_intercept, line[1], atol=self.filter_atol[1], rtol=1e-9)):
                 temp_lines.append(line)
                 temp_coords.append(coords[i])
         return temp_lines, temp_coords
@@ -153,7 +168,8 @@ class ParkingSlotDetector(LineDetector):
                              image: np.ndarray,
                              qr_size_px: int,
                              qr_size_mm: int,
-                             qr_distance: int) -> Union[list[np.ndarray], None]:
+                             qr_distance: int
+                             ) -> Union[list[np.ndarray], None]:
         "Detect the parking lines in the image"
         qrc,  data = self.__get_qr_code_info(
             image, qr_size_px, qr_size_mm, qr_distance)

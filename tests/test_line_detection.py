@@ -2,7 +2,7 @@
 import pytest
 import cv2
 import numpy as np
-from computer_vision.line_detection.main import LineDetector
+from computer_vision.line_detection.lane_detector import LineDetector
 PATH = "computer_vision/line_detection/assets/"
 
 

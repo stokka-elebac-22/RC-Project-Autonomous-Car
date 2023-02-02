@@ -1,5 +1,5 @@
 '''Import libraries'''
-from main import LineDetector
+from lane_detector import LineDetector
 import cv2
 
 def nothing(_):

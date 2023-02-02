@@ -4,12 +4,12 @@ import warnings
 import cv2
 import numpy as np
 try:
-    from computer_vision.line_detection.main import LineDetector
+    from computer_vision.line_detection.lane_detector import LineDetector
 except ImportError:
     try:
-        from line_detection.main import LineDetector
+        from line_detection.lane_detector import LineDetector
     except ImportError:
-        from main import LineDetector
+        from lane_detector import LineDetector
 
 # SOURCE
 # https://medium.com/analytics-vidhya/lane-detection-for-a-self-driving-car-using-opencv-e2aa95105b89

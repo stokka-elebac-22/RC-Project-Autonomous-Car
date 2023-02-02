@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 #from main import LineDetector
 try:
-    from computer_vision.line_detection.main import LineDetector
+    from computer_vision.line_detection.lane_detector import LineDetector
 except ImportError:
     try:
         from line_detection.main import LineDetector

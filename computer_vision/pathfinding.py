@@ -7,7 +7,7 @@ from environment.src.display import DisplayEnvironment
 from environment.src.a_star import AStar
 from line_detection.parking_slot_detection import ParkingSlotDetector
 from line_detection.lane_detection import LaneDetector
-from traffic_sign_detection.src.main import TrafficSignDetector
+from traffic_sign_detection.main import TrafficSignDetector
 # function for line generation
 # https://github.com/encukou/bresenham
 

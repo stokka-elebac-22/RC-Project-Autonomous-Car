@@ -157,8 +157,76 @@ class TestAStar:
         while True:
             cur_node = cur_node.parent
             cur_exp = cur_exp.parent
-            if cur_node is not None:
-                print(cur_node.position, cur_exp.position)
             if cur_exp is None:
                 return
             assert cur_node == cur_exp
+
+    @pytest.mark.parametrize(
+        ['param', 'exp'],
+        [
+            ([1, [
+                [0,0,0],
+                [0,0,0],
+                [0,0,0],
+            ]],
+            [[
+                [0,0,0],
+                [0,0,0],
+                [0,0,0],
+            ]]),
+            ([1, [
+                [0,1,0],
+                [0,0,0],
+                [0,0,0],
+            ]],
+            [[
+                [1,2,1],
+                [1,1,1],
+                [0,0,0],
+            ]]),
+            ([1, [
+                [0,1,0],
+                [0,1,0],
+                [0,0,0],
+            ]],
+            [[
+                [2,3,2],
+                [2,3,2],
+                [1,1,1],
+            ]]),
+            ([2, [
+                [0,0,0,0,0],
+                [0,0,0,0,0],
+                [0,0,1,0,0],
+                [0,0,0,0,0],
+                [0,0,0,0,0],
+            ]],
+            [[
+                [1,1,1,1,1],
+                [1,2,2,2,1],
+                [1,2,3,2,1],
+                [1,2,2,2,1],
+                [1,1,1,1,1],
+            ]]),
+            ([2, [
+                [0,0,0,0,0],
+                [0,0,1,0,0],
+                [0,0,1,0,0],
+                [0,0,0,0,0],
+                [0,0,0,0,0],
+            ]],
+            [[
+                [2,3,3,3,2],
+                [2,4,5,4,2],
+                [2,4,5,4,2],
+                [2,3,3,3,2],
+                [1,1,1,1,1],
+            ]]),
+        ]
+    )
+
+    def test_create_weight_matrix(self, param, exp):
+        '''Test create weight matrix'''
+        a_star = AStar(param[0])
+        res = a_star.create_weight_matrix(param[1])
+        assert (exp[0] == res).all()

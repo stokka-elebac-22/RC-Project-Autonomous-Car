@@ -11,6 +11,7 @@ class TestEnvironment:
             ((10, 10), 10)
         ]
     )
+    @pytest.mark.skip(reason="no way of testing this without a video device")
     def test_init(self, size, exp):
         '''Testing the init method'''
         env = Environment(size, 1)

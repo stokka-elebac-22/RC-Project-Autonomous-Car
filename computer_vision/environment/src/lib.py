@@ -1,12 +1,18 @@
 '''Library'''
+from typing import TypedDict
 import dataclasses
 import math
 import pygame as pg
 
+ObjectParam = TypedDict('ObjectParam', {
+    'color': pg.Color,
+    'thickness': int,
+})
+
 @dataclasses.dataclass
 class Object:
     '''Object'''
-    def __init__(self, id, name, param):
+    def __init__(self, id: int, name: str, param: ObjectParam):
         self.id = id # pylint: disable=C0103
         self.name = name
         self.color = param['color']
@@ -133,7 +139,7 @@ class Objects:
             new_object = Object(i['id'], i['name'], i['param'])
             self.object_data[i['id']] = new_object
 
-    def get_data(self, obj):
+    def get_data(self, obj: Object) -> Object:
         '''
         Get the data of the object
         Each object have:
@@ -169,9 +175,8 @@ class TwoWayDict(dict):
 @dataclasses.dataclass
 class Node:
     '''Node'''
-    # newid = itertools.count().__next__
-    def __init__(self, position, h_value, parent=None, f_value=None) -> None:
-        # self.id = Node.newid() # pylint: disable=C0103
+    def __init__(self, position: tuple[int, int],
+                h_value: float, parent=None, f_value: int=None) -> None:
         self.position = position
         self.parent: Node = parent
 

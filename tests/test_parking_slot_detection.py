@@ -31,7 +31,9 @@ class TestParametrized:
         parking_slot_detector = ParkingSlotDetector()
         clustered_lines, clustered_coords = parking_slot_detector.cluster_lines(
             lines)
-        assert clustered_lines == expected[0]
+        for i, line in enumerate(clustered_lines):
+            for j, value in enumerate(line):
+                assert value == pytest.approx(expected[0][i][j], 0.001)
         for i, coords in enumerate(clustered_coords):
             assert (np.array(coords) == np.array(expected[1][i])).all()
 

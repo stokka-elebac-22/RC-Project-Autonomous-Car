@@ -8,13 +8,12 @@ from environment.src.a_star import AStar
 from line_detection.parking_slot_detection import ParkingSlotDetector
 from line_detection.lane_detection import LaneDetector
 from traffic_sign_detection.main import TrafficSignDetector
-# function for line generation
-# https://github.com/encukou/bresenham
 
 def bresenham(x_0, y_0, x_1, y_1):
-    """Yield integer coordinates on the line from (x0, y0) to (x1, y1).
-    Input coordinates should be integers.
-    The result will contain both the start and the end point.
+    """
+    Returns a list of coordinates
+    representing a line from (x1, y1) to (x2, y2)
+    Source: https://github.com/encukou/bresenham
     """
     coordinates = []
     d_x = x_1 - x_0
@@ -36,7 +35,8 @@ def bresenham(x_0, y_0, x_1, y_1):
     y_val = 0
 
     for x_val in range(d_x + 1):
-        coordinates.append((x_0 + x_val*x_x + y_val*y_x, y_0 + x_val*x_y + y_val*y_y))
+        coordinates.append((x_0 + x_val*x_x + y_val*y_x,
+                           y_0 + x_val*x_y + y_val*y_y))
         if d_val >= 0:
             y_val += 1
             d_val -= 2*d_x
@@ -46,8 +46,13 @@ def bresenham(x_0, y_0, x_1, y_1):
 
 
 class PathFinding:
+    '''
+    Class using 2D environment mapping to calculate shortest
+    path with objects that can be hindrances
+    '''
 
-    def __init__(self, size, w_size, pixel_width, pixel_height, cam_width, cam_height, center, object_id=10):
+    def __init__(self, size, w_size, pixel_width, pixel_height
+                ,cam_width, cam_height, cam_center, object_id=10):
         self.ratio_width = cam_width/pixel_width
         self.ratio_height = cam_height/pixel_height
         self.size = size
@@ -55,47 +60,56 @@ class PathFinding:
         self.display = DisplayEnvironment(self.window_size, size)
         self.env = Environment(
             size, 20, {'view_point': None, 'object_id': object_id})
-        self.center = center
+        self.center = cam_center
+        self.a_star = AStar(weight=10, penalty=1)
 
     def point_to_distance(self, point):
+        '''Converts point to distance'''
         offset_x = point[0] - self.center[0]/2
         offset_y = self.center[1] - point[1]
         x_distance = offset_x*self.ratio_width
         y_distance = offset_y*self.ratio_height
         return (x_distance, y_distance)
 
-    def calculate_path(self, end_point, obstacles):
-        self.env.remove(12)
-        converted_point = self.point_to_distance(end_point)
-        self.env.insert(converted_point, 12)
+    def insert_objects(self, objects):
+        '''Insert objects into environment'''
+        for groups in objects:
+            coords = []
+            if groups['points'] is not None:
+                for group in groups['points']:
+                    _, coord = self.env.insert(
+                        self.point_to_distance(group), groups['object_id'])
+                    if coord is not None:
+                        coords.append(coord[0])
+                        coords.append(coord[1])
 
-        for groups in obstacles:
-            line = []
-            for group in groups['points']:
-                ret, coord = self.env.insert(self.point_to_distance(group), groups['object_id'])
-                if coord is not None:
-                    line.append(coord[0])
-                    line.append(coord[1])
+                if len(coords) == 4:
+                    result = bresenham(
+                        coords[0], coords[1], coords[2], coords[3])
+                    if result is not None:
+                        for point in result:
+                            self.env.insert_by_index(point, 1)
 
-            if len(line) == 4:
-                result = bresenham(line[0], line[1], line[2], line[3])
-                if result is not None:
-                    for pt in result:
-                        self.env.insert_by_index(pt, 1)
-
-            line = []
+            coords = []
             if groups['distances'] is not None:
                 for group in groups['distances']:
-                    ret, coord = self.env.insert(group, groups['object_id'])
+                    _, coord = self.env.insert(group, groups['object_id'])
                     if coord is not None:
-                        line.append(coord[0])
-                        line.append(coord[1])
+                        coords.append(coord[0])
+                        coords.append(coord[1])
 
-                if len(line) == 4:
-                    result = bresenham(line[0], line[1], line[2], line[3])
+                if len(coords) == 4:
+                    result = bresenham(
+                        coords[0], coords[1], coords[2], coords[3])
                     if result is not None:
-                        for pt in result:
-                            self.env.insert_by_index(pt, 1)
+                        for point in result:
+                            self.env.insert_by_index(point, 1)
+
+    def calculate_path(self, point):
+        '''Calculate the shortest path to a specific point using AStar algorithm'''
+        self.env.remove(12)
+        converted_point = self.point_to_distance(point)
+        self.env.insert(converted_point, 12)
 
         start_pos_path = self.env.get_pos(10)
         end_pos_path = self.env.get_pos(12)
@@ -103,7 +117,7 @@ class PathFinding:
         cur_mat = self.env.get_data()
         self.display.update(cur_mat)
         cur_mat = self.env.get_data()
-        ret, path = AStar().get_data(cur_mat, start_pos_path, end_pos_path)
+        ret, path = self.a_star.get_data(cur_mat, start_pos_path, end_pos_path)
 
         if ret:
             for pos in path[1:-1]:
@@ -124,18 +138,21 @@ if __name__ == "__main__":
     CAM_HEIGHT = 500
 
     img = cv2.imread(
-            'computer_vision/line_detection/assets/parking/10.png')
+        'computer_vision/line_detection/assets/parking/10.png')
     center = (img.shape[1], img.shape[0])
-    
+
     path_finding = PathFinding(
         (60, 115), 720, PIXEL_WIDTH, PIXEL_HEIGHT, CAM_WIDTH, CAM_HEIGHT, center)
     parking_slot_detector = ParkingSlotDetector(
         hough=[200, 5], iterations=[5, 2])
     lane_detector = LaneDetector()
-    traffic_sign_detector = TrafficSignDetector(size_mm=61, size_px=10, distance = 200)
+    traffic_sign_detector = TrafficSignDetector(
+        size_mm=61, size_px=10, distance=200)
 
     RUN = True
     while RUN:
+
+        # Add hindrances using mouse
         for event in pg.event.get():
             if event.type == QUIT:
                 RUN = False
@@ -146,35 +163,46 @@ if __name__ == "__main__":
                 row = mouse_pos[1] // TILE_SIZE
                 path_finding.env.insert_by_index((int(row), int(col)), '1')
 
+        # Should change this to camera frame later
         frame = cv2.imread(
             'computer_vision/line_detection/assets/parking/10.png')
         obstacles = []
 
+        # Use ParkingSlot Module
         parking_lines = parking_slot_detector.detect_parking_lines(
             frame, QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
 
         if parking_lines is not None:
-            parking_lines.append(parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
+            parking_lines.append(
+                parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
             for lines in parking_lines:
-                obstacles.append({'points':[(lines[0], lines[1]), (lines[2], lines[3])], 'distances': None, 'object_id': 3})
+                obstacles.append({'points': [
+                                 (lines[0], lines[1]), (lines[2], lines[3])],
+                                 'distances': None, 'object_id': 3})
 
-        #lane_img = cv2.imread('computer_vision/line_detection/assets/bike_park.jpg')
+        # Use lane Module
         all_lines = lane_detector.get_lines(frame)
         avg_lines = lane_detector.get_average_lines(all_lines)
         if avg_lines is not None:
             avg_lines = [lane_detector.get_line_coordinates_from_parameters(
-            frame, line) for line in avg_lines]
+                frame, line) for line in avg_lines]
         if avg_lines is not None:
             for line in avg_lines:
                 if line is not None:
-                    obstacles.append({'points':[(line[0], line[1]), (line[2], line[3])], 'distances': None, 'object_id': 4})
+                    obstacles.append({'points': [
+                                     (line[0], line[1]), (line[2], line[3])],
+                                     'distances': None, 'object_id': 4})
 
+        # Use Traffic Sign module
         signs = traffic_sign_detector.detect_signs(frame)
         if signs is not None:
             for sign in signs:
-                distances = path_finding.point_to_distance((sign[0]+sign[2]/2, sign[1]))
+                distances = path_finding.point_to_distance(
+                    (sign[0]+sign[2]/2, sign[1]))
                 distance_x = distances[0]
                 distance_y = traffic_sign_detector.get_distance()
-                obstacles.append({'points':[], 'distances': [(distance_x, distance_y)], 'object_id': 5})
+                obstacles.append({'points': [], 'distances': [
+                                 (distance_x, distance_y)], 'object_id': 5})
 
-        path_finding.calculate_path((460, 120), obstacles)
+        path_finding.insert_objects(obstacles)
+        path_finding.calculate_path((460, 120))

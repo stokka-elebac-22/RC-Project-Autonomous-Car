@@ -171,3 +171,4 @@ class AStar:
             path_list.append(node.position)
             node = node.parent
         return True, path_list
+        

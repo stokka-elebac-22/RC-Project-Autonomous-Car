@@ -124,7 +124,7 @@ class Ui(QtWidgets.QMainWindow):
             for camera in self.camera_handler.get_camera_list():
                 cbo.addItem(self.camera_handler.get_camera_string(camera["id"]))
                 # create the video capture thread
-        self.thread2 = VideoThread(1)
+        self.thread2 = VideoThread(camera_id=2)
         # connect its signal to the update_image slot
         self.thread2.change_pixmap_signal.connect(self.update_image)
         # start the thread

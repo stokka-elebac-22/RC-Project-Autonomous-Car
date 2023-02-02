@@ -26,7 +26,7 @@ class LineDetector:
         self.canny_low_thr = canny[0]
         self.canny_high_thr = canny[1]
 
-        self.blur_kernel_size = blur
+        self.blur_kernel_size = blur*2 + 1
 
         self.hough_min_line_length = hough[0]
         self.hough_max_line_gap = hough[1]

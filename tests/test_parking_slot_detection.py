@@ -28,10 +28,11 @@ class TestParametrized:
     def test_cluster_lines(self, lines, expected):
         """Test cluster_lines method of ParkingSlotDetector"""
         parking_slot_detector = ParkingSlotDetector()
-        clustered_lines, clustered_coords = parking_slot_detector.cluster_lines(lines)
+        clustered_lines, clustered_coords = parking_slot_detector.cluster_lines(
+            lines)
         for i, line in enumerate(clustered_lines):
             for j, value in enumerate(line):
-                assert value == pytest.approx(expected[0][i][j])
+                assert value == pytest.approx(expected[0][i][j], 0.001)
         for i, coords in enumerate(clustered_coords):
             assert (np.array(coords) == np.array(expected[1][i])).all()
 

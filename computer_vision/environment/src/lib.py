@@ -35,9 +35,12 @@ class Objects:
             ('None', 0),
             ('Hindrance', 1),
             ('Path', 2),
+            ('ParkingLine', 3),
+            ('LaneLine', 4),
             # Optional in map but necessary in a* start at 10
             ('Car', 10),
             ('QR', 11),
+            ('EndPoint', 12),
             # Signs start at 20
             ('Stop', 20),
         ]
@@ -76,6 +79,30 @@ class Objects:
                 }
             },
             {
+                'id': 3,
+                'name': 'ParkingLine',
+                'param': {
+                    'color': pg.Color(227,174,87),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 4,
+                'name': 'LaneLine',
+                'param': {
+                    'color': pg.Color(220,61,36),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 5,
+                'name': 'StopSign',
+                'param': {
+                    'color': pg.Color(242, 205, 92),
+                    'thickness': 0
+                }
+            },
+            {
                 'id': 10,
                 'name': 'Car',
                 'param': {
@@ -88,6 +115,14 @@ class Objects:
                 'name': 'QR',
                 'param': {
                     'color': pg.Color(150, 80, 180),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 12,
+                'name': 'EndPoint',
+                'param': {
+                    'color': pg.Color(22, 80, 22),
                     'thickness': 0
                 }
             },

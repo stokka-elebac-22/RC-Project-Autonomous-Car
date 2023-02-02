@@ -16,7 +16,6 @@ class TestParametrized:
         image = cv2.imread(PATH + source)
         return image
 
-    # @pytest.mark.skip("NOT FINISHED")
     @pytest.mark.parametrize('lines, expected', [
         ([np.array((20, 120, 400, 20)), np.array((20, 120, 400, 20)),
         np.array((123, 232, 234, 100))],
@@ -102,3 +101,14 @@ class TestParametrized:
         line_coordinates = parking_slot_detector.get_line_coordinates_from_parameters(
             min_x, max_x, line_parameters)
         assert (line_coordinates == expected).all()
+
+    @pytest.mark.parametrize('lines, expected', [
+        ([np.array([200, 100, 300, 400]), np.array([200, 100, 300, 400])], np.array([300, 400, 300, 400])),
+        ([np.array([100, 200, 300, 400]), np.array([200, 300, 400, 500])], np.array([300, 400, 400, 500]))
+        ])
+    def test_get_closing_line_of_two_lines(self, lines, expected):
+        parking_slot_detector = ParkingSlotDetector()
+        closing_line = parking_slot_detector.get_closing_line_of_two_lines(lines)
+        assert (closing_line == expected).all()
+        
+        

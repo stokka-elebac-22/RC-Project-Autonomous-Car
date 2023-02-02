@@ -1,5 +1,4 @@
 '''Main'''
-import cv2 as cv
 import pygame as pg
 from pygame.locals import QUIT # pylint: disable=no-name-in-module
 from environment.src.environment import Environment
@@ -17,7 +16,7 @@ if __name__ == '__main__':
     QR_DISTANCE = 320
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
     CAMERA_ID = 0
-    CAMEREA_PX_SIZE = (1920, 1080)
+    CAMERA_PX_SIZE = (1920, 1080)
     # print('Setting up camera...')
     # cap = cv.VideoCapture(CAMERA_ID)
     # print('Done')
@@ -54,10 +53,10 @@ if __name__ == '__main__':
         #     points = qr_data['points'][0]
         #     width = qr_code.qr_geometries[0].get_width()
         #     mm_per_px = QR_SIZE_MM/width
-        #     if points[0][0] > CAMEREA_PX_SIZE[0]/2:
-        #         offset = points[0][0] - CAMEREA_PX_SIZE[1]/2
+        #     if points[0][0] > CAMERA_PX_SIZE[0]/2:
+        #         offset = points[0][0] - CAMERA_PX_SIZE[1]/2
         #     else:
-        #         offset = points[1][0] - CAMEREA_PX_SIZE[1]/2
+        #         offset = points[1][0] - CAMERA_PX_SIZE[1]/2
         #     distance_x = offset * mm_per_px + 200 # idk why 200,
 
             # env.insert((distance_x, distance_y), 11)

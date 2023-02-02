@@ -47,13 +47,23 @@ class AStar:
                 (pos[0]-1, pos[1]),
                 (pos[0]+1, pos[1]),
                 (pos[0], pos[1]-1),
+                (pos[0], pos[1]+1),
                 (pos[0]-1, pos[1]-1),
                 (pos[0]+1, pos[1]-1),
-                (pos[0], pos[1]+1),
                 (pos[0]-1, pos[1]+1),
                 (pos[0]+1, pos[1]+1),
             ]
-            for pos in positions:
+            constraints = [
+                [],
+                [],
+                [],
+                [],
+                [0, 2],
+                [2, 1],
+                [0, 3],
+                [1, 3]
+            ]
+            for i, pos in enumerate(positions):
                 # checks if position is out of bounds
                 if pos[0] > size[1] - 1 or \
                     pos[0] < 0 or \
@@ -65,6 +75,24 @@ class AStar:
                     finish_node = Node(pos, 0, parent=cur)
                     return finish_node
                 # checks if tile is valid
+
+                obstacles_detected = []
+                for con in constraints[i]:
+                    pos_x = positions[con][0]
+                    pos_y = positions[con][1]
+                    if pos_x > size[1] - 1 or \
+                        pos_x < 0 or \
+                        pos_y > size[0] - 1 or \
+                        pos_y < 0:
+                        obstacles_detected.append(True)
+                        continue
+                    con_object_id = mat[pos_x][pos_y]
+                    if con_object_id == 1:
+                        obstacles_detected.append(True)
+
+                if len(obstacles_detected) > 0 and all(obstacles_detected):
+                    continue
+
                 object_id = mat[pos[0]][pos[1]]
                 object_data = objects.get_data(object_id)
                 # if the object is a hindrance(not valid)
@@ -143,3 +171,4 @@ class AStar:
             path_list.append(node.position)
             node = node.parent
         return True, path_list
+        

@@ -51,7 +51,7 @@ class Environment:
         '''
         if distance[1] < 0:
             # distance in y direction needs to be positive
-            return False
+            return False, None
         if distance[1] == 0:
             row = self.view_point[0]-1 # so it does not collide with view point
         else:
@@ -62,9 +62,9 @@ class Environment:
         else:
             col = self.view_point[1] + distance[0]//self.real_size
         if row >= self.size[0] or row < 0 or col < 0 or col >= self.size[1]:
-            return False
+            return False, None
         self.map[int(row)][int(col)] = object_id
-        return True
+        return True, (int(row), int(col))
 
     def remove(self, object_id: int, remove_all: bool=False):
         '''Remove an object'''

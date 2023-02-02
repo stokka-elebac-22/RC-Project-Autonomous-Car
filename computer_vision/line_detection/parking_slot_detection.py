@@ -5,16 +5,13 @@ import sys
 import os
 import cv2
 import numpy as np
-#from main import LineDetector
 try:
-    from computer_vision.line_detection.lane_detector import LineDetector
+    from main import LineDetector
 except ImportError:
     try:
-        from line_detection.main import LineDetector
+        from computer_vision.line_detection.main import LineDetector
     except ImportError:
-        from main import LineDetector
-
-
+        from line_detection.main import LineDetector
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -225,6 +222,22 @@ class ParkingSlotDetector(LineDetector):
         x_2 = max_x
         return np.array([x_1, y_1, x_2, y_2])
 
+    def get_closing_line_of_two_lines(self, lines):
+        '''Get the line that closes the two parking lines'''
+        line_coords = []
+        if len(lines) == 2:
+            for line in lines:
+                max_value = min(line[1], line[3])
+                min_index=np.where(line==max_value)[0][0]
+                if min_index == 1:
+                    line_coords.append(line[0])
+                    line_coords.append(line[1])
+                else:
+                    line_coords.append(line[2])
+                    line_coords.append(line[3])
+        return np.array(line_coords)
+
+
 
 if __name__ == "__main__":
     # ORIGINAL: hough=[200,5]
@@ -236,6 +249,7 @@ if __name__ == "__main__":
     QR_DISTANCE = 500
     parking_lines = parking_slot_detector.detect_parking_lines(
         img, QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+    parking_lines.append(parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
     parking_slot_detector.show_lines(img, parking_lines)
     cv2.imshow("img", img)
     cv2.waitKey(0)

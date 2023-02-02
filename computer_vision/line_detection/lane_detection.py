@@ -4,12 +4,15 @@ import warnings
 import cv2
 import numpy as np
 try:
-    from computer_vision.line_detection.lane_detector import LineDetector
+    from computer_vision.line_detection.main import LineDetector
 except ImportError:
     try:
-        from line_detection.lane_detector import LineDetector
+        from main import LineDetector
     except ImportError:
-        from lane_detector import LineDetector
+        from line_detection.main import LineDetector
+
+#from main import LineDetector
+
 
 # SOURCE
 # https://medium.com/analytics-vidhya/lane-detection-for-a-self-driving-car-using-opencv-e2aa95105b89
@@ -41,16 +44,16 @@ class LaneDetector(LineDetector):
     def get_line_coordinates_from_parameters(self, image: np.ndarray,
                                              line_parameters: list[float, float]) -> np.ndarray:
         """Get line coordinates from line parameters"""
-        if line_parameters is None:
-            return None
-        slope = line_parameters[0]
-        intercept = line_parameters[1]
-        # since line will always start from bottom of image
-        y_1 = image.shape[0]
-        y_2 = int(y_1 * (2.3 / 5))
-        x_1 = int((y_1 - intercept) / slope)
-        x_2 = int((y_2 - intercept) / slope)
-        return np.array([x_1, y_1, x_2, y_2])
+        if line_parameters is not None:
+            slope = line_parameters[0]
+            intercept = line_parameters[1]
+            # since line will always start from bottom of image
+            y_1 = image.shape[0]
+            y_2 = int(y_1 * (2.3 / 5))
+            x_1 = int((y_1 - intercept) / slope)
+            x_2 = int((y_2 - intercept) / slope)
+            return np.array([x_1, y_1, x_2, y_2])
+        return None
 
     def get_average_lines(self, lines: np.ndarray) -> np.ndarray:
         """Sort the lines into left and right and get the average for each side"""

@@ -87,8 +87,8 @@ class AStar:
                         obstacles_detected.append(True)
                         continue
                     # checks if it is a number or not (then it should be a Node)
-                    con_object_id = self.__get_object_id()
                     obj = mat[pos_x][pos_y]
+                    ret, con_object_id = self.__get_object_id(obj)
                     if isinstance(obj, int):
                         con_object_id = obj
                     elif isinstance(obj, Node):
@@ -192,7 +192,7 @@ class AStar:
             node = node.parent
         return True, path_list
 
-    def __get_object_id(self, obj) -> tuple(bool, int):
+    def __get_object_id(self, obj) -> tuple[bool, int]:
         '''Returns the object id'''
         if isinstance(obj, int):
             return True, obj

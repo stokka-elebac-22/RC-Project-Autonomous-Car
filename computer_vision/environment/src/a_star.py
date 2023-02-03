@@ -79,13 +79,6 @@ class AStar:
                     pos[1] < 0:
                     continue
 
-                # checks if tile is valid
-                object_id = mat[pos[0]][pos[1]]
-                object_data = objects.get_data(object_id)
-                # if the object is a hindrance(not valid)
-                if object_data.name not in self.valid:
-                    continue
-
                 obstacles_detected = 0
                 for con in constraints[i]:
                     pos_y = positions[con][0]
@@ -114,6 +107,12 @@ class AStar:
                     finish_node = Node(node_data)
                     return finish_node
 
+                # checks if tile is valid
+                object_id = mat[pos[0]][pos[1]]
+                object_data = objects.get_data(object_id)
+                # if the object is a hindrance(not valid)
+                if object_data.name not in self.valid:
+                    continue
                 # check if node already in the list
                 ret, node = open_list.get(pos)
                 if ret:

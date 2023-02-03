@@ -4,12 +4,12 @@ import warnings
 import cv2
 import numpy as np
 try:
-    from computer_vision.line_detection.main import LineDetector
+    from computer_vision.line_detection.line_detector import LineDetector
 except ImportError:
     try:
-        from main import LineDetector
+        from line_detector import LineDetector
     except ImportError:
-        from line_detection.main import LineDetector
+        from line_detection.line_detector import LineDetector
 
 #from main import LineDetector
 

@@ -225,24 +225,5 @@ class TestAStar:
     def test_create_weighted_node_matrix(self, param, exp):
         '''Test create weight matrix'''
         a_star = AStar(param[0])
-        res = a_star.create_weighted_node_matrix(param[1])
+        res = a_star.create_weight_matrix(param[1])
         assert (exp[0] == res).all()
-
-    @pytest.mark.parametrize(
-        ['param', 'exp'],
-        [
-        #     (Node((0,0),(0),object_id=1), 1),
-        #     (Node((0,0),(0),object_id=0), 0),
-        #     (Node((0,0),(0)), 0),
-        #     (0, 0),
-        #     (1, 1),
-        #     (2, 2),
-        ]
-    )
-
-    def test_get_object_id(self, param, exp):
-        '''Test get object id'''
-        a_star = AStar()
-        res = a_star.__get_object_id(param) # pylint: disable=protected-access
-        assert res == exp
-        

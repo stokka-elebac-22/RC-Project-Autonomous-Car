@@ -16,7 +16,7 @@ class AStar:
         self.penalty = penalty
 
     def find_path(self, mat: np.ndarray, start_pos: tuple[int, int],
-        end_pos: tuple[int, int], verbose=0) -> tuple[list[Node], np.ndarray]:
+        end_pos: tuple[int, int]) -> tuple[list[Node], np.ndarray]:
         '''Returns the start node'''
         # The f_value will be the total distance and calculated with pythagoras
         # without the square root
@@ -25,12 +25,9 @@ class AStar:
 
         # if weight is not 0, create a weight matrix
         # this will now be O(N^2) in any case
-        elif verbose == 1:
-            mat = self.create_node_matrix(mat)
-            if self.weight != 0:
-                mat = self.create_weight_matrix(mat)
-
-
+        mat = self.create_node_matrix(mat)
+        if self.weight != 0:
+            mat = self.create_weighted_node_matrix(mat)
 
         size = (len(mat[0]), len(mat))
         h_value = math.sqrt((start_pos[0]-end_pos[0])**2 + (start_pos[1]-end_pos[1])**2)
@@ -83,12 +80,6 @@ class AStar:
                     pos[1] < 0:
                     continue
 
-                # if finish node
-                if pos == end_pos:
-                    finish_node = mat[pos[0]][pos[1]]
-                    finish_node.parent = cur
-                    return finish_node
-
                 # checks if tile is valid
                 object_id = mat[pos[0]][pos[1]].object_id
                 object_data = objects.get_data(object_id)
@@ -96,37 +87,33 @@ class AStar:
                 if object_data.name not in self.valid:
                     continue
 
-                obstacles_detected = []
+                obstacles_detected = 0
                 for con in constraints[i]:
                     pos_x = positions[con][0]
                     pos_y = positions[con][1]
 
                     con_object_id = mat[pos_y][pos_x].object_id
-                    object_data = objects.get_data(object_id)
+                    object_data = objects.get_data(con_object_id)
                     # if the object is a hindrance(not valid)
                     if object_data.name not in self.valid:
-                        obstacle_detected.append(True)
-                        continue
+                        obstacle_detected += 1
 
-                    if pos_x > size[1] - 1 or \
-                        pos_x < 0 or \
-                        pos_y > size[0] - 1 or \
-                        pos_y < 0:
-                        obstacles_detected.append(True)
-                        continue
-                    # checks if it is a number or not (then it should be a Node)
-
-                    if con_object_id == 1:
-                        obstacles_detected.append(True)
-
-                if len(obstacles_detected) > 0 and all(obstacles_detected):
+                if obstacles_detected == 2:
                     continue
 
-                object_id = mat[pos[0]][pos[1]].object_id
-                object_data = objects.get_data(object_id)
-                # if the object is a hindrance(not valid)
-                if object_data.name not in self.valid:
-                    continue
+                # if finish node
+                if pos == end_pos:
+                    node_data = {
+                        'position': pos,
+                        'h_value': 0,
+                        'f_value': None,
+                        'parent': cur,
+                        'weight': None,
+                        'object_id': None
+                    }
+                    finish_node = Node(node_data)
+                    return finish_node
+
                 # check if node already in the list
                 ret, node = open_list.get(pos)
                 if ret:
@@ -147,15 +134,14 @@ class AStar:
                 open_list.insert(new_node)
             # sets the value to 1 (hindrance) so it can not be used again
             mat[cur.position[0]][cur.position[1]].blocked = True
-
         return cur, mat
 
-    def create_weighted_node_matrix(self, mat: np.ndarray(Node)) -> tuple[bool, np.ndarray(Node)]:
+    def create_weighted_node_matrix(self, mat: np.ndarray) -> np.ndarray:
         '''Creating a weighted matrix'''
         # The matrix mat should be a matrix containing Nodes
         # checks if the matrix is valid
         if mat is None or len(mat) == 0 or len(mat[0]) == 0:
-            return False, None
+            return None
         size = (len(mat), len(mat[0]))
 
         diff_pos = [(1,-1),(1,0),(1,1),(0,-1),(0,0),(0,1),(-1,-1),(-1,0),(-1,1)]
@@ -169,7 +155,7 @@ class AStar:
         for row in range(size[0]):
             for col in range(size[1]):
                 # checks if it is a hindrance and then applies a weight to the tiles around
-                if mat[row][col] == 1:
+                if mat[row][col].object_id == 1:
                     # checks all surronding positions
                     for pos in positions:
                         idx_x = col + pos[0]
@@ -182,11 +168,13 @@ class AStar:
                             continue
                         weight = self.weight - max(abs(pos[0]), abs(pos[1])) + 1
                         mat[idx_y][idx_x] += weight * self.penalty
-        return True, mat
+        return mat
 
     def create_node_matrix(self, mat) -> np.ndarray:
         '''Create node matrix'''
+        new_mat = []
         for i, row in enumerate(mat):
+            new_row = []
             for j, col in enumerate(row):
                 node_data = {
                     'position': (i, j),
@@ -196,8 +184,9 @@ class AStar:
                     'weight': None,
                     'object_id': col
                 }
-                mat[i][j] = Node(node_data)
-        return mat
+                new_row.append(Node(node_data))
+            new_mat.append(new_row)
+        return new_mat
 
 
     def get_data(self, mat: np.ndarray, start_pos: tuple[int, int], end_pos: tuple[int, int]):

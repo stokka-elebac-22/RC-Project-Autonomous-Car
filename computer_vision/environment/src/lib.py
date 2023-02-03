@@ -215,6 +215,8 @@ class Node:
         self.f_value = data.get('f_value')
         if self.h_value is not None and self.weight is not None and self.g_value is not None:
             self.f_value = self.g_value + self.h_value + self.weight
+        elif self.f_value is None:
+            self.f_value = 0
 
     def update(self):
         '''Update the node'''

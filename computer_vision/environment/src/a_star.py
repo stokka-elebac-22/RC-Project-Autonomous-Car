@@ -66,10 +66,10 @@ class AStar:
                 [],
                 [],
                 [],
-                [0, 2],
-                [2, 1],
-                [0, 3],
-                [1, 3]
+                # [0, 2],
+                # [2, 1],
+                # [0, 3],
+                # [1, 3]
             ]
             for i, pos in enumerate(positions):
                 # checks if position is out of bounds
@@ -146,7 +146,6 @@ class AStar:
                 open_list.insert(new_node)
             # sets the value to 1 (hindrance) so it can not be used again
             mat[cur.position[0]][cur.position[1]] = 1
-
         return cur
 
     def create_weight_matrix(self, mat: np.ndarray) -> np.ndarray:

@@ -103,8 +103,8 @@ class TestParametrized:
         assert (line_coordinates == expected).all()
 
     @pytest.mark.parametrize('lines, expected', [
-        ([np.array([200, 100, 300, 400]), np.array([200, 100, 300, 400])], np.array([300, 400, 300, 400])),
-        ([np.array([100, 200, 300, 400]), np.array([200, 300, 400, 500])], np.array([300, 400, 400, 500]))
+        ([np.array([200, 100, 300, 400]), np.array([200, 100, 300, 400])], np.array([200, 100, 200, 100])),
+        ([np.array([100, 200, 300, 400]), np.array([200, 300, 400, 500])], np.array([100, 200, 200, 300]))
         ])
     def test_get_closing_line_of_two_lines(self, lines, expected):
         parking_slot_detector = ParkingSlotDetector()

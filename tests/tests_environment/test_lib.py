@@ -112,13 +112,13 @@ class TestBinarySearchList:
             ([
                 [Node({'f_value': 1})],
                 Node({'f_value': 0})],
-                [Node({'f_value': 1})],
-                Node({'f_value': 0})),
+                [Node({'f_value': 1}),
+                Node({'f_value': 0})]),
             ([
                 [Node({'f_value': 0})],
                 Node({'f_value': 1})],
-                [Node({'f_value': 0})],
-                Node({'f_value': 1})),
+                [Node({'f_value': 0}),
+                Node({'f_value': 1})]),
             (
                 [Node({'f_value': 4}),
                 Node({'f_value': 2}),

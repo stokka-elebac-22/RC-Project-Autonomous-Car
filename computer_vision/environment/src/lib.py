@@ -185,30 +185,34 @@ NodeData = TypedDict('NodeData', {
 class Node:
     '''Node'''
     def __init__(self, data: NodeData) -> None:
-        self.position = data['position']
-        self.parent: Node = data['parent']
+        self.position = data.get('position')
+        if self.position is None:
+            self.position = (0,0)
+        self.parent: Node = data.get('parent')
 
         # This value is set to 1 if the node can not be used anymore (blocked in)
         self.blocked: bool = False
 
-        self.object_id: Object = data['object_id']
+        self.object_id: Object = data.get('object_id')
         if self.object_id is None:
             self.object_id = 0
 
-        self.weight = data['weight']
+        self.weight = data.get('weight')
         if self.weight is None:
             self.weight = 0
 
-        self.g_value = data['g_value']
+        self.g_value = data.get('g_value')
+        if self.g_value is None:
+            self.g_value = 0
 
-        self.h_value = data['h_value']
+        self.h_value = data.get('h_value')
 
         if self.parent is not None:
             self.g_value = self.parent.g_value + math.sqrt(
                 abs(self.parent.position[0]-self.position[0])**2 +
                 abs(self.parent.position[1]-self.position[1]))
 
-        self.f_value = data['f_value']
+        self.f_value = data.get('f_value')
         if self.h_value is not None and self.weight is not None and self.g_value is not None:
             self.f_value = self.g_value + self.h_value + self.weight
 

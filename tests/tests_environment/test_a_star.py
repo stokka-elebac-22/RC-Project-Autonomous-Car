@@ -14,9 +14,9 @@ class TestAStar:
                 [0, 0, 0],
                 [0, 0, 0],
             ]],
-                Node((0, 1), 1, parent=
-                Node((1, 1), 1, parent=
-                Node((2, 1), 1, parent=None)))
+                Node({'position': (0, 1), 'h_value': 1, 'parent':
+                Node({'position': (2, 1), 'h_value': 1, 'parent':
+                Node({'position': (2, 1), 'h_value': 1})})})
             ),
             ([(2, 2), (0, 2),
                 [
@@ -24,11 +24,11 @@ class TestAStar:
                     [0, 1, 1],
                     [0, 0, 0],
                 ]],
-                    Node((0, 2), 1, parent=
-                    Node((0, 1), 1, parent=
-                    Node((1, 0), 1, parent=
-                    Node((2, 1), 1, parent=
-                    Node((2, 2), 1, parent=None)))))
+                    Node({'position': (0, 2), 'h_value': 1, 'parent':
+                    Node({'position': (0, 1), 'h_value': 1, 'parent':
+                    Node({'position': (1, 0), 'h_value': 1, 'parent':
+                    Node({'position': (2, 1), 'h_value': 1, 'parent':
+                    Node({'position': (2, 2), 'h_value': 1})})})})})
             ),
             ([(0, 4), (4, 3),
                 [
@@ -38,15 +38,15 @@ class TestAStar:
                     [0, 1, 1, 0, 0],
                     [0, 0, 0, 0, 0],
                 ]],
-                    Node((4, 3), 1, parent=
-                    Node((3, 3), 1, parent=
-                    Node((2, 2), 1, parent=
-                    Node((2, 1), 1, parent=
-                    Node((1, 0), 1, parent=
-                    Node((0, 1), 1, parent=
-                    Node((0, 2), 1, parent=
-                    Node((0, 3), 1, parent=
-                    Node((0, 4), 1, parent=None)))))))))
+                    Node({'position': (4, 3), 'h_value': 1, 'parent':
+                    Node({'position': (3, 3), 'h_value': 1, 'parent':
+                    Node({'position': (2, 2), 'h_value': 1, 'parent':
+                    Node({'position': (2, 1), 'h_value': 1, 'parent':
+                    Node({'position': (1, 0), 'h_value': 1, 'parent':
+                    Node({'position': (0, 1), 'h_value': 1, 'parent':
+                    Node({'position': (0, 2), 'h_value': 1, 'parent':
+                    Node({'position': (0, 3), 'h_value': 1, 'parent':
+                    Node({'position': (0, 4), 'h_value': 1})})})})})})})})})
             ),
             ([(0, 0), (0, 4),
                 [
@@ -56,11 +56,11 @@ class TestAStar:
                     [0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0],
                 ]],
-                    Node((0, 4), 1, parent=
-                    Node((0, 3), 1, parent=
-                    Node((0, 2), 1, parent=
-                    Node((0, 1), 1, parent=
-                    Node((0, 0), 1, parent=None)))))
+                    Node({'position': (0, 4), 'h_value': 1, 'parent':
+                    Node({'position': (0, 3), 'h_value': 1, 'parent':
+                    Node({'position': (0, 2), 'h_value': 1, 'parent':
+                    Node({'position': (0, 1), 'h_value': 1, 'parent':
+                    Node({'position': (0, 0), 'h_value': 1})})})})})
             ),
             ([(9, 5), (2, 8),
             [
@@ -75,22 +75,21 @@ class TestAStar:
                 [0,0,0,0,1,0,0,0,0,0,0],
                 [0,0,0,0,0,0,0,0,0,0,0],
             ]],
-                Node((2,8), 1, parent=
-                Node((2,7), 1, parent=
-                Node((2,6), 1, parent=
-                Node((2,5), 1, parent=
-                Node((2,4), 1, parent=
-                Node((2,3), 1, parent=
-                Node((2,2), 1, parent=
-                Node((3,1), 1, parent=
-                Node((4,1), 1, parent=
-                Node((5,1), 1, parent=
-                Node((6,1), 1, parent=
-                Node((7,2), 1, parent=
-                Node((8,3), 1, parent=
-                Node((9,4), 1, parent=
-                Node((9,5), 1, parent=None
-                )))))))))))))))
+                Node({'position': (2, 8), 'h_value': 1, 'parent':
+                Node({'position': (2, 7), 'h_value': 1, 'parent':
+                Node({'position': (2, 6), 'h_value': 1, 'parent':
+                Node({'position': (2, 5), 'h_value': 1, 'parent':
+                Node({'position': (2, 4), 'h_value': 1, 'parent':
+                Node({'position': (2, 3), 'h_value': 1, 'parent':
+                Node({'position': (2, 2), 'h_value': 1, 'parent':
+                Node({'position': (3, 1), 'h_value': 1, 'parent':
+                Node({'position': (4, 1), 'h_value': 1, 'parent':
+                Node({'position': (5, 1), 'h_value': 1, 'parent':
+                Node({'position': (6, 1), 'h_value': 1, 'parent':
+                Node({'position': (7, 2), 'h_value': 1, 'parent':
+                Node({'position': (8, 3), 'h_value': 1, 'parent':
+                Node({'position': (9, 4), 'h_value': 1, 'parent':
+                Node({'position': (9, 5), 'h_value': 1 })})})})})})})})})})})})})})}),
             ),
             ([(9, 5), (2, 8),
             [
@@ -105,22 +104,21 @@ class TestAStar:
                 [0,0,0,0,1,1,1,0,0,0,0],
                 [0,0,0,0,0,0,0,0,0,0,0],
             ]],
-                Node((2,8), 1, parent=
-                Node((2,7), 1, parent=
-                Node((2,6), 1, parent=
-                Node((2,5), 1, parent=
-                Node((2,4), 1, parent=
-                Node((2,3), 1, parent=
-                Node((2,2), 1, parent=
-                Node((3,1), 1, parent=
-                Node((4,1), 1, parent=
-                Node((5,1), 1, parent=
-                Node((6,1), 1, parent=
-                Node((7,2), 1, parent=
-                Node((8,3), 1, parent=
-                Node((9,4), 1, parent=
-                Node((9,5), 1, parent=None
-                )))))))))))))))
+                Node({'position': (2, 8), 'h_value': 1, 'parent':
+                Node({'position': (2, 7), 'h_value': 1, 'parent':
+                Node({'position': (2, 6), 'h_value': 1, 'parent':
+                Node({'position': (2, 5), 'h_value': 1, 'parent':
+                Node({'position': (2, 4), 'h_value': 1, 'parent':
+                Node({'position': (2, 3), 'h_value': 1, 'parent':
+                Node({'position': (2, 2), 'h_value': 1, 'parent':
+                Node({'position': (3, 1), 'h_value': 1, 'parent':
+                Node({'position': (4, 1), 'h_value': 1, 'parent':
+                Node({'position': (5, 1), 'h_value': 1, 'parent':
+                Node({'position': (6, 1), 'h_value': 1, 'parent':
+                Node({'position': (7, 2), 'h_value': 1, 'parent':
+                Node({'position': (8, 3), 'h_value': 1, 'parent':
+                Node({'position': (9, 4), 'h_value': 1, 'parent':
+                Node({'position': (9, 5), 'h_value': 1 })})})})})})})})})})})})})})}),
             ),
             ([(9, 5), (3, 7),
             [
@@ -135,15 +133,14 @@ class TestAStar:
                 [0,0,0,0,0,0,0,0,0,0,0],
                 [0,0,0,0,0,0,0,0,0,0,0],
             ]],
-                Node((3,7), 1, parent=
-                Node((3,6), 1, parent=
-                Node((4,5), 1, parent=
-                Node((5,5), 1, parent=
-                Node((6,5), 1, parent=
-                Node((7,5), 1, parent=
-                Node((8,5), 1, parent=
-                Node((9,5), 1, parent=None
-                ))))))))
+                Node({'position': (3, 7), 'h_value': 1, 'parent':
+                Node({'position': (3, 6), 'h_value': 1, 'parent':
+                Node({'position': (4, 5), 'h_value': 1, 'parent':
+                Node({'position': (5, 5), 'h_value': 1, 'parent':
+                Node({'position': (6, 5), 'h_value': 1, 'parent':
+                Node({'position': (7, 5), 'h_value': 1, 'parent':
+                Node({'position': (8, 5), 'h_value': 1, 'parent':
+                Node({'position': (9, 5), 'h_value': 1 })})})})})})})}),
             ),
         ]
     )
@@ -248,3 +245,4 @@ class TestAStar:
         a_star = AStar()
         res = a_star.__get_object_id(param) # pylint: disable=protected-access
         assert res == exp
+        

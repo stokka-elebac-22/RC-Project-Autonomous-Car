@@ -16,7 +16,7 @@ class AStar:
         self.penalty = penalty
 
     def find_path(self, mat: np.ndarray, start_pos: tuple[int, int],
-        end_pos: tuple[int, int]) -> list[Node]:
+        end_pos: tuple[int, int], verbose=0) -> tuple[list[Node], np.ndarray]:
         '''Returns the start node'''
         # The f_value will be the total distance and calculated with pythagoras
         # without the square root
@@ -24,21 +24,17 @@ class AStar:
             return None
 
         # if weight is not 0, create a weight matrix
-        weighted_mat = None
-        if self.weight != 0:
-            weighted_mat = self.create_weight_matrix(mat)
+        # this will now be O(N^2) in any case
+        elif verbose == 1:
+            mat = self.create_node_matrix(mat)
+            if self.weight != 0:
+                mat = self.create_weight_matrix(mat)
+
+
 
         size = (len(mat[0]), len(mat))
         h_value = math.sqrt((start_pos[0]-end_pos[0])**2 + (start_pos[1]-end_pos[1])**2)
-        node_data = {
-            'position': start_pos,
-            'h_value': h_value,
-            'f_value': None,
-            'parent': None,
-            'weight': None,
-            'object_id': None
-        }
-        start_node = Node(node_data)
+        start_node = Node(position=start_pos, h_value=h_value)
         open_list = BinarySearchList() # a list of possible candidates to be the next current node
         open_list.insert(start_node)
 
@@ -80,18 +76,11 @@ class AStar:
                     continue
                 # if finish node
                 if pos == end_pos:
-                    node_data = {
-                        'position': pos,
-                        'h_value': 0,
-                        'f_value': None,
-                        'parent': cur,
-                        'weight': None,
-                        'object_id': None
-                    }
-                    finish_node = Node(node_data)
+                    finish_node = mat[pos[0]][pos[1]]
+                    finish_node.parent = cur
                     return finish_node
-                # checks if tile is valid
 
+                # checks if tile is valid
                 obstacles_detected = []
                 for con in constraints[i]:
                     pos_x = positions[con][0]
@@ -102,14 +91,16 @@ class AStar:
                         pos_y < 0:
                         obstacles_detected.append(True)
                         continue
-                    con_object_id = mat[pos_x][pos_y]
+                    # checks if it is a number or not (then it should be a Node)
+                    con_object_id = mat[pos_x][pos_y].object_id
+
                     if con_object_id == 1:
                         obstacles_detected.append(True)
 
                 if len(obstacles_detected) > 0 and all(obstacles_detected):
                     continue
 
-                object_id = mat[pos[0]][pos[1]]
+                object_id = mat[pos[0]][pos[1]].object_id
                 object_data = objects.get_data(object_id)
                 # if the object is a hindrance(not valid)
                 if object_data.name not in self.valid:
@@ -122,41 +113,28 @@ class AStar:
                     new_g_value = cur.g_value + math.sqrt(
                         abs(cur.position[0]-node.position[0])**2 +
                         abs(cur.position[1]-node.position[1]))
-                    new_f_value = new_h_value + new_g_value
-                    if weighted_mat is not None:
-                        # adding a weight
-                        new_f_value += weighted_mat[pos[0]][pos[1]]
+                    # adding a weight
+                    new_f_value = new_h_value + new_g_value + mat[pos[0]][pos[1]].weight
                     if new_f_value > old_f_value:
                         continue
                     open_list.delete(node.position)
                 # if not in the list, create a node with cur note as parent
                 h_value = math.sqrt((pos[0]-end_pos[0])**2 + (pos[1]-end_pos[1])**2)
-                node_data = {
-                    'position': pos,
-                    'h_value': h_value,
-                    'f_value': None,
-                    'parent': cur,
-                    'weight': None,
-                    'object_id': None
-                }
-                new_node = Node(node_data)
-                if weighted_mat is not None:
-                    new_node.f_value += weighted_mat[pos[0]][pos[1]]
+                new_node = mat[pos[0]][pos[1]]
                 # add the new node to the open list
                 open_list.insert(new_node)
             # sets the value to 1 (hindrance) so it can not be used again
-            mat[cur.position[0]][cur.position[1]] = 1
+            mat[cur.position[0]][cur.position[1]].blocked = True
 
-        return cur
+        return cur, mat
 
-    def create_weight_matrix(self, mat: np.ndarray) -> np.ndarray:
+    def create_weighted_node_matrix(self, mat: np.ndarray(Node)) -> tuple[bool, np.ndarray(Node)]:
         '''Creating a weighted matrix'''
+        # The matrix mat should be a matrix containing Nodes
         # checks if the matrix is valid
         if mat is None or len(mat) == 0 or len(mat[0]) == 0:
-            return
+            return False, None
         size = (len(mat), len(mat[0]))
-        # weighted_mat = np.full((size[0], size[1]), (0,0), dtype=(int,int))
-        weighted_mat = np.zeros((size[0], size[1]), dtype=int)
 
         diff_pos = [(1,-1),(1,0),(1,1),(0,-1),(0,0),(0,1),(-1,-1),(-1,0),(-1,1)]
         positions = set()
@@ -181,8 +159,23 @@ class AStar:
                             idx_y < 0:
                             continue
                         weight = self.weight - max(abs(pos[0]), abs(pos[1])) + 1
-                        weighted_mat[idx_y][idx_x] += weight * self.penalty
-        return weighted_mat
+                        mat[idx_y][idx_x] += weight * self.penalty
+        return True, mat
+
+    def create_node_matrix(self, mat) -> np.ndarray:
+        '''Create node matrix'''
+        for i, row in enumerate(mat):
+            for j, col in enumerate(row):
+                node_data = {
+                    'position': (i, j),
+                    'h_value': None,
+                    'f_value': None,
+                    'parent': None,
+                    'weight': None,
+                    'object_id': col
+                }
+                mat[i][j] = Node(node_data)
+        return mat
 
 
     def get_data(self, mat: np.ndarray, start_pos: tuple[int, int], end_pos: tuple[int, int]):

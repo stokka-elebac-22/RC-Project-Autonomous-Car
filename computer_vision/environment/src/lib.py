@@ -188,6 +188,9 @@ class Node:
         self.position = data['position']
         self.parent: Node = data['parent']
 
+        # This value is set to 1 if the node can not be used anymore (blocked in)
+        self.blocked: bool = False
+
         self.object_id: Object = data['object_id']
         if self.object_id is None:
             self.object_id = 0
@@ -197,8 +200,6 @@ class Node:
             self.weight = 0
 
         self.g_value = data['g_value']
-        if self.g_value is None:
-            self.g_value = 0
 
         self.h_value = data['h_value']
 

@@ -78,20 +78,8 @@ class AStar:
                     pos[1] > size[0] - 1 or \
                     pos[1] < 0:
                     continue
-                # if finish node
-                if pos == end_pos:
-                    node_data = {
-                        'position': pos,
-                        'h_value': 0,
-                        'f_value': None,
-                        'parent': cur,
-                        'weight': None,
-                        'object_id': None
-                    }
-                    finish_node = Node(node_data)
-                    return finish_node
-                # checks if tile is valid
 
+                # checks if tile is valid
                 object_id = mat[pos[0]][pos[1]]
                 object_data = objects.get_data(object_id)
                 # if the object is a hindrance(not valid)
@@ -112,9 +100,18 @@ class AStar:
 
                 if len(obstacles_detected) == 2 and all(obstacles_detected):
                     continue
+
                 # if finish node
                 if pos == end_pos:
-                    finish_node = Node(pos, 0, parent=cur)
+                    node_data = {
+                        'position': pos,
+                        'h_value': 0,
+                        'f_value': None,
+                        'parent': cur,
+                        'weight': None,
+                        'object_id': None
+                    }
+                    finish_node = Node(node_data)
                     return finish_node
 
                 # check if node already in the list

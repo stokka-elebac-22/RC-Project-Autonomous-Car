@@ -17,7 +17,7 @@ class TestAStar:
                 [0, 0, 0],
             ]],
                 Node({'position': (0, 1), 'h_value': 1, 'parent':
-                Node({'position': (2, 1), 'h_value': 1, 'parent':
+                Node({'position': (1, 1), 'h_value': 1, 'parent':
                 Node({'position': (2, 1), 'h_value': 1})})})
             ),
             ([(2, 2), (0, 2),
@@ -195,15 +195,15 @@ class TestAStar:
         a_star = AStar()
         cur_node: Node = a_star.find_path(param[2], param[0], param[1])
         cur_exp: Node = exp
-        print(cur_node.position, cur_exp.position)
         assert cur_node == cur_exp
         while True:
+            print(cur_node.position, cur_exp.position)
             cur_node = cur_node.parent
             cur_exp = cur_exp.parent
             if cur_exp is None:
                 return
             print(cur_node.position, cur_exp.position)
-            #assert cur_node == cur_exp
+            assert cur_node == cur_exp
 
     @pytest.mark.parametrize(
         ['param', 'exp'],

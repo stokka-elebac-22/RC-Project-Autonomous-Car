@@ -58,13 +58,13 @@ class TestNode:
     '''Test node'''
     def test_node(self):
         '''Test Node'''
-        node = Node({'position': (0,0)}),
+        node = Node({'position': (0,0)})
         assert node.parent is None
         parent = Node({'position': (0,1)})
         node.parent = parent
         assert node.parent.position == (0, 1)
-        node = Node({'position': (0,0)}),
-        node_dup = Node({'position': (0,0)}),
+        node = Node({'position': (0,0)})
+        node_dup = Node({'position': (0,0)})
         assert node == node_dup
 
 class TestBinarySearchList:
@@ -119,11 +119,11 @@ class TestBinarySearchList:
                 Node({'f_value': 1})],
                 [Node({'f_value': 0}),
                 Node({'f_value': 1})]),
-            (
+            ([
                 [Node({'f_value': 4}),
                 Node({'f_value': 2}),
                 Node({'f_value': 3}),
-                Node({'f_value': 8}),
+                Node({'f_value': 8})],
                 Node({'f_value': 5})],
                 [Node({'f_value': 2}),
                 Node({'f_value': 3}),
@@ -136,6 +136,7 @@ class TestBinarySearchList:
     def test_insert(self, param, exp):
         '''Test insert'''
         bsn = BinarySearchList()
+        print(param[0])
         for node in param[0]:
             bsn.insert(node)
         bsn.insert(param[1])

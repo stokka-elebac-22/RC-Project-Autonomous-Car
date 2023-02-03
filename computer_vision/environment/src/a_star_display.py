@@ -92,7 +92,7 @@ class AStar:
                         obstacles_detected.append(True)
                         continue
                     # checks if it is a number or not (then it should be a Node)
-                    con_object_id = mat[pos_x][pos_y].object_id
+                    con_object_id = mat[pos_y][pos_x].object_id
 
                     if con_object_id == 1:
                         obstacles_detected.append(True)

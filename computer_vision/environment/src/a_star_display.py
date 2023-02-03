@@ -34,7 +34,15 @@ class AStar:
 
         size = (len(mat[0]), len(mat))
         h_value = math.sqrt((start_pos[0]-end_pos[0])**2 + (start_pos[1]-end_pos[1])**2)
-        start_node = Node(position=start_pos, h_value=h_value)
+        node_data = {
+            'position': start_pos,
+            'h_value': h_value,
+            'f_value': None,
+            'parent': None,
+            'weight': None,
+            'object_id': None
+        }
+        start_node = Node(node_data)
         open_list = BinarySearchList() # a list of possible candidates to be the next current node
         open_list.insert(start_node)
 
@@ -74,6 +82,7 @@ class AStar:
                     pos[1] > size[0] - 1 or \
                     pos[1] < 0:
                     continue
+
                 # if finish node
                 if pos == end_pos:
                     finish_node = mat[pos[0]][pos[1]]
@@ -81,10 +90,24 @@ class AStar:
                     return finish_node
 
                 # checks if tile is valid
+                object_id = mat[pos[0]][pos[1]].object_id
+                object_data = objects.get_data(object_id)
+                # if the object is a hindrance(not valid)
+                if object_data.name not in self.valid:
+                    continue
+
                 obstacles_detected = []
                 for con in constraints[i]:
                     pos_x = positions[con][0]
                     pos_y = positions[con][1]
+
+                    con_object_id = mat[pos_y][pos_x].object_id
+                    object_data = objects.get_data(object_id)
+                    # if the object is a hindrance(not valid)
+                    if object_data.name not in self.valid:
+                        obstacle_detected.append(True)
+                        continue
+
                     if pos_x > size[1] - 1 or \
                         pos_x < 0 or \
                         pos_y > size[0] - 1 or \
@@ -92,7 +115,6 @@ class AStar:
                         obstacles_detected.append(True)
                         continue
                     # checks if it is a number or not (then it should be a Node)
-                    con_object_id = mat[pos_y][pos_x].object_id
 
                     if con_object_id == 1:
                         obstacles_detected.append(True)

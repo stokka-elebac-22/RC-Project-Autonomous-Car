@@ -86,7 +86,7 @@ class AStar:
                 if object_data.name not in self.valid:
                     continue
 
-                obstacles_detected = []
+                obstacles_detected = 0
                 for con in constraints[i]:
                     pos_y = positions[con][0]
                     pos_x = positions[con][1]
@@ -96,9 +96,9 @@ class AStar:
 
                     # if the object is a hindrance(not valid)
                     if con_object_data.name not in self.valid:
-                        obstacles_detected.append(True)
+                        obstacles_detected += 1
 
-                if len(obstacles_detected) == 2 and all(obstacles_detected):
+                if obstacles_detected == 2:
                     continue
 
                 # if finish node

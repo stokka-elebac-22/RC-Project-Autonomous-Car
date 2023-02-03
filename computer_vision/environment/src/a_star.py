@@ -66,10 +66,10 @@ class AStar:
                 [],
                 [],
                 [],
-                # [0, 2],
-                # [2, 1],
-                # [0, 3],
-                # [1, 3]
+                [0, 2],
+                [2, 1],
+                [0, 3],
+                [1, 3]
             ]
             for i, pos in enumerate(positions):
                 # checks if position is out of bounds

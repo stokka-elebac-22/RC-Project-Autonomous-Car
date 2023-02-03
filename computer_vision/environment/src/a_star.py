@@ -87,15 +87,7 @@ class AStar:
                         obstacles_detected.append(True)
                         continue
                     # checks if it is a number or not (then it should be a Node)
-                    obj = mat[pos_x][pos_y]
-                    ret, con_object_id = self.__get_object_id(obj)
-                    if isinstance(obj, int):
-                        con_object_id = obj
-                    elif isinstance(obj, Node):
-                        con_object_id = mat[pos_x][pos_y].id
-                    else: # this should not happen
-                        print(f'Object {obj} is neither a int or a Node')
-                        continue
+                    ret, con_object_id = self.__get_object_id(mat[pos_x][pos_y])
 
                     if con_object_id == 1:
                         obstacles_detected.append(True)
@@ -103,15 +95,7 @@ class AStar:
                 if len(obstacles_detected) > 0 and all(obstacles_detected):
                     continue
 
-                obj = mat[pos_x][pos_y]
-                if isinstance(obj, int):
-                    con_object_id = obj
-                elif isinstance(obj, Node):
-                    con_object_id = mat[pos_x][pos_y].id
-                else: # this should not happen
-                    print(f'Object {obj} is neither a int or a Node')
-                    continue
-                object_id = mat[pos[0]][pos[1]]
+                ret, object_id = self.__get_object_id(mat[pos[0]][pos[1]])
                 object_data = objects.get_data(object_id)
                 # if the object is a hindrance(not valid)
                 if object_data.name not in self.valid:
@@ -197,6 +181,6 @@ class AStar:
         if isinstance(obj, int):
             return True, obj
         if isinstance(obj, Node):
-            return True, obj.id
+            return True, obj.object_id
         print(f'Object {obj} is neither a int or a Node')
         return False, None

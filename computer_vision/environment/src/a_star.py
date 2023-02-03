@@ -63,21 +63,13 @@ class AStar:
                 [0, 3],
                 [1, 3]
             ]
-            print(pos)
+            
             for i, pos in enumerate(positions):
                 # checks if position is out of bounds
                 if pos[0] > size[1] - 1 or \
                     pos[0] < 0 or \
                     pos[1] > size[0] - 1 or \
                     pos[1] < 0:
-                    continue
-
-                # checks if tile is valid
-
-                object_id = mat[pos[0]][pos[1]]
-                object_data = objects.get_data(object_id)
-                # if the object is a hindrance(not valid)
-                if object_data.name not in self.valid:
                     continue
 
                 obstacles_detected = []
@@ -94,10 +86,19 @@ class AStar:
                 
                 if len(obstacles_detected) == 2 and all(obstacles_detected):
                     continue
+                
                 # if finish node
                 if pos == end_pos:
                     finish_node = Node(pos, 0, parent=cur)
                     return finish_node
+
+                # checks if tile is valid
+
+                object_id = mat[pos[0]][pos[1]]
+                object_data = objects.get_data(object_id)
+                # if the object is a hindrance(not valid)
+                if object_data.name not in self.valid:
+                    continue
                 
                 # check if node already in the list
                 ret, node = open_list.get(pos)

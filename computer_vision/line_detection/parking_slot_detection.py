@@ -6,12 +6,12 @@ import os
 import cv2
 import numpy as np
 try:
-    from lane_detector import LineDetector
+    from line_detector import LineDetector
 except ImportError:
     try:
-        from computer_vision.line_detection.lane_detector import LineDetector
+        from computer_vision.line_detection.line_detector import LineDetector
     except ImportError:
-        from line_detection.lane_detector import LineDetector
+        from line_detection.line_detector import LineDetector
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)

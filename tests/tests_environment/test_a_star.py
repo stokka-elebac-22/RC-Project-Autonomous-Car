@@ -225,10 +225,10 @@ class TestAStar:
         ]
     )
 
-    def test_create_weight_matrix(self, param, exp):
+    def test_create_weighted_node_matrix(self, param, exp):
         '''Test create weight matrix'''
         a_star = AStar(param[0])
-        res = a_star.create_weight_matrix(param[1])
+        res = a_star.create_weighted_node_matrix(param[1])
         assert (exp[0] == res).all()
 
     @pytest.mark.parametrize(

@@ -172,28 +172,44 @@ class TwoWayDict(dict):
         '''Returns the number of connections'''
         return dict.__len__(self) // 2
 
+NodeData = TypedDict('NodeData', {
+    'position': tuple[int, int],
+    'h_value': float,
+    'f_value': int,
+    'parent': None,
+    'weight': int,
+    'object_id': int,
+})
+
 @dataclasses.dataclass
 class Node:
     '''Node'''
-    def __init__(self, position: tuple[int, int],
-                h_value: float, parent=None, f_value: int=None, object_id: int=None) -> None:
-        self.position = position
-        self.parent: Node = parent
+    def __init__(self, data: NodeData) -> None:
+        self.position = data['position']
+        self.parent: Node = data['parent']
 
-        self.object_id: Object = object_id
-        if object_id is None:
+        self.object_id: Object = data['object_id']
+        if self.object_id is None:
             self.object_id = 0
 
-        self.g_value = 0
-        self.h_value = h_value
+        self.weight = data['weight']
+        if self.weight is None:
+            self.weight = 0
+
+        self.g_value = data['g_value']
+        if self.g_value is None:
+            self.g_value = 0
+
+        self.h_value = data['h_value']
 
         if self.parent is not None:
             self.g_value = self.parent.g_value + math.sqrt(
                 abs(self.parent.position[0]-self.position[0])**2 +
                 abs(self.parent.position[1]-self.position[1]))
-        self.f_value = f_value
-        if f_value is None: # rarly used
-            self.f_value = self.g_value + self.h_value
+
+        self.f_value = data['f_value']
+        if self.h_value is not None and self.weight is not None and self.g_value is not None:
+            self.f_value = self.g_value + self.h_value + self.weight
 
     def update(self):
         '''Update the node'''
@@ -202,7 +218,7 @@ class Node:
             self.g_value = self.parent.g_value + math.sqrt(
                 abs(self.parent.position[0]-self.position[0])**2 +
                 abs(self.parent.position[1]-self.position[1]))
-        self.f_value = self.g_value + self.h_value
+        self.f_value = self.g_value + self.h_value + self.weight
 
     def __eq__(self, other):
         return self.position == other.position

@@ -16,7 +16,7 @@ class AStar:
         self.penalty = penalty
 
     def find_path(self, mat: np.ndarray, start_pos: tuple[int, int],
-        end_pos: tuple[int, int]) -> list[Node]:
+        end_pos: tuple[int, int]) -> tuple[list[Node], np.ndarray]:
         '''Returns the start node'''
         # The f_value will be the total distance and calculated with pythagoras
         # without the square root
@@ -24,9 +24,13 @@ class AStar:
             return None
 
         # if weight is not 0, create a weight matrix
-        weighted_mat = None
+        # this will now be O(N^2) in any case
         if self.weight != 0:
-            weighted_mat = self.create_weight_matrix(mat)
+            mat = self.create_weighted_node_matrix(mat)
+        else:
+            mat = self.create_node_matrix(mat)
+
+
 
         size = (len(mat[0]), len(mat))
         h_value = math.sqrt((start_pos[0]-end_pos[0])**2 + (start_pos[1]-end_pos[1])**2)
@@ -129,7 +133,7 @@ class AStar:
 
         return cur, mat
 
-    def create_weight_matrix(self, mat: np.ndarray) -> np.ndarray:
+    def create_weighted_node_matrix(self, mat: np.ndarray) -> np.ndarray:
         '''Creating a weighted matrix'''
         # checks if the matrix is valid
         if mat is None or len(mat) == 0 or len(mat[0]) == 0:
@@ -163,6 +167,13 @@ class AStar:
                         weight = self.weight - max(abs(pos[0]), abs(pos[1])) + 1
                         weighted_mat[idx_y][idx_x] += weight * self.penalty
         return weighted_mat
+
+    def create_node_matrix(self, mat) -> np.ndarray:
+        '''Create node matrix'''
+        for i, row in enumerate(mat):
+            for j, col in enumerate(row):
+                mat[i][j] = Node((i,j), object_id=col)
+        return mat
 
 
     def get_data(self, mat: np.ndarray, start_pos: tuple[int, int], end_pos: tuple[int, int]):

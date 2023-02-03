@@ -176,9 +176,13 @@ class TwoWayDict(dict):
 class Node:
     '''Node'''
     def __init__(self, position: tuple[int, int],
-                h_value: float, parent=None, f_value: int=None) -> None:
+                h_value: float, parent=None, f_value: int=None, object_id: int=None) -> None:
         self.position = position
         self.parent: Node = parent
+
+        self.object_id: Object = object_id
+        if object_id is None:
+            self.object_id = 0
 
         self.g_value = 0
         self.h_value = h_value

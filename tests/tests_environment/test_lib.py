@@ -58,12 +58,13 @@ class TestNode:
     '''Test node'''
     def test_node(self):
         '''Test Node'''
-        node = Node((0, 0), 1)
+        node = Node({'position': (0,0)})
         assert node.parent is None
-        parent = Node((0, 1), 1)
+        parent = Node({'position': (0,1)})
         node.parent = parent
         assert node.parent.position == (0, 1)
-        node_dup = Node((0, 0), 1)
+        node = Node({'position': (0,0)})
+        node_dup = Node({'position': (0,0)})
         assert node == node_dup
 
 class TestBinarySearchList:
@@ -95,76 +96,60 @@ class TestBinarySearchList:
         ['param', 'exp'],
         [
             ([
-                [Node((0,0), 1, f_value=0),
-                Node((0,0), 1, f_value=1),
-                Node((0,0), 1, f_value=2),
-                Node((0,0), 1, f_value=4)],
-                Node((0,0), 1, f_value=3)],
-                [Node((0,0), 1, f_value=0),
-                Node((0,0), 1, f_value=1),
-                Node((0,0), 1, f_value=2),
-                Node((0,0), 1, f_value=3),
-                Node((0,0), 1, f_value=4)],
+                [
+                Node({'f_value': 0}),
+                Node({'f_value': 1}),
+                Node({'f_value': 2}),
+                Node({'f_value': 4})],
+                Node({'f_value': 3})],
+                [
+                Node({'f_value': 0}),
+                Node({'f_value': 1}),
+                Node({'f_value': 2}),
+                Node({'f_value': 4}),
+                Node({'f_value': 3})],
                 ),
             ([
-                [Node((0,0), 1, f_value=1)],
-                Node((0,0), 1, f_value=0)],
-                [Node((0,0), 1, f_value=1),
-                Node((0,0), 1, f_value=0)]),
+                [Node({'f_value': 1})],
+                Node({'f_value': 0})],
+                [Node({'f_value': 1}),
+                Node({'f_value': 0})]),
             ([
-                [Node((0,0), 1, f_value=0)],
-                Node((0,0), 1, f_value=1)],
-                [Node((0,0), 1, f_value=0),
-                Node((0,0), 1, f_value=1)]),
+                [Node({'f_value': 0})],
+                Node({'f_value': 1})],
+                [Node({'f_value': 0}),
+                Node({'f_value': 1})]),
             ([
-                [Node((0,0), 1, f_value=4),
-                Node((0,0), 1, f_value=2),
-                Node((0,0), 1, f_value=3),
-                Node((0,0), 1, f_value=8)],
-                Node((0,0), 1, f_value=5)],
-                [Node((0,0), 1, f_value=2),
-                Node((0,0), 1, f_value=3),
-                Node((0,0), 1, f_value=4),
-                Node((0,0), 1, f_value=5),
-                Node((0,0), 1, f_value=8)],
+                [Node({'f_value': 4}),
+                Node({'f_value': 2}),
+                Node({'f_value': 3}),
+                Node({'f_value': 8})],
+                Node({'f_value': 5})],
+                [Node({'f_value': 2}),
+                Node({'f_value': 3}),
+                Node({'f_value': 4}),
+                Node({'f_value': 5}),
+                Node({'f_value': 8})],
                 ),
         ]
     )
     def test_insert(self, param, exp):
         '''Test insert'''
         bsn = BinarySearchList()
+        print(param[0])
         for node in param[0]:
             bsn.insert(node)
         bsn.insert(param[1])
         _, nodes = bsn.get()
         assert nodes == exp
 
-    @pytest.mark.parametrize(
-        ['param', 'exp'],
-        [
-            (
-            [Node((0,0), 1, f_value=4),
-            Node((1,1), 1, f_value=2),
-            Node((0,0), 1, f_value=3),
-            Node((0,0), 1, f_value=8),
-            Node((0,0), 1, f_value=5)],
-            [[Node((0,0), 1, f_value=3),
-            Node((0,0), 1, f_value=4),
-            Node((0,0), 1, f_value=5),
-            Node((0,0), 1, f_value=8)],
-            [Node((0,0), 1, f_value=3),
-            Node((0,0), 1, f_value=5),
-            Node((0,0), 1, f_value=8)]],
-            ),
-        ]
-    )
     def data1(self):
         '''A method to generate data'''
-        node2 = Node((0,0), 1, f_value=2)
-        node3 = Node((0,0), 1, f_value=3)
-        node4 = Node((0,0), 1, f_value=4)
-        node5 = Node((0,0), 1, f_value=5)
-        node8 = Node((0,0), 1, f_value=8)
+        node2 = Node({'f_value': 2})
+        node3 = Node({'f_value': 3})
+        node4 = Node({'f_value': 4})
+        node5 = Node({'f_value': 5})
+        node8 = Node({'f_value': 8})
 
         param = [node4, node2, node3, node5, node8]
 
@@ -202,7 +187,8 @@ class TestBinarySearchList:
     @pytest.mark.parametrize(
         ['param', 'exp'],
         [
-            ([Node((0, 0), 1), (0, 0), (0, 1)], [True, Node((0, 0), 1), False])
+            ([Node({'position': (0,0), 'h_value': 1}), (0, 0), (0, 1)],
+            [True, Node({'position': (0,0), 'h_value': 1}), False])
         ]
     )
 

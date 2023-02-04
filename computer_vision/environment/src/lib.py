@@ -146,8 +146,8 @@ class Objects:
         color, thickness
         '''
         if not isinstance(obj, (int, float)):
-            obj = self.objects[obj] # convert to correct keyname
-        return self.object_data[int(obj)]
+            obj = self.objects.get(obj) # convert to correct keyname
+        return self.object_data.get(int(obj))
 
 
 class TwoWayDict(dict):
@@ -172,24 +172,48 @@ class TwoWayDict(dict):
         '''Returns the number of connections'''
         return dict.__len__(self) // 2
 
+NodeData = TypedDict('NodeData', {
+    'position': tuple[int, int],
+    'h_value': float,
+    'f_value': int,
+    'parent': None,
+    'weight': int,
+    'object_id': int,
+})
+
 @dataclasses.dataclass
 class Node:
     '''Node'''
-    def __init__(self, position: tuple[int, int],
-                h_value: float, parent=None, f_value: int=None) -> None:
-        self.position = position
-        self.parent: Node = parent
+    def __init__(self, data: NodeData) -> None:
+        self.position = data.get('position')
+        if self.position is None:
+            self.position = (0,0)
+        self.parent: Node = data.get('parent')
 
-        self.g_value = 0
-        self.h_value = h_value
+        self.object_id: Object = data.get('object_id')
+        if self.object_id is None:
+            self.object_id = 0
+
+        self.weight = data.get('weight')
+        if self.weight is None:
+            self.weight = 0
+
+        self.g_value = data.get('g_value')
+        if self.g_value is None:
+            self.g_value = 0
+
+        self.h_value = data.get('h_value')
 
         if self.parent is not None:
             self.g_value = self.parent.g_value + math.sqrt(
                 abs(self.parent.position[0]-self.position[0])**2 +
                 abs(self.parent.position[1]-self.position[1]))
-        self.f_value = f_value
-        if f_value is None: # rarly used
-            self.f_value = self.g_value + self.h_value
+
+        self.f_value = data.get('f_value')
+        if self.h_value is not None and self.weight is not None and self.g_value is not None:
+            self.f_value = self.g_value + self.h_value + self.weight
+        elif self.f_value is None:
+            self.f_value = 0
 
     def update(self):
         '''Update the node'''
@@ -198,7 +222,7 @@ class Node:
             self.g_value = self.parent.g_value + math.sqrt(
                 abs(self.parent.position[0]-self.position[0])**2 +
                 abs(self.parent.position[1]-self.position[1]))
-        self.f_value = self.g_value + self.h_value
+        self.f_value = self.g_value + self.h_value + self.weight
 
     def __eq__(self, other):
         return self.position == other.position

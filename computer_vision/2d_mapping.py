@@ -4,10 +4,11 @@ from pygame.locals import QUIT # pylint: disable=no-name-in-module
 from environment.src.environment import Environment
 from environment.src.display import DisplayEnvironment
 from environment.src.a_star import AStar
+from environment.src.a_star_display import AStar as AstarDisplay
 from qr_code.qr_code import QRCode
 
 if __name__ == '__main__':
-    SIZE = (40, 41)
+    SIZE = (10, 11)
     W_SIZE = 600
     WINDOW_SIZE = (W_SIZE* (SIZE[1]/SIZE[0]), W_SIZE)
 
@@ -26,7 +27,8 @@ if __name__ == '__main__':
     env= Environment(SIZE, 70, {'view_point': None, 'object_id': 10})
     display = DisplayEnvironment(WINDOW_SIZE, SIZE)
 
-    a_star = AStar(weight=20, penalty=1)
+    a_star = AStar()
+    a_star_display = AstarDisplay(10, 1)
 
     env.insert_by_index((1,1), 11)
 
@@ -59,7 +61,7 @@ if __name__ == '__main__':
         #         offset = points[1][0] - CAMERA_PX_SIZE[1]/2
         #     distance_x = offset * mm_per_px + 200 # idk why 200,
 
-            # env.insert((distance_x, distance_y), 11)
+        #     env.insert((distance_x, distance_y), 11)
 
         start_pos_path = env.get_pos(10)
         end_pos_path = env.get_pos(11)
@@ -67,7 +69,14 @@ if __name__ == '__main__':
         cur_mat = env.get_data()
         display.update(cur_mat)
         cur_mat = env.get_data()
-        ret, path = a_star.get_data(cur_mat, start_pos_path, end_pos_path)
+        # ret, path = a_star.get_data(cur_mat, start_pos_path, end_pos_path)
+
+        node, mat = a_star_display.find_path(cur_mat, start_pos_path, end_pos_path)
+        path = []
+        ret = True
+        while node is not None:
+            path.append(node.position)
+            node = node.parent
 
         if ret:
             for pos in path[1:-1]:

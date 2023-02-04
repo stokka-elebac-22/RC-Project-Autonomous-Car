@@ -71,6 +71,7 @@ class AStar:
                 [0, 3],
                 [1, 3]
             ]
+
             for i, pos in enumerate(positions):
                 # checks if position is out of bounds
                 if pos[0] > size[1] - 1 or \
@@ -80,6 +81,7 @@ class AStar:
                     continue
 
                 obstacles_detected = 0
+
                 for con in constraints[i]:
                     pos_y = positions[con][0]
                     pos_x = positions[con][1]
@@ -108,6 +110,7 @@ class AStar:
                     return finish_node
 
                 # checks if tile is valid
+
                 object_id = mat[pos[0]][pos[1]]
                 object_data = objects.get_data(object_id)
                 # if the object is a hindrance(not valid)

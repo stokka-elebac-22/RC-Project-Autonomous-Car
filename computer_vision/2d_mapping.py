@@ -4,7 +4,6 @@ from pygame.locals import QUIT # pylint: disable=no-name-in-module
 from environment.src.environment import Environment
 from environment.src.display import DisplayEnvironment
 from environment.src.a_star import AStar
-from environment.src.a_star_display import AStar as AstarDisplay
 from qr_code.qr_code import QRCode
 
 if __name__ == '__main__':
@@ -28,7 +27,6 @@ if __name__ == '__main__':
     display = DisplayEnvironment(WINDOW_SIZE, SIZE)
 
     a_star = AStar()
-    a_star_display = AstarDisplay(10, 1)
 
     env.insert_by_index((1,1), 11)
 

@@ -28,7 +28,7 @@ if __name__ == '__main__':
     display = DisplayEnvironment(WINDOW_SIZE, SIZE)
 
     a_star = AStar()
-    a_star_display = AstarDisplay()
+    a_star_display = AstarDisplay(10, 1)
 
     env.insert_by_index((1,1), 11)
 
@@ -69,12 +69,14 @@ if __name__ == '__main__':
         cur_mat = env.get_data()
         display.update(cur_mat)
         cur_mat = env.get_data()
-        ret, path = a_star.get_data(cur_mat, start_pos_path, end_pos_path)
-        # node, mat = a_star_display.find_path(cur_mat, start_pos_path, end_pos_path)
-        # path = []
-        # while node is not None:
-        #     path.append(node.position)
-        #     node = node.parent
+        # ret, path = a_star.get_data(cur_mat, start_pos_path, end_pos_path)
+
+        node, mat = a_star_display.find_path(cur_mat, start_pos_path, end_pos_path)
+        path = []
+        ret = True
+        while node is not None:
+            path.append(node.position)
+            node = node.parent
 
         if ret:
             for pos in path[1:-1]:

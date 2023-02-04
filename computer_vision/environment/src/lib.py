@@ -146,8 +146,8 @@ class Objects:
         color, thickness
         '''
         if not isinstance(obj, (int, float)):
-            obj = self.objects[obj] # convert to correct keyname
-        return self.object_data[int(obj)]
+            obj = self.objects.get(obj) # convert to correct keyname
+        return self.object_data.get(int(obj))
 
 
 class TwoWayDict(dict):
@@ -189,9 +189,6 @@ class Node:
         if self.position is None:
             self.position = (0,0)
         self.parent: Node = data.get('parent')
-
-        # This value is set to 1 if the node can not be used anymore (blocked in)
-        self.blocked: bool = False
 
         self.object_id: Object = data.get('object_id')
         if self.object_id is None:

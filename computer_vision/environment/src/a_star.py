@@ -113,6 +113,7 @@ class AStar:
                 # if the object is a hindrance(not valid)
                 if object_data.name not in self.valid:
                     continue
+
                 # check if node already in the list
                 ret, node = open_list.get(pos)
                 if ret:

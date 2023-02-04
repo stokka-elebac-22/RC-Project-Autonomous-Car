@@ -188,6 +188,17 @@ class TestAStar:
                 Node({'position': (2, 1), 'h_value': 1, 'parent':
                 Node({'position': (1, 0), 'h_value': 1 })})})}),
             ),
+            ([(1, 0), (0, 1),
+            [
+                [1, 0, 0],
+                [0, 1, 0],
+                [0, 0, 0],
+            ]],
+                Node({'position': (0, 1), 'h_value': 1, 'parent':
+                Node({'position': (1, 2), 'h_value': 1, 'parent':
+                Node({'position': (2, 1), 'h_value': 1, 'parent':
+                Node({'position': (1, 0), 'h_value': 1 })})})}),
+            ),
         ]
     )
     def test_find_path(self, param, exp):

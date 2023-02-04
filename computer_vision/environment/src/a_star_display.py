@@ -80,23 +80,17 @@ class AStar:
                     pos[1] < 0:
                     continue
 
-                # checks if tile is valid
-                object_id = mat[pos[0]][pos[1]].object_id
-                object_data = objects.get_data(object_id)
-                # if the object is a hindrance(not valid)
-                if object_data.name not in self.valid:
-                    continue
-
                 obstacles_detected = 0
                 for con in constraints[i]:
                     pos_x = positions[con][0]
                     pos_y = positions[con][1]
 
-                    con_object_id = mat[pos_y][pos_x].object_id
+                    con_object_id = mat[pos_x][pos_y].object_id
                     object_data = objects.get_data(con_object_id)
+
                     # if the object is a hindrance(not valid)
-                    if object_data.name not in self.valid:
-                        obstacle_detected += 1
+                    if object_data is None or object_data.name not in self.valid:
+                        obstacles_detected += 1
 
                 if obstacles_detected == 2:
                     continue
@@ -112,7 +106,14 @@ class AStar:
                         'object_id': None
                     }
                     finish_node = Node(node_data)
-                    return finish_node
+                    return finish_node, mat
+
+                # checks if tile is valid
+                object_id = mat[pos[0]][pos[1]].object_id
+                object_data = objects.get_data(object_id)
+                # if the object is a hindrance(not valid)
+                if object_data is None or object_data.name not in self.valid:
+                    continue
 
                 # check if node already in the list
                 ret, node = open_list.get(pos)
@@ -130,10 +131,13 @@ class AStar:
                 # if not in the list, create a node with cur note as parent
                 h_value = math.sqrt((pos[0]-end_pos[0])**2 + (pos[1]-end_pos[1])**2)
                 new_node = mat[pos[0]][pos[1]]
+                new_node.h_value = h_value
+                new_node.parent = cur
+                new_node.update()
                 # add the new node to the open list
                 open_list.insert(new_node)
             # sets the value to 1 (hindrance) so it can not be used again
-            mat[cur.position[0]][cur.position[1]].blocked = True
+            mat[cur.position[0]][cur.position[1]].object_id = -1
         return cur, mat
 
     def create_weighted_node_matrix(self, mat: np.ndarray) -> np.ndarray:
@@ -167,7 +171,7 @@ class AStar:
                             idx_y < 0:
                             continue
                         weight = self.weight - max(abs(pos[0]), abs(pos[1])) + 1
-                        mat[idx_y][idx_x] += weight * self.penalty
+                        mat[idx_y][idx_x].weight += weight * self.penalty
         return mat
 
     def create_node_matrix(self, mat) -> np.ndarray:

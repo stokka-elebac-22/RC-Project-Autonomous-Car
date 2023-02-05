@@ -11,6 +11,7 @@ try:
     from line_detection.lane_detection import LaneDetector
     from traffic_sign_detection.main import TrafficSignDetector
     from qr_code.qr_code import QRCode
+    from environment.src.lib import Node
 except ImportError:
     from computer_vision.environment.src.environment import Environment
     from computer_vision.environment.src.display import DisplayEnvironment
@@ -19,6 +20,7 @@ except ImportError:
     from computer_vision.line_detection.lane_detection import LaneDetector
     from computer_vision.traffic_sign_detection.main import TrafficSignDetector
     from computer_vision.qr_code.qr_code import QRCode
+    from computer_vision.environment.src.lib import Node
 
 def bresenham(x_0: int, y_0: int, x_1: int, y_1: int) -> list[tuple[int, int]]:
     """
@@ -110,7 +112,7 @@ class PathFinding:
                             self.env.insert_by_index(point, 1)
 
 
-    def calculate_path(self, value: tuple[int, int], distance: bool) -> None:
+    def calculate_path(self, value: tuple[int, int], distance: bool) -> list[Node]:
         '''Calculate the shortest path to a specific point using AStar algorithm'''
         self.env.remove(12)
         if not distance:
@@ -130,8 +132,7 @@ class PathFinding:
         if ret:
             for pos in path[1:-1]:
                 self.display.insert(pos, 'Path')
-
-        self.display.display()
+        return path
 
 
 if __name__ == "__main__":
@@ -234,7 +235,8 @@ if __name__ == "__main__":
 
         path_finding.insert_objects(obstacles)
         # TODO: Test
-        path_finding.calculate_path((460, 120), False)
+        path = path_finding.calculate_path((460, 120), False)
+        path_finding.display.display()
 
         # TODO: point for lane line, maybe can remove the get course functions noneed?
         # path_finding.calculate_path((center_diff_x, center_diff_y), True)
@@ -244,3 +246,4 @@ if __name__ == "__main__":
         #path_finding.calculate_path((qr_distance_x, DESIRED_DISTANCE_FORWARD), True)
 
         # TODO: add catmull rom spline based on points given by path
+        # USE PATH variable!!!

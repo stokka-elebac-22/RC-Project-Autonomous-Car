@@ -1,6 +1,6 @@
 """Import libraries"""
 import warnings
-from typing import Union
+from typing import Union, TypedDict
 import sys
 import os
 import cv2
@@ -17,6 +17,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 from qr_code.qr_code import QRCode
 
+
 class ParkingSlotDetector(LineDetector):
     """
     DOC: Detects parking slot
@@ -27,7 +28,7 @@ class ParkingSlotDetector(LineDetector):
                  blur: int = 3,
                  hough: list[int, int] = None,
                  iterations: list[int, int] = None,
-                 filter_atol: list[int, int]= None,
+                 filter_atol: list[int, int] = None,
                  cluster_atol: int = 5):
         '''Initialize the Line Detector'''
         LineDetector.__init__(self, canny, blur, hough, iterations)
@@ -39,23 +40,15 @@ class ParkingSlotDetector(LineDetector):
         self.qr_slope = 0
         self.qr_intercept = 0
 
-    def __get_qr_code_info(self,
-                           image: np.ndarray,
-                           qr_size_px: int,
-                           qr_size_mm: int,
-                           qr_distance: int) -> list[QRCode, dict]:
-        '''Use the QR-code module to get the info needed'''
-        qr_code = QRCode(qr_size_px, qr_size_mm, qr_distance)
-        return qr_code, qr_code.get_data(image)
-
     def get_region_of_interest(self, image: np.ndarray) -> np.ndarray:
         '''
         Calculate the region of interest,
         '''
         black_image = np.zeros_like(image)
-        mask_points = np.array([[(0,int(self.qr_intercept)),
-            (image.shape[1], int(self.qr_slope*image.shape[1]+self.qr_intercept)),
-            (image.shape[1], image.shape[0]), (0, image.shape[0])]])
+        mask_points = np.array([[(0, int(self.qr_intercept)),
+                                 (image.shape[1], int(
+                                     self.qr_slope*image.shape[1]+self.qr_intercept)),
+                                 (image.shape[1], image.shape[0]), (0, image.shape[0])]])
         mask = cv2.fillPoly(black_image, mask_points, (255, 255, 255))
         roi = cv2.bitwise_and(image, mask)
         return roi
@@ -124,8 +117,8 @@ class ParkingSlotDetector(LineDetector):
     def get_closest_line(self,
                          line_coords: list[np.ndarray],
                          points: np.ndarray,
-                        ) -> list[np.ndarray]:
-        """Get the closest line based on the Y value"""
+                         ) -> list[np.ndarray]:
+        """Get the closest line to the QR code"""
         lines = []
         left_diff = None
         left_index = 0
@@ -135,7 +128,7 @@ class ParkingSlotDetector(LineDetector):
         for i, coords in enumerate(line_coords):
 
             min_value = min(coords[1], coords[3])
-            min_index=np.where(coords==min_value)[0][0]
+            min_index = np.where(coords == min_value)[0][0]
             if min_index == 1:
                 point = [coords[0], coords[1]]
             else:
@@ -148,7 +141,7 @@ class ParkingSlotDetector(LineDetector):
                 else:
                     if point[0] - points[3][0] > left_diff:
                         left_index = i
-                        left_diff = point[0]- points[3][0]
+                        left_diff = point[0] - points[3][0]
             elif point[0] - points[2][0] >= 0:
                 if right_diff is None:
                     right_index = i
@@ -156,34 +149,27 @@ class ParkingSlotDetector(LineDetector):
                 else:
                     if point[0] - points[2][0] < right_diff:
                         right_index = i
-                        right_diff = point[0]- points[2][0]
+                        right_diff = point[0] - points[2][0]
 
-        lines=[line_coords[left_index], line_coords[right_index]]
+        lines = [line_coords[left_index], line_coords[right_index]]
         return lines
 
+    QrData = TypedDict('QrData', {
+        'ret': bool,
+        'points': np.ndarray
+    })
     def detect_parking_lines(self,
                              image: np.ndarray,
-                             qr_size_px: int,
-                             qr_size_mm: int,
-                             qr_distance: int
+                             qr_data: QrData
                              ) -> Union[list[np.ndarray], None]:
         "Detect the parking lines in the image"
-        qrc,  data = self.__get_qr_code_info(
-            image, qr_size_px, qr_size_mm, qr_distance)
-        if data['ret']:
-            # display QR-code on image
-            qr_code_measurements = {
-                'distances': data['distances'],
-                'angles': data['angles'],
-                'info': data['info']}
-
+        if qr_data['ret']:
             self.qr_slope, self.qr_intercept = np.polyfit(
-                (data['points'][0][2][0],
-                 data['points'][0][3][0]),
-                (data['points'][0][2][1],
-                 data['points'][0][3][1]), 1)
+                (qr_data['points'][0][2][0],
+                 qr_data['points'][0][3][0]),
+                (qr_data['points'][0][2][1],
+                 qr_data['points'][0][3][1]), 1)
 
-            qrc.display(image, qr_code_measurements, verbose=2)
             lines = self.get_lines(image)
             if lines is None:
                 return None
@@ -201,11 +187,12 @@ class ParkingSlotDetector(LineDetector):
                     min_x, max_x, line)
                 avg_lines_coords.append(coordinates)
             # filter away lines that are close to the QR-code
-            avg_lines, avg_lines_coords = self.filter_lines(avg_lines, avg_lines_coords)
+            avg_lines, avg_lines_coords = self.filter_lines(
+                avg_lines, avg_lines_coords)
 
             # find the two closesqt lines to the QR-code
             lines = self.get_closest_line(
-                avg_lines_coords, data['points'][0])
+                avg_lines_coords, qr_data['points'][0])
             return lines
         return None
 
@@ -228,7 +215,7 @@ class ParkingSlotDetector(LineDetector):
         if len(lines) == 2:
             for line in lines:
                 max_value = min(line[1], line[3])
-                min_index=np.where(line==max_value)[0][0]
+                min_index = np.where(line == max_value)[0][0]
                 if min_index == 1:
                     line_coords.append(line[0])
                     line_coords.append(line[1])
@@ -236,7 +223,6 @@ class ParkingSlotDetector(LineDetector):
                     line_coords.append(line[2])
                     line_coords.append(line[3])
         return np.array(line_coords)
-
 
 
 if __name__ == "__main__":
@@ -247,9 +233,21 @@ if __name__ == "__main__":
     QR_SIZE_PX = 76
     QR_SIZE_MM = 52
     QR_DISTANCE = 500
-    parking_lines = parking_slot_detector.detect_parking_lines(
-        img, QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
-    parking_lines.append(parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
+    qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+    data = qr_code.get_data(img)
+    qr_code_data = {
+        'ret': data['ret'],
+        'points': data['points']
+    }
+    qr_code_measurements = {
+        'distances': data['distances'],
+        'angles': data['angles'],
+        'info': data['info']}
+    qr_code.display(img, qr_code_measurements, verbose=2)
+
+    parking_lines = parking_slot_detector.detect_parking_lines(img, qr_code_data)
+    parking_lines.append(
+        parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
     parking_slot_detector.show_lines(img, parking_lines)
     cv2.imshow("img", img)
     cv2.waitKey(0)

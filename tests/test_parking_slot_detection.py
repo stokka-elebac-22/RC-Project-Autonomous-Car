@@ -3,6 +3,7 @@ import pytest
 import cv2
 import numpy as np
 from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
+from computer_vision.qr_code.qr_code import QRCode
 PATH = "computer_vision/line_detection/assets/parking/"
 
 
@@ -78,17 +79,26 @@ class TestParametrized:
         for i, line in enumerate(lines):
             assert (line == expected[i]).all()
 
-    @pytest.mark.parametrize('img_source, qr_size_px, qr_size_mm, qr_distance', [
-        ("4.png", 76, 52, 500),
-        ("7.png", 76, 52, 500),
-        ("8.png", 76, 52, 500)
+    @pytest.mark.parametrize('img_source', [
+        ("4.png"),
+        ("7.png"),
+        ("8.png")
     ])
-    def test_detect_parking_lines(self, img_source, qr_size_px, qr_size_mm, qr_distance):
+    def test_detect_parking_lines(self, img_source):
         """Test parking_lines method of ParkingSlotDetector"""
+        QR_SIZE_PX = 76
+        QR_SIZE_MM = 52
+        QR_DISTANCE = 500
         image = self.get_image(img_source)
         parking_slot_detector = ParkingSlotDetector()
+        qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+        data = qr_code.get_data(image)
+        qr_code_data = {
+            'ret': data['ret'],
+            'points': data['points']
+        }
         lines = parking_slot_detector.detect_parking_lines(
-            image, qr_size_px, qr_size_mm, qr_distance)
+            image, qr_code_data)
         assert len(lines) > 0
 
     @pytest.mark.parametrize('min_x, max_x, line_parameters, expected', [
@@ -107,6 +117,7 @@ class TestParametrized:
         ([np.array([100, 200, 300, 400]), np.array([200, 300, 400, 500])], np.array([100, 200, 200, 300]))
         ])
     def test_get_closing_line_of_two_lines(self, lines, expected):
+        """Test get_closing_line_of_two_lines method of ParkingSlotDetector"""
         parking_slot_detector = ParkingSlotDetector()
         closing_line = parking_slot_detector.get_closing_line_of_two_lines(lines)
         assert (closing_line == expected).all()

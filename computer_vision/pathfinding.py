@@ -10,6 +10,7 @@ try:
     from line_detection.parking_slot_detection import ParkingSlotDetector
     from line_detection.lane_detection import LaneDetector
     from traffic_sign_detection.main import TrafficSignDetector
+    from qr_code.qr_code import QRCode
 except ImportError:
     from computer_vision.environment.src.environment import Environment
     from computer_vision.environment.src.display import DisplayEnvironment
@@ -17,6 +18,7 @@ except ImportError:
     from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
     from computer_vision.line_detection.lane_detection import LaneDetector
     from computer_vision.traffic_sign_detection.main import TrafficSignDetector
+    from computer_vision.qr_code.qr_code import QRCode
 
 def bresenham(x_0: int, y_0: int, x_1: int, y_1: int) -> list[tuple[int, int]]:
     """
@@ -93,8 +95,9 @@ class PathFinding:
                     if groups['distance']:
                         _, coord = self.env.insert(group, groups['object_id'])
                     else:
+                        distance = self.point_to_distance(group)
                         _, coord = self.env.insert(
-                            self.point_to_distance(group), groups['object_id'])
+                            distance, groups['object_id'])
                     if coord is not None:
                         coords.append(coord[0])
                         coords.append(coord[1])
@@ -107,11 +110,14 @@ class PathFinding:
                             self.env.insert_by_index(point, 1)
 
 
-    def calculate_path(self, point: tuple[int, int]) -> None:
+    def calculate_path(self, value: tuple[int, int], distance: bool) -> None:
         '''Calculate the shortest path to a specific point using AStar algorithm'''
         self.env.remove(12)
-        converted_point = self.point_to_distance(point)
-        self.env.insert(converted_point, 12)
+        if not distance:
+            point = self.point_to_distance(value)
+        else:
+            point = value
+        self.env.insert(point, 12)
 
         start_pos_path = self.env.get_pos(10)
         end_pos_path = self.env.get_pos(12)
@@ -150,6 +156,7 @@ if __name__ == "__main__":
     lane_detector = LaneDetector()
     traffic_sign_detector = TrafficSignDetector(
         size_mm=61, size_px=10, distance=200)
+    qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
 
     RUN = True
     while RUN:
@@ -170,9 +177,23 @@ if __name__ == "__main__":
             'computer_vision/line_detection/assets/parking/10.png')
         obstacles = []
 
+        qr_data = qr_code.get_data(frame)
+        if qr_data['ret']:
+            distances = path_finding.point_to_distance(
+                    (qr_data['points'][0][3][0]+qr_data['points'][0][2][0]/2, qr_data['points'][0][0][0]))
+            qr_distance_x = distances[0]
+            qr_distance_y = qr_data['distances'][0]
+            obstacles.append({'values': [
+                                 (qr_distance_x, qr_distance_y)],
+                            'distance': True, 'object_id': 11})
+
         # Use ParkingSlot Module
+        qr_code_data = {
+            'ret': qr_data['ret'],
+            'points': qr_data['points']
+        }
         parking_lines = parking_slot_detector.detect_parking_lines(
-            frame, QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+            frame, qr_code_data)
 
         if parking_lines is not None:
             parking_lines.append(
@@ -188,13 +209,18 @@ if __name__ == "__main__":
         if avg_lines is not None:
             avg_lines = [lane_detector.get_line_coordinates_from_parameters(
                 frame, line) for line in avg_lines]
-        if avg_lines is not None:
             for line in avg_lines:
                 if line is not None:
                     obstacles.append({'values': [
                                      (line[0], line[1]), (line[2], line[3])],
                                      'distance': False, 'object_id': 4})
 
+            center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)
+            center_diff_x = 0
+            center_diff_y = 0
+            if center_diff is not None:
+                center_diff_x = center_diff
+                DESIRED_DISTANCE_FORWARD = 100
         # Use Traffic Sign module
         signs = traffic_sign_detector.detect_signs(frame)
         if signs is not None:
@@ -204,7 +230,17 @@ if __name__ == "__main__":
                 distance_x = distances[0]
                 distance_y = traffic_sign_detector.get_distance()
                 obstacles.append({'values': [
-                                 (distance_x, distance_y)], 'distance': False,'object_id': 5})
+                                 (distance_x, distance_y)], 'distance': True,'object_id': 5})
 
         path_finding.insert_objects(obstacles)
-        path_finding.calculate_path((460, 120))
+        # TODO: Test
+        path_finding.calculate_path((460, 120), False)
+
+        # TODO: point for lane line, maybe can remove the get course functions noneed?
+        # path_finding.calculate_path((center_diff_x, center_diff_y), True)
+
+        # With distance from Parking using QR!!!
+        # TODO: DOES NOT WORK WHY?? maybe bcus of calibration constants
+        #path_finding.calculate_path((qr_distance_x, DESIRED_DISTANCE_FORWARD), True)
+
+        # TODO: add catmull rom spline based on points given by path

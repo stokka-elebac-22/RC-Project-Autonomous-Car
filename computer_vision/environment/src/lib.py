@@ -90,7 +90,7 @@ class Objects:
                 'id': 4,
                 'name': 'LaneLine',
                 'param': {
-                    'color': pg.Color(220,61,36),
+                    'color': pg.Color(204, 204, 150),
                     'thickness': 0
                 }
             },

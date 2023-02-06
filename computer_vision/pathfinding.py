@@ -1,14 +1,8 @@
 '''Main'''
 from typing import TypedDict
-<<<<<<< HEAD
 import cv2
-import pygame as pg
-=======
 import numpy as np
-import cv2
 import pygame as pg
-from matplotlib import pyplot as plt
->>>>>>> 1a3835913b2785ce0df513b32b9ff1e48a3a0e1a
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
 try:
     from environment.src.environment import Environment
@@ -63,7 +57,6 @@ def bresenham(x_0: int, y_0: int, x_1: int, y_1: int) -> list[tuple[int, int]]:
         d_val += 2*d_y
 
     return coordinates
-
 
 class PathFinding:
     '''
@@ -141,6 +134,60 @@ class PathFinding:
                 self.display.insert(pos, 'Path')
         return path
 
+def CatmullRomSpline(P0, P1, P2, P3, a, nPoints=100):
+    """
+    P0, P1, P2, and P3 should be (x,y) point pairs that define the Catmull-Rom spline.
+    nPoints is the number of points to include in this curve segment.
+    """
+    # Convert the points to numpy so that we can do array multiplication
+    P0, P1, P2, P3 = map(np.array, [P0, P1, P2, P3])
+
+    # Calculate t0 to t4
+    alpha = a
+    def tj(ti, Pi, Pj):
+        xi, yi = Pi
+        xj, yj = Pj
+        return ( ( (xj-xi)**2 + (yj-yi)**2 )**0.5 )**alpha + ti
+
+    t0 = 0
+    t1 = tj(t0, P0, P1)
+    t2 = tj(t1, P1, P2)
+    t3 = tj(t2, P2, P3)
+
+    # Only calculate points between P1 and P2
+    t = np.linspace(t1,t2,nPoints)
+
+    # Reshape so that we can multiply by the points P0 to P3
+    # and get a point for each value of t.
+    t = t.reshape(len(t),1)
+
+    A1 = (t1-t)/(t1-t0)*P0 + (t-t0)/(t1-t0)*P1
+    A2 = (t2-t)/(t2-t1)*P1 + (t-t1)/(t2-t1)*P2
+    A3 = (t3-t)/(t3-t2)*P2 + (t-t2)/(t3-t2)*P3
+
+    B1 = (t2-t)/(t2-t0)*A1 + (t-t0)/(t2-t0)*A2
+    B2 = (t3-t)/(t3-t1)*A2 + (t-t1)/(t3-t1)*A3
+
+    C  = (t2-t)/(t2-t1)*B1 + (t-t1)/(t2-t1)*B2
+    return C
+
+def CatmullRomChain(P,alpha):
+    """
+    Calculate Catmull Rom for a chain of points and return the combined curve.
+    """
+    sz = len(P)
+
+    # The curve C will contain an array of (x,y) points.
+    C = []
+    for i in range(sz-3):
+        c = CatmullRomSpline(P[i], P[i+1], P[i+2], P[i+3],alpha)
+        C.extend(c*-1)
+
+    return C
+
+#plt.xlim(0, BOARD_SIZE[1])
+#plt.ylim(0, BOARD_SIZE[0])
+
 
 if __name__ == "__main__":
 
@@ -160,13 +207,15 @@ if __name__ == "__main__":
     center = (img.shape[1], img.shape[0])
 
     path_finding = PathFinding(
-        BOARD_SIZE, 720, PIXEL_WIDTH, PIXEL_HEIGHT, CAM_WIDTH, CAM_HEIGHT, center)
+        BOARD_SIZE, 360*1.5, PIXEL_WIDTH, PIXEL_HEIGHT, CAM_WIDTH, CAM_HEIGHT, center)
     parking_slot_detector = ParkingSlotDetector(
         hough=[200, 5], iterations=[5, 2])
     lane_detector = LaneDetector()
     traffic_sign_detector = TrafficSignDetector(
         size_mm=61, size_px=10, distance=200)
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+
+    TILE_SIZE = path_finding.window_size[1]/path_finding.size[0]
 
     RUN = True
     while RUN:
@@ -177,7 +226,6 @@ if __name__ == "__main__":
                 RUN = False
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_pos = pg.mouse.get_pos()
-                TILE_SIZE = path_finding.window_size[1]/path_finding.size[0]
                 col = mouse_pos[0] // TILE_SIZE
                 row = mouse_pos[1] // TILE_SIZE
                 path_finding.env.insert_by_index((int(row), int(col)), '1')
@@ -190,7 +238,8 @@ if __name__ == "__main__":
         qr_data = qr_code.get_data(frame)
         if qr_data['ret']:
             distances = path_finding.point_to_distance(
-                    (qr_data['points'][0][3][0]+qr_data['points'][0][2][0]/2, qr_data['points'][0][0][0]))
+                (qr_data['points'][0][3][0]+qr_data['points'][0][2][0]/2,
+                qr_data['points'][0][0][0]))
             qr_distance_x = distances[0]
             qr_distance_y = qr_data['distances'][0]
             obstacles.append({'values': [
@@ -247,6 +296,23 @@ if __name__ == "__main__":
         path = path_finding.calculate_path((460, 120), False)
         path_finding.display.display()
 
+        a = 0.
+        new_path = [(value[1], value[0]) for i, value in enumerate(path) if i % 3 == 0]
+        c = CatmullRomChain(new_path, a)
+        # x_values, y_values = zip(*c)
+
+        line_color = (255, 0, 0)
+
+        pg.display.flip()
+        COUNT = 0
+        LEN_C = len(c)
+        while COUNT < LEN_C:
+            print(c[COUNT])
+            pg.draw.line(path_finding.display.display_window, line_color,
+                (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE),
+                (c[COUNT+1][0]*TILE_SIZE, c[COUNT+1][1]*TILE_SIZE))
+            COUNT += 2
+
         # RUN = True
         # TODO: point for lane line, maybe can remove the get course functions no need?
         # path_finding.calculate_path((center_diff_x, center_diff_y), True)
@@ -261,68 +327,3 @@ if __name__ == "__main__":
 x_values = [ point[1] for i, point in enumerate(path) if i % 5 == 0 ]
 y_values = [ BOARD_SIZE[0] - (point[0] + 1) for i, point in enumerate(path) if i % 5 == 0]
 
-def CatmullRomSpline(P0, P1, P2, P3, a, nPoints=100):
-    """
-    P0, P1, P2, and P3 should be (x,y) point pairs that define the Catmull-Rom spline.
-    nPoints is the number of points to include in this curve segment.
-    """
-    # Convert the points to numpy so that we can do array multiplication
-    P0, P1, P2, P3 = map(np.array, [P0, P1, P2, P3])
-
-    # Calculate t0 to t4
-    alpha = a
-    def tj(ti, Pi, Pj):
-        xi, yi = Pi
-        xj, yj = Pj
-        return ( ( (xj-xi)**2 + (yj-yi)**2 )**0.5 )**alpha + ti
-
-    t0 = 0
-    t1 = tj(t0, P0, P1)
-    t2 = tj(t1, P1, P2)
-    t3 = tj(t2, P2, P3)
-
-    # Only calculate points between P1 and P2
-    t = np.linspace(t1,t2,nPoints)
-
-    # Reshape so that we can multiply by the points P0 to P3
-    # and get a point for each value of t.
-    t = t.reshape(len(t),1)
-
-    A1 = (t1-t)/(t1-t0)*P0 + (t-t0)/(t1-t0)*P1
-    A2 = (t2-t)/(t2-t1)*P1 + (t-t1)/(t2-t1)*P2
-    A3 = (t3-t)/(t3-t2)*P2 + (t-t2)/(t3-t2)*P3
-
-    B1 = (t2-t)/(t2-t0)*A1 + (t-t0)/(t2-t0)*A2
-    B2 = (t3-t)/(t3-t1)*A2 + (t-t1)/(t3-t1)*A3
-
-    C  = (t2-t)/(t2-t1)*B1 + (t-t1)/(t2-t1)*B2
-    return C
-
-def CatmullRomChain(P,alpha):
-    """
-    Calculate Catmull Rom for a chain of points and return the combined curve.
-    """
-    sz = len(P)
-
-    # The curve C will contain an array of (x,y) points.
-    C = []
-    for i in range(sz-3):
-        c = CatmullRomSpline(P[i], P[i+1], P[i+2], P[i+3],alpha)
-        C.extend(c*-1)
-
-    return C
-
-#plt.xlim(0, BOARD_SIZE[1])
-#plt.ylim(0, BOARD_SIZE[0])
-
-a = 0.
-
-new_path = [(value[1], value[0]) for i, value in enumerate(path) if i % 3 == 0]
-
-c = CatmullRomChain(new_path, a)
-x_values, y_values = zip(*c)
-plt.plot(x_values,y_values,c='red')
-
-plt.grid()
-plt.plot(x_values, y_values, marker="o", markersize=2, markeredgecolor="red", markerfacecolor="green")
-plt.show()

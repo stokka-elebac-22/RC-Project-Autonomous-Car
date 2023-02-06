@@ -303,16 +303,16 @@ def CatmullRomChain(P,alpha):
     C = []
     for i in range(sz-3):
         c = CatmullRomSpline(P[i], P[i+1], P[i+2], P[i+3],alpha)
-        C.extend(c*-1)
+        C.extend(c)
 
     return C
 
-#plt.xlim(0, BOARD_SIZE[1])
-#plt.ylim(0, BOARD_SIZE[0])
+plt.xlim(0, BOARD_SIZE[1])
+plt.ylim(0, BOARD_SIZE[0])
 
 a = 0.
 
-new_path = [(value[1], value[0]) for i, value in enumerate(path) if i % 3 == 0]
+new_path = [(value[1], BOARD_SIZE[0] - (value[0]+1)) for i, value in enumerate(path) if i % 3 == 0]
 
 c = CatmullRomChain(new_path, a)
 x_values, y_values = zip(*c)

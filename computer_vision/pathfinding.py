@@ -73,7 +73,7 @@ class PathFinding:
         self.env = Environment(
             size, 20, {'view_point': None, 'object_id': object_id})
         self.center = cam_center
-        self.a_star = AStar(weight=2, penalty=100)
+        self.a_star = AStar(weight=10, penalty=100)
 
     def point_to_distance(self, point:tuple[int, int]) -> tuple[int, int]:
         '''Converts point to distance'''
@@ -181,7 +181,7 @@ def CatmullRomChain(P,alpha):
     C = []
     for i in range(sz-3):
         c = CatmullRomSpline(P[i], P[i+1], P[i+2], P[i+3],alpha)
-        C.extend(c*-1)
+        C.extend(c)
 
     return C
 
@@ -326,4 +326,3 @@ if __name__ == "__main__":
 
 x_values = [ point[1] for i, point in enumerate(path) if i % 5 == 0 ]
 y_values = [ BOARD_SIZE[0] - (point[0] + 1) for i, point in enumerate(path) if i % 5 == 0]
-

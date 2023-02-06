@@ -1,7 +1,7 @@
 '''Main'''
+from typing import TypedDict
 import cv2
 import pygame as pg
-from typing import TypedDict
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
 try:
     from environment.src.environment import Environment

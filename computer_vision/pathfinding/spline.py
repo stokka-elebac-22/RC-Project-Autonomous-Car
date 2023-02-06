@@ -9,7 +9,7 @@ def tj(ti, Pi, Pj, a):
     return (((xj-xi)**2 + (yj-yi)**2)**0.5)**a + ti
 
 
-def CatmullRomDerivative(P0, P1, P2, P3, a, nPoints=10):
+def CatmullRomDerivative(P0, P1, P2, P3, a, nPoints=100):
     # Convert the points to numpy so that we can do array multiplication
     P0, P1, P2, P3 = map(np.array, [P0, P1, P2, P3])
 
@@ -37,7 +37,7 @@ def CatmullRomDerivative(P0, P1, P2, P3, a, nPoints=10):
     return C
 
 
-def CatmullRomSpline(P0, P1, P2, P3, a, nPoints=10):
+def CatmullRomSpline(P0, P1, P2, P3, a, nPoints=100):
     """
     P0, P1, P2, and P3 should be (x,y) point pairs that define the Catmull-Rom spline.
     nPoints is the number of points to include in this curve segment.
@@ -66,7 +66,16 @@ def CatmullRomSpline(P0, P1, P2, P3, a, nPoints=10):
     B2 = (t3-t)/(t3-t1)*A2 + (t-t1)/(t3-t1)*A3
 
     C = (t2-t)/(t2-t1)*B1 + (t-t1)/(t2-t1)*B2
-    return C
+
+    A1_D = (P1-P0)/(t1-t0)
+    A2_D = (P2-P1)/(t2-t1)
+    A3_D = (P3-P2)/(t3-t2)
+
+    B1_D = (A2-A1)/(t2-t0)+(t2-t)/(t2-t0)*A1_D+(t-t0)/(t2-t0)*A2_D
+    B2_D = (A3-A2)/(t3-t1)+(t3-t)/(t3-t1)*A2_D+(t-t1)/(t3-t1)*A3_D
+
+    C_D = (B2-B1)/(t2-t1)+(t2-t)/(t2-t1)*B1_D+(t-t1)/(t2-t1)*B2_D
+    return C, C_D
 
 
 def CatmullRomChain(P, alpha):
@@ -79,8 +88,7 @@ def CatmullRomChain(P, alpha):
     C = []
     V = []
     for i in range(sz-3):
-        c = CatmullRomSpline(P[i], P[i+1], P[i+2], P[i+3], alpha)
-        v = CatmullRomDerivative(P[i], P[i+1], P[i+2], P[i+3], alpha)
+        c, v = CatmullRomSpline(P[i], P[i+1], P[i+2], P[i+3], alpha)
         C.extend(c)
         V.extend(v)
 

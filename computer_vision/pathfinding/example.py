@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
         tension = 0.
 
-        new_path = [(value[1], value[0]) for i, value in enumerate(path) if i % 20 == 0]
+        new_path = [(value[1], value[0]) for i, value in enumerate(path) if i % 3 == 0]
         temp_path = [(path[0][1], path[0][0])]
         temp_path = temp_path + new_path
         for _ in range(2):
@@ -142,8 +142,6 @@ if __name__ == "__main__":
             abs_velos.append(get_abs_velo(value))
             angles.append(get_angle(value))
         
-        print(angles)
-
         # CHECK DIFF WITH NEXT ONE TO SEE IF TURN RIGHT OR LEFT AND AMOUNT OF TURN
         # diff = velocities[i] - velocities[i+1]
         # if positive: rotate clockwise

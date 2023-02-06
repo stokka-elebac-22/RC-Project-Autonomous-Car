@@ -4,6 +4,8 @@ import pygame as pg
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
 from main import PathFinding
 from spline import CatmullRomChain
+from helping_functions import get_abs_velo, get_angle
+from matplotlib import pyplot as plt
 try:
     from line_detection.parking_slot_detection import ParkingSlotDetector
     from line_detection.lane_detection import LaneDetector
@@ -27,13 +29,14 @@ if __name__ == "__main__":
     CAM_HEIGHT = 500
 
     BOARD_SIZE = (60, 115)
+    ENV_SIZE = 20
 
     img = cv2.imread(
         'computer_vision/line_detection/assets/parking/10.png')
     center = (img.shape[1], img.shape[0])
 
     path_finding = PathFinding(
-        BOARD_SIZE, 720, PIXEL_WIDTH, PIXEL_HEIGHT, CAM_WIDTH, CAM_HEIGHT, center)
+        BOARD_SIZE, 720, PIXEL_WIDTH, PIXEL_HEIGHT, CAM_WIDTH, CAM_HEIGHT, center, env_size=20)
     parking_slot_detector = ParkingSlotDetector(
         hough=[200, 5], iterations=[5, 2])
     lane_detector = LaneDetector()
@@ -118,21 +121,34 @@ if __name__ == "__main__":
                                  (distance_x, distance_y)], 'distance': True,'object_id': 5})
 
         path_finding.insert_objects(obstacles)
-        # TODO: Test
+        # TODO: Remove later since Test point
         path = path_finding.calculate_path((460, 120), False)
         path_finding.display.display()
 
         tension = 0.
 
-        new_path = [(value[1], value[0]) for i, value in enumerate(path) if i % 3 == 0]
+        new_path = [(value[1], value[0]) for i, value in enumerate(path) if i % 20 == 0]
         temp_path = [(path[0][1], path[0][0])]
         temp_path = temp_path + new_path
         for _ in range(2):
             temp_path.append((path[len(path) - 1][1], path[len(path) - 1][0]))
 
-        c = CatmullRomChain(temp_path, tension)
+        temp_path.reverse()
+        c, v = CatmullRomChain(temp_path, tension)
         # x_values, y_values = zip(*c)
+        abs_velos = []
+        angles = []
+        for value in v:
+            abs_velos.append(get_abs_velo(value))
+            angles.append(get_angle(value))
+        
+        print(angles)
 
+        # CHECK DIFF WITH NEXT ONE TO SEE IF TURN RIGHT OR LEFT AND AMOUNT OF TURN
+        # diff = velocities[i] - velocities[i+1]
+        # if positive: rotate clockwise
+        # else rotate counter clockwise
+        
         line_color = (255, 0, 0)
 
         pg.display.flip()
@@ -154,3 +170,11 @@ if __name__ == "__main__":
 
         # TODO: add catmull rom spline based on points given by path
         # USE PATH variable!!!
+
+    x_values = [i[0] for i in c]
+    y_values = [i[1] for i in c]
+    vx_values = [i[0] for i in v]
+    vy_values = [i[1] for i in v]
+    plt.plot(x_values, y_values)
+    plt.quiver(x_values, y_values, vx_values, vy_values, linewidths=1)
+    plt.show()

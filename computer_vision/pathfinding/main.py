@@ -24,14 +24,16 @@ class PathFinding:
     path with objects that can be hindrances
     '''
     def __init__(self, size: tuple[int, int], w_size:int, pixel_width:int, pixel_height:int
-                ,cam_width:int, cam_height:int, cam_center:list[int, int], object_id:int=10):
+                ,cam_width:int, cam_height:int, cam_center:list[int, int], object_id:int=10,
+                env_size:int = 20
+                ):
         self.ratio_width = cam_width/pixel_width
         self.ratio_height = cam_height/pixel_height
         self.size = size
         self.window_size = (w_size * (size[1]/size[0]), w_size)
         self.display = DisplayEnvironment(self.window_size, size)
         self.env = Environment(
-            size, 20, {'view_point': None, 'object_id': object_id})
+            size, env_size, {'view_point': None, 'object_id': object_id})
         self.center = cam_center
         self.a_star = AStar(weight=2, penalty=100)
 

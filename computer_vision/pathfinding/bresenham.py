@@ -1,3 +1,4 @@
+'''Bresenham algorithm'''
 def bresenham(x_0: int, y_0: int, x_1: int, y_1: int) -> list[tuple[int, int]]:
     """
     Returns a list of coordinates
@@ -32,3 +33,4 @@ def bresenham(x_0: int, y_0: int, x_1: int, y_1: int) -> list[tuple[int, int]]:
         d_val += 2*d_y
 
     return coordinates
+    

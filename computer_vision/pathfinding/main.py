@@ -74,7 +74,7 @@ class PathFinding:
                             self.env.insert_by_index(point, 1)
 
 
-    def calculate_path(self, value: tuple[int, int], distance: bool) -> list[Node]:
+    def calculate_path(self, value: tuple[int, int], distance: bool) -> list[tuple]:
         '''Calculate the shortest path to a specific point using AStar algorithm'''
         self.env.remove(12)
         if not distance:

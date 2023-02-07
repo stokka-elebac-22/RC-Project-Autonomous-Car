@@ -1,8 +1,6 @@
 """Importing needed libraries"""
 import pytest
-from computer_vision.pathfinding import PathFinding
-PATH = "computer_vision/line_detection/assets/"
-
+from computer_vision.pathfinding.main import PathFinding
 
 class TestParametrized:
     """
@@ -22,8 +20,6 @@ class TestParametrized:
             cam_center=(800, 500),
             object_id=10
         )
-        print(point)
-        print(expected)
         result = pathfinding.point_to_distance(point)
         assert result[0] == pytest.approx(expected[0], 0.001)
         assert result[1] == pytest.approx(expected[1], 0.001)

@@ -173,6 +173,20 @@ if __name__ == "__main__":
     y_values = [i[1] for i in c]
     vx_values = [i[0] for i in v]
     vy_values = [i[1] for i in v]
-    plt.plot(x_values, y_values)
-    plt.quiver(x_values, y_values, vx_values, vy_values, linewidths=1)
+    # plt.plot(x_values, y_values)
+    # plt.quiver(x_values, y_values, vx_values, vy_values, linewidths=1)
+    # plt.show()
+    current_ang = 0
+    angle_diff = []
+    angle_diff_x = []
+    for i, next_ang in enumerate(angles):
+        angle_diff_x.append(i)
+        angle_diff.append(current_ang - next_ang)
+        current_ang = next_ang
+
+    fig, axs = plt.subplots(1, 2)
+    fig.suptitle('Horizontally stacked subplots')
+    axs[0].plot(x_values, y_values)
+    axs[0].quiver(x_values, y_values, vx_values, vy_values, linewidths=1)
+    axs[1].plot(angle_diff_x, angle_diff)
     plt.show()

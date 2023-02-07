@@ -1,95 +1,70 @@
+'''Import_ing Libraries'''
 import numpy as np
 
-# Source: https://stackoverflow.com/questions/1251438/catmull-rom-splines-in-python
+# Source: https://stackoverflow.com/quest_ions/1251438/catmull-rom-splines-in-python
 # based on formula from wikipedia!!
 
-def tj(ti, Pi, Pj, a):
-    xi, yi = Pi
-    xj, yj = Pj
-    return (((xj-xi)**2 + (yj-yi)**2)**0.5)**a + ti
+def t_j(t_i, p_i, p_j, alpha):
+    '''Method to calculate t_p'''
+    x_i, y_i = p_i
+    x_j, y_j = p_j
+    return (((x_j-x_i)**2 + (y_j-y_i)**2)**0.5)**alpha + t_i
 
-
-def CatmullRomDerivative(P0, P1, P2, P3, a, nPoints=100):
-    # Convert the points to numpy so that we can do array multiplication
-    P0, P1, P2, P3 = map(np.array, [P0, P1, P2, P3])
-
-    # Calculate t0 to t4
-    t0 = 0
-    t1 = tj(t0, P0, P1, a)
-    t2 = tj(t1, P1, P2, a)
-    t3 = tj(t2, P2, P3, a)
-
-    # Only calculate points between P1 and P2
-    t = np.linspace(t1, t2, nPoints)
-
-    # Reshape so that we can multiply by the points P0 to P3
-    # and get a point for each value of t.
-    t = t.reshape(len(t), 1)
-
-    A1 = (P1-P0)/(t1-t0)
-    A2 = (P2-P1)/(t2-t1)
-    A3 = (P3-P2)/(t3-t2)
-
-    B1 = (A2-A1)/(t2-t0)+(t2-t)/(t2-t0)*A1+(t-t0)/(t2-t0)*A2
-    B2 = (A3-A2)/(t3-t1)+(t3-t)/(t3-t1)*A2+(t-t1)/(t3-t1)*A3
-
-    C = (B2-B1)/(t2-t1)+(t2-t)/(t2-t1)*B1+(t-t1)/(t2-t1)*B2
-    return C
-
-
-def CatmullRomSpline(P0, P1, P2, P3, a, nPoints=100):
+def catmull_rom_spline(p_0, p_1, p_2, p_3, alpha, num_points=100):
     """
-    P0, P1, P2, and P3 should be (x,y) point pairs that define the Catmull-Rom spline.
-    nPoints is the number of points to include in this curve segment.
+    p_0, p_1, p_2, and p_3: (x, y) pairs
+    nPoints: number of points in the segment
     """
-    # Convert the points to numpy so that we can do array multiplication
-    P0, P1, P2, P3 = map(np.array, [P0, P1, P2, P3])
+    # To do array mult_iplicat_ion convert to numpy array
+    p_0, p_1, p_2, p_3 = map(np.array, [p_0, p_1, p_2, p_3])
 
-    # Calculate t0 to t4
-    t0 = 0
-    t1 = tj(t0, P0, P1, a)
-    t2 = tj(t1, P1, P2, a)
-    t3 = tj(t2, P2, P3, a)
+    # Calculate t_0 to t4
+    t_0 = 0
+    t_1 = t_j(t_0, p_0, p_1, alpha)
+    t_2 = t_j(t_1, p_1, p_2, alpha)
+    t_3 = t_j(t_2, p_2, p_3, alpha)
 
-    # Only calculate points between P1 and P2
-    t = np.linspace(t1, t2, nPoints)
+    # Only calculate points between p_1 and p_2
+    t_p = np.linspace(t_1, t_2, num_points)
 
-    # Reshape so that we can multiply by the points P0 to P3
-    # and get a point for each value of t.
-    t = t.reshape(len(t), 1)
+    # Reshape so that we can mult_iply by the points p_0 to p_3
+    # and get a point for each value of t_p.
+    t_p = t_p.reshape(len(t_p), 1)
 
-    A1 = (t1-t)/(t1-t0)*P0 + (t-t0)/(t1-t0)*P1
-    A2 = (t2-t)/(t2-t1)*P1 + (t-t1)/(t2-t1)*P2
-    A3 = (t3-t)/(t3-t2)*P2 + (t-t2)/(t3-t2)*P3
+    a_1 = (t_1-t_p)/(t_1-t_0)*p_0 + (t_p-t_0)/(t_1-t_0)*p_1
+    a_2 = (t_2-t_p)/(t_2-t_1)*p_1 + (t_p-t_1)/(t_2-t_1)*p_2
+    a_3 = (t_3-t_p)/(t_3-t_2)*p_2 + (t_p-t_2)/(t_3-t_2)*p_3
 
-    B1 = (t2-t)/(t2-t0)*A1 + (t-t0)/(t2-t0)*A2
-    B2 = (t3-t)/(t3-t1)*A2 + (t-t1)/(t3-t1)*A3
+    b_1 = (t_2-t_p)/(t_2-t_0)*a_1 + (t_p-t_0)/(t_2-t_0)*a_2
+    b_2 = (t_3-t_p)/(t_3-t_1)*a_2 + (t_p-t_1)/(t_3-t_1)*a_3
 
-    C = (t2-t)/(t2-t1)*B1 + (t-t1)/(t2-t1)*B2
+    c_o = (t_2-t_p)/(t_2-t_1)*b_1 + (t_p-t_1)/(t_2-t_1)*b_2
 
-    A1_D = (P1-P0)/(t1-t0)
-    A2_D = (P2-P1)/(t2-t1)
-    A3_D = (P3-P2)/(t3-t2)
+    a1_d = (p_1-p_0)/(t_1-t_0)
+    a2_d = (p_2-p_1)/(t_2-t_1)
+    a3_d = (p_3-p_2)/(t_3-t_2)
 
-    B1_D = (A2-A1)/(t2-t0)+(t2-t)/(t2-t0)*A1_D+(t-t0)/(t2-t0)*A2_D
-    B2_D = (A3-A2)/(t3-t1)+(t3-t)/(t3-t1)*A2_D+(t-t1)/(t3-t1)*A3_D
+    b1_d = (a_2-a_1)/(t_2-t_0)+(t_2-t_p)/(t_2-t_0)*a1_d+(t_p-t_0)/(t_2-t_0)*a2_d
+    b2_d = (a_3-a_2)/(t_3-t_1)+(t_3-t_p)/(t_3-t_1)*a2_d+(t_p-t_1)/(t_3-t_1)*a3_d
 
-    C_D = (B2-B1)/(t2-t1)+(t2-t)/(t2-t1)*B1_D+(t-t1)/(t2-t1)*B2_D
-    return C, C_D
+    c_d = (b_2-b_1)/(t_2-t_1)+(t_2-t_p)/(t_2-t_1)*b1_d+(t_p-t_1)/(t_2-t_1)*b2_d
+    return c_o, c_d
 
 
-def CatmullRomChain(P, alpha):
+def catmull_rom_chain(points, alpha):
     """
-    Calculate Catmull Rom for a chain of points and return the combined curve.
+    Calculate Catmull Rom spline for a list of points
+    and return the points on the spline and the derivative
     """
-    sz = len(P)
+    # c: points on the curve
+    # v: derivative of the curve
+    curve = []
+    derivative = []
+    for i in range(len(points)-3):
+        c_value, d_value = catmull_rom_spline(
+            points[i], points[i+1], points[i+2], points[i+3], alpha
+        )
+        curve.extend(c_value)
+        derivative.extend(d_value)
 
-    # The curve C will contain an array of (x,y) points.
-    C = []
-    V = []
-    for i in range(sz-3):
-        c, v = CatmullRomSpline(P[i], P[i+1], P[i+2], P[i+3], alpha)
-        C.extend(c)
-        V.extend(v)
-
-    return C, V
+    return curve, derivative

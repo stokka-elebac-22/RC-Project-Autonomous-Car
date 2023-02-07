@@ -3,7 +3,7 @@ import cv2
 import pygame as pg
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
 from main import PathFinding
-from spline import CatmullRomChain
+from spline import catmull_rom_chain
 from helping_functions import get_abs_velo, get_angle
 from matplotlib import pyplot as plt
 try:
@@ -134,7 +134,7 @@ if __name__ == "__main__":
             temp_path.append((path[len(path) - 1][1], path[len(path) - 1][0]))
 
         temp_path.reverse()
-        c, v = CatmullRomChain(temp_path, tension)
+        c, v = catmull_rom_chain(temp_path, tension)
         # x_values, y_values = zip(*c)
         abs_velos = []
         angles = []
@@ -181,12 +181,19 @@ if __name__ == "__main__":
     angle_diff_x = []
     for i, next_ang in enumerate(angles):
         angle_diff_x.append(i)
-        angle_diff.append(current_ang - next_ang)
+        first_diff = current_ang - next_ang
+        second_diff = 360-abs(first_diff)
+        minimum_diff = min(abs(first_diff), second_diff)
+        if first_diff > 0:
+            minimum_diff = minimum_diff*-1
+
+        angle_diff.append(minimum_diff)
         current_ang = next_ang
 
-    fig, axs = plt.subplots(1, 2)
+    fig, axs = plt.subplots(1, 3)
     fig.suptitle('Horizontally stacked subplots')
     axs[0].plot(x_values, y_values)
     axs[0].quiver(x_values, y_values, vx_values, vy_values, linewidths=1)
-    axs[1].plot(angle_diff_x, angle_diff)
+    axs[1].plot(angle_diff_x, angles)
+    axs[2].plot(angle_diff_x, angle_diff)
     plt.show()

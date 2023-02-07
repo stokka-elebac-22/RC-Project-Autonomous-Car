@@ -51,7 +51,7 @@ def catmull_rom_spline(p_0, p_1, p_2, p_3, alpha, num_points=100):
     return c_o, c_d
 
 
-def catmull_rom_chain(points, alpha):
+def catmull_rom_chain(points, alpha, num_points=100):
     """
     Calculate Catmull Rom spline for a list of points
     and return the points on the spline and the derivative
@@ -62,7 +62,7 @@ def catmull_rom_chain(points, alpha):
     derivative = []
     for i in range(len(points)-3):
         c_value, d_value = catmull_rom_spline(
-            points[i], points[i+1], points[i+2], points[i+3], alpha
+            points[i], points[i+1], points[i+2], points[i+3], alpha, num_points
         )
         curve.extend(c_value)
         derivative.extend(d_value)

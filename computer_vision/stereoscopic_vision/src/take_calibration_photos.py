@@ -2,9 +2,9 @@
 import cv2 as cv
 
 if __name__ == '__main__':
-    DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate/'
+    DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_large/'
     CAMERA_ID_LEFT = 1
-    CAMERA_ID_RIGHT = 2
+    CAMERA_ID_RIGHT = 0
     BOARD_DIMENSIONS = (8, 6)
     cam1 = cv.VideoCapture(CAMERA_ID_LEFT)
     cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)

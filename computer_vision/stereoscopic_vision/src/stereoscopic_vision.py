@@ -161,7 +161,7 @@ class StereoscopicVision:
 if __name__ == '__main__':
     from camera import Camera
     PARAMETER_PATH = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
-    MAPS_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml'
+    MAPS_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps_large.xml'
     MAX_DIST = 4000 # max distance to recognize objects (mm)
     MIN_DIST = 500 # min distance to recognize objects (mm)
     THRESH_DIST = MAX_DIST

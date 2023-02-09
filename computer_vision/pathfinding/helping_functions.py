@@ -8,6 +8,8 @@ def get_angle(vec: list) -> float:
     temp = 90 - degrees_result
     if vec[0] < 0:
         temp =  temp - 180
+    if temp == -180:
+        temp = 180
     return temp
 
 def get_abs_velo(vec: list) -> float:

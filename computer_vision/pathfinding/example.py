@@ -104,10 +104,10 @@ if __name__ == "__main__":
                                      'distance': False, 'object_id': 4})
 
             center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)
-            center_diff_x = 0
-            center_diff_y = 0
+            CENTER_DIFF_X = 0
+            CENTER_DIFF_Y = 0
             if center_diff is not None:
-                center_diff_x = center_diff
+                CENTER_DIFF_X = center_diff
                 DESIRED_DISTANCE_FORWARD = 100
         # Use Traffic Sign module
         signs = traffic_sign_detector.detect_signs(frame)
@@ -125,7 +125,7 @@ if __name__ == "__main__":
         path = path_finding.calculate_path((460, 120), False)
         path_finding.display.display()
 
-        tension = 0.
+        TENSION = 0.
 
         new_path = [(value[1], value[0]) for i, value in enumerate(path) if i % 3 == 0]
         temp_path = [(path[0][1], path[0][0])]
@@ -134,19 +134,19 @@ if __name__ == "__main__":
             temp_path.append((path[len(path) - 1][1], path[len(path) - 1][0]))
 
         temp_path.reverse()
-        c, v = catmull_rom_chain(temp_path, tension)
+        c, v = catmull_rom_chain(temp_path, TENSION)
         # x_values, y_values = zip(*c)
         abs_velos = []
         angles = []
         for value in v:
             abs_velos.append(get_abs_velo(value))
             angles.append(get_angle(value))
-        
+
         # CHECK DIFF WITH NEXT ONE TO SEE IF TURN RIGHT OR LEFT AND AMOUNT OF TURN
         # diff = velocities[i] - velocities[i+1]
         # if positive: rotate clockwise
         # else rotate counter clockwise
-        
+
         line_color = (255, 0, 0)
 
         pg.display.flip()
@@ -160,7 +160,7 @@ if __name__ == "__main__":
 
         # RUN = True
         # TODO: point for lane line, maybe can remove the get course functions no need?
-        # path_finding.calculate_path((center_diff_x, center_diff_y), True)
+        # path_finding.calculate_path((CENTER_DIFF_X, CENTER_DIFF_Y), True)
 
         # With distance from Parking using QR!!!
         # TODO: DOES NOT WORK WHY?? maybe bcus of calibration constants
@@ -176,19 +176,19 @@ if __name__ == "__main__":
     # plt.plot(x_values, y_values)
     # plt.quiver(x_values, y_values, vx_values, vy_values, linewidths=1)
     # plt.show()
-    current_ang = 0
+    CURRENT_ANG = 0
     angle_diff = []
     angle_diff_x = []
     for i, next_ang in enumerate(angles):
         angle_diff_x.append(i)
-        first_diff = current_ang - next_ang
+        first_diff = CURRENT_ANG - next_ang
         second_diff = 360-abs(first_diff)
         minimum_diff = min(abs(first_diff), second_diff)
         if first_diff > 0:
             minimum_diff = minimum_diff*-1
 
         angle_diff.append(minimum_diff)
-        current_ang = next_ang
+        CURRENT_ANG = next_ang
 
     fig, axs = plt.subplots(1, 3)
     fig.suptitle('Horizontally stacked subplots')
@@ -197,3 +197,4 @@ if __name__ == "__main__":
     axs[1].plot(angle_diff_x, angles)
     axs[2].plot(angle_diff_x, angle_diff)
     plt.show()
+    

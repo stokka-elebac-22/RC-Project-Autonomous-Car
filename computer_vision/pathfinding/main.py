@@ -9,13 +9,11 @@ try:
     from environment.src.environment import Environment
     from environment.src.display import DisplayEnvironment
     from environment.src.a_star import AStar
-    from environment.src.lib import Node
     from bresenham import bresenham
 except ImportError:
     from computer_vision.environment.src.environment import Environment
     from computer_vision.environment.src.display import DisplayEnvironment
     from computer_vision.environment.src.a_star import AStar
-    from computer_vision.environment.src.lib import Node
 
 
 class PathFinding:

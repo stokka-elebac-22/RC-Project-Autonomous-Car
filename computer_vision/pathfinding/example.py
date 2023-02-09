@@ -1,4 +1,5 @@
 '''Main'''
+import math
 import cv2
 import pygame as pg
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
@@ -181,10 +182,10 @@ if __name__ == "__main__":
     angle_diff_x = []
     for i, next_ang in enumerate(angles):
         angle_diff_x.append(i)
-        first_diff = CURRENT_ANG - next_ang
+        first_diff = math.dist([CURRENT_ANG], [next_ang])
         second_diff = 360-abs(first_diff)
         minimum_diff = min(abs(first_diff), second_diff)
-        if first_diff > 0:
+        if CURRENT_ANG > 0 and next_ang < 0:
             minimum_diff = minimum_diff*-1
 
         angle_diff.append(minimum_diff)

@@ -5,11 +5,7 @@ def get_angle(vec: list) -> float:
     '''Get the angle from -180 to 180 where y-axis is 0'''
     rad_result = math.atan(vec[1]/vec[0])
     degrees_result = math.degrees(rad_result)
-
-    if vec[1] < 0:
-        temp = 90 - degrees_result
-    else:
-        temp = 90 - degrees_result
+    temp = 90 - degrees_result
     if vec[0] < 0:
         temp =  temp - 180
     return temp

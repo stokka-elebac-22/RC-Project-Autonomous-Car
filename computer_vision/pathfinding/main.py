@@ -1,6 +1,7 @@
 '''Main'''
 import os
 import sys
+import math
 from typing import TypedDict
 try:
     current = os.path.dirname(os.path.realpath(__file__))
@@ -35,13 +36,19 @@ class PathFinding:
         self.center = cam_center
         self.a_star = AStar(weight=2, penalty=100)
 
-    def point_to_distance(self, point:tuple[int, int]) -> tuple[int, int]:
+    def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
         offset_x = point[0] - self.center[0]/2
         offset_y = self.center[1] - point[1]
         x_distance = offset_x*self.ratio_width
         y_distance = offset_y*self.ratio_height
         return (x_distance, y_distance)
+
+    def distance_to_point(self, distance:tuple[float, float]) -> tuple[int, int]:
+        '''Converts distance to point'''
+        p_x = math.floor((distance[0]/self.ratio_width) + self.center[0]/2)
+        p_y = math.floor(self.center[1] - (distance[1]/self.ratio_height))
+        return (p_x, p_y)
 
     Objects = TypedDict('Objects', {
         'points': list[tuple[int, int]],

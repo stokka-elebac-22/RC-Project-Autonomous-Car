@@ -1,6 +1,7 @@
 '''Main'''
 import os
 import sys
+import math
 from typing import TypedDict
 try:
     current = os.path.dirname(os.path.realpath(__file__))
@@ -21,27 +22,32 @@ class PathFinding:
     Class using 2D environment mapping to calculate shortest
     path with objects that can be hindrances
     '''
-    def __init__(self, size: tuple[int, int], w_size:int, pixel_width:int, pixel_height:int
-                ,cam_width:int, cam_height:int, cam_center:list[int, int], object_id:int=10,
-                env_size:int = 20
+    def __init__(self, size: tuple[int, int], pixel_width:int, pixel_height:int
+                ,cam_width:int, cam_height:int, cam_center:list[int, int],
+                object_id:int=10, display:DisplayEnvironment=None, env_size:int = 20
                 ):
         self.ratio_width = cam_width/pixel_width
         self.ratio_height = cam_height/pixel_height
         self.size = size
-        self.window_size = (w_size * (size[1]/size[0]), w_size)
-        self.display = DisplayEnvironment(self.window_size, size)
+        self.display = display
         self.env = Environment(
             size, env_size, {'view_point': None, 'object_id': object_id})
         self.center = cam_center
         self.a_star = AStar(weight=2, penalty=100)
 
-    def point_to_distance(self, point:tuple[int, int]) -> tuple[int, int]:
+    def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
         offset_x = point[0] - self.center[0]/2
         offset_y = self.center[1] - point[1]
         x_distance = offset_x*self.ratio_width
         y_distance = offset_y*self.ratio_height
         return (x_distance, y_distance)
+
+    def distance_to_point(self, distance:tuple[float, float]) -> tuple[int, int]:
+        '''Converts distance to point'''
+        p_x = math.floor((distance[0]/self.ratio_width) + self.center[0]/2)
+        p_y = math.floor(self.center[1] - (distance[1]/self.ratio_height))
+        return (p_x, p_y)
 
     Objects = TypedDict('Objects', {
         'points': list[tuple[int, int]],
@@ -85,11 +91,13 @@ class PathFinding:
         end_pos_path = self.env.get_pos(12)
 
         cur_mat = self.env.get_data()
-        self.display.update(cur_mat)
-        cur_mat = self.env.get_data()
-        ret, path = self.a_star.get_data(cur_mat, start_pos_path, end_pos_path)
+        _, path = self.a_star.get_data(cur_mat, start_pos_path, end_pos_path)
+        return path
 
-        if ret:
+    def update_display(self, path):
+        '''Update display if there are new changes'''
+        if self.display is not None:
+            cur_mat = self.env.get_data()
+            self.display.update(cur_mat)
             for pos in path[1:-1]:
                 self.display.insert(pos, 'Path')
-        return path

@@ -11,11 +11,13 @@ try:
     from line_detection.parking_slot_detection import ParkingSlotDetector
     from line_detection.lane_detection import LaneDetector
     from traffic_sign_detection.main import TrafficSignDetector
+    from environment.src.display import DisplayEnvironment
     from qr_code.qr_code import QRCode
 except ImportError:
     from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
     from computer_vision.line_detection.lane_detection import LaneDetector
     from computer_vision.traffic_sign_detection.main import TrafficSignDetector
+    from computer_vision.environment.src.display import DisplayEnvironment
     from computer_vision.qr_code.qr_code import QRCode
 
 if __name__ == "__main__":
@@ -31,13 +33,16 @@ if __name__ == "__main__":
 
     BOARD_SIZE = (60, 115)
     ENV_SIZE = 20
+    W_SIZE = 720
 
     img = cv2.imread(
         'computer_vision/line_detection/assets/parking/10.png')
     center = (img.shape[1], img.shape[0])
-
+    window_size = (W_SIZE * (BOARD_SIZE[1]/BOARD_SIZE[0]), W_SIZE)
+    display = DisplayEnvironment(window_size, BOARD_SIZE)
     path_finding = PathFinding(
-        BOARD_SIZE, 720, PIXEL_WIDTH, PIXEL_HEIGHT, CAM_WIDTH, CAM_HEIGHT, center, env_size=20)
+        BOARD_SIZE, PIXEL_WIDTH, PIXEL_HEIGHT,
+        CAM_WIDTH, CAM_HEIGHT, center, display=display, env_size=20)
     parking_slot_detector = ParkingSlotDetector(
         hough=[200, 5], iterations=[5, 2])
     lane_detector = LaneDetector()
@@ -45,7 +50,7 @@ if __name__ == "__main__":
         size_mm=61, size_px=10, distance=200)
     qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
 
-    TILE_SIZE = path_finding.window_size[1]/path_finding.size[0]
+    TILE_SIZE = display.window_size[1]/path_finding.size[0]
 
     RUN = True
     while RUN:

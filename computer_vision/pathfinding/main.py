@@ -91,12 +91,13 @@ class PathFinding:
         end_pos_path = self.env.get_pos(12)
 
         cur_mat = self.env.get_data()
-        if self.display is not None:
-            self.display.update(cur_mat)
-        cur_mat = self.env.get_data()
-        ret, path = self.a_star.get_data(cur_mat, start_pos_path, end_pos_path)
+        _, path = self.a_star.get_data(cur_mat, start_pos_path, end_pos_path)
+        return path
 
-        if ret:
+    def update_display(self, path):
+        '''Update display if there are new changes'''
+        if self.display is not None:
+            cur_mat = self.env.get_data()
+            self.display.update(cur_mat)
             for pos in path[1:-1]:
                 self.display.insert(pos, 'Path')
-        return path

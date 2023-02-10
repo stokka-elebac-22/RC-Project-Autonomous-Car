@@ -130,6 +130,7 @@ if __name__ == "__main__":
         path_finding.insert_objects(obstacles)
         # TODO: Remove later since Test point
         path = path_finding.calculate_path((460, 120), False)
+        path_finding.update_display(path)
         path_finding.display.display()
 
         TENSION = 0.

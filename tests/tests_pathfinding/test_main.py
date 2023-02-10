@@ -14,7 +14,6 @@ class TestParametrized:
         '''Testing point to distance'''
         pathfinding = PathFinding(
             size= (60, 115),
-            w_size= 720,
             pixel_height=500,
             pixel_width=300,
             cam_width=800,
@@ -33,7 +32,6 @@ class TestParametrized:
         '''Testing distance to point'''
         pathfinding = PathFinding(
             size= (60, 115),
-            w_size= 720,
             pixel_height=500,
             pixel_width=300,
             cam_width=800,

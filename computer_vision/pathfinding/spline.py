@@ -10,7 +10,7 @@ def t_j(t_i, p_i, p_j, alpha):
     x_j, y_j = p_j
     return (((x_j-x_i)**2 + (y_j-y_i)**2)**0.5)**alpha + t_i
 
-def catmull_rom_spline(p_0, p_1, p_2, p_3, alpha, num_points=100):
+def catmull_rom_spline(p_0, p_1, p_2, p_3, alpha, num_points=100): # pylint: disable=R0913 R0914
     """
     p_0, p_1, p_2, and p_3: (x, y) pairs
     nPoints: number of points in the segment

@@ -130,9 +130,9 @@ class QRCode:
         else:
             for i in range(len(points_qr) - len(self.qr_geometries)):
                 size = {
-                    'px': self.size_px,
-                    'mm': self.size_mm,
-                    'distance': self.distance
+                    'px': self.qr_geometries[i].size.get('px'),
+                    'mm': self.qr_geometries[i].size.get('mm'),
+                    'distance': self.qr_geometries[i].size.get('distance')
                 }
                 self.qr_geometries.append(QRGeometry(size))
 

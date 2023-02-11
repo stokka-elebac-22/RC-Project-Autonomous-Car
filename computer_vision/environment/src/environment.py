@@ -9,7 +9,7 @@ ViewPointObject = TypedDict('ViewPointObject', {
 })
 class Environment:
     '''Creating a 2 dimensional map of the 3 dimensional world'''
-    def __init__(self, size: tuple[int, int], real_size: float, view_point_object=ViewPointObject):
+    def __init__(self, size: tuple[int, int], real_size: float, view_point_object: ViewPointObject = None):
         '''View point is the position in a 2d matrix where everyting should be relativ too'''
         self.size = size
         self.real_size = real_size # the real unit size per square

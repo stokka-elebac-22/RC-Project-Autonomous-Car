@@ -103,8 +103,9 @@ class TestQRCode:
         frame = cv.imread('tests/images/qr_code/logi_1080p/distance/' + path + '.jpg')
         data = qr_code.get_data(frame)
         # Tolerance of 30mm
-        assert data['ret'] == exp[0] and data['distances'][0] == pytest.approx(exp[1], abs=abs(30)) \
-            and data['angles'][0] == pytest.approx(exp[2], abs=abs(5))
+        assert data['ret'] == exp[0] and \
+                data['distances'][0] == pytest.approx(exp[1], abs=abs(30)) and \
+                data['angles'][0] == pytest.approx(exp[2], abs=abs(5))
 
     @pytest.mark.parametrize(
         ['path', 'exp'],

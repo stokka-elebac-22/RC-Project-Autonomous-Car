@@ -1,11 +1,11 @@
-"""Importing needed libraries"""
+'''Importing needed libraries'''
 import pytest
 from computer_vision.pathfinding.bresenham import bresenham
 
-class TestParametrized:
-    """
+class TestParametrized: # pylint: disable=R0903
+    '''
     DOC: Testing bresenham function
-    """
+    '''
 
     @pytest.mark.parametrize('param, expected', [
         ([3, 4, 10, 2], [(3, 4), (4, 4), (5, 3), (6, 3), (7, 3), (8, 3), (9, 2), (10, 2)]),
@@ -16,4 +16,3 @@ class TestParametrized:
     def test_bresenham(self, param, expected):
         '''Testing get_bresenham method'''
         assert bresenham(param[0], param[1], param[2], param[3]) == expected
-        

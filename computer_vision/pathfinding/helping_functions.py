@@ -13,5 +13,5 @@ def get_angle(vec: list) -> float:
     return temp
 
 def get_abs_velo(vec: list) -> float:
-    """Calculate the absolute value of a vector"""
+    '''Calculate the absolute value of a vector'''
     return math.sqrt(vec[0]**2 + vec[1]**2)

@@ -86,12 +86,14 @@ class TestParametrized:
     ])
     def test_detect_parking_lines(self, img_source):
         '''Test parking_lines method of ParkingSlotDetector'''
-        QR_SIZE_PX = 76
-        QR_SIZE_MM = 52
-        QR_DISTANCE = 500
+        size = {
+            'px': 76,
+            'mm': 52,
+            'distance': 500
+        }
         image = self.get_image(img_source)
         parking_slot_detector = ParkingSlotDetector()
-        qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+        qr_code = QRCode(size=size)
         data = qr_code.get_data(image)
         qr_code_data = {
             'ret': data['ret'],

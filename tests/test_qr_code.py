@@ -71,12 +71,12 @@ class TestQRCode:
         ]
     )
     def test_angle_logi_1080p(self, name, exp):
-        """Testing the angle to qr code"""
+        '''Testing the angle to qr code'''
         qr_size_px = 112
         qr_size_mm = 52
         qr_distance = 400
         qr_code = QRCode(qr_size_px, qr_size_mm, qr_distance)
-        frame = cv.imread("tests/images/qr_code/logi_1080p/angle/" + name + ".jpg")
+        frame = cv.imread('tests/images/qr_code/logi_1080p/angle/' + name + '.jpg')
         data = qr_code.get_data(frame)
         # Tolerance of 5
         assert data['ret'] == exp[0] and data['angles'][0] == pytest.approx(exp[1], abs=abs(5))

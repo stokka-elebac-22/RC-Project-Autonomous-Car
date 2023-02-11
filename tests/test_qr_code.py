@@ -121,10 +121,12 @@ class TestQRCode:
     @pytest.mark.skip(reason='No way of testing atm because of poor test photos')
     def test_distance_webcam(self, path, exp):
         '''Testing the distance to qr code for the small webcam'''
-        qr_size_px = 120
-        qr_size_mm= 52
-        qr_distance_mm = 320
-        qr_code = QRCode(qr_size_px, qr_size_mm, qr_distance_mm)
+        size = {
+            'px': 120,
+            'mm': 52,
+            'distance': 320,
+        }
+        qr_code = QRCode(size=size)
         frame = cv.imread('tests/images/qr_code/webcam/distance/' + path + '.jpg')
         data = qr_code.get_data(frame)
         assert data['ret'] == exp[0] and data['distances']== pytest.approx(exp[1]) \

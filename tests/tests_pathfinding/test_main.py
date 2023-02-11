@@ -1,11 +1,11 @@
-"""Importing needed libraries"""
+'''Importing needed libraries'''
 import pytest
 from computer_vision.pathfinding.main import PathFinding
 
 class TestParametrized:
-    """
+    '''
     DOC: Testing PathFinding
-    """
+    '''
 
     @pytest.mark.parametrize('point, expected', [
         ((20, 300), (-1013.33, 200.0)),

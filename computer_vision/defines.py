@@ -1,24 +1,24 @@
-"""defines.py: Class for enums to ensure consistency in values across platforms."""
-__copyright__ = "Copyright 2023, DATBAC"
-__license__ = "Apache-2.0"
-__version__ = "0.1.0"
-__status__ = "Testing"
+'''defines.py: Class for enums to ensure consistency in values across platforms.'''
+__copyright__ = 'Copyright 2023, DATBAC'
+__license__ = 'Apache-2.0'
+__version__ = '0.1.0'
+__status__ = 'Testing'
 
 from enum import Enum
 class Sensor(Enum):
-    """Enum for sensor types"""
+    '''Enum for sensor types'''
     HCSR04 = 1   # Ultrasonic distance sensor
     VL53L = 2    # Laser distance sensor
 
 class Position(Enum):
-    """Enum for positions"""
+    '''Enum for positions'''
     BACK_RIGHT = 0
     FRONT_RIGHT = 1
     BACK_LEFT = 2
     FRONT_LEFT = 3
 
 class MessageId(Enum):
-    """Enum for CAN message Ids"""
+    '''Enum for CAN message Ids'''
     CAN_MOTOR_DATA_ID = 16       # 0x010 //  00010 000
     CAN_STEERING_DATA_ID = 24    # 0x018 //  00011 000
 
@@ -33,10 +33,10 @@ class MessageId(Enum):
     CAN_TEST_MSG_ID = 136        # 0x088
     CAN_DEVICE_SETTINGS_ID = 152 # 0x098
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     test = Position(3)
-    print("current position is " + test.name)
+    print('current position is ' + test.name)
     test = Position.BACK_LEFT
-    print("current position is " + test.name)
+    print('current position is ' + test.name)
     message = MessageId.CAN_TEST_MSG_ID
-    print("CAN message Id: " + message.name + " value: " + hex(message.value))
+    print('CAN message Id: ' + message.name + ' value: ' + hex(message.value))

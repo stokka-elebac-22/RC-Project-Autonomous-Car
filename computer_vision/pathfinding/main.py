@@ -71,7 +71,7 @@ class PathFinding:
 
                 if len(coords) == 4:
                     result = bresenham(
-                        coords[0], coords[1], coords[2], coords[3])
+                        (coords[0], coords[1]), (coords[2], coords[3]))
                     if result is not None:
                         for point in result:
                             self.env.insert_by_index(point, 1)

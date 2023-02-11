@@ -1,10 +1,9 @@
 '''Test the display for environment'''
-import sys
 import pytest
 from computer_vision.environment.src.board import Board
 from computer_vision.environment.src.display import DisplayEnvironment
 
-class TestDisplayEnvironment:
+class TestDisplayEnvironment: # pylint: disable=R0903
     '''Testing the environment'''
     @pytest.mark.parametrize(
         ['param', 'exp'],

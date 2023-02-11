@@ -4,8 +4,8 @@ import cv2
 import numpy as np
 from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
 from computer_vision.qr_code.qr_code import QRCode
-PATH = "computer_vision/line_detection/assets/parking/"
 
+PATH = "computer_vision/line_detection/assets/parking/"
 
 class TestParametrized:
     """
@@ -113,13 +113,17 @@ class TestParametrized:
         assert (line_coordinates == expected).all()
 
     @pytest.mark.parametrize('lines, expected', [
-        ([np.array([200, 100, 300, 400]), np.array([200, 100, 300, 400])], np.array([200, 100, 200, 100])),
-        ([np.array([100, 200, 300, 400]), np.array([200, 300, 400, 500])], np.array([100, 200, 200, 300]))
+        ([
+            np.array([200, 100, 300, 400]),
+            np.array([200, 100, 300, 400])],
+            np.array([200, 100, 200, 100])),
+        ([
+            np.array([100, 200, 300, 400]),
+            np.array([200, 300, 400, 500])],
+            np.array([100, 200, 200, 300]))
         ])
     def test_get_closing_line_of_two_lines(self, lines, expected):
         """Test get_closing_line_of_two_lines method of ParkingSlotDetector"""
         parking_slot_detector = ParkingSlotDetector()
         closing_line = parking_slot_detector.get_closing_line_of_two_lines(lines)
         assert (closing_line == expected).all()
-        
-        

@@ -15,6 +15,8 @@ class AStar:
         self.weight = weight
         self.penalty = penalty
 
+    # pylint warning needs to be fixed.
+    # pylint: disable=R0914 R0912 R0915
     def find_path(self, mat: np.ndarray, start_pos: tuple[int, int],
         end_pos: tuple[int, int]) -> list[Node]:
         '''Returns the start node'''
@@ -155,7 +157,7 @@ class AStar:
         '''Creating a weighted matrix'''
         # checks if the matrix is valid
         if mat is None or len(mat) == 0 or len(mat[0]) == 0:
-            return
+            return None
         size = (len(mat), len(mat[0]))
         # weighted_mat = np.full((size[0], size[1]), (0,0), dtype=(int,int))
         weighted_mat = np.zeros((size[0], size[1]), dtype=int)

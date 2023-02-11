@@ -3,8 +3,8 @@ import pytest
 import cv2
 import numpy as np
 from computer_vision.line_detection.line_detector import LineDetector
-PATH = "computer_vision/line_detection/assets/"
 
+PATH = "computer_vision/line_detection/assets/"
 
 class TestParametrized:
     """

@@ -1,6 +1,5 @@
 '''Test the display for environment'''
 import pytest
-import pygame as pg
 from computer_vision.environment.src.board import Board
 from computer_vision.environment.src.display import DisplayEnvironment
 class TestDisplayEnvironment:

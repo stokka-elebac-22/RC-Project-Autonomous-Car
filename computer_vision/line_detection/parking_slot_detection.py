@@ -5,12 +5,13 @@ import sys
 import os
 import cv2
 import numpy as np
-from qr_code.qr_code import QRCode
 try:
     from line_detector import LineDetector
+    from qr_code.qr_code import QRCode
 except ImportError:
     try:
         from computer_vision.line_detection.line_detector import LineDetector
+        from computer_vision.qr_code.qr_code import QRCode
     except ImportError:
         from line_detection.line_detector import LineDetector
 

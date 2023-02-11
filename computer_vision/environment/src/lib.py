@@ -12,8 +12,8 @@ ObjectParam = TypedDict('ObjectParam', {
 @dataclasses.dataclass
 class Object:
     '''Object'''
-    def __init__(self, id: int, name: str, param: ObjectParam):
-        self.id = id # pylint: disable=C0103
+    def __init__(self, object_id: int, name: str, param: ObjectParam):
+        self.id = object_id # pylint: disable=C0103
         self.name = name
         self.color = param['color']
         self.thickness = param['thickness']

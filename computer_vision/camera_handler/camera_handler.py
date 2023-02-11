@@ -3,7 +3,7 @@ __copyright__ = "Copyright 2023, DATBAC23"
 __license__ = "Apache-2.0"
 __version__ = "0.1.0"
 __status__ = "Testing"
-from PyQt6.QtGui import QPixmap, QColor, QImage
+from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import pyqtSignal, Qt, QThread
 import cv2
 import numpy as np
@@ -48,7 +48,7 @@ class CameraHandler:
     def get_cv_frame(self, cam_id: int):
         """Returns a new CV frame"""
         print(cam_id)
-    
+
     def convert_cv_qt(self, cv_img, scale_w: int, scale_h: int) -> QPixmap:
         """Convert from an opencv image to QPixmap"""
         rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)

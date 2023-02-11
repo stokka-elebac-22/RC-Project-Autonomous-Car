@@ -1,10 +1,11 @@
-"""Import libraries"""
+'''Import libraries'''
 import warnings
 from typing import Union, TypedDict
 import sys
 import os
 import cv2
 import numpy as np
+from qr_code.qr_code import QRCode
 try:
     from line_detector import LineDetector
 except ImportError:
@@ -12,17 +13,14 @@ except ImportError:
         from computer_vision.line_detection.line_detector import LineDetector
     except ImportError:
         from line_detection.line_detector import LineDetector
+
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-from qr_code.qr_code import QRCode
-
 
 class ParkingSlotDetector(LineDetector):
-    """
-    DOC: Detects parking slot
-    """
-
+    '''DOC: Detects parking slot'''
+    # pylint: disable=R0913
     def __init__(self,
                  canny: list[int, int] = None,
                  blur: int = 3,
@@ -53,7 +51,7 @@ class ParkingSlotDetector(LineDetector):
         roi = cv2.bitwise_and(image, mask)
         return roi
 
-    def cluster_lines(self, lines: np.ndarray) -> list[np.ndarray, np.ndarray]:
+    def cluster_lines(self, lines: np.ndarray) -> list[np.ndarray, np.ndarray]: # pylint: disable=R0914
         '''Cluster lines that are close to each other'''
         clustered_lines = []
         clustered_coords = []
@@ -105,7 +103,7 @@ class ParkingSlotDetector(LineDetector):
         return temp_lines, temp_coords
 
     def get_min_max_x(self, coordinates: list[np.ndarray]) -> list[int, int]:
-        """Get the minimum and maximum x values from a set of coordinates"""
+        '''Get the minimum and maximum x values from a set of coordinates'''
         max_values = np.argmax(coordinates, axis=0)
         max_x = np.max([coordinates[max_values[0]]
                         [0], coordinates[max_values[2]][2]])
@@ -118,7 +116,7 @@ class ParkingSlotDetector(LineDetector):
                          line_coords: list[np.ndarray],
                          points: np.ndarray,
                          ) -> list[np.ndarray]:
-        """Get the closest line to the QR code"""
+        '''Get the closest line to the QR code'''
         lines = []
         left_diff = None
         left_index = 0
@@ -158,11 +156,12 @@ class ParkingSlotDetector(LineDetector):
         'ret': bool,
         'points': np.ndarray
     })
+
     def detect_parking_lines(self,
                              image: np.ndarray,
                              qr_data: QrData
                              ) -> Union[list[np.ndarray], None]:
-        "Detect the parking lines in the image"
+        '''Detect the parking lines in the image'''
         if qr_data['ret']:
             self.qr_slope, self.qr_intercept = np.polyfit(
                 (qr_data['points'][0][2][0],
@@ -200,7 +199,7 @@ class ParkingSlotDetector(LineDetector):
                                              min_x: int,
                                              max_x: int,
                                              line_parameters: list[float, float]) -> np.ndarray:
-        """Get line coordinates from line parameters"""
+        '''Get line coordinates from line parameters'''
         slope = line_parameters[0]
         intercept = line_parameters[1]
         y_1 = int(slope*min_x + intercept)
@@ -225,15 +224,17 @@ class ParkingSlotDetector(LineDetector):
         return np.array(line_coords)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # ORIGINAL: hough=[200,5]
     parking_slot_detector = ParkingSlotDetector(
         hough=[200, 5], iterations=[5, 2])
     img = cv2.imread('computer_vision/line_detection/assets/parking/10.png')
-    QR_SIZE_PX = 76
-    QR_SIZE_MM = 52
-    QR_DISTANCE = 500
-    qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+    qr_size = {
+        'px': 76,
+        'mm': 52,
+        'distance': 500
+    }
+    qr_code = QRCode(size=qr_size)
     data = qr_code.get_data(img)
     qr_code_data = {
         'ret': data['ret'],
@@ -249,6 +250,6 @@ if __name__ == "__main__":
     parking_lines.append(
         parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
     parking_slot_detector.show_lines(img, parking_lines)
-    cv2.imshow("img", img)
+    cv2.imshow('img', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()

@@ -1,6 +1,6 @@
 '''Bresenham algorithm'''
 def bresenham(point_0: tuple[int, int], point_1: tuple[int, int]) -> list[tuple[int, int]]:
-    """
+    '''
     Returns a list of coordinates
     representing a line from (x1, y1) to (x2, y2)
     Source: https://github.com/encukou/bresenham
@@ -24,7 +24,8 @@ def bresenham(point_0: tuple[int, int], point_1: tuple[int, int]) -> list[tuple[
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
     THE SOFTWARE.
-    """
+    '''
+
     coordinates = []
     d_x = point_1[0] - point_0[0]
     d_y = point_1[1] - point_0[1]

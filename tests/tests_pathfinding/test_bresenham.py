@@ -15,4 +15,4 @@ class TestParametrized: # pylint: disable=R0903
         ])
     def test_bresenham(self, param, expected):
         '''Testing get_bresenham method'''
-        assert bresenham(param[0], param[1], param[2], param[3]) == expected
+        assert bresenham((param[0], param[1]), (param[2], param[3])) == expected

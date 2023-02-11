@@ -1,6 +1,6 @@
 '''Importing necessary libraries'''
-import cv2
 from typing import TypedDict
+import cv2
 
 SignSize = TypedDict('SignSize', {
     'px': int,

@@ -20,7 +20,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
 # from random import randint
 import numpy as np
 
-class Worker(QObject, ):
+class Worker(QObject, ): # pylint: disable=R0903
     '''Worker thread'''
     finished = pyqtSignal()
     def __init__(self, cam_handler: CameraHandler):
@@ -32,7 +32,7 @@ class Worker(QObject, ):
         self.cam_handler.refresh_camera_list()
         self.finished.emit()
 
-class Ui(QtWidgets.QMainWindow):
+class Ui(QtWidgets.QMainWindow): # pylint: disable=R0902
     '''Class handling Qt GUI control'''
     def __init__(self, ui_file, connection: tuple[str, int], fullscreen):
         self.connection_details = connection

@@ -16,7 +16,7 @@ class VideoThread(QThread):
         super().__init__()
         self._run_flag = True
 
-    # pylint: disable=C0301
+    # pylint: disable=(0801
     def run(self):
         '''run'''
         # capture from web cam
@@ -28,7 +28,7 @@ class VideoThread(QThread):
         # shut down capture system
         cap.release()
 
-    # pylint: disable=C0301
+    # pylint: disable=R0801
     def stop(self):
         '''Sets run flag to False and waits for thread to finish'''
         self._run_flag = False

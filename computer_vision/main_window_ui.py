@@ -20,7 +20,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
 # from random import randint
 import numpy as np
 
-class Worker(QObject, ):
+class Worker(QObject, ): # pylint: disable=R0902
     '''Worker thread'''
     finished = pyqtSignal()
     def __init__(self, cam_handler: CameraHandler):

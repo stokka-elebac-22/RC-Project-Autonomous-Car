@@ -34,7 +34,7 @@ class Worker(QObject, ): # pylint: disable=R0903
 
 class Ui(QtWidgets.QMainWindow): # pylint: disable=R0902
     '''Class handling Qt GUI control'''
-    def __init__(self, ui_file, connection: tuple[str, int], fullscreen):
+    def __init__(self, ui_file, connection: list[str, int], fullscreen):
         self.connection_details = connection
         self.camera_handler = CameraHandler()
         self.app = QtWidgets.QApplication(sys.argv) # Create an instance of QtWidgets.QApplication

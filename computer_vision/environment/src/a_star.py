@@ -9,9 +9,10 @@ try:
 except ImportError:
     from .lib import Node, BinarySearchList, Objects
 
+
 class AStar:
     '''A* Algorithm'''
-    def __init__(self, weight: int=0, penalty: int=1):
+    def __init__(self, weight: int = 0, penalty: int = 1):
         self.valid = ['None'] # a list of object names that are valid
         self.weight = weight
         self.penalty = penalty
@@ -19,7 +20,7 @@ class AStar:
     # pylint warning needs to be fixed.
     # pylint: disable=R0914 R0912 R0915
     def find_path(self, mat: np.ndarray, start_pos: Tuple[int, int],
-        end_pos: Tuple[int, int]) -> List[Node]:
+            end_pos: Tuple[int, int]) -> List[Node]:
         '''Returns the start node'''
         # The f_value will be the total distance and calculated with pythagoras
         # without the square root
@@ -32,7 +33,8 @@ class AStar:
             weighted_mat = self.create_weight_matrix(mat)
 
         size = (len(mat[0]), len(mat))
-        h_value = math.sqrt((start_pos[0]-end_pos[0])**2 + (start_pos[1]-end_pos[1])**2)
+        h_value = math.sqrt((start_pos[0]-end_pos[0])**2 +
+            (start_pos[1]-end_pos[1])**2)
         node_data = {
             'position': start_pos,
             'h_value': h_value,
@@ -42,7 +44,8 @@ class AStar:
             'object_id': None
         }
         start_node = Node(node_data)
-        open_list = BinarySearchList() # a list of possible candidates to be the next current node
+        # a list of possible candidates to be the next current node
+        open_list = BinarySearchList()
         open_list.insert(start_node)
 
         objects = Objects()
@@ -124,7 +127,8 @@ class AStar:
                 ret, node = open_list.get(pos)
                 if ret:
                     old_f_value = node.f_value
-                    new_h_value = math.sqrt((pos[0]-end_pos[0])**2 + (pos[1]-end_pos[1])**2)
+                    new_h_value = math.sqrt((pos[0]-end_pos[0])**2 +
+                        (pos[1]-end_pos[1])**2)
                     new_g_value = cur.g_value + math.sqrt(
                         abs(cur.position[0]-node.position[0])**2 +
                         abs(cur.position[1]-node.position[1]))
@@ -136,7 +140,8 @@ class AStar:
                         continue
                     open_list.delete(node.position)
                 # if not in the list, create a node with cur note as parent
-                h_value = math.sqrt((pos[0]-end_pos[0])**2 + (pos[1]-end_pos[1])**2)
+                h_value = math.sqrt((pos[0]-end_pos[0])**2 +
+                    (pos[1]-end_pos[1])**2)
                 node_data = {
                     'position': pos,
                     'h_value': h_value,
@@ -163,7 +168,8 @@ class AStar:
         # weighted_mat = np.full((size[0], size[1]), (0,0), dtype=(int,int))
         weighted_mat = np.zeros((size[0], size[1]), dtype=int)
 
-        diff_pos = [(1,-1),(1,0),(1,1),(0,-1),(0,0),(0,1),(-1,-1),(-1,0),(-1,1)]
+        diff_pos = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0),
+                    (0, 1), (-1, -1), (-1, 0), (-1, 1)]
         positions = set()
         for i in range(self.weight+1):
             for j in range(self.weight+1):
@@ -173,7 +179,8 @@ class AStar:
         # NEED TO IMPROVE THIS!
         for row in range(size[0]):
             for col in range(size[1]):
-                # checks if it is a hindrance and then applies a weight to the tiles around
+                # checks if it is a hindrance and then
+                # applies a weight to the tiles around
                 if mat[row][col] == 1:
                     # checks all surronding positions
                     for pos in positions:
@@ -185,13 +192,13 @@ class AStar:
                             idx_y > size[0] - 1 or \
                             idx_y < 0:
                             continue
-                        weight = self.weight - max(abs(pos[0]), abs(pos[1])) + 1
+                        weight = self.weight - \
+                            max(abs(pos[0]), abs(pos[1])) + 1
                         weighted_mat[idx_y][idx_x] += weight * self.penalty
         return weighted_mat
 
-
     def get_data(self, mat: np.ndarray, start_pos: Tuple[int, int],
-            end_pos: Tuple[int, int]) -> Tuple[bool, List[Node]]:
+                end_pos: Tuple[int, int]) -> Tuple[bool, List[Node]]:
         '''Returns a path list'''
         if start_pos is None or end_pos is None:
             return False, None

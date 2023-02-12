@@ -6,10 +6,10 @@ from environment.src.display import DisplayEnvironment
 from environment.src.a_star import AStar
 from qr_code.qr_code import QRCode
 
-if __name__ == '__main__': # pylint: disable=R0801
+if __name__ == '__main__':  # pylint: disable=R0801
     SIZE = (10, 11)
     W_SIZE = 600
-    WINDOW_SIZE = (W_SIZE* (SIZE[1]/SIZE[0]), W_SIZE)
+    WINDOW_SIZE = (W_SIZE * (SIZE[1]/SIZE[0]), W_SIZE)
 
     QR_SIZE_PX = 120
     QR_SIZE_MM = 52
@@ -23,12 +23,12 @@ if __name__ == '__main__': # pylint: disable=R0801
     DELAY = 1
 
     # create the environment and adding the 'car'
-    env= Environment(SIZE, 70, {'view_point': None, 'object_id': 10})
+    env = Environment(SIZE, 70, {'view_point': None, 'object_id': 10})
     display = DisplayEnvironment(WINDOW_SIZE, SIZE)
 
     a_star = AStar()
 
-    env.insert_by_index((1,1), 11)
+    env.insert_by_index((1, 1), 11)
 
     # pylint: disable=R0801
     TRIGGER = True
@@ -36,7 +36,7 @@ if __name__ == '__main__': # pylint: disable=R0801
         # checking events
         for event in pg.event.get():
             if event.type == QUIT:
-                TRIGGER= False
+                TRIGGER = False
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_position = pg.mouse.get_pos()
                 TILE_SIZE = WINDOW_SIZE[1]/SIZE[0]

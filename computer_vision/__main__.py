@@ -1,4 +1,7 @@
-'''__init__.py: Initialization class for the Computer vision control panel GUI tool.'''
+'''
+__init__.py: Initialization class for the
+Computer vision control panel GUI tool.
+'''
 # This causes linting error because it is similar in another file
 # __author__ = 'Asbjørn Stokka'
 # __copyright__ = 'Copyright 2023, DATBAC'
@@ -15,7 +18,8 @@ import argparse
 from main_window_ui import Ui
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='DATBAC23 Computer vision control interface.')
+    parser = argparse.ArgumentParser(
+        description='DATBAC23 Computer vision control interface.')
     parser.add_argument('--theme', dest='theme',
                         default='desktop_design',
                         help='name of theme file (default: desktop_design)')
@@ -38,7 +42,7 @@ if __name__ == '__main__':
     os.environ['QT_SCREEN_SCALE_FACTORS'] = '1'
     os.environ['QT_SCALE_FACTOR'] = '1'
 
-    HOST = '10.0.10.95' #socket.gethostname()  # when both code is running on same pc
+    HOST = '10.0.10.95' # socket.gethostname()  # when both code is running on same pc
     PORT = 2004  # socket server port number
     window = Ui(args.theme + '.ui', (HOST, PORT), FULL_SCREEN)
     sys.exit(0)

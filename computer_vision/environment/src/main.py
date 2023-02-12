@@ -5,6 +5,7 @@ from environment import Environment
 from display import DisplayEnvironment
 from a_star import AStar
 
+# pylint: disable=R0801
 if __name__ == '__main__':
     SIZE = (10, 11)
     W_SIZE = 600

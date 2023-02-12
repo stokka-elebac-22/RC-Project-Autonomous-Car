@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout
 from PyQt6.QtGui import QPixmap
 # https://gist.github.com/docPhil99/ca4da12c9d6f29b9cea137b617c7b8b1
 
+# pylint: disable=C0301
 class VideoThread(QThread):
     '''Video Thread'''
     change_pixmap_signal = pyqtSignal(np.ndarray)

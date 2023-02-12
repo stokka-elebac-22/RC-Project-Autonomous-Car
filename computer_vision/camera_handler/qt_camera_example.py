@@ -21,8 +21,8 @@ class VideoThread(QThread):
         # capture from web cam
         cap = cv2.VideoCapture(0)
         while self._run_flag:
-            ret, cv_img = cap.read()
-            if ret:
+            ret_val, cv_img = cap.read()
+            if ret_val:
                 self.change_pixmap_signal.emit(cv_img)
         # shut down capture system
         cap.release()

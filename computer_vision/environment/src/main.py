@@ -16,7 +16,6 @@ if __name__ == '__main__': # pylint: disable=R0801
 
     env.insert((2, SIZE[1]-2), 11)
 
-    # pylint: disable=R0801
     RUN = True
     while RUN:
         for event in pg.event.get():

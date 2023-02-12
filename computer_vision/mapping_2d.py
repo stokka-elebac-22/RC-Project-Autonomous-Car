@@ -31,12 +31,12 @@ if __name__ == '__main__': # pylint: disable=R0801
     env.insert_by_index((1,1), 11)
 
     # pylint: disable=R0801
-    RUN = True
-    while RUN:
+    TRIGGER = True
+    while TRIGGER:
         # checking events
         for event in pg.event.get():
             if event.type == QUIT:
-                RUN = False
+                TRIGGER= False
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_pos = pg.mouse.get_pos()
                 TILE_SIZE = WINDOW_SIZE[1]/SIZE[0]

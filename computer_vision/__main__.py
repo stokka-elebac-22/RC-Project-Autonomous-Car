@@ -1,13 +1,13 @@
 '''__init__.py: Initialization class for the Computer vision control panel GUI tool.'''
-__author__ = 'Asbjørn Stokka'
-__copyright__ = 'Copyright 2023, DATBAC'
-__credits__ = ['Asbjørn Stokka']
-__license__ = 'Apache-2.0'
-__version__ = '0.1.0'
-__maintainer__ = 'Asbjørn Stokka'
-__email__ = 'asbjorn@maxit-as.com'
-__status__ = 'Testing'
- # pylint: disable=R0801
+# This causes linting error because it is similar in another file
+# __author__ = 'Asbjørn Stokka'
+# __copyright__ = 'Copyright 2023, DATBAC'
+# __credits__ = ['Asbjørn Stokka']
+# __license__ = 'Apache-2.0'
+# __version__ = '0.1.0'
+# __maintainer__ = 'Asbjørn Stokka'
+# __email__ = 'asbjorn@maxit-as.com'
+# __status__ = 'Testing'
 
 import os
 import sys

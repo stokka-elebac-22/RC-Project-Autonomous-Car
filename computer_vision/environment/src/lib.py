@@ -30,19 +30,23 @@ class Objects:
 
     def _init_objects(self):
         '''Initializing the object dict'''
+        # Choose object id wisely. It should have space to expand if needed,
+        # but not exceed 255 (uncesseary use of space)
         obj = [
             # Basic stars at 0
             ('None', 0),
             ('Hindrance', 1),
-            ('Path', 2),
-            ('ParkingLine', 3),
-            ('LaneLine', 4),
-            # Optional in map but necessary in a* start at 10
+            ('EndPoint', 2),
+            ('Path', 3),
+            # Other basic
             ('Car', 10),
-            ('QR', 11),
-            ('EndPoint', 12),
-            # Signs start at 20
-            ('Stop', 20),
+            # Parking
+            ('QR', 20),
+            # Lines
+            ('ParkingLine', 30),
+            ('LaneLine', 31),
+            # Signs
+            ('Stop', 40),
         ]
         for i in obj:
             self.objects[i[0]] = i[1]
@@ -72,33 +76,17 @@ class Objects:
             },
             {
                 'id': 2,
-                'name': 'Path',
+                'name': 'EndPoint',
                 'param': {
-                    'color': pg.Color(50, 80, 180),
+                    'color': pg.Color(22, 80, 22),
                     'thickness': 0
                 }
             },
             {
                 'id': 3,
-                'name': 'ParkingLine',
+                'name': 'Path',
                 'param': {
-                    'color': pg.Color(227,174,87),
-                    'thickness': 0
-                }
-            },
-            {
-                'id': 4,
-                'name': 'LaneLine',
-                'param': {
-                    'color': pg.Color(204, 204, 150),
-                    'thickness': 0
-                }
-            },
-            {
-                'id': 5,
-                'name': 'StopSign',
-                'param': {
-                    'color': pg.Color(242, 205, 92),
+                    'color': pg.Color(50, 80, 180),
                     'thickness': 0
                 }
             },
@@ -111,7 +99,7 @@ class Objects:
                 }
             },
             {
-                'id': 11,
+                'id': 20,
                 'name': 'QR',
                 'param': {
                     'color': pg.Color(150, 80, 180),
@@ -119,15 +107,23 @@ class Objects:
                 }
             },
             {
-                'id': 12,
-                'name': 'EndPoint',
+                'id': 30,
+                'name': 'ParkingLine',
                 'param': {
-                    'color': pg.Color(22, 80, 22),
+                    'color': pg.Color(227,174,87),
                     'thickness': 0
                 }
             },
             {
-                'id': 20,
+                'id': 31,
+                'name': 'LaneLine',
+                'param': {
+                    'color': pg.Color(204, 204, 150),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 40,
                 'name': 'Stop',
                 'param': {
                     'color': pg.Color(255, 0, 0),

@@ -198,7 +198,7 @@ class AStar:
         return weighted_mat
 
     def get_data(self, mat: np.ndarray, start_pos: Tuple[int, int],
-                end_pos: Tuple[int, int]) -> Tuple[bool, List[Node]]:
+            end_pos: Tuple[int, int]) -> Tuple[bool, List[Node]]:
         '''Returns a path list'''
         if start_pos is None or end_pos is None:
             return False, None

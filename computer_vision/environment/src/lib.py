@@ -1,5 +1,5 @@
 '''Library'''
-from typing import TypedDict
+from typing import TypedDict, Tuple
 import dataclasses
 import math
 import pygame as pg
@@ -173,7 +173,7 @@ class TwoWayDict(dict):
         return dict.__len__(self) // 2
 
 NodeData = TypedDict('NodeData', {
-    'position': tuple[int, int],
+    'position': Tuple[int, int],
     'h_value': float,
     'f_value': int,
     'parent': None,

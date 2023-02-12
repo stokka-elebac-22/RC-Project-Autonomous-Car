@@ -1,6 +1,6 @@
 '''QR code module.'''
 import dataclasses
-from typing import TypedDict
+from typing import TypedDict, Tuple, List
 import numpy as np
 import cv2 as cv
 
@@ -12,7 +12,7 @@ QRSize = TypedDict('QRSize', {
 @dataclasses.dataclass
 class QRGeometry:
     '''PointSet, used by qrcode.'''
-    def __init__(self, size: QRSize=None, pts: tuple[tuple[int, int]]=None):
+    def __init__(self, size: QRSize=None, pts: List[Tuple[int, int]]=None):
         self.size = size
         if size is None:
             self.size = {}
@@ -72,17 +72,17 @@ class QRGeometry:
 
 QRData = TypedDict('QRData', {
     'ret': bool,
-    'distances': list[float],
-    'angles': list[float],
-    'info': list[str],
-    'points': list[tuple()],
+    'distances': List[float],
+    'angles': List[float],
+    'info': List[str],
+    'points': List[Tuple],
     'rest': int,
 })
 
 DisplayData = TypedDict('DisplayData', {
-    'distances': list[float],
-    'angles': list[float],
-    'info': list[str],
+    'distances': List[float],
+    'angles': List[float],
+    'info': List[str],
 })
 
 class QRCode:

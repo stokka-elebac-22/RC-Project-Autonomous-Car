@@ -4,7 +4,7 @@ import copy
 import numpy as np
 
 ViewPointObject = TypedDict('ViewPointObject', {
-    'view_point': tuple[int, int],
+    'view_point': Tuple[int, int],
     'object_id': int,
 })
 class Environment:

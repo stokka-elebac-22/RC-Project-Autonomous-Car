@@ -16,6 +16,7 @@ from traffic_sign_detection.main import TrafficSignDetector
 from qr_code.qr_code import QRCode
 from PyQt6 import QtWidgets, uic, QtCore
 from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
+from typing import List
 # from pyqtgraph import PlotWidget, plot
 # from random import randint
 import numpy as np
@@ -34,7 +35,7 @@ class Worker(QObject, ): # pylint: disable=R0903
 
 class Ui(QtWidgets.QMainWindow): # pylint: disable=R0902
     '''Class handling Qt GUI control'''
-    def __init__(self, ui_file, connection: list[str, int], fullscreen):
+    def __init__(self, ui_file, connection: List[str, int], fullscreen):
         self.connection_details = connection
         self.camera_handler = CameraHandler()
         self.app = QtWidgets.QApplication(sys.argv) # Create an instance of QtWidgets.QApplication

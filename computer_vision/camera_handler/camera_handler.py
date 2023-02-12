@@ -3,6 +3,7 @@ __copyright__ = 'Copyright 2023, DATBAC23'
 __license__ = 'Apache-2.0'
 __version__ = '0.1.0'
 __status__ = 'Testing'
+from typing import List
 from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import pyqtSignal, Qt, QThread
 import cv2
@@ -21,11 +22,11 @@ class CameraHandler:
             + str(self.available_camera_list[camera_id]['res_h']) \
             + ' (' + str(self.available_camera_list[camera_id]['fps']) + 'fps)'
 
-    def get_camera_list(self) -> list[dict]:
+    def get_camera_list(self) -> List[dict]:
         '''Return the list of cameras'''
         return self.available_camera_list
 
-    def refresh_camera_list(self) -> list[dict]:
+    def refresh_camera_list(self) -> List[dict]:
         '''Test camera input to create a list of available cameras'''
         index = 0
         testing = 1

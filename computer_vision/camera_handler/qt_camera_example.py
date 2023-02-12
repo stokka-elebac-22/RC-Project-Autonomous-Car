@@ -8,7 +8,6 @@ from PyQt6.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout
 from PyQt6.QtGui import QPixmap
 # https://gist.github.com/docPhil99/ca4da12c9d6f29b9cea137b617c7b8b1
 
-# pylint: disable=C0301
 class VideoThread(QThread):
     '''Video Thread'''
     change_pixmap_signal = pyqtSignal(np.ndarray)
@@ -17,6 +16,7 @@ class VideoThread(QThread):
         super().__init__()
         self._run_flag = True
 
+    # pylint: disable=C0301
     def run(self):
         '''run'''
         # capture from web cam
@@ -28,6 +28,7 @@ class VideoThread(QThread):
         # shut down capture system
         cap.release()
 
+    # pylint: disable=C0301
     def stop(self):
         '''Sets run flag to False and waits for thread to finish'''
         self._run_flag = False

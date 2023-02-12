@@ -6,6 +6,7 @@ from environment.src.display import DisplayEnvironment
 from environment.src.a_star import AStar
 from qr_code.qr_code import QRCode
 
+# pylint: disable=R0801
 if __name__ == '__main__':
     SIZE = (10, 11)
     W_SIZE = 600

@@ -17,7 +17,8 @@ from PyQt6 import QtWidgets, uic, QtCore
 from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
 import numpy as np
 
-class Worker(QObject, ): # pylint: disable=R0903
+
+class Worker(QObject, ):  # pylint: disable=R0903
     '''Worker thread'''
     finished = pyqtSignal()
     def __init__(self, cam_handler: CameraHandler):
@@ -29,15 +30,16 @@ class Worker(QObject, ): # pylint: disable=R0903
         self.cam_handler.refresh_camera_list()
         self.finished.emit()
 
-class Ui(QtWidgets.QMainWindow): # pylint: disable=R0902
+
+class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     '''Class handling Qt GUI control'''
     def __init__(self, ui_file, connection: Tuple[str, int], fullscreen):
         self.connection_details = connection
         self.camera_handler = CameraHandler()
-        self.app = QtWidgets.QApplication(sys.argv) # Create an instance of QtWidgets.QApplication
+        self.app = QtWidgets.QApplication(sys.argv)  # Create an instance of QtWidgets.QApplication
 
-        super().__init__() # Ui, self).__init__() # Call the inherited classes __init__ method
-        uic.loadUi(ui_file, self) # Load the .ui file
+        super().__init__()  # Ui, self).__init__() # Call the inherited classes __init__ method
+        uic.loadUi(ui_file, self)  # Load the .ui file
 
         self.camera_cbo = [
             self.findChild(QtWidgets.QComboBox, 'input_cbo_1'),
@@ -63,7 +65,7 @@ class Ui(QtWidgets.QMainWindow): # pylint: disable=R0902
 
         self.timer = QtCore.QTimer()
         self.timer.setInterval(50)
-        #self.timer.timeout.connect(self.update_plot_data)
+        # self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
 
         # self.update_plot_data()
@@ -121,7 +123,8 @@ class Ui(QtWidgets.QMainWindow): # pylint: disable=R0902
         '''Callback function for webcam check thread'''
         for cbo in self.camera_cbo:
             for camera in self.camera_handler.get_camera_list():
-                cbo.addItem(self.camera_handler.get_camera_string(camera['id']))
+                cbo.addItem(
+                    self.camera_handler.get_camera_string(camera['id']))
                 # create the video capture thread
         self.thread2 = VideoThread(1)  # pylint: disable=W0201
         # connect its signal to the update_image slot

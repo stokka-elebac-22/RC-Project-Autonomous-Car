@@ -123,9 +123,9 @@ class Ui(QtWidgets.QMainWindow): # pylint: disable=R0902
             for camera in self.camera_handler.get_camera_list():
                 cbo.addItem(self.camera_handler.get_camera_string(camera['id']))
                 # create the video capture thread
-        self.thread2 = VideoThread(1) # pylint: disable=W0201
+        self.thread2 = VideoThread(1)  # pylint: disable=W0201
         # connect its signal to the update_image slot
         self.thread2.change_pixmap_signal.connect(self.update_image)
         # start the thread
         self.thread2.start()
-    #def update_plot_data(self):
+    # def update_plot_data(self):

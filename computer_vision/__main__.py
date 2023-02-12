@@ -1,5 +1,4 @@
 '''__init__.py: Initialization class for the Computer vision control panel GUI tool.'''
- # pylint: disable=R0801
 __author__ = 'Asbjørn Stokka'
 __copyright__ = 'Copyright 2023, DATBAC'
 __credits__ = ['Asbjørn Stokka']
@@ -8,6 +7,7 @@ __version__ = '0.1.0'
 __maintainer__ = 'Asbjørn Stokka'
 __email__ = 'asbjorn@maxit-as.com'
 __status__ = 'Testing'
+ # pylint: disable=R0801
 
 import os
 import sys

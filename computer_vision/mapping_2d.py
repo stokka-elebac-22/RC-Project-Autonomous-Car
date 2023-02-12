@@ -6,7 +6,7 @@ from environment.src.display import DisplayEnvironment
 from environment.src.a_star import AStar
 from qr_code.qr_code import QRCode
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pylint: disable=R0801
     SIZE = (10, 11)
     W_SIZE = 600
     WINDOW_SIZE = (W_SIZE* (SIZE[1]/SIZE[0]), W_SIZE)
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     env.insert_by_index((1,1), 11)
 
     RUN = True
-    while RUN: # pylint: disable=R0801
+    while RUN:
         for event in pg.event.get():
             if event.type == QUIT:
                 RUN = False

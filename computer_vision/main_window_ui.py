@@ -36,9 +36,11 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     def __init__(self, ui_file, connection: Tuple[str, int], fullscreen):
         self.connection_details = connection
         self.camera_handler = CameraHandler()
-        self.app = QtWidgets.QApplication(sys.argv)  # Create an instance of QtWidgets.QApplication
+        # Create an instance of QtWidgets.QApplication
+        self.app = QtWidgets.QApplication(sys.argv)
 
-        super().__init__()  # Ui, self).__init__() # Call the inherited classes __init__ method
+        super().__init__()
+        # Ui, self).__init__() # Call the inherited classes __init__ method
         uic.loadUi(ui_file, self)  # Load the .ui file
 
         self.camera_cbo = [

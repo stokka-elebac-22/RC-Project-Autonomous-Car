@@ -7,8 +7,9 @@ __license__ = 'Apache-2.0'
 __version__ = '0.1.0'
 __status__ = 'Testing'
 
-
 from enum import Enum
+
+
 class Sensor(Enum):
     '''Enum for sensor types'''
     HCSR04 = 1   # Ultrasonic distance sensor
@@ -25,19 +26,19 @@ class Position(Enum):
 
 class MessageId(Enum):
     '''Enum for CAN message Ids'''
-    CAN_MOTOR_DATA_ID = 16       # 0x010 //  00010 000
-    CAN_STEERING_DATA_ID = 24    # 0x018 //  00011 000
+    CAN_MOTOR_DATA_ID = 16        # 0x010 //  00010 000
+    CAN_STEERING_DATA_ID = 24     # 0x018 //  00011 000
 
     CAN_SENSOR0_DATA_ID = 32      # 0x020 // 00100 000 (+ position)
     CAN_SENSOR1_DATA_ID = 40      # 0x028 // 00110 000 (+ position)
 
-    CAN_LIGHT_CONTROL_ID = 64    # 0x040
-    CAN_RGB_CONTROL_ID = 72      # 0x048
+    CAN_LIGHT_CONTROL_ID = 64     # 0x040
+    CAN_RGB_CONTROL_ID = 72       # 0x048
 
-    CAN_BUZZER_CONTROL_ID = 128  # 0x080
+    CAN_BUZZER_CONTROL_ID = 128   # 0x080
 
-    CAN_TEST_MSG_ID = 136        # 0x088
-    CAN_DEVICE_SETTINGS_ID = 152 # 0x098
+    CAN_TEST_MSG_ID = 136         # 0x088
+    CAN_DEVICE_SETTINGS_ID = 152  # 0x098
 
 
 if __name__ == '__main__':

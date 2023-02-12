@@ -47,20 +47,20 @@ class CameraHandler:
         self.available_camera_list = arr
         return arr
 
-    def get_cv_frame(self, cam_id: int): # pylint: disable=R0022
-        '''Returns a new CV frame'''
-        print(cam_id)
+def get_cv_frame(cam_id: int):
+    '''Returns a new CV frame'''
+    print(cam_id)
 
-    def convert_cv_qt(self, cv_img, scale_w: int, scale_h: int) -> QPixmap: # pylint: disable=R0022
-        '''Convert from an opencv image to QPixmap'''
-        rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
-        # pylint: disable=C0103
-        h, w, ch = rgb_image.shape
-        bytes_per_line = ch * w
-        convert_to_Qt_format = QImage(
-            rgb_image.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
-        p = convert_to_Qt_format.scaled(scale_w, scale_h, Qt.AspectRatioMode.KeepAspectRatio)
-        return QPixmap.fromImage(p)
+def convert_cv_qt(cv_img, scale_w: int, scale_h: int) -> QPixmap:
+    '''Convert from an opencv image to QPixmap'''
+    rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+    # pylint: disable=C0103
+    h, w, ch = rgb_image.shape
+    bytes_per_line = ch * w
+    convert_to_Qt_format = QImage(
+        rgb_image.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
+    p = convert_to_Qt_format.scaled(scale_w, scale_h, Qt.AspectRatioMode.KeepAspectRatio)
+    return QPixmap.fromImage(p)
 
 class VideoThread(QThread):
     '''Video Thread'''

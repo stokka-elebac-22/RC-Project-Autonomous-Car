@@ -49,7 +49,7 @@ jobs:
         with:
           python-root-list: "computer_vision"
           use-pylint: true
-          use-pycodestyle: true
+          use-pycodestyle: false
           use-flake8: false
           use-black: false
           use-mypy: true

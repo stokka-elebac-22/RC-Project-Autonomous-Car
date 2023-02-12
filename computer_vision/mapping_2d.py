@@ -33,6 +33,7 @@ if __name__ == '__main__': # pylint: disable=R0801
     # pylint: disable=R0801
     RUN = True
     while RUN:
+        # checking events
         for event in pg.event.get():
             if event.type == QUIT:
                 RUN = False
@@ -41,6 +42,7 @@ if __name__ == '__main__': # pylint: disable=R0801
                 TILE_SIZE = WINDOW_SIZE[1]/SIZE[0]
                 col = mouse_pos[0] // TILE_SIZE
                 row = mouse_pos[1] // TILE_SIZE
+                # inserting by index
                 env.insert_by_index((int(row), int(col)), '1')
 
         # ret, frame = cap.read()

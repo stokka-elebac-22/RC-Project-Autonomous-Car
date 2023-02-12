@@ -72,8 +72,7 @@ class VideoThread(QThread):
         self._run_flag = True
         self.camera_id = camera_id
 
-    # pylint: disable=R0801
-    def run(self):
+    def run(self): # pylint: disable=R0801
         '''Run'''
         # capture from web cam
         cap = cv2.VideoCapture(0)

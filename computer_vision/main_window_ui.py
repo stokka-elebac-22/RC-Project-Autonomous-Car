@@ -9,16 +9,12 @@ __email__ = 'asbjorn@maxit-as.com'
 __status__ = 'Testing'
 
 import sys
-# import time
-# from defines import *
+from typing import Tuple
 from camera_handler.camera_handler import CameraHandler, VideoThread
 from traffic_sign_detection.main import TrafficSignDetector
 from qr_code.qr_code import QRCode
 from PyQt6 import QtWidgets, uic, QtCore
 from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
-from typing import Tuple
-# from pyqtgraph import PlotWidget, plot
-# from random import randint
 import numpy as np
 
 class Worker(QObject, ): # pylint: disable=R0903

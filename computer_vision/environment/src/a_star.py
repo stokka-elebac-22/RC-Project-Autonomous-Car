@@ -1,6 +1,7 @@
 '''
 A star algorithm
 '''
+from typing import List, Tuple
 import math
 import numpy as np
 try:
@@ -17,8 +18,8 @@ class AStar:
 
     # pylint warning needs to be fixed.
     # pylint: disable=R0914 R0912 R0915
-    def find_path(self, mat: np.ndarray, start_pos: tuple[int, int],
-        end_pos: tuple[int, int]) -> list[Node]:
+    def find_path(self, mat: np.ndarray, start_pos: Tuple[int, int],
+        end_pos: Tuple[int, int]) -> List[Node]:
         '''Returns the start node'''
         # The f_value will be the total distance and calculated with pythagoras
         # without the square root
@@ -189,7 +190,8 @@ class AStar:
         return weighted_mat
 
 
-    def get_data(self, mat: np.ndarray, start_pos: tuple[int, int], end_pos: tuple[int, int]):
+    def get_data(self, mat: np.ndarray, start_pos: Tuple[int, int],
+            end_pos: Tuple[int, int]) -> Tuple[bool, List[Node]]:
         '''Returns a path list'''
         if start_pos is None or end_pos is None:
             return False, None

@@ -1,8 +1,9 @@
+'''Importing libraries'''
 from typing import TypedDict
 import cv2
 from main import TrafficSignDetector
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     # define a video capture object
     cam = cv2.VideoCapture(0)
@@ -13,7 +14,7 @@ if __name__ == "__main__":
         'distance': int,
     })
 
-    while (True):
+    while True:
 
         ret, frame = cam.read()
 
@@ -26,7 +27,7 @@ if __name__ == "__main__":
         output_signs = traffic_sign_detection.detect_signs(frame)
         traffic_sign_detection.show_signs(frame, output_signs)
         cv2.imshow('frame', frame)
-        
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 

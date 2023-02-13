@@ -16,7 +16,6 @@ except ImportError:
     from computer_vision.environment.src.display import DisplayEnvironment
     from computer_vision.environment.src.a_star import AStar
 
-
 class PathFinding:
     '''
     Class using 2D environment mapping to calculate shortest
@@ -25,7 +24,7 @@ class PathFinding:
     def __init__(self, size: tuple[int, int], pixel_width:int, pixel_height:int
                 ,cam_width:int, cam_height:int, cam_center:list[int, int],
                 object_id:int=10, display:DisplayEnvironment=None, env_size:int = 20
-                ):
+                ): # pylint: disable=R0913
         self.ratio_width = cam_width/pixel_width
         self.ratio_height = cam_height/pixel_height
         self.size = size
@@ -72,7 +71,7 @@ class PathFinding:
 
                 if len(coords) == 4:
                     result = bresenham(
-                        coords[0], coords[1], coords[2], coords[3])
+                        (coords[0], coords[1]), (coords[2], coords[3]))
                     if result is not None:
                         for point in result:
                             self.env.insert_by_index(point, 1)

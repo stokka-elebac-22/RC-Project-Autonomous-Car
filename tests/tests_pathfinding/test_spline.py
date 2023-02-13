@@ -1,13 +1,13 @@
-"""Importing needed libraries"""
+'''Importing needed libraries'''
 import pytest
 import numpy as np
 from computer_vision.pathfinding.spline import t_j, catmull_rom_spline, catmull_rom_chain
 
 
 class TestParametrized:
-    """
+    '''
     DOC: Testing spline functions
-    """
+    '''
 
     @pytest.mark.parametrize('param, expected', [
         ([1, (43, 12), (12, 30), 0.5], 6.987),

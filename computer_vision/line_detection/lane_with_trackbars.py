@@ -5,7 +5,7 @@ import cv2
 def nothing(_):
     '''Empty function'''
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     cam = cv2.VideoCapture(0)
 
     # Trackbars
@@ -39,7 +39,7 @@ if __name__ == "__main__":
         center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)
         if center_diff is not None:
             cv2.putText(
-                frame, f"Diff from center: {center_diff}", (50, 50),
+                frame, f'Diff from center: {center_diff}', (50, 50),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
 
         cv2.imshow('image', frame)
@@ -49,4 +49,3 @@ if __name__ == "__main__":
 
     cam.release()
     cv2.destroyAllWindows()
-    

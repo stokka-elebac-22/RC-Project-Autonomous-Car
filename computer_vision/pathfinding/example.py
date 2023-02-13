@@ -20,7 +20,7 @@ except ImportError:
     from computer_vision.environment.src.display import DisplayEnvironment
     from computer_vision.qr_code.qr_code import QRCode
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     QR_SIZE_PX = 76
     QR_SIZE_MM = 52
@@ -128,7 +128,7 @@ if __name__ == "__main__":
                                  (distance_x, distance_y)], 'distance': True, 'object_id': 5})
 
         path_finding.insert_objects(obstacles)
-        # TODO: Remove later since Test point
+        # TODO: Remove later since Test point # pylint: disable=W0511
         path = path_finding.calculate_path((460, 120), False)
         path_finding.update_display(path)
         path_finding.display.display()
@@ -168,14 +168,14 @@ if __name__ == "__main__":
             COUNT += 2
 
         # RUN = True
-        # TODO: point for lane line, maybe can remove the get course functions no need?
+        # TODO: point for lane line, maybe can remove the get course functions no need? # pylint: disable=W0511
         # path_finding.calculate_path((CENTER_DIFF_X, CENTER_DIFF_Y), True)
 
         # With distance from Parking using QR!!!
-        # TODO: DOES NOT WORK WHY?? maybe bcus of calibration constants
+        # TODO: DOES NOT WORK WHY?? maybe bcus of calibration constants # pylint: disable=W0511
         # path_finding.calculate_path((qr_distance_x, DESIRED_DISTANCE_FORWARD), True)
 
-        # TODO: add catmull rom spline based on points given by path
+        # TODO: add catmull rom spline based on points given by path # pylint: disable=W0511
         # USE PATH variable!!!
 
 

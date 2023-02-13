@@ -62,6 +62,7 @@ def convert_cv_qt(cv_img, scale_w: int, scale_h: int) -> QPixmap:
     p = convert_to_Qt_format.scaled(scale_w, scale_h, Qt.AspectRatioMode.KeepAspectRatio)
     return QPixmap.fromImage(p)
 
+
 class VideoThread(QThread):
     '''Video Thread'''
     change_pixmap_signal = pyqtSignal(np.ndarray)

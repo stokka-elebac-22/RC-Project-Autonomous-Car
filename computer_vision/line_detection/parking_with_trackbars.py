@@ -49,9 +49,11 @@ if __name__ == "__main__":
 
         ret, frame = cam.read()
 
-        parking_lines = parking_slot_detector.detect_parking_lines(
-        frame, QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
-        parking_slot_detector.show_lines(frame, parking_lines)
+        # Commented this out, because it did not work. Need to call it correctly
+
+        # # parking_lines = parking_slot_detector.detect_parking_lines(
+        # # frame, QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+        # parking_slot_detector.show_lines(frame, parking_lines)
         cv2.imshow('frame', frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

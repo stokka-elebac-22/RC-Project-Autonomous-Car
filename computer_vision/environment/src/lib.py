@@ -1,5 +1,5 @@
 '''Library'''
-from typing import TypedDict
+from typing import TypedDict, Tuple
 import dataclasses
 import math
 import pygame as pg
@@ -12,8 +12,8 @@ ObjectParam = TypedDict('ObjectParam', {
 @dataclasses.dataclass
 class Object:
     '''Object'''
-    def __init__(self, id: int, name: str, param: ObjectParam):
-        self.id = id # pylint: disable=C0103
+    def __init__(self, object_id: int, name: str, param: ObjectParam):
+        self.id = object_id # pylint: disable=C0103
         self.name = name
         self.color = param['color']
         self.thickness = param['thickness']
@@ -169,7 +169,7 @@ class TwoWayDict(dict):
         return dict.__len__(self) // 2
 
 NodeData = TypedDict('NodeData', {
-    'position': tuple[int, int],
+    'position': Tuple[int, int],
     'h_value': float,
     'f_value': int,
     'parent': None,

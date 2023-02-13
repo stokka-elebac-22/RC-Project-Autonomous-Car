@@ -1,10 +1,9 @@
 '''Test the display for environment'''
-import sys
 import pytest
 from computer_vision.environment.src.board import Board
 from computer_vision.environment.src.display import DisplayEnvironment
 
-class TestDisplayEnvironment:
+class TestDisplayEnvironment: # pylint: disable=R0903
     '''Testing the environment'''
     @pytest.mark.parametrize(
         ['param', 'exp'],
@@ -12,8 +11,6 @@ class TestDisplayEnvironment:
             ([(1, 2), (10, 10)], [(1, 2), (10, 10)])
         ]
     )
-    # @pytest.mark.skipif('pygame' not in sys.modules,
-    #                     reason="requires the pygame library")
     @pytest.mark.skip(reason="This test creates problem for git testing")
     def test_init(self, param, exp):
         '''Testing the init method'''

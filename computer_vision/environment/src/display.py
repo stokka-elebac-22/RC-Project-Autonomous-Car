@@ -1,4 +1,5 @@
 '''Display environment'''
+from typing import Tuple
 import pygame as pg
 import numpy as np
 try:
@@ -10,7 +11,7 @@ except ImportError:
 
 class DisplayEnvironment:
     '''Displaying the environment with pygame'''
-    def __init__(self, window_size: tuple[int, int], board_size: tuple[int, int], caption: str=''):
+    def __init__(self, window_size: Tuple[int, int], board_size: Tuple[int, int], caption: str=''):
         self.window_size = window_size
         self.board_size = board_size
 

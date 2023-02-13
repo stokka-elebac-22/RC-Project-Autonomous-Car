@@ -1,4 +1,4 @@
-"""Importing necessary libraries"""
+'''Importing necessary libraries'''
 import dataclasses
 import os.path
 import cv2 as cv
@@ -46,10 +46,10 @@ class DisparityParameters:
             print(f"Path: '{path}' does not exists")
 
 class StereoscopicVision:
-    """
+    '''
     DOC:
-    """
-    def __init__(self, path="", param_path="", disparity_parameters = None) -> None:
+    '''
+    def __init__(self, path='', param_path='', disparity_parameters = None) -> None:
         if disparity_parameters is None:
             self.parameters = DisparityParameters(param_path)
         else: self.parameters = disparity_parameters
@@ -62,7 +62,7 @@ class StereoscopicVision:
 
 
     def get_disparity(self, image_left, image_right):
-        """Calculates and return the disparity"""
+        '''Calculates and return the disparity'''
         gray_left = cv.cvtColor(image_left, cv.COLOR_BGR2GRAY)
         gray_right = cv.cvtColor(image_right, cv.COLOR_BGR2GRAY)
 
@@ -97,17 +97,17 @@ class StereoscopicVision:
         return disparity
 
     def read_stereo_map(self, path):
-        """Reading from stereo map xml file"""
+        '''Reading from stereo map xml file'''
         cv_file = cv.FileStorage(path, cv.FILE_STORAGE_READ)
-        stereo_map_left_x = cv_file.getNode("stereo_map_left_x").mat()
-        stereo_map_left_y = cv_file.getNode("stereo_map_left_y").mat()
-        stereo_map_right_x = cv_file.getNode("stereo_map_right_x").mat()
-        stereo_map_right_y = cv_file.getNode("stereo_map_right_y").mat()
+        stereo_map_left_x = cv_file.getNode('stereo_map_left_x').mat()
+        stereo_map_left_y = cv_file.getNode('stereo_map_left_y').mat()
+        stereo_map_right_x = cv_file.getNode('stereo_map_right_x').mat()
+        stereo_map_right_y = cv_file.getNode('stereo_map_right_y').mat()
         cv_file.release()
         return (stereo_map_left_x, stereo_map_left_y), (stereo_map_right_x, stereo_map_right_y)
 
     def obstacle_detection(self, depth_map, area, min_dist, thresh_dist):
-        """Detecting depth to obstacles in cm"""
+        '''Detecting depth to obstacles in cm'''
         # Mask to segment regions with depth less than threshold
         mask = cv.inRange(depth_map, min_dist, thresh_dist)
 
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     # cv.resizeWindow('disp', 800,600)
 
     def nothing(_):
-        """Empty function"""
+        '''Empty function'''
 
     print('Creating trackbars...')
     # creating trackbars for testing
@@ -237,8 +237,10 @@ if __name__ == '__main__':
     average = [0 for _ in range(10)]
 
     # Defining callback functions for mouse events
+    # pylint: disable=W0613
     def mouse_click(event, x_pos, y_pos, flags, param):
         '''Recognize when the mouse is pressed'''
+        # pylint: disable=W0603
         global CURRENT_DEPTH
         if event == cv.EVENT_LBUTTONDBLCLK:
             print('Pressing...')
@@ -362,7 +364,7 @@ if __name__ == '__main__':
         C = dst[1, 0]
         print('Value of M: ', M)
 
-    print("Saving parameters...")
+    print('Saving parameters...')
     cv_file_write = cv.FileStorage(PARAMETER_PATH, cv.FILE_STORAGE_WRITE)
     cv_file_write.write('num_disparities', stereo_vision.parameters.num_disparities)
     cv_file_write.write('block_size', stereo_vision.parameters.block_size)

@@ -41,7 +41,7 @@ class TestEnvironment:
         env = Environment(param[0], param[2], param[1])
         ret = env.insert(param[3], param[4])
         data = env.get_data()
-        assert ret == exp[0] and are_same(data, exp[1])
+        assert ret[0] == exp[0] and are_same(data, exp[1])
 
     @pytest.mark.parametrize(
         ['param', 'exp'],

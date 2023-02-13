@@ -1,24 +1,24 @@
-"""Importing needed libraries"""
+'''Importing needed libraries'''
 import pytest
 import cv2
 import numpy as np
 from computer_vision.line_detection.lane_detection import LaneDetector
-PATH = "computer_vision/line_detection/assets/"
+PATH = 'computer_vision/line_detection/assets/'
 
 
 class TestParametrized:
-    """
+    '''
     DOC: Testing TrafficSignDetection class from module traffic_sign_detection
-    """
+    '''
 
     def get_image(self, source):
-        """Helping function for tests to get a cv2 image from a source file"""
+        '''Helping function for tests to get a cv2 image from a source file'''
         image = cv2.imread(PATH + source)
         return image
 
     @pytest.mark.parametrize('img_source', ['bike_park.jpg', 'curve.jpg', '1.jpg', '2.jpg'])
     def test_get_lane_region(self, img_source):
-        """Test if the output image is not equal to the input image"""
+        '''Test if the output image is not equal to the input image'''
         lane_detector = LaneDetector()
         original_image = self.get_image(img_source)
 
@@ -64,7 +64,7 @@ class TestParametrized:
         ([np.array([100, 327, 509, 811])],
          [None, np.array([1.18337408, 208.66259169])])])
     def test_get_average_lines(self, lines, expected):
-        """Test if the output average lines is equal to the expected average lines"""
+        '''Test if the output average lines is equal to the expected average lines'''
         lane_detector = LaneDetector()
         avg_lines = lane_detector.get_average_lines(lines)
 
@@ -90,14 +90,13 @@ class TestParametrized:
          np.array([0, 781, 272, 561])], 96.925),
         ('2.jpg', [np.array([100, 327, 509, 811]), np.array([573, 339, 780, 336])], 83.175)])
     def test_get_diff_from_center_info(self, img_source, lines, expected):
-        """Test if the output value is equal to the manual calculation value"""
+        '''Test if the output value is equal to the manual calculation value'''
         lane_detector = LaneDetector()
         image = self.get_image(img_source)
         diff = np.round(
             lane_detector.get_diff_from_center_info(image, lines), 3)
         assert diff == expected
 
-    # @pytest.mark.skip('NOT FINISHED')
     @pytest.mark.parametrize('img_source, lines, expected', [
         ('bike_park.jpg',
          [np.array([300, 327, 1059, 600]), np.array([0, 781, 272, 561])],
@@ -144,7 +143,7 @@ class TestParametrized:
           np.array([np.array([6.31163708e-04, -1.29388560e+00,  3.06311637e+03]),
                     np.array([-6.31163708e-04,  1.29388560e+00,  1.73688363e+03])])])])
     def test_get_course(self, img_source, lines, expected):
-        """Test if the output value is equal to the manual calculation value"""
+        '''Test if the output value is equal to the manual calculation value'''
         lane_detector = LaneDetector()
         image = self.get_image(img_source)
         data = lane_detector.get_course(
@@ -154,7 +153,6 @@ class TestParametrized:
         assert (data['points'] == expected[2]).all()
         assert data['polys'] == pytest.approx(expected[3], rel=1e-3)
 
-    # @pytest.mark.skip('NOT FINISHED')
     @pytest.mark.parametrize('img_source, shape, transform, points, polys', [
         ('bike_park.jpg',
          (3000, 300, 3),
@@ -196,8 +194,9 @@ class TestParametrized:
          np.array([(2000, 3000), (1025, 2400), (50, 1800)]),
          np.array([np.array([6.31163708e-04, -1.29388560e+00,  3.06311637e+03]),
                   np.array([-6.31163708e-04,  1.29388560e+00,  1.73688363e+03])]))])
-    def test_show_course(self, img_source, shape, transform, points, polys):
-        """Test if the output value is equal to the manual calculation value"""
+
+    def test_show_course(self, img_source, shape, transform, points, polys): # pylint: disable=R0913
+        '''Test if the output value is equal to the manual calculation value'''
         lane_detector = LaneDetector()
         image = self.get_image(img_source)
         images = lane_detector.show_course(

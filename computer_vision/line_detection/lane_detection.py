@@ -1,9 +1,16 @@
-"""Import libraries"""
+'''Import libraries'''
 from typing import TypedDict
 import warnings
 import cv2
 import numpy as np
-from computer_vision.line_detection.main import LineDetector
+try:
+    from computer_vision.line_detection.line_detector import LineDetector
+except ImportError:
+    try:
+        from line_detector import LineDetector
+    except ImportError:
+        from line_detection.line_detector import LineDetector
+
 #from main import LineDetector
 
 
@@ -11,16 +18,16 @@ from computer_vision.line_detection.main import LineDetector
 # https://medium.com/analytics-vidhya/lane-detection-for-a-self-driving-car-using-opencv-e2aa95105b89
 
 class LaneDetector(LineDetector):
-    """
+    '''
     DOC: Detects driving lane
-    """
+    '''
 
     def __init__(self, canny: list[int, int] = None, blur: int = 5, hough: list[int, int] = None):
         '''Initialize the Line Detector'''
         LineDetector.__init__(self, canny, blur, hough)
 
     def get_region_of_interest(self, image: np.ndarray) -> np.ndarray:
-        """Get the region of interest from image"""
+        '''Get the region of interest from image'''
         offset = 250
         height = image.shape[0]
         width = image.shape[1]
@@ -36,18 +43,20 @@ class LaneDetector(LineDetector):
 
     def get_line_coordinates_from_parameters(self, image: np.ndarray,
                                              line_parameters: list[float, float]) -> np.ndarray:
-        """Get line coordinates from line parameters"""
-        slope = line_parameters[0]
-        intercept = line_parameters[1]
-        # since line will always start from bottom of image
-        y_1 = image.shape[0]
-        y_2 = int(y_1 * (2.3 / 5))
-        x_1 = int((y_1 - intercept) / slope)
-        x_2 = int((y_2 - intercept) / slope)
-        return np.array([x_1, y_1, x_2, y_2])
+        '''Get line coordinates from line parameters'''
+        if line_parameters is not None:
+            slope = line_parameters[0]
+            intercept = line_parameters[1]
+            # since line will always start from bottom of image
+            y_1 = image.shape[0]
+            y_2 = int(y_1 * (2.3 / 5))
+            x_1 = int((y_1 - intercept) / slope)
+            x_2 = int((y_2 - intercept) / slope)
+            return np.array([x_1, y_1, x_2, y_2])
+        return None
 
     def get_average_lines(self, lines: np.ndarray) -> np.ndarray:
-        """Sort the lines into left and right and get the average for each side"""
+        '''Sort the lines into left and right and get the average for each side'''
         if lines is not None:
             left_fit = []  # will hold intercept and slope parameters for the left side lines
             right_fit = []  # will hold intercept and slope parameters for the right side lines
@@ -79,7 +88,7 @@ class LaneDetector(LineDetector):
         return np.array([None, None])
 
     def get_diff_from_center_info(self, image: np.ndarray, lines: np.ndarray) -> float:
-        """Calculate the difference from car center to lane center"""
+        '''Calculate the difference from car center to lane center'''
         if lines is not None:
             width = image.shape[1]
             center_car = width/2
@@ -101,6 +110,7 @@ class LaneDetector(LineDetector):
                 center_lane = start + (stop-start)/2
                 diff = (center_car - center_lane)/width * real_width
             return diff
+        return None
 
     CirclePoints = list[tuple[int, int], tuple[int, int], tuple[int, int]]
     CoursePolys = list[list[float, float], list[float, float]]
@@ -111,8 +121,8 @@ class LaneDetector(LineDetector):
         'polys': CoursePolys
     })
 
-    def get_course(self, image: np.ndarray, lines: np.ndarray) -> CourseData:
-        """Returns polys that define the course and points used to define the polys"""
+    def get_course(self, image: np.ndarray, lines: np.ndarray) -> CourseData: # pylint: disable=R0914
+        '''Returns polys that define the course and points used to define the polys'''
         if lines is None:
             return (None, None, None, None)
         if lines[0] is None or lines[1] is None:
@@ -121,7 +131,7 @@ class LaneDetector(LineDetector):
         # coordinates_y = [points_coordinates[0][3], points_coordinates[1][3]]
         width = max(coordinates_x) - min(coordinates_x)
 
-        # TODO: need to change size here, measure in real life
+        # TODO: need to change size here, measure in real life # pylint: disable=W0511
         height = image.shape[0]
 
         offset = int(image.shape[1]/2 - min(coordinates_x))
@@ -156,10 +166,10 @@ class LaneDetector(LineDetector):
         poly_2 = np.polyfit([x_1, x_2, x_3], [y_3, y_2, y_3,], 2)
 
         data = {
-            "warped_shape": warped.shape,
-            "perspective_transform": perspective_transform,
-            "points": [(x_1, y_1), (x_2, y_2), (x_3, y_3)],
-            "polys": [poly_1, poly_2]
+            'warped_shape': warped.shape,
+            'perspective_transform': perspective_transform,
+            'points': [(x_1, y_1), (x_2, y_2), (x_3, y_3)],
+            'polys': [poly_1, poly_2]
         }
 
         return data
@@ -169,12 +179,13 @@ class LaneDetector(LineDetector):
         'weighted': np.ndarray
     })
 
+    # pylint: disable=R0913 R0914
     def show_course(self, image: np.ndarray,
                     warped_shape: np.ndarray,
                     circle_points: CirclePoints,
                     perspective_transform: np.ndarray,
                     polys: CoursePolys) -> CourseImages:
-        """Display the points and curves for the driving course"""
+        '''Display the points and curves for the driving course'''
         x_1 = circle_points[0][0]
         x_2 = circle_points[1][0]
         x_3 = circle_points[2][0]
@@ -221,10 +232,10 @@ class LaneDetector(LineDetector):
         return data
 
 
-if __name__ == "__main__":
-    # cap = cv2.VideoCapture("./assets/challenge_video.mp4")
+if __name__ == '__main__':
+    # cap = cv2.VideoCapture('./assets/challenge_video.mp4')
     frame = cv2.imread(
-        "computer_vision/line_detection/assets/bike_park.jpg")
+        'computer_vision/line_detection/assets/bike_park.jpg')
 
     SCALE_PERCENT = 30  # percent of original size
     new_width = int(frame.shape[1] * SCALE_PERCENT / 100)
@@ -248,7 +259,7 @@ if __name__ == "__main__":
         center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)
         if center_diff is not None:
             cv2.putText(
-                frame, f"Diff from center: {center_diff}", (50, 50),
+                frame, f'Diff from center: {center_diff}', (50, 50),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
 
         course_data = lane_detector.get_course(

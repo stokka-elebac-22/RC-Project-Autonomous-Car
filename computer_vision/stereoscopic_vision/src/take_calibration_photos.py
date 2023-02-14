@@ -2,13 +2,15 @@
 import cv2 as cv
 
 if __name__ == '__main__':
-    DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_large/'
+    # DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_large/'
+    DIRECTORY = 'computer_vision/stereoscopic_vision/images/depth_test'
+    # DIRECTORY = 'tests/images/stereoscopic_vision/images/depth_test/'
     CAMERA_ID_LEFT = 1
     CAMERA_ID_RIGHT = 0
     BOARD_DIMENSIONS = (8, 6)
     cam1 = cv.VideoCapture(CAMERA_ID_LEFT)
     cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)
-    cameras = [(cam1, 'left'), (cam2, 'right')]
+    cameras = [(cam1, 'left_1'), (cam2, 'right_1')]
 
     qcd = cv.QRCodeDetector()
 
@@ -48,6 +50,6 @@ if __name__ == '__main__':
 
             print('Done\n')
             for frame, title in frames:
-                cv.imwrite(f'{DIRECTORY}/{title}/{title}_{COUNT}.jpg', frame)
+                cv.imwrite(f'{DIRECTORY}/{title}_{COUNT}.jpg', frame)
             COUNT += 1
             TRIGGER = False

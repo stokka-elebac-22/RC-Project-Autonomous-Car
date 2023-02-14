@@ -3,6 +3,7 @@ import dataclasses
 import os.path
 import cv2 as cv
 import numpy as np
+from matplotlib import pyplot as plt
 
 @dataclasses.dataclass
 class DisparityParameters:
@@ -83,17 +84,19 @@ class StereoscopicVision:
             cv.BORDER_CONSTANT,
             0)
 
+        # disparity = self.stereo.compute(gray_left, gray_right)
         disparity = self.stereo.compute(rect_left, rect_right)
         # NOTE: Code returns a 16bit signed single channel image (CV_16S),
         # containing a disparity map scaled by 16.
         # Hence it is essential to convert it to CV_32F and scale it down 16 times.
+
+        # disparity = cv.normalize(disparity, disparity, alpha=255, beta=0, norm_type=cv.NORM_MINMAX)
 
         # Converting to float32
         disparity = disparity.astype(np.float32)
 
         # Scaling down the disparity values and normalizing them
         disparity = (disparity/16.0 - self.parameters.min_disparity)/self.parameters.num_disparities
-
         return disparity
 
     def read_stereo_map(self, path):
@@ -170,8 +173,8 @@ if __name__ == '__main__':
 
     # NOTE: if you also have a webcam (that you do not want to use),
     # use id 0 and 2 (not always the case....)
-    cam_left = Camera(camera_id=2, window_name='Right camera')
-    cam_right = Camera(camera_id=1, window_name='Left camera')
+    cam_left = Camera(camera_id=0, window_name='Left camera')
+    cam_right = Camera(camera_id=1, window_name='Right camera')
     stereo_vision = StereoscopicVision(MAPS_PATH, PARAMETER_PATH)
 
     cv.namedWindow('disp', cv.WINDOW_NORMAL)
@@ -185,50 +188,50 @@ if __name__ == '__main__':
     # creating trackbars for testing
     cv.createTrackbar('num_disparities','disp',1,17, nothing)
     cv.createTrackbar('block_size','disp',5,50,nothing)
-    cv.createTrackbar('pre_filter_type','disp',1,1,nothing)
-    cv.createTrackbar('pre_filter_size','disp',2,25,nothing)
-    cv.createTrackbar('pre_filter_cap','disp',5,58,nothing)
-    cv.createTrackbar('texture_threshold','disp',10,100,nothing)
-    cv.createTrackbar('uniqueness_ratio','disp',15,100,nothing)
-    cv.createTrackbar('speckle_range','disp',0,100,nothing)
-    cv.createTrackbar('speckle_window_size','disp',3,25,nothing)
-    cv.createTrackbar('disparity_max_diff','disp',5,25,nothing)
-    cv.createTrackbar('min_disparity','disp',5,25,nothing)
-    cv.createTrackbar('obstacle_area', 'disp', 1, 100, nothing)
-    cv.createTrackbar('contour_area', 'disp', 1, 100, nothing)
+    # cv.createTrackbar('pre_filter_type','disp',1,1,nothing)
+    # cv.createTrackbar('pre_filter_size','disp',2,25,nothing)
+    # cv.createTrackbar('pre_filter_cap','disp',5,58,nothing)
+    # cv.createTrackbar('texture_threshold','disp',10,100,nothing)
+    # cv.createTrackbar('uniqueness_ratio','disp',15,100,nothing)
+    # cv.createTrackbar('speckle_range','disp',0,100,nothing)
+    # cv.createTrackbar('speckle_window_size','disp',3,25,nothing)
+    # cv.createTrackbar('disparity_max_diff','disp',5,25,nothing)
+    # cv.createTrackbar('min_disparity','disp',5,25,nothing)
+    # cv.createTrackbar('obstacle_area', 'disp', 1, 100, nothing)
+    # cv.createTrackbar('contour_area', 'disp', 1, 100, nothing)
 
     print('Setting trackbar positions...')
     # Getting parameter information from previous tests, if there is one
-    if os.path.exists(PARAMETER_PATH):
-        file_read = cv.FileStorage(PARAMETER_PATH, cv.FILE_STORAGE_READ)
-        cv.setTrackbarPos('num_disparities','disp',
-            int(stereo_vision.parameters.num_disparities/16))
-        cv.setTrackbarPos('block_size','disp',
-            int((stereo_vision.parameters.block_size-5)/2))
-        cv.setTrackbarPos('pre_filter_type','disp',
-            int(stereo_vision.parameters.pre_filter_type))
-        cv.setTrackbarPos('pre_filter_size','disp',
-            int((stereo_vision.parameters.pre_filter_size-5)/2))
-        cv.setTrackbarPos('pre_filter_cap','disp',
-            int(stereo_vision.parameters.pre_filter_cap))
-        cv.setTrackbarPos('texture_threshold','disp',
-            int(stereo_vision.parameters.texture_threshold))
-        cv.setTrackbarPos('uniqueness_ratio','disp',
-            int(stereo_vision.parameters.uniqueness_ratio))
-        cv.setTrackbarPos('speckle_range','disp',
-            int(stereo_vision.parameters.speckle_range))
-        cv.setTrackbarPos('speckle_window_size','disp',
-            int(stereo_vision.parameters.speckle_window_size))
-        cv.setTrackbarPos('disparity_max_diff','disp',
-            int(stereo_vision.parameters.disparity_max_diff))
-        cv.setTrackbarPos('min_disparity','disp',
-            int(stereo_vision.parameters.min_disparity))
-        cv.setTrackbarPos('obstacle_area', 'disp',
-            int(stereo_vision.parameters.obstacle_area * 1000))
-        cv.setTrackbarPos('contour_area', 'disp',
-            int(stereo_vision.parameters.contour_area * 1000))
-        M = file_read.getNode('M').real()
-        file_read.release()
+    # if os.path.exists(PARAMETER_PATH):
+    #     file_read = cv.FileStorage(PARAMETER_PATH, cv.FILE_STORAGE_READ)
+    #     cv.setTrackbarPos('num_disparities','disp',
+    #         int(stereo_vision.parameters.num_disparities/16))
+    #     cv.setTrackbarPos('block_size','disp',
+    #         int((stereo_vision.parameters.block_size-5)/2))
+        # cv.setTrackbarPos('pre_filter_type','disp',
+        #     int(stereo_vision.parameters.pre_filter_type))
+        # cv.setTrackbarPos('pre_filter_size','disp',
+        #     int((stereo_vision.parameters.pre_filter_size-5)/2))
+        # cv.setTrackbarPos('pre_filter_cap','disp',
+        #     int(stereo_vision.parameters.pre_filter_cap))
+        # cv.setTrackbarPos('texture_threshold','disp',
+        #     int(stereo_vision.parameters.texture_threshold))
+        # cv.setTrackbarPos('uniqueness_ratio','disp',
+        #     int(stereo_vision.parameters.uniqueness_ratio))
+        # cv.setTrackbarPos('speckle_range','disp',
+        #     int(stereo_vision.parameters.speckle_range))
+        # cv.setTrackbarPos('speckle_window_size','disp',
+        #     int(stereo_vision.parameters.speckle_window_size))
+        # cv.setTrackbarPos('disparity_max_diff','disp',
+        #     int(stereo_vision.parameters.disparity_max_diff))
+        # cv.setTrackbarPos('min_disparity','disp',
+        #     int(stereo_vision.parameters.min_disparity))
+        # cv.setTrackbarPos('obstacle_area', 'disp',
+        #     int(stereo_vision.parameters.obstacle_area * 1000))
+        # cv.setTrackbarPos('contour_area', 'disp',
+        #     int(stereo_vision.parameters.contour_area * 1000))
+        # M = file_read.getNode('M').real()
+        # file_read.release()
 
     CURRENT_DEPTH = MAX_DIST
     STEP_SIZE = 500 # Reduce the current depth by step size for every mouse press
@@ -256,25 +259,25 @@ if __name__ == '__main__':
     #     'tests/images/stereoscopic_vision/distance/logi_1080p/left/left_300.jpg'
     # DIRECTORY_RIGHT_IMAGE = \
     #     'tests/images/stereoscopic_vision/distance/logi_1080p/right/right_300.jpg'
-    # DIRECTORY_LEFT_IMAGE = \
-    #     'computer_vision/stereoscopic_vision/images/test/test_left.png'
-    # DIRECTORY_RIGHT_IMAGE = \
-    #     'computer_vision/stereoscopic_vision/images/test/test_right.png'
+    DIRECTORY_LEFT_IMAGE = \
+        'computer_vision/stereoscopic_vision/images/depth_test/left_2.jpg'
+    DIRECTORY_RIGHT_IMAGE = \
+        'computer_vision/stereoscopic_vision/images/depth_test/right_2.jpg'
 
-    # if not os.path.exists(DIRECTORY_LEFT_IMAGE):
-    #     print(f'{DIRECTORY_LEFT_IMAGE} does not exists')
-    #     raise Exception
-    # if not os.path.exists(DIRECTORY_RIGHT_IMAGE):
-    #     print(f'{DIRECTORY_RIGHT_IMAGE} does not exists')
-    #     raise Exception
+    if not os.path.exists(DIRECTORY_LEFT_IMAGE):
+        print(f'{DIRECTORY_LEFT_IMAGE} does not exists')
+        raise FileExistsError
+    if not os.path.exists(DIRECTORY_RIGHT_IMAGE):
+        print(f'{DIRECTORY_RIGHT_IMAGE} does not exists')
+        raise FileExistsError
 
     print('Running...')
     while True:
-        ret_left, frame_left = cam_left.read()
-        ret_right, frame_right = cam_right.read()
-        # ret_left, ret_right = True, True
-        # frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
-        # frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
+        # ret_left, frame_left = cam_left.read()
+        # ret_right, frame_right = cam_right.read()
+        ret_left, ret_right = True, True
+        frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
+        frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
 
         if ret_left and ret_right:
             # NOTE: it might help to blur the image to reduce noise
@@ -282,44 +285,44 @@ if __name__ == '__main__':
             # Updating the parameters based on the trackbar positions
             gtp_num_disparities = cv.getTrackbarPos('num_disparities', 'disp')
             gtp_block_size = cv.getTrackbarPos('block_size','disp')
-            gtp_pre_filter_type = cv.getTrackbarPos('pre_filter_type','disp')
-            gtp_pre_filter_size = cv.getTrackbarPos('pre_filter_size','disp')
-            gtp_pre_filter_cap = cv.getTrackbarPos('pre_filter_cap','disp')
-            gtp_texture_threshold = cv.getTrackbarPos('texture_threshold','disp')
-            gtp_uniqueness_ratio = cv.getTrackbarPos('uniqueness_ratio','disp')
-            gtp_speckle_range = cv.getTrackbarPos('speckle_range','disp')
-            gtp_speckle_window_size = cv.getTrackbarPos('speckle_window_size','disp')
-            gtp_disparity_max_diff = cv.getTrackbarPos('disparity_max_diff','disp')
-            gtp_min_disparity = cv.getTrackbarPos('min_disparity','disp')
-            gtp_obstacle_area = cv.getTrackbarPos('obstacle_area', 'disp')
-            gtp_contour_area = cv.getTrackbarPos('contour_area', 'disp')
+            # gtp_pre_filter_type = cv.getTrackbarPos('pre_filter_type','disp')
+            # gtp_pre_filter_size = cv.getTrackbarPos('pre_filter_size','disp')
+            # gtp_pre_filter_cap = cv.getTrackbarPos('pre_filter_cap','disp')
+            # gtp_texture_threshold = cv.getTrackbarPos('texture_threshold','disp')
+            # gtp_uniqueness_ratio = cv.getTrackbarPos('uniqueness_ratio','disp')
+            # gtp_speckle_range = cv.getTrackbarPos('speckle_range','disp')
+            # gtp_speckle_window_size = cv.getTrackbarPos('speckle_window_size','disp')
+            # gtp_disparity_max_diff = cv.getTrackbarPos('disparity_max_diff','disp')
+            # gtp_min_disparity = cv.getTrackbarPos('min_disparity','disp')
+            # gtp_obstacle_area = cv.getTrackbarPos('obstacle_area', 'disp')
+            # gtp_contour_area = cv.getTrackbarPos('contour_area', 'disp')
 
             stereo_vision.parameters.num_disparities = max(gtp_num_disparities*16, 16)
             stereo_vision.parameters.block_size = gtp_block_size*2 + 5
-            stereo_vision.parameters.pre_filter_type = gtp_pre_filter_type
-            stereo_vision.parameters.pre_filter_size = gtp_pre_filter_size*2 + 5
-            stereo_vision.parameters.pre_filter_cap = max(gtp_pre_filter_cap, 1)
-            stereo_vision.parameters.texture_threshold = gtp_texture_threshold
-            stereo_vision.parameters.uniqueness_ratio = gtp_uniqueness_ratio
-            stereo_vision.parameters.speckle_range = gtp_speckle_range
-            stereo_vision.parameters.speckle_window_size = gtp_speckle_window_size
-            stereo_vision.parameters.disparity_max_diff = gtp_disparity_max_diff
-            stereo_vision.parameters.min_disparity = gtp_min_disparity
-            stereo_vision.parameters.obstacle_area = gtp_obstacle_area / 1000
-            stereo_vision.parameters.contour_area = gtp_contour_area / 1000
+            # stereo_vision.parameters.pre_filter_type = gtp_pre_filter_type
+            # stereo_vision.parameters.pre_filter_size = gtp_pre_filter_size*2 + 5
+            # stereo_vision.parameters.pre_filter_cap = max(gtp_pre_filter_cap, 1)
+            # stereo_vision.parameters.texture_threshold = gtp_texture_threshold
+            # stereo_vision.parameters.uniqueness_ratio = gtp_uniqueness_ratio
+            # stereo_vision.parameters.speckle_range = gtp_speckle_range
+            # stereo_vision.parameters.speckle_window_size = gtp_speckle_window_size
+            # stereo_vision.parameters.disparity_max_diff = gtp_disparity_max_diff
+            # stereo_vision.parameters.min_disparity = gtp_min_disparity
+            # stereo_vision.parameters.obstacle_area = gtp_obstacle_area / 1000
+            # stereo_vision.parameters.contour_area = gtp_contour_area / 1000
 
             # Setting the updated parameters before computing disparity map
             stereo_vision.stereo.setNumDisparities(stereo_vision.parameters.num_disparities)
             stereo_vision.stereo.setBlockSize(stereo_vision.parameters.block_size)
-            stereo_vision.stereo.setPreFilterType(stereo_vision.parameters.pre_filter_type)
-            stereo_vision.stereo.setPreFilterSize(stereo_vision.parameters.pre_filter_size)
-            stereo_vision.stereo.setPreFilterCap(stereo_vision.parameters.pre_filter_cap)
-            stereo_vision.stereo.setTextureThreshold(stereo_vision.parameters.texture_threshold)
-            stereo_vision.stereo.setUniquenessRatio(stereo_vision.parameters.uniqueness_ratio)
-            stereo_vision.stereo.setSpeckleRange(stereo_vision.parameters.speckle_range)
-            stereo_vision.stereo.setSpeckleWindowSize(stereo_vision.parameters.speckle_window_size)
-            stereo_vision.stereo.setDisp12MaxDiff(stereo_vision.parameters.disparity_max_diff)
-            stereo_vision.stereo.setMinDisparity(stereo_vision.parameters.min_disparity)
+            # stereo_vision.stereo.setPreFilterType(stereo_vision.parameters.pre_filter_type)
+            # stereo_vision.stereo.setPreFilterSize(stereo_vision.parameters.pre_filter_size)
+            # stereo_vision.stereo.setPreFilterCap(stereo_vision.parameters.pre_filter_cap)
+            # stereo_vision.stereo.setTextureThreshold(stereo_vision.parameters.texture_threshold)
+            # stereo_vision.stereo.setUniquenessRatio(stereo_vision.parameters.uniqueness_ratio)
+            # stereo_vision.stereo.setSpeckleRange(stereo_vision.parameters.speckle_range)
+            # stereo_vision.stereo.setSpeckleWindowSize(stereo_vision.parameters.speckle_window_size)
+            # stereo_vision.stereo.setDisp12MaxDiff(stereo_vision.parameters.disparity_max_diff)
+            # stereo_vision.stereo.setMinDisparity(stereo_vision.parameters.min_disparity)
 
             current_disparity = stereo_vision.get_disparity(frame_left, frame_right)
             ret_val, depth_val, pos_val, size_val = stereo_vision.get_data(
@@ -338,6 +341,9 @@ if __name__ == '__main__':
             cv.imshow('frame left', frame_left)
             cv.imshow('frame right', frame_right)
             cv.imshow('disparity', current_disparity)
+            # plt.imshow(current_disparity)
+            # plt.axis('off')
+            # plt.show()
 
             if CURRENT_DEPTH < MIN_DIST:
                 break
@@ -364,21 +370,21 @@ if __name__ == '__main__':
         C = dst[1, 0]
         print('Value of M: ', M)
 
-    print('Saving parameters...')
-    cv_file_write = cv.FileStorage(PARAMETER_PATH, cv.FILE_STORAGE_WRITE)
-    cv_file_write.write('num_disparities', stereo_vision.parameters.num_disparities)
-    cv_file_write.write('block_size', stereo_vision.parameters.block_size)
-    cv_file_write.write('pre_filter_type', stereo_vision.parameters.pre_filter_type)
-    cv_file_write.write('pre_filter_size', stereo_vision.parameters.pre_filter_size)
-    cv_file_write.write('pre_filter_cap', stereo_vision.parameters.pre_filter_cap)
-    cv_file_write.write('texture_threshold', stereo_vision.parameters.texture_threshold)
-    cv_file_write.write('uniqueness_ratio', stereo_vision.parameters.uniqueness_ratio)
-    cv_file_write.write('speckle_range', stereo_vision.parameters.speckle_range)
-    cv_file_write.write('speckle_window_size', stereo_vision.parameters.speckle_window_size)
-    cv_file_write.write('disparity_max_diff', stereo_vision.parameters.disparity_max_diff)
-    cv_file_write.write('min_disparity', stereo_vision.parameters.min_disparity)
-    cv_file_write.write('obstacle_area', stereo_vision.parameters.obstacle_area)
-    cv_file_write.write('contour_area', stereo_vision.parameters.contour_area)
-    if CURRENT_DEPTH < MIN_DIST: # only write if testing
-        cv_file_write.write('M', M)
-    cv_file_write.release()
+    # print('Saving parameters...')
+    # cv_file_write = cv.FileStorage(PARAMETER_PATH, cv.FILE_STORAGE_WRITE)
+    # cv_file_write.write('num_disparities', stereo_vision.parameters.num_disparities)
+    # cv_file_write.write('block_size', stereo_vision.parameters.block_size)
+    # cv_file_write.write('pre_filter_type', stereo_vision.parameters.pre_filter_type)
+    # cv_file_write.write('pre_filter_size', stereo_vision.parameters.pre_filter_size)
+    # cv_file_write.write('pre_filter_cap', stereo_vision.parameters.pre_filter_cap)
+    # cv_file_write.write('texture_threshold', stereo_vision.parameters.texture_threshold)
+    # cv_file_write.write('uniqueness_ratio', stereo_vision.parameters.uniqueness_ratio)
+    # cv_file_write.write('speckle_range', stereo_vision.parameters.speckle_range)
+    # cv_file_write.write('speckle_window_size', stereo_vision.parameters.speckle_window_size)
+    # cv_file_write.write('disparity_max_diff', stereo_vision.parameters.disparity_max_diff)
+    # cv_file_write.write('min_disparity', stereo_vision.parameters.min_disparity)
+    # cv_file_write.write('obstacle_area', stereo_vision.parameters.obstacle_area)
+    # cv_file_write.write('contour_area', stereo_vision.parameters.contour_area)
+    # if CURRENT_DEPTH < MIN_DIST: # only write if testing
+    #     cv_file_write.write('M', M)
+    # cv_file_write.release()

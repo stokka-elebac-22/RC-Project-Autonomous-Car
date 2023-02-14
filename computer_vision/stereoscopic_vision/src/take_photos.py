@@ -2,12 +2,12 @@
 import cv2 as cv
 
 if __name__ == '__main__':
-    DIRECTORY = 'tests/images/stereoscopic_vision/distance/logi_1080p/v2'
+    DIRECTORY = 'tests/images/stereoscopic_vision/images/depth_test/'
     CAMERA_ID_LEFT = 1
     CAMERA_ID_RIGHT = 0
     cam1 = cv.VideoCapture(CAMERA_ID_LEFT)
     cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)
-    cameras = [(cam1, 'left'), (cam2, 'right')]
+    cameras = [(cam1, 'left2'), (cam2, 'right2')]
 
     qcd = cv.QRCodeDetector()
 
@@ -27,8 +27,8 @@ if __name__ == '__main__':
             print('Stopping...')
             break
 
-        if not RETS:
-            continue
+        # if not RETS:
+        #     continue
 
         if cv.waitKey(1) & 0xFF == ord('c'):
             print('Capturing...')

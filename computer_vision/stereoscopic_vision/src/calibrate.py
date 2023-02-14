@@ -146,15 +146,9 @@ class Calibrate:
 if __name__ == '__main__':
     CHECKERBOARD_DIMENSION = (8, 6)
     CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-<<<<<<< HEAD
     DIRECTORY_LEFT = "computer_vision/stereoscopic_vision/images/calibrate_large/left/*.jpg"
     DIRECTORY_RIGHT = "computer_vision/stereoscopic_vision/images/calibrate_large/right/*.jpg"
     DESTINATION_PATH = "computer_vision/stereoscopic_vision/data/stereo_rectify_maps_large.xml"
-=======
-    DIRECTORY_LEFT = 'computer_vision/stereoscopic_vision/images/calibrate_small/left/*.jpg'
-    DIRECTORY_RIGHT = 'computer_vision/stereoscopic_vision/images/calibrate_small/right/*.jpg'
-    DESTINATION_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml'
->>>>>>> 62487943220cd197782e10a92ff3a3c4ecb6699d
 
     # Calibrate left camera
     calibrate = Calibrate(CRITERIA, CHECKERBOARD_DIMENSION, DIRECTORY_LEFT, DIRECTORY_RIGHT)

@@ -98,6 +98,24 @@ class TestParametrized:
         assert diff == expected
 
     @pytest.mark.parametrize('img_source, lines, expected', [
+        ('bike_park.jpg', [np.array([300, 327, 1059, 600]),
+         np.array([0, 781, 272, 561])], (193, 823)),
+        ('curve.jpg', [np.array([751, 327, 1059, 500]),
+         np.array([0, 781, 272, 561])], (-657, 1044)),
+        ('1.jpg', [np.array([123, 434, 343, 767]),
+         np.array([0, 781, 272, 561])], (953, 1034)),
+        ('2.jpg', [np.array([100, 327, 509, 811]), np.array([573, 339, 780, 336])], (546, 333))])
+    def test_get_next_point(self, img_source, lines, expected):
+        '''
+        Test if the output value from
+        get_next_point is equal to manual calculation
+        '''
+        lane_detector = LaneDetector()
+        image = self.get_image(img_source)
+        new_point = lane_detector.get_next_point(image, lines)
+        assert new_point == expected
+
+    @pytest.mark.parametrize('img_source, lines, expected', [
         ('bike_park.jpg',
          [np.array([300, 327, 1059, 600]), np.array([0, 781, 272, 561])],
          [(3000, 300, 3),

@@ -111,6 +111,8 @@ if __name__ == '__main__':
 
             center_diff = lane_detector.get_diff_from_center_info(
                 frame, avg_lines)
+            
+        #TODO: fix this to use warping instead of just forwarding
             CENTER_DIFF_X = 0
             CENTER_DIFF_Y = 0
             if center_diff is not None:

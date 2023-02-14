@@ -1,5 +1,5 @@
 '''Import libraries'''
-from typing import TypedDict
+from typing import TypedDict, Tuple
 import warnings
 import cv2
 import numpy as np
@@ -112,6 +112,40 @@ class LaneDetector(LineDetector):
             return diff
         return None
 
+    def get_next_point(self, image: np.ndarray, lines:np.ndarray) -> Tuple[int, int]:
+        '''Get a point on the center line'''
+        if lines is None:
+            return None
+
+        coordinates_x = [lines[0][0], lines[1][0]]
+        # coordinates_y = [points_coordinates[0][3], points_coordinates[1][3]]
+        width = max(coordinates_x) - min(coordinates_x)
+
+        # TODO: need to change size here, measure in real life # pylint: disable=W0511
+        height = image.shape[0]
+
+        pt_input = np.float32([[0, 0],
+                                [0, height],
+                                [width, height],
+                                [width, 0]])
+
+        pt_output = np.float32([[lines[0][2], lines[0][3]],
+                               [lines[0][0], lines[0][1]],
+                               [lines[1][0], lines[1][1]],
+                               [lines[1][2], lines[1][3]]])
+
+        point = (int(width/2), int(height*0.6))
+
+        matrix = cv2.getPerspectiveTransform(
+            pt_input, pt_output)
+
+        p_x = (matrix[0][0]*point[0] + matrix[0][1]*point[1] + matrix[0][2]) \
+        /(matrix[2][0]*point[0] + matrix[2][1]*point[1] + matrix[2][2])
+        p_y = (matrix[1][0]*point[0] + matrix[1][1]*point[1] + matrix[1][2]) \
+        /(matrix[2][0]*point[0] + matrix[2][1]*point[1] + matrix[2][2])
+
+        return (int(p_x), int(p_y))
+
     CirclePoints = list[tuple[int, int], tuple[int, int], tuple[int, int]]
     CoursePolys = list[list[float, float], list[float, float]]
     CourseData = TypedDict('CourseData', {
@@ -121,12 +155,13 @@ class LaneDetector(LineDetector):
         'polys': CoursePolys
     })
 
+    # TODO: maybe remove later, no need, cus have pathfinding?
     def get_course(self, image: np.ndarray, lines: np.ndarray) -> CourseData: # pylint: disable=R0914
         '''Returns polys that define the course and points used to define the polys'''
         if lines is None:
-            return (None, None, None, None)
+            return None
         if lines[0] is None or lines[1] is None:
-            return (None, None, None, None)
+            return None
         coordinates_x = [lines[0][0], lines[1][0]]
         # coordinates_y = [points_coordinates[0][3], points_coordinates[1][3]]
         width = max(coordinates_x) - min(coordinates_x)
@@ -179,6 +214,7 @@ class LaneDetector(LineDetector):
         'weighted': np.ndarray
     })
 
+    # TODO: maybe remove later, no need, cus have pathfinding?
     # pylint: disable=R0913 R0914
     def show_course(self, image: np.ndarray,
                     warped_shape: np.ndarray,
@@ -245,7 +281,7 @@ if __name__ == '__main__':
     # resize image
     frame = cv2.resize(frame, dim, interpolation=cv2.INTER_AREA)
 
-    lane_detector = LaneDetector()
+    lane_detector = LaneDetector([50, 150], 5, [100, 250])
 
     while True:
         # ret, frame = cap.read()
@@ -265,23 +301,28 @@ if __name__ == '__main__':
         course_data = lane_detector.get_course(
             frame, avg_lines)
 
+        next_point = lane_detector.get_next_point(frame, avg_lines)
+
+        frame = cv2.circle(
+            frame, (next_point[0], next_point[1]), 5, (0, 0, 255), 5)
+
         NO_NONE = True
+        if course_data is not None:
+            for key, value in course_data.items():
+                if value is None:
+                    NO_NONE = False
+                    break
 
-        for key, value in course_data.items():
-            if value is None:
-                NO_NONE = False
-                break
-
-        if NO_NONE:
-            images = lane_detector.show_course(
-                    frame,
-                    course_data['warped_shape'],
-                    course_data['points'],
-                    course_data['perspective_transform'],
-                    course_data['polys']
-                )
-            cv2.imshow('warped', images['warped'])
-            cv2.imshow('course', images['weighted'])
+            if NO_NONE:
+                images = lane_detector.show_course(
+                        frame,
+                        course_data['warped_shape'],
+                        course_data['points'],
+                        course_data['perspective_transform'],
+                        course_data['polys']
+                    )
+                cv2.imshow('warped', images['warped'])
+                cv2.imshow('course', images['weighted'])
         cv2.imshow('image', frame)
 
         # cv2.imshow('frame', frame)

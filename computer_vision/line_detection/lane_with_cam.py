@@ -8,20 +8,12 @@ def nothing(_):
 if __name__ == '__main__':
     cam = cv2.VideoCapture(0)
 
-    # Trackbars
-    cv2.namedWindow('Trackbars')
-    cv2.createTrackbar('Canny low threshold', 'Trackbars', 100, 500, nothing)
-    cv2.createTrackbar('Canny high threshold', 'Trackbars', 200, 500, nothing)
-    cv2.createTrackbar('Hough minimum line length', 'Trackbars', 200, 500, nothing)
-    cv2.createTrackbar('Hough maximum line gap', 'Trackbars', 300, 500, nothing)
-    cv2.createTrackbar('Gaussian blur kernel size', 'Trackbars', 5, 20, nothing)
-
     while True:
-        canny_low_thr = cv2.getTrackbarPos('Canny low threshold','Trackbars')
-        canny_high_thr = cv2.getTrackbarPos('Canny high threshold','Trackbars')
-        hough_min_length = cv2.getTrackbarPos('Hough minimum line length','Trackbars')
-        hough_max_gap = cv2.getTrackbarPos('Hough maximum line gap','Trackbars')
-        gaussian_kernel = cv2.getTrackbarPos('Gaussian blur kernel size','Trackbars')
+        canny_low_thr = 103
+        canny_high_thr = 97
+        hough_min_length = 341
+        hough_max_gap = 90
+        gaussian_kernel = 1
 
         lane_detector = LaneDetector(
             canny = [canny_low_thr, canny_high_thr],
@@ -47,8 +39,5 @@ if __name__ == '__main__':
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    print("canny", canny_low_thr, canny_high_thr)
-    print("hough", hough_min_length, hough_max_gap)
-    print("blur", gaussian_kernel)
     cam.release()
     cv2.destroyAllWindows()

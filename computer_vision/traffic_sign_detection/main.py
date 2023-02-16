@@ -16,8 +16,11 @@ class TrafficSignDetector:
             model='computer_vision/traffic_sign_detection/stop_sign_model.xml',
             size: SignSize=None):
         self.cascade = cv2.CascadeClassifier(model)
+
         if size is None:
             self.size = {}
+        else:
+            self.size = size
 
         if self.size.get('px') is None:
             self.size['px'] = 1
@@ -59,7 +62,7 @@ if __name__ == '__main__':
         'mm': 61,
         'distance': 200
     }
-    traffic_sign_detection = TrafficSignDetector(sign_size)
+    traffic_sign_detection = TrafficSignDetector(size=sign_size)
     output_signs = traffic_sign_detection.detect_signs(img)
     traffic_sign_detection.show_signs(img, output_signs)
 

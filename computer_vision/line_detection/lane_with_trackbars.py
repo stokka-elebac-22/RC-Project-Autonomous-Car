@@ -7,6 +7,7 @@ def nothing(_):
 
 if __name__ == '__main__':
     cam = cv2.VideoCapture(0)
+    avg_center_diff = []
 
     # Trackbars
     cv2.namedWindow('Trackbars')
@@ -38,6 +39,9 @@ if __name__ == '__main__':
         lane_detector.show_lines(frame, avg_lines)
         center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)
         if center_diff is not None:
+            avg_center_diff.append(center_diff)
+            if len(avg_center_diff) > 100:
+                avg_center_diff.pop()
             cv2.putText(
                 frame, f'Diff from center: {center_diff}', (50, 50),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)

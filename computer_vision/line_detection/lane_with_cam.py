@@ -7,13 +7,14 @@ def nothing(_):
 
 if __name__ == '__main__':
     cam = cv2.VideoCapture(0)
+    avg_center_diff = []
 
     while True:
-        canny_low_thr = 103
-        canny_high_thr = 97
-        hough_min_length = 341
-        hough_max_gap = 90
-        gaussian_kernel = 1
+        canny_low_thr = 50
+        canny_high_thr = 67
+        hough_min_length = 500
+        hough_max_gap = 246
+        gaussian_kernel = 4
 
         lane_detector = LaneDetector(
             canny = [canny_low_thr, canny_high_thr],
@@ -30,8 +31,11 @@ if __name__ == '__main__':
         lane_detector.show_lines(frame, avg_lines)
         center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)
         if center_diff is not None:
+            avg_center_diff.append(center_diff)
+            if len(avg_center_diff) > 3:
+                avg_center_diff.pop()
             cv2.putText(
-                frame, f'Diff from center: {center_diff}', (50, 50),
+                frame, f'Diff from center: {sum(avg_center_diff)/len(avg_center_diff)}', (50, 50),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
 
         cv2.imshow('image', frame)

@@ -2,7 +2,7 @@
 import cv2 
 
 if __name__ == '__main__':
-    DIRECTORY = 'tests/images/lane_detection/logi'
+    DIRECTORY = 'tests/images/parking_slot_detection/'
     CAMERA_ID_LEFT = 1
     CAMERA_ID_RIGHT = 0
     cam = cv2.VideoCapture(0)

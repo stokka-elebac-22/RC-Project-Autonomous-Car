@@ -7,7 +7,6 @@ import cv2
 import numpy as np
 try:
     from line_detector import LineDetector
-    from qr_code.qr_code import QRCode
 except ImportError:
     try:
         from computer_vision.line_detection.line_detector import LineDetector
@@ -18,6 +17,7 @@ except ImportError:
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
+from qr_code.qr_code import QRCode
 
 class ParkingSlotDetector(LineDetector):
     '''DOC: Detects parking slot'''

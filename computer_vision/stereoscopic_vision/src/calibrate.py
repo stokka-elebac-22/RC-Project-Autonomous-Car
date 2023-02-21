@@ -1,18 +1,19 @@
-"""
+'''
 source: https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_calib3d/
 py_calibration/py_calibration.html#calibration
 
 https://learnopencv.com/making-a-low-cost-stereo-camera-using-opencv/
 
 the code is highly inspired from the sources, but modified to fit our use case
-"""
+'''
+from typing import TypedDict, List
 import glob
 import numpy as np
 import cv2 as cv
 
 class Calibrate:
-    """Calibrating two cameras"""
-    def __init__(self, criteria, board_dim=(8, 6), dir_left="", dir_right=""):
+    '''Calibrating two cameras'''
+    def __init__(self, criteria, board_dim=(8, 6), dir_left='', dir_right=''):
         self.board_dim = board_dim
         self.dir_left = dir_left
         self.dir_right = dir_right
@@ -22,20 +23,37 @@ class Calibrate:
         self.obj_pnt = np.zeros((self.board_dim[0]*self.board_dim[1], 3), np.float32)
         self.obj_pnt[:, :2] = np.mgrid[0:self.board_dim[0], 0:self.board_dim[1]].T.reshape(-1, 2)
 
-    def calculate_object_and_image_points(self):
-        """Calculate object points and image points for valid images"""
+    CalibratePoints = TypedDict('CalibratePoints', {
+        'object': List,
+        'image_left': List,
+        'image_right': List
+    })
+
+    ImagesReturned = TypedDict('ImagesReturned', {
+        'left': List[np.ndarray],
+        'right': List[np.ndarray],
+    })
+
+    def calculate_object_and_image_points(self) -> tuple(CalibratePoints, ImagesReturned):
+        '''Calculate object points and image points for valid images'''
         # arrays to store object poitns and image points from all the images
-        object_points = []
-        image_points_left = []
-        image_points_right = []
+        point = {
+            'object': [],
+            'image_left': [],
+            'image_right': [],
+        }
 
-        images_left = glob.glob(self.dir_left)
-        images_right= glob.glob(self.dir_right)
+        images = {
+            'left': glob.glob(self.dir_left),
+            'right': glob.glob(self.dir_right)
+        }
 
-        images_returned_left = []
-        images_returned_right = []
+        images_returned = {
+            'left': [],
+            'right': []
+        }
 
-        for left, right in zip(images_left, images_right):
+        for left, right in zip(images['left'], images['right']):
             image_left = cv.imread(left)
             image_right = cv.imread(right)
             gray_left = cv.cvtColor(image_left, cv.COLOR_BGR2GRAY)
@@ -47,88 +65,106 @@ class Calibrate:
 
             # if found, add object point, image point (after refining them)
             if ret_left and ret_right:
-                object_points.append(self.obj_pnt)
-                images_returned_left.append(left)
-                images_returned_right.append(right)
+                point['object'].append(self.obj_pnt)
+                images_returned['left'].append(left)
+                images_returned['right'].append(right)
 
                 corners_left = cv.cornerSubPix(
                     gray_left, corners_left, (11, 11), (-1, -1), self.criteria)
-                image_points_left.append(corners_left)
+                point['image_left'].append(corners_left)
                 corners_right = cv.cornerSubPix(
                     gray_right, corners_right, (11, 11), (-1, -1), self.criteria)
-                image_points_right.append(corners_right)
+                point['image_right'].append(corners_right)
                 # draw and display the corners
                 cv.drawChessboardCorners(image_left, self.board_dim, corners_left, ret_left)
                 cv.drawChessboardCorners(image_right, self.board_dim, corners_right, ret_right)
-                cv.imshow("left", image_left)
-                cv.imshow("right", image_right)
+                cv.imshow('left', image_left)
+                cv.imshow('right', image_right)
                 cv.waitKey(0)
-        print(f"""Could find chessboard corners in {len(object_points)}
-        out of {len(images_left)} images""")
+        print(f'''Could find chessboard corners in {len(point['object'])}
+        out of {len(images['left'])} images''')
 
         cv.destroyAllWindows()
 
-        return object_points, image_points_left, image_points_right, \
-            images_returned_left, images_returned_right
+        return point, images_returned
 
     def get_optimal_new_camera_matrix(self, img, mtx, dist):
-        """return optimal camera matrix with cv.getOptimalNewCameraMatrix"""
+        '''return optimal camera matrix with cv.getOptimalNewCameraMatrix'''
         height, width = img.shape[:2]
         new_camera_matrix, roi = \
             cv.getOptimalNewCameraMatrix(mtx, dist, (width, height), 1, (width, height))
         return new_camera_matrix, roi
 
-    def undistort(self, img, mtx, dist, new_camera_matrix, roi):
-        """Undistort the image"""
-        height, width = img.shape[:2]
+    UndistortData = TypedDict('UndistortData', {
+        'image': np.ndarray,
+        'matrix': np.ndarray,
+        'distance': int,
+        'new_camera_matrix': np.ndarray,
+        'roi': None # I do not know what type this should be
+    })
+
+    def undistort(self, data: UndistortData):
+        '''Undistort the image'''
+        height, width = data['img'].shape[:2]
         # undistort
         mapx, mapy = \
-            cv.initUndistortRectifyMap(mtx, dist, None, new_camera_matrix, (width, height), 5)
-        dst = cv.remap(img, mapx, mapy, cv.INTER_LINEAR)
+            cv.initUndistortRectifyMap(data['matrix'],
+                data['distance'], None, data['new_camera_matrix'], (width, height), 5)
+        dst = cv.remap(data['image'], mapx, mapy, cv.INTER_LINEAR)
 
         # crop image
-        pos_x, pos_y, roi_width, roi_height = roi
+        pos_x, pos_y, roi_width, roi_height = data['roi']
         dst = dst[pos_y:pos_y+roi_height, pos_x:pos_x+roi_width]
-
         # cv.imwrite('Stereoscopic Vision\images\calibrate_results\calibrated.png', dst)
 
-    def re_projection_error(self, object_points, image_points, rvecs, tvecs, mtx, dist):
-        """
+    ReProjectionErrorData = TypedDict('ReProjectionErrorData', {
+        'object_points': tuple,
+        'image_points': tuple,
+        'rvecs': tuple,
+        'tvecs': tuple,
+        'matrix': np.ndarray,
+        'distance': int
+    })
+
+    def re_projection_error(self, data: ReProjectionErrorData):
+        '''
         # From the source 1:
         # Re-projection error gives a good estimation of just how exact is the found parameters.
         # This should be as close to 0 as possible.
-        """
+        '''
 
         mean_error = 0
         total_error = 0
-        # for i in range(len(object_points)):
-        for object_point, image_point, rvec, tvec in zip(object_points, image_points, rvecs, tvecs):
-            image_point, _ = cv.projectPoints(object_point, rvec, tvec, mtx, dist)
+        for object_point, image_point, rvec, tvec in zip(data['object_points'],
+                data['image_points'], data['rvecs'], data['tvecs']):
+            image_point, _ = cv.projectPoints(
+                object_point, rvec, tvec, data['matrix'], data['distance'])
             error = cv.norm(image_point, image_point, cv.NORM_L2)/len(image_point)
             total_error += error
-
-        print(f"total error: {mean_error/len(object_points)}")
+        print(f"total error: {mean_error/len(data['object_points'])}")
 
 if __name__ == '__main__':
     CHECKERBOARD_DIMENSION = (8, 6)
     CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-    DIRECTORY_LEFT = "computer_vision/stereoscopic_vision/images/calibrate_small/left/*.jpg"
-    DIRECTORY_RIGHT = "computer_vision/stereoscopic_vision/images/calibrate_small/right/*.jpg"
-    DESTINATION_PATH = "computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml"
+    DIRECTORY_LEFT = 'computer_vision/stereoscopic_vision/images/calibrate_small/left/*.jpg'
+    DIRECTORY_RIGHT = 'computer_vision/stereoscopic_vision/images/calibrate_small/right/*.jpg'
+    DESTINATION_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml'
 
     # Calibrate left camera
     calibrate = Calibrate(CRITERIA, CHECKERBOARD_DIMENSION, DIRECTORY_LEFT, DIRECTORY_RIGHT)
-    obj_pnts, img_pnts_l, img_pnts_r, img_l, img_r= calibrate.calculate_object_and_image_points()
+    calibrate_point, returned_images = calibrate.calculate_object_and_image_points()
 
-    image_l = cv.imread(img_l[0])
+    image_l = cv.imread(returned_images['left'][0])
     gray_l = cv.cvtColor(image_l, cv.COLOR_BGR2GRAY)
-    image_r = cv.imread(img_r[0])
+    image_r = cv.imread(returned_images['right'][0])
     gray_r = cv.cvtColor(image_r, cv.COLOR_BGR2GRAY)
 
     ret_1, mtx_l, dist_l, rvecs_l, tvecs_l = \
-        cv.calibrateCamera(obj_pnts, img_pnts_l, gray_l.shape[::-1], None, None)
+        cv.calibrateCamera(calibrate_point['object'],
+        calibrate_point['image_left'], gray_l.shape[::-1], None, None)
     ret_r, mtx_r, dist_r, rvecs_r, tvecs_r = \
-        cv.calibrateCamera(obj_pnts, img_pnts_r, gray_r.shape[::-1], None, None)
+        cv.calibrateCamera(calibrate_point['object'],
+        calibrate_point['image_right'], gray_r.shape[::-1], None, None)
 
     new_camera_matrix_left, roi_left = \
         calibrate.get_optimal_new_camera_matrix(gray_l, mtx_l, dist_l)
@@ -141,9 +177,9 @@ if __name__ == '__main__':
     FLAGS |= FLAGS
     retS, new_mtx_left, dist_left, new_mtx_right, dist_right, Rot, Trns, Emat, Fmat = \
         cv.stereoCalibrate(
-        obj_pnts,
-        img_pnts_l,
-        img_pnts_r,
+        calibrate_point['object'],
+        calibrate_point['image_left'],
+        calibrate_point['image_right'],
         new_camera_matrix_left,
         dist_l,
         new_camera_matrix_right,
@@ -180,10 +216,10 @@ if __name__ == '__main__':
         gray_r.shape[::-1],
         cv.CV_16SC2)
 
-    print("Saving parameters...")
+    print('Saving parameters...')
     cv_file = cv.FileStorage(DESTINATION_PATH, cv.FILE_STORAGE_WRITE)
-    cv_file.write("stereo_map_left_x", stereo_map_left[0])
-    cv_file.write("stereo_map_left_y", stereo_map_left[1])
-    cv_file.write("stereo_map_right_x", stereo_map_right[0])
-    cv_file.write("stereo_map_right_y", stereo_map_right[1])
+    cv_file.write('stereo_map_left_x', stereo_map_left[0])
+    cv_file.write('stereo_map_left_y', stereo_map_left[1])
+    cv_file.write('stereo_map_right_x', stereo_map_right[0])
+    cv_file.write('stereo_map_right_y', stereo_map_right[1])
     cv_file.release()

@@ -1,29 +1,34 @@
-"""QR code module."""
+'''QR code module.'''
 import dataclasses
+from typing import TypedDict, Tuple, List
+import numpy as np
 import cv2 as cv
 
+QRSize = TypedDict('QRSize', {
+    'px': int,
+    'mm': int,
+    'distance': int,
+})
 @dataclasses.dataclass
 class QRGeometry:
-    """PointSet, used by qrcode."""
-    # pylint: disable=too-many-instance-attributes
-    # 8 instances seem reasonable in this case
-    def __init__(self, size_px=None, size_mm=None, distance=None, pts=None):
-        self.qr_size_px = size_px
-        self.qr_size_mm = size_mm
-        self.qr_distance = distance
-        if size_px is None:
-            self.qr_size_px = 1
-        if size_mm is None:
-            self.qr_size_mm = 1
-        if distance is None:
-            self.qr_distance = 1
+    '''PointSet, used by qrcode.'''
+    def __init__(self, size: QRSize=None, pts: List[Tuple[int, int]]=None):
+        self.size = size
+        if size is None:
+            self.size = {}
+        if self.size.get('px') is None:
+            self.size['px'] = 1
+        if self.size.get('mm') is None:
+            self.size['mm'] = 1
+        if self.size.get('distance') is None:
+            self.size['distance'] = 1
 
         if pts is None or len(pts) < 4:
             pts = [[0,0],[0,0],[0,0],[0,0]]
         self.update(pts)
 
     def update(self, pts):
-        """update points, used by qrcode."""
+        '''update points, used by qrcode.'''
         if pts is None:
             return
         self.points = pts
@@ -61,13 +66,27 @@ class QRGeometry:
     def get_distance(self) -> float:
         '''Return the distance'''
         height_px = self.get_height()
-        focal_length = (self.qr_size_px / self.qr_size_mm) * self.qr_distance
-        distance = (self.qr_size_mm * focal_length) / height_px
+        focal_length = (self.size.get('px') / self.size.get('mm')) * self.size.get('distance')
+        distance = (self.size.get('mm') * focal_length) / height_px
         return distance
 
+QRData = TypedDict('QRData', {
+    'ret': bool,
+    'distances': List[float],
+    'angles': List[float],
+    'info': List[str],
+    'points': List[Tuple],
+    'rest': int,
+})
+
+DisplayData = TypedDict('DisplayData', {
+    'distances': List[float],
+    'angles': List[float],
+    'info': List[str],
+})
 
 class QRCode:
-    """QRCode, doing calculations for QR code placement estimation."""
+    '''QRCode, doing calculations for QR code placement estimation.'''
 #                          c
 #            p2 ---------- p3
 #            |             |
@@ -77,15 +96,12 @@ class QRCode:
 #            p1 ---------- p0
 #                    a
 
-    def __init__(self, size_px, size_mm, distance, pts=None):
-        self.size_px = size_px
-        self.size_mm = size_mm
-        self.distance = distance
-        self.qr_geometries = [QRGeometry(size_px, size_mm, distance, pts)]
+    def __init__(self, size: QRSize, pts=None):
+        self.qr_geometries = [QRGeometry(size, pts)]
         self.qr_display = DisplayQRCode()
 
-    def get_data(self, frame):
-        """Update values
+    def get_data(self, frame: np.ndarray) -> QRData:
+        '''Update values
         The resize variable is only relevant if not using video
         This function returns in a dict:
         - ret: bool, stating if it could detect the qr code
@@ -94,7 +110,7 @@ class QRCode:
         - points: a list of points (formatted like [[[0, 0], ..., [1, 1]]])
         - rest: return straight value
         get_measurements(self, frame, resize=1) -> bool, float, float
-        """
+        '''
         qcd = cv.QRCodeDetector()
         ret_qr, decoded_info , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
 
@@ -113,7 +129,12 @@ class QRCode:
                 self.qr_geometries.pop()
         else:
             for i in range(len(points_qr) - len(self.qr_geometries)):
-                self.qr_geometries.append(QRGeometry(self.size_px, self.size_mm, self.distance))
+                size = {
+                    'px': self.qr_geometries[i].size.get('px'),
+                    'mm': self.qr_geometries[i].size.get('mm'),
+                    'distance': self.qr_geometries[i].size.get('distance')
+                }
+                self.qr_geometries.append(QRGeometry(size))
 
         distances = []
         angles = []
@@ -130,8 +151,8 @@ class QRCode:
             'rest': rest_qr
             }
 
-    def display(self, frame, data, verbose=1):
-        """Displays the qr code with data"""
+    def display(self, frame: np.ndarray, data: DisplayData, verbose=1):
+        '''Displays the qr code with data'''
         self.qr_display.display(
             frame,
             self.qr_geometries,
@@ -139,7 +160,7 @@ class QRCode:
             verbose=verbose
         )
 class DisplayQRCode:
-    """DisplayQRCode, QR code placement estimation."""
+    '''DisplayQRCode, QR code placement estimation.'''
     def __init__(self):
         ##### DISPLAY #####
         self.color_frame_green = (0, 255, 0)
@@ -150,11 +171,11 @@ class DisplayQRCode:
         self.text_color = (255, 0, 255)
         self.text_thickness = 1
 
-    def display(self, frame, qrgs: QRGeometry, data, verbose=1):
-        """
+    def display(self, frame: np.ndarray, qrgs: QRGeometry, data: DisplayData, verbose: int=1):
+        '''
         Display
         returns a frame
-        """
+        '''
         for i, qrg in enumerate(qrgs):
             if data['angles'] is None:
                 angle = qrgs[i].get_angle()
@@ -175,8 +196,13 @@ class DisplayQRCode:
                 self.display_values(frame, qrg, display_data, verbose)
         return frame
 
-    def display_values(self, frame, qrg: QRGeometry, data, verbose=1):
-        """Display values"""
+    DisplayInfoData = TypedDict('DisplayInfoData', {
+        'distance': int,
+        'angle': int,
+    })
+
+    def display_values(self, frame, qrg: QRGeometry, data: DisplayData, verbose: int=1):
+        '''Display values'''
         if verbose > 1:
             text_location_a = (int(min(qrg.points[0][0], qrg.points[1][0]) + \
                                     qrg.side_a/2), int(qrg.points[0][1]))
@@ -203,8 +229,8 @@ class DisplayQRCode:
         cv.putText(frame, f'distance = {int(distance)}', (10, 50), \
                 self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
-def local_read_camera(name=None, resize=1):
-    """Local read camera """
+def local_read_camera(name: str=None, resize: int=1):
+    '''Local read camera '''
     if not name:
         ret, frame = cap.read()
         if not ret:
@@ -218,10 +244,12 @@ def local_read_camera(name=None, resize=1):
 if __name__ == '__main__':
     # ----- ORIGINAL MEASUREMENTS -----
     # QR Code measured, 55mm lense
-    QR_SIZE_PX = 76
-    QR_SIZE_MM = 52
-    QR_DISTANCE = 500
-    qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+    SIZE = {
+        'px': 76,
+        'mm': 52,
+        'distance': 500
+    }
+    qr_code = QRCode(SIZE)
     CAMERA_ID = 0
     DELAY = 1
     WINDOW_NAME = 'window'
@@ -277,5 +305,3 @@ if __name__ == '__main__':
         if cv.waitKey(DELAY) & 0xFF == ord('q'):
             break
     cv.destroyWindow(WINDOW_NAME)
-
-    # camera.run(verbose=2)

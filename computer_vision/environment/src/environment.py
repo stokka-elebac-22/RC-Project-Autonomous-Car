@@ -1,10 +1,16 @@
 '''Environment'''
+from typing import TypedDict, Tuple
 import copy
 import numpy as np
 
+ViewPointObject = TypedDict('ViewPointObject', {
+    'view_point': Tuple[int, int],
+    'object_id': int,
+})
 class Environment:
     '''Creating a 2 dimensional map of the 3 dimensional world'''
-    def __init__(self, size, real_size, view_point_object=None):
+    def __init__(self, size: Tuple[int, int], real_size: float,
+            view_point_object: ViewPointObject = None):
         '''View point is the position in a 2d matrix where everyting should be relativ too'''
         self.size = size
         self.real_size = real_size # the real unit size per square
@@ -14,10 +20,10 @@ class Environment:
         object_id = 0
 
         if view_point_object is not None:
-            if view_point_object['view_point'] is not None:
-                self.view_point = view_point_object['view_point']
-            if view_point_object['object_id'] is not None:
-                object_id = view_point_object['object_id']
+            if view_point_object.get('view_point') is not None:
+                self.view_point = view_point_object.get('view_point')
+            if view_point_object.get('object_id') is not None:
+                object_id = view_point_object.get('object_id')
         self.map[self.view_point[0]][self.view_point[1]] = object_id
 
     def update(self):
@@ -39,14 +45,14 @@ class Environment:
                     return (i, j)
         return None
 
-    def insert(self, distance: float, object_id: int) -> bool:
+    def insert(self, distance: Tuple[float, float], object_id: int) -> bool:
         '''
         Insert object
         The distance contains a x and y value (direction)
         '''
         if distance[1] < 0:
             # distance in y direction needs to be positive
-            return False
+            return False, None
         if distance[1] == 0:
             row = self.view_point[0]-1 # so it does not collide with view point
         else:
@@ -57,11 +63,11 @@ class Environment:
         else:
             col = self.view_point[1] + distance[0]//self.real_size
         if row >= self.size[0] or row < 0 or col < 0 or col >= self.size[1]:
-            return False
+            return False, None
         self.map[int(row)][int(col)] = object_id
-        return True
+        return True, (int(row), int(col))
 
-    def remove(self, object_id: int, remove_all=False):
+    def remove(self, object_id: int, remove_all: bool=False):
         '''Remove an object'''
         for i, row in enumerate(self.map):
             for j, col in enumerate(row):
@@ -71,7 +77,7 @@ class Environment:
                         continue
                     return
 
-    def insert_by_index(self, pos: int, object_id: int):
+    def insert_by_index(self, pos: Tuple[int, int], object_id: int):
         '''Insert object by index'''
         if pos[0] < 0 or pos[0] >= self.size[0] or pos[1] < 0 or pos[1] > self.size[1]:
             return False

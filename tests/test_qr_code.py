@@ -71,12 +71,14 @@ class TestQRCode:
         ]
     )
     def test_angle_logi_1080p(self, name, exp):
-        """Testing the angle to qr code"""
-        qr_size_px = 112
-        qr_size_mm = 52
-        qr_distance = 400
-        qr_code = QRCode(qr_size_px, qr_size_mm, qr_distance)
-        frame = cv.imread("tests/images/qr_code/logi_1080p/angle/" + name + ".jpg")
+        '''Testing the angle to qr code'''
+        size = {
+            'px': 112,
+            'mm': 52,
+            'distance': 400,
+        }
+        qr_code = QRCode(size=size)
+        frame = cv.imread('tests/images/qr_code/logi_1080p/angle/' + name + '.jpg')
         data = qr_code.get_data(frame)
         # Tolerance of 5
         assert data['ret'] == exp[0] and data['angles'][0] == pytest.approx(exp[1], abs=abs(5))
@@ -96,15 +98,18 @@ class TestQRCode:
 
     def test_distance_logi_1080p(self, path, exp):
         '''Testing the distance to qr_code'''
-        qr_size_px = 112
-        qr_size_mm = 52
-        qr_distance = 300
-        qr_code = QRCode(qr_size_px, qr_size_mm, qr_distance)
+        size = {
+            'px': 112,
+            'mm': 52,
+            'distance': 300,
+        }
+        qr_code = QRCode(size=size)
         frame = cv.imread('tests/images/qr_code/logi_1080p/distance/' + path + '.jpg')
         data = qr_code.get_data(frame)
         # Tolerance of 30mm
-        assert data['ret'] == exp[0] and data['distances'][0] == pytest.approx(exp[1], abs=abs(30)) \
-            and data['angles'][0] == pytest.approx(exp[2], abs=abs(5))
+        assert data['ret'] == exp[0] and \
+                data['distances'][0] == pytest.approx(exp[1], abs=abs(30)) and \
+                data['angles'][0] == pytest.approx(exp[2], abs=abs(5))
 
     @pytest.mark.parametrize(
         ['path', 'exp'],
@@ -120,10 +125,12 @@ class TestQRCode:
     @pytest.mark.skip(reason='No way of testing atm because of poor test photos')
     def test_distance_webcam(self, path, exp):
         '''Testing the distance to qr code for the small webcam'''
-        qr_size_px = 120
-        qr_size_mm= 52
-        qr_distance_mm = 320
-        qr_code = QRCode(qr_size_px, qr_size_mm, qr_distance_mm)
+        size = {
+            'px': 120,
+            'mm': 52,
+            'distance': 320,
+        }
+        qr_code = QRCode(size=size)
         frame = cv.imread('tests/images/qr_code/webcam/distance/' + path + '.jpg')
         data = qr_code.get_data(frame)
         assert data['ret'] == exp[0] and data['distances']== pytest.approx(exp[1]) \
@@ -136,8 +143,12 @@ class TestQRCode:
 
     def test_multiple(self, path, exp):
         '''Testing if the code can detect multiple qr codes'''
-        qr_code = QRCode(1, 1, 1)
+        size = {
+            'px': 1,
+            'mm': 1,
+            'distance': 1,
+        }
+        qr_code = QRCode(size=size)
         frame = cv.imread('tests/images/qr_code/multi/' + path)
         data = qr_code.get_data(frame)
-        print(data['ret'])
         assert data['ret'] == exp[0] and len(data['distances']) == exp[1]

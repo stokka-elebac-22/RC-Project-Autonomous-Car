@@ -1,5 +1,5 @@
 '''DOC'''
-import cv2 
+import cv2
 
 if __name__ == '__main__':
     DIRECTORY = 'tests/images/parking_slot_detection/'

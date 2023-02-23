@@ -69,7 +69,6 @@ if __name__ == "__main__":
             'ret': data['ret'],
             'points': data['points']
         }
-        print(qr_code_data['ret'])
         parking_lines = parking_slot_detector.detect_parking_lines(
             frame, qr_code_data)
         parking_slot_detector.show_lines(frame, parking_lines)
@@ -86,3 +85,4 @@ if __name__ == "__main__":
     print("cluter", cluster_atol)
     cam.release()
     cv2.destroyAllWindows()
+    

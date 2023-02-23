@@ -22,10 +22,11 @@ class LaneDetector(LineDetector):
     DOC: Detects driving lane
     '''
 
-    def __init__(self, canny: list[int, int] = None, blur: int = 5, hough: list[int, int] = None, width=200):
+    def __init__(self, canny: list[int, int] = None, 
+                 blur: int = 5, hough: list[int, int] = None, width=200):
         '''Initialize the Line Detector'''
         LineDetector.__init__(self, canny, blur, hough)
-        self.width = 200
+        self.width = width
 
     def get_region_of_interest(self, image: np.ndarray) -> np.ndarray:
         '''Get the region of interest from image'''
@@ -97,7 +98,6 @@ class LaneDetector(LineDetector):
             start = None
             stop = None
 
-            real_width = 270
             for line in lines:
                 if line is not None:
                     x_1, _, _, _ = line.reshape(4)

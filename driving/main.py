@@ -7,6 +7,8 @@ from computer_vision.qr_code.qr_code import QRCode
 from computer_vision.environment.src.environment import Environment
 from computer_vision.camera_handler.camera import Camera
 from computer_vision.camera_handler.camera_handler import CameraHandler
+from computer_vision.traffic_sign_detection.main import TrafficSignDetector
+from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
 
 # ---------- CONSTANTS ---------- #
 
@@ -15,15 +17,27 @@ if __name__ == '__main__':
     # ---------- INIT ---------- #
     ### init camera ###
     ### init qr code ###
-    QR_CODE_SIZE_PX = 76
-    QR_CODE_SIZE_MM = 52
-    QR_CODE_DISTANCE = 500
-    size = {
-        'px': QR_CODE_SIZE_PX,
-        'mm': QR_CODE_SIZE_MM,
-        'distance': QR_CODE_DISTANCE
+    qr_size = {
+        'px': 76,
+        'mm': 52,
+        'distance': 500
     }
-    qr_code = QRCode(size)
+    qr_code = QRCode(qr_size)
+
+    ### init traffic sign detector ###
+    sign_size = {
+        'px': 10,
+        'mm': 61,
+        'distance': 200
+    }
+    traffic_sign_detection = TrafficSignDetector(size=sign_size)
+
+    ### init lane detector ###
+
+    ### init parking slot detector ###
+    parking_slot_detector = ParkingSlotDetector(
+        hough=[200, 5], iterations=[5, 2])
+
     ### init environment ###
     SIZE = (10, 11)
     WINDOW_WIDTH = 600
@@ -48,11 +62,24 @@ if __name__ == '__main__':
         env_objects: List[Tuple[int, int, int]] = []
 
         ### QR Code ###
-        # qr_code.get_data(frame)
+        # data = qr_code.get_data(frame)
 
         ### Traffic Sign ###
 
         ### Line detection ###
+
+        ### Trafic Sign Detection ###
+        # output_signs = traffic_sign_detection.detect_signs(frame)
+        # traffic_sign_detection.show_signs(frame, output_signs)
+
+        ### Lane Detection ###
+
+        ### Parking Slot Detection ###
+        # parking_lines = parking_slot_detector.detect_parking_lines(frame, data)
+        # parking_lines.append(
+        #     parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
+        # parking_slot_detector.show_lines(frame, parking_lines)
+
 
         # ---------- UPDATE ENVIRONMENT ---------- #
         # Insert objects into the environment

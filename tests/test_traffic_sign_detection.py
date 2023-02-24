@@ -2,16 +2,8 @@
 import pytest
 import cv2
 from computer_vision.traffic_sign_detection.main import TrafficSignDetector
-<<<<<<< HEAD
-PATH = 'tests/images/traffic_sign'
 
-=======
-<<<<<<< HEAD
 PATH = "tests/images/traffic_sign"
-=======
-PATH = 'tests/images/traffic_sign'
->>>>>>> b852c1cd23eb363806578fc5271647f31dd41c48
->>>>>>> 057f240
 
 cases_ok = [
     ('1.jpg', 1),

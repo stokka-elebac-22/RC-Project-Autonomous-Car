@@ -1,6 +1,6 @@
 """Importing necessary libraries"""
-import cv2
 from typing import TypedDict
+import cv2
 
 SignSize = TypedDict('SignSize', {
     'px': int,
@@ -12,7 +12,7 @@ class TrafficSignDetector:
     """
     DOC:
     """
-    
+
     def __init__(
             self,
             model='computer_vision/traffic_sign_detection/stop_sign_model.xml',
@@ -30,7 +30,7 @@ class TrafficSignDetector:
             self.size['mm'] = 1
         if self.size.get('distance') is None:
             self.size['distance'] = 1
-        
+
     def detect_signs(self, image):
         '''Detect the signs based on the model used'''
         signs = self.cascade.detectMultiScale(image)
@@ -47,8 +47,6 @@ class TrafficSignDetector:
         for (x_coordinate, y_coordinate, width, height) in signs:
             cv2.rectangle(image, (x_coordinate, y_coordinate),
                           (x_coordinate+width, y_coordinate+height), (255, 0, 0), 5)
-
-
 
 if __name__ == '__main__':
     img = cv2.imread('computer_vision/traffic_sign_detection/images/test/1.jpg')

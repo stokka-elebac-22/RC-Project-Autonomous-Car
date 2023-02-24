@@ -1,6 +1,13 @@
 '''Importing libraries'''
+import os
+import sys
 from parking_slot_detection import ParkingSlotDetector
 import cv2
+
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+from qr_code.qr_code import QRCode
 
 def nothing(_):
     '''Empty function'''
@@ -12,6 +19,12 @@ if __name__ == "__main__":
     QR_SIZE_PX = 76
     QR_SIZE_MM = 52
     QR_DISTANCE = 500
+    qr_size = {
+        'px': 76,
+        'mm': 52,
+        'distance': 500
+    }
+    qr_code = QRCode(size=qr_size)
 
     # Trackbars
     cv2.namedWindow('Trackbars')
@@ -51,13 +64,25 @@ if __name__ == "__main__":
 
         # Commented this out, because it did not work. Need to call it correctly
 
-        # # parking_lines = parking_slot_detector.detect_parking_lines(
-        # # frame, QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
-        # parking_slot_detector.show_lines(frame, parking_lines)
+        data = qr_code.get_data(frame)
+        qr_code_data = {
+            'ret': data['ret'],
+            'points': data['points']
+        }
+        parking_lines = parking_slot_detector.detect_parking_lines(
+            frame, qr_code_data)
+        parking_slot_detector.show_lines(frame, parking_lines)
         cv2.imshow('frame', frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
+    print("canny", canny_low_thr, canny_high_thr)
+    print("hough", hough_min_length, hough_max_gap)
+    print("blur", gaussian_kernel)
+    print("iter", dilate_iter, erode_iter)
+    print("filter", filter_atol_slope, filter_atol_intercept)
+    print("cluter", cluster_atol)
     cam.release()
     cv2.destroyAllWindows()
+    

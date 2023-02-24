@@ -9,18 +9,15 @@ __email__ = 'asbjorn@maxit-as.com'
 __status__ = 'Testing'
 
 import sys
-import time
 from typing import Tuple
-# from defines import *
 from camera_handler.camera_handler import CameraHandler, VideoThread
 from traffic_sign_detection.main import TrafficSignDetector
-from qr_code.qr_code import QRCode, DisplayQRCode
+from qr_code.qr_code import QRCode
 from PyQt6 import QtWidgets, uic, QtCore
 from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
 # from pyqtgraph import PlotWidget, plot
 # from random import randint
 import numpy as np
-
 
 class Worker(QObject, ):  # pylint: disable=R0903
     '''Worker thread'''
@@ -34,11 +31,12 @@ class Worker(QObject, ):  # pylint: disable=R0903
         self.cam_handler.refresh_camera_list()
         self.finished.emit()
 
+
 class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
-    """Class handling Qt GUI control"""
-    def __init__(self, ui_file, connection: tuple[str, int], fullscreen):
+    '''Class handling Qt GUI control'''
+    def __init__(self, ui_file, connection: Tuple[str, int], fullscreen):
         self.fps_count = 0
-        self.output_data = ""
+        self.output_data = ''
         self.connection_details = connection
         self.camera_handler = CameraHandler()
         # Create an instance of QtWidgets.QApplication
@@ -56,7 +54,7 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
             self.findChild(QtWidgets.QLabel, 'input_img_1'),
             self.findChild(QtWidgets.QLabel, 'input_img_2')
         ]
-        
+
         size = {
             'px': 76,
             'mm': 52,
@@ -65,13 +63,13 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
 
         self.qr_code = QRCode(size)
         self.stop_sign_detector = TrafficSignDetector('stop_sign_model.xml')
-        
+
         self.img_output = self.findChild(QtWidgets.QLabel, 'output_img')
         self.output_text = self.findChild(QtWidgets.QLabel, 'output_lbl')
         self.refresh_webcam_list()
 
-        
-        
+
+
         self.timer = QtCore.QTimer()
         self.timer.setInterval(500)
         self.timer.timeout.connect(self.update_label_data)
@@ -87,21 +85,22 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
         '''Updates the image_label with a new opencv image'''
+        self.fps_count += 1
+
+        qr_output = ''
         output_frame = cv_img
         qt_img = self.camera_handler.convert_cv_qt(
             cv_img, self.img_input[0].width(), self.img_input[0].height())
         current_qr_data = self.qr_code.get_data(cv_img)
-        output_data = 'Data: \n'
+
         # print(current_qr_data)
         if current_qr_data['ret']:
             self.qr_code.display(output_frame, current_qr_data, verbose=0)
             for i in range(len(current_qr_data['distances'])):
-                output_data += \
-                    f"QR-Code {str(i)} \n \
-                        Distance: {round(current_qr_data['distances'][i])} \n \
-                        Angle: {current_qr_data['angles'][i]} \n"
-
-                output_data += 'Data: ' + current_qr_data['info'][i] + '\n'
+                qr_output += f"-QR-Code {i} \n \
+                    Distance: {round(current_qr_data['distances'][i], 5)} \
+                    Angle: {round(current_qr_data['angles'][i], 5)} \n  \
+                    Data: {current_qr_data['info'][i]}"
 
         current_stop_sign = self.stop_sign_detector.detect_signs(cv_img)
         self.stop_sign_detector.show_signs(output_frame, current_stop_sign)
@@ -112,13 +111,16 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         # print('Setting new image')
         self.img_input[0].setPixmap(qt_img)
         self.img_output.setPixmap(output_img)
-        self.output_text.setText(output_data)
+        # self.output_text.setText(output_data)
+        self.output_data = 'Data:\n ' + qr_output
+
+        # self.output_text.setText(output_data)
 
     def refresh_webcam_list(self):
         '''Run a Qthread to check possible webcams and create a list'''
         self.thread = QThread()
         self.worker = Worker(self.camera_handler)
-        self.worker.moveToThread(self.thread)
+        self.worker.moveToThread(self.thread) # pylint: disable=W0201
         self.thread.started.connect(self.worker.update_webcam_list)
         self.worker.finished.connect(self.thread.quit)
         self.worker.finished.connect(self.worker.deleteLater)
@@ -135,7 +137,7 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
                 cbo.addItem(
                     self.camera_handler.get_camera_string(camera['id']))
                 # create the video capture thread
-        self.thread2 = VideoThread(self.thread2 = VideoThread(camera_id=2))  # pylint: disable=W0201
+        self.thread2 = VideoThread(VideoThread(camera_id=2))  # pylint: disable=W0201
         # connect its signal to the update_image slot
         self.thread2.change_pixmap_signal.connect(self.update_image)
         # start the thread
@@ -143,7 +145,8 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     #def update_plot_data(self):
 
     def update_label_data(self):
+        '''Update label data'''
         if self.fps_count > 0:
-            self.output_data += "\nFPS: {}".format(self.fps_count * 2)
+            self.output_data += f'\nFPS: {self.fps_count * 2}'
             self.fps_count = 0
-            self.output_text.setText(self.output_data)
+            self.output_text.setText(self.output_data) # pylint: disable=E0001

@@ -11,14 +11,14 @@ if __name__ == '__main__':
 
     qcd = cv.QRCodeDetector()
 
-    count = 4000
+    COUNT = 4000
     while True:
         frames = []
-        rets = True
+        RETS = True
         for cam in cameras:
             ret, frame = cam[0].read()
             if not ret:
-                rets = False
+                RETS = False
                 break
             cv.imshow(cam[1], frame)
             frames.append((frame, cam[1]))
@@ -27,11 +27,11 @@ if __name__ == '__main__':
             print('Stopping...')
             break
 
-        if not rets:
+        if not RETS:
             continue
 
         if cv.waitKey(1) & 0xFF == ord('c'):
             print('Capturing...')
             for frame, title in frames:
-                cv.imwrite(f'{DIRECTORY}/{title}/{title}_{count}.jpg', frame)
-            count -= 500
+                cv.imwrite(f'{DIRECTORY}/{title}/{title}_{COUNT}.jpg', frame)
+            COUNT -= 500

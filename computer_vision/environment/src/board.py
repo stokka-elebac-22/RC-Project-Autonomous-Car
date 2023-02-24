@@ -1,4 +1,5 @@
 '''Creating the board'''
+from typing import Tuple
 import pygame as pg
 try:
     from lib import Objects
@@ -7,7 +8,7 @@ except ImportError:
 
 class Board:
     '''Display Board'''
-    def __init__(self, dimensions, square_size):
+    def __init__(self, dimensions: Tuple[int, int], square_size: int):
         self.rows = dimensions[0]
         self.cols = dimensions[1]
         self.square_size = square_size
@@ -49,6 +50,6 @@ class Board:
         '''Reset'''
         self.board = new_board
 
-    def insert(self, pos, value):
+    def insert(self, pos: Tuple[int, int], value: int):
         '''Insert in board matrix'''
         self.board[pos[0]][pos[1]] = value

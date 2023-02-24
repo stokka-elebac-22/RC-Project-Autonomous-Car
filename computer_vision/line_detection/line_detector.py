@@ -1,21 +1,20 @@
-"""Import needed libraries"""
+'''Import needed libraries'''
 import cv2
 import numpy as np
 
-
 class LineDetector:
-    """
+    '''
     DOC: Detecting lines
-    """
+    '''
 
     def __init__(self, canny: list[int, int] = None,
                  blur: int = 5,
                  hough: list[int, int] = None,
                  iterations: list[int, int] = None):
-        """
+        '''
         CANNY: [low_threshold, high_threshold]
         HOUGH_LINES: [min_line_length, max_line_gap]
-        """
+        '''
         if canny is None:
             canny = [100, 200]
         if hough is None:
@@ -26,7 +25,7 @@ class LineDetector:
         self.canny_low_thr = canny[0]
         self.canny_high_thr = canny[1]
 
-        self.blur_kernel_size = blur
+        self.blur_kernel_size = blur*2 + 1
 
         self.hough_min_line_length = hough[0]
         self.hough_max_line_gap = hough[1]
@@ -42,7 +41,7 @@ class LineDetector:
         return image
 
     def get_lines(self, image: np.ndarray) -> np.ndarray:
-        """Extract lines on the lane from image"""
+        '''Extract lines on the lane from image'''
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         gaussian_blur = cv2.GaussianBlur(
             gray, (self.blur_kernel_size, self.blur_kernel_size), 0)
@@ -58,17 +57,20 @@ class LineDetector:
         return lines
 
     def show_lines(self, image: np.ndarray, lines: np.ndarray) -> None:
-        """Show the lines on image"""
+        '''Show the lines on image'''
         if lines is not None:
             for line in lines:
                 if line is not None:
-                    x_1, y_1, x_2, y_2 = line.reshape(4)
-                    cv2.line(image, (x_1, y_1), (x_2, y_2), (255, 0, 0), 5)
+                    try: 
+                        x_1, y_1, x_2, y_2 = line.reshape(4)
+                        cv2.line(image, (x_1, y_1), (x_2, y_2), (255, 0, 0), 5)
+                    except cv2.error:
+                        print("error")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     frame = cv2.imread(
-        "computer_vision/line_detection/assets/bike_park.jpg")
+        'computer_vision/line_detection/assets/bike_park.jpg')
 
     SCALE_PERCENT = 30  # percent of original size
     new_width = int(frame.shape[1] * SCALE_PERCENT / 100)

@@ -1,13 +1,19 @@
 '''Library'''
+from typing import TypedDict, Tuple
 import dataclasses
 import math
 import pygame as pg
 
+ObjectParam = TypedDict('ObjectParam', {
+    'color': pg.Color,
+    'thickness': int,
+})
+
 @dataclasses.dataclass
 class Object:
     '''Object'''
-    def __init__(self, id, name, param):
-        self.id = id # pylint: disable=C0103
+    def __init__(self, object_id: int, name: str, param: ObjectParam):
+        self.id = object_id # pylint: disable=C0103
         self.name = name
         self.color = param['color']
         self.thickness = param['thickness']
@@ -24,16 +30,23 @@ class Objects:
 
     def _init_objects(self):
         '''Initializing the object dict'''
+        # Choose object id wisely. It should have space to expand if needed,
+        # but not exceed 255 (uncesseary use of space)
         obj = [
             # Basic stars at 0
             ('None', 0),
             ('Hindrance', 1),
-            ('Path', 2),
-            # Optional in map but necessary in a* start at 10
+            ('EndPoint', 2),
+            ('Path', 3),
+            # Other basic
             ('Car', 10),
-            ('QR', 11),
-            # Signs start at 20
-            ('Stop', 20),
+            # Parking
+            ('QR', 20),
+            # Lines
+            ('ParkingLine', 30),
+            ('LaneLine', 31),
+            # Signs
+            ('Stop', 40),
         ]
         for i in obj:
             self.objects[i[0]] = i[1]
@@ -63,6 +76,14 @@ class Objects:
             },
             {
                 'id': 2,
+                'name': 'EndPoint',
+                'param': {
+                    'color': pg.Color(22, 80, 22),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 3,
                 'name': 'Path',
                 'param': {
                     'color': pg.Color(50, 80, 180),
@@ -78,7 +99,7 @@ class Objects:
                 }
             },
             {
-                'id': 11,
+                'id': 20,
                 'name': 'QR',
                 'param': {
                     'color': pg.Color(150, 80, 180),
@@ -86,7 +107,23 @@ class Objects:
                 }
             },
             {
-                'id': 20,
+                'id': 30,
+                'name': 'ParkingLine',
+                'param': {
+                    'color': pg.Color(227,174,87),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 31,
+                'name': 'LaneLine',
+                'param': {
+                    'color': pg.Color(204, 204, 150),
+                    'thickness': 0
+                }
+            },
+            {
+                'id': 40,
                 'name': 'Stop',
                 'param': {
                     'color': pg.Color(255, 0, 0),
@@ -98,15 +135,15 @@ class Objects:
             new_object = Object(i['id'], i['name'], i['param'])
             self.object_data[i['id']] = new_object
 
-    def get_data(self, obj):
+    def get_data(self, obj: Object) -> Object:
         '''
         Get the data of the object
         Each object have:
         color, thickness
         '''
         if not isinstance(obj, (int, float)):
-            obj = self.objects[obj] # convert to correct keyname
-        return self.object_data[int(obj)]
+            obj = self.objects.get(obj) # convert to correct keyname
+        return self.object_data.get(int(obj))
 
 
 class TwoWayDict(dict):
@@ -131,25 +168,48 @@ class TwoWayDict(dict):
         '''Returns the number of connections'''
         return dict.__len__(self) // 2
 
+NodeData = TypedDict('NodeData', {
+    'position': Tuple[int, int],
+    'h_value': float,
+    'f_value': int,
+    'parent': None,
+    'weight': int,
+    'object_id': int,
+})
+
 @dataclasses.dataclass
 class Node:
     '''Node'''
-    # newid = itertools.count().__next__
-    def __init__(self, position, h_value, parent=None, f_value=None) -> None:
-        # self.id = Node.newid() # pylint: disable=C0103
-        self.position = position
-        self.parent: Node = parent
+    def __init__(self, data: NodeData) -> None:
+        self.position = data.get('position')
+        if self.position is None:
+            self.position = (0,0)
+        self.parent: Node = data.get('parent')
 
-        self.g_value = 0
-        self.h_value = h_value
+        self.object_id: Object = data.get('object_id')
+        if self.object_id is None:
+            self.object_id = 0
+
+        self.weight = data.get('weight')
+        if self.weight is None:
+            self.weight = 0
+
+        self.g_value = data.get('g_value')
+        if self.g_value is None:
+            self.g_value = 0
+
+        self.h_value = data.get('h_value')
 
         if self.parent is not None:
             self.g_value = self.parent.g_value + math.sqrt(
                 abs(self.parent.position[0]-self.position[0])**2 +
                 abs(self.parent.position[1]-self.position[1]))
-        self.f_value = f_value
-        if f_value is None: # rarly used
-            self.f_value = self.g_value + self.h_value
+
+        self.f_value = data.get('f_value')
+        if self.h_value is not None and self.weight is not None and self.g_value is not None:
+            self.f_value = self.g_value + self.h_value + self.weight
+        elif self.f_value is None:
+            self.f_value = 0
 
     def update(self):
         '''Update the node'''
@@ -158,7 +218,7 @@ class Node:
             self.g_value = self.parent.g_value + math.sqrt(
                 abs(self.parent.position[0]-self.position[0])**2 +
                 abs(self.parent.position[1]-self.position[1]))
-        self.f_value = self.g_value + self.h_value
+        self.f_value = self.g_value + self.h_value + self.weight
 
     def __eq__(self, other):
         return self.position == other.position

@@ -115,7 +115,7 @@ class LaneDetector(LineDetector):
 
     def get_next_point(self, image: np.ndarray, lines:np.ndarray) -> Tuple[int, int]:
         '''Get a point on the center line'''
-        if lines is None:
+        if lines is None or len(lines) < 2 or lines[0] is None or lines[1] is None:
             return None
 
         coordinates_x = [lines[0][0], lines[1][0]]
@@ -267,6 +267,13 @@ class LaneDetector(LineDetector):
         }
 
         return data
+    
+    def get_lane_line(self, image):
+        all_lines = self.get_lines(image)
+        avg_lines = self.get_average_lines(all_lines)
+        avg_lines = [self.get_line_coordinates_from_parameters(
+            frame, line) for line in avg_lines]
+        return avg_lines
 
 
 if __name__ == '__main__':
@@ -288,10 +295,7 @@ if __name__ == '__main__':
         # ret, frame = cap.read()
         # if cv2.waitKey(1) == ord('q') or ret == False:
         #    break
-        all_lines = lane_detector.get_lines(frame)
-        avg_lines = lane_detector.get_average_lines(all_lines)
-        avg_lines = [lane_detector.get_line_coordinates_from_parameters(
-            frame, line) for line in avg_lines]
+        avg_lines = lane_detector.get_lane_line(frame)
         lane_detector.show_lines(frame, avg_lines)
         center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)
         if center_diff is not None:
@@ -304,26 +308,27 @@ if __name__ == '__main__':
 
         next_point = lane_detector.get_next_point(frame, avg_lines)
 
-        frame = cv2.circle(
-            frame, (next_point[0], next_point[1]), 5, (0, 0, 255), 5)
+        if next_point is not None:
+            frame = cv2.circle(
+                frame, (next_point[0], next_point[1]), 5, (0, 0, 255), 5)
 
-        NO_NONE = True
-        if course_data is not None:
-            for key, value in course_data.items():
-                if value is None:
-                    NO_NONE = False
-                    break
+            NO_NONE = True
+            if course_data is not None:
+                for key, value in course_data.items():
+                    if value is None:
+                        NO_NONE = False
+                        break
 
-            if NO_NONE:
-                images = lane_detector.show_course(
-                        frame,
-                        course_data['warped_shape'],
-                        course_data['points'],
-                        course_data['perspective_transform'],
-                        course_data['polys']
-                    )
-                cv2.imshow('warped', images['warped'])
-                cv2.imshow('course', images['weighted'])
+                if NO_NONE:
+                    images = lane_detector.show_course(
+                            frame,
+                            course_data['warped_shape'],
+                            course_data['points'],
+                            course_data['perspective_transform'],
+                            course_data['polys']
+                        )
+                    cv2.imshow('warped', images['warped'])
+                    cv2.imshow('course', images['weighted'])
         cv2.imshow('image', frame)
 
         # cv2.imshow('frame', frame)

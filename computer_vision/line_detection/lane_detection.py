@@ -22,18 +22,20 @@ class LaneDetector(LineDetector):
     DOC: Detects driving lane
     '''
 
-    def __init__(self, canny: list[int, int] = None, blur: int = 5, hough: list[int, int] = None):
+    def __init__(self, canny: list[int, int] = None, 
+                 blur: int = 5, hough: list[int, int] = None, width=200):
         '''Initialize the Line Detector'''
         LineDetector.__init__(self, canny, blur, hough)
+        self.width = width
 
     def get_region_of_interest(self, image: np.ndarray) -> np.ndarray:
         '''Get the region of interest from image'''
-        offset = 250
+        offset = 100
         height = image.shape[0]
         width = image.shape[1]
         triangle = np.array(
             [[(0, height-offset), (width, height-offset),
-              (int(width/2), int(height / 2.7))]]
+              (int(width/2), int(height / 2.5))]]
         )
         black_image = np.zeros_like(image)
         mask = cv2.fillPoly(black_image, triangle, (255, 255, 255))
@@ -96,7 +98,6 @@ class LaneDetector(LineDetector):
             start = None
             stop = None
 
-            real_width = 200
             for line in lines:
                 if line is not None:
                     x_1, _, _, _ = line.reshape(4)
@@ -108,7 +109,7 @@ class LaneDetector(LineDetector):
             diff = None
             if start is not None and stop is not None:
                 center_lane = start + (stop-start)/2
-                diff = (center_car - center_lane)/width * real_width
+                diff = (center_car - center_lane)/width * self.width
             return diff
         return None
 

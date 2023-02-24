@@ -3,6 +3,8 @@ __init__.py: Initialization class for the
 Computer vision control panel GUI tool.
 '''
 # This causes linting error because it is similar in another file
+# as described in: https://www.pythonclear.com/programs/python-
+#                   file-header/#Format_for_writing_Python_File_Header
 # __author__ = 'Asbjørn Stokka'
 # __copyright__ = 'Copyright 2023, DATBAC'
 # __credits__ = ['Asbjørn Stokka']
@@ -15,6 +17,7 @@ Computer vision control panel GUI tool.
 import os
 import sys
 import argparse
+import yaml
 from main_window_ui import Ui
 
 if __name__ == '__main__':
@@ -31,12 +34,28 @@ if __name__ == '__main__':
     parser.add_argument('--storage', dest='storage',
                         default='tmp_db.db',
                         help='Choose SQLite storage (default: tmp_db.db)')
+    parser.add_argument('--headless', dest='headless',
+                        default='false',
+                        help='activate headless-mode (default: false)')
+    parser.add_argument('--config-file', dest='config_file',
+                        default='config',
+                        help='name of config file (default: config)')
+
 
     args = parser.parse_args()
     if not os.path.isfile(args.theme + '.ui'):
         print('Unable to locate the theme file, \
             please check if it exists in the script folder')
         sys.exit(0)
+
+    if not os.path.isfile(args.config_file + '.yml'):
+        print('Unable to locate the config file, \
+            please check if it exists in the script folder')
+        sys.exit(0)
+
+    with open(args.config_file + '.yml') as f:
+        config = yaml.load(f, Loader=SafeLoader)
+
     FULL_SCREEN = args.full_screen.lower() in ['true', 1]
     os.environ['QT_DEVICE_PIXEL_RATIO'] = '0'
     os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
@@ -44,7 +63,6 @@ if __name__ == '__main__':
     os.environ['QT_SCALE_FACTOR'] = '1'
 
     HOST = '10.0.10.95'
-    # socket.gethostname()  # when both code is running on same pc
     PORT = 2004  # socket server port number
     window = Ui(args.theme + '.ui', (HOST, PORT), FULL_SCREEN)
     sys.exit(0)

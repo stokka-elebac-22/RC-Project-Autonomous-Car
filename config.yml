@@ -1,0 +1,9 @@
+---
+  headless: false
+  network:
+    host:
+    port:
+  serial:
+    active: false
+    port: 0
+...

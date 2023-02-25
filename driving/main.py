@@ -2,8 +2,8 @@
 The main file for the driving logic.
 This file should only contain short code
 '''
-import yaml
 from typing import Tuple, List
+import yaml
 from computer_vision.qr_code.qr_code import QRCode
 from computer_vision.environment.src.environment import Environment
 # from computer_vision.camera_handler.camera import Camera
@@ -18,7 +18,6 @@ if __name__ == '__main__':
     with open('config.yaml', 'r', encoding=str) as config:
         yaml.safe_load(config)
 
-    print(config)
     # ---------- INIT ---------- #
     ### init camera ###
     ### init qr code ###

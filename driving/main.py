@@ -2,6 +2,12 @@
 The main file for the driving logic.
 This file should only contain short code
 '''
+import sys
+import os
+
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
 from computer_vision.qr_code.qr_code import QRCode
 from computer_vision.environment.src.environment import Environment
 from computer_vision.traffic_sign_detection.main import TrafficSignDetector

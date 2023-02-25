@@ -2,10 +2,11 @@
 The main file for the driving logic.
 This file should only contain short code
 '''
+import yaml
 from typing import Tuple, List
 from computer_vision.qr_code.qr_code import QRCode
 from computer_vision.environment.src.environment import Environment
-from computer_vision.camera_handler.camera import Camera
+# from computer_vision.camera_handler.camera import Camera
 from computer_vision.camera_handler.camera_handler import CameraHandler
 from computer_vision.traffic_sign_detection.main import TrafficSignDetector
 from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
@@ -14,6 +15,10 @@ from computer_vision.line_detection.parking_slot_detection import ParkingSlotDet
 
 # ---------- MAIN ---------- #
 if __name__ == '__main__':
+    with open('config.yaml', 'r', encoding=str) as config:
+        yaml.safe_load(config)
+
+    print(config)
     # ---------- INIT ---------- #
     ### init camera ###
     ### init qr code ###

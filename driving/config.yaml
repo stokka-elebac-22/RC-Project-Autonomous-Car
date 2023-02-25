@@ -1,0 +1,24 @@
+---
+QR_code_size:
+- px: !!int 76
+- mm: !!int 52
+- distance: !!int 500
+---
+Sign_size:
+- px: !!int 10
+- mm: !!int 61
+- distance: !!int 200
+---
+Parking_slot_detector:
+- hough0: !!int 200
+- hough1: !!int 5
+- iterations0: !!int 5
+- iterations1: !!int 2
+---
+Environment:
+- sizex: !!int 10
+- sizey: !!int 11
+---
+GUI:
+- window_width: !!int 600
+...

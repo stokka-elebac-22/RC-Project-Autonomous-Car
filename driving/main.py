@@ -6,6 +6,7 @@ import sys
 import os
 from typing import Tuple, List
 import yaml
+from lib import Status, Action
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -74,6 +75,9 @@ if __name__ == '__main__':
         camera_id = available_cameras[0].get('id')
         # CAMERA = Camera(camera_id)
 
+    STATUS: Status = None
+    action = Action
+
     # ---------- LOOP ---------- #
     while True:
         # ---------- GET CAMERA INFORMATION---------- #
@@ -111,3 +115,6 @@ if __name__ == '__main__':
                 env_objects[0])
 
         # ---------- ACTION ---------- #
+        match STATUS.active:
+            case 'move':
+                action.move(1, 0, 0)

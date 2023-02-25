@@ -61,8 +61,11 @@ class LineDetector:
         if lines is not None:
             for line in lines:
                 if line is not None:
-                    x_1, y_1, x_2, y_2 = line.reshape(4)
-                    cv2.line(image, (x_1, y_1), (x_2, y_2), (255, 0, 0), 5)
+                    try: 
+                        x_1, y_1, x_2, y_2 = line.reshape(4)
+                        cv2.line(image, (x_1, y_1), (x_2, y_2), (255, 0, 0), 5)
+                    except cv2.error:
+                        print("error")
 
 
 if __name__ == '__main__':

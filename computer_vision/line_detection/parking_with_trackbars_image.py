@@ -39,7 +39,13 @@ if __name__ == "__main__":
     cv2.createTrackbar('Filter atol intercept', 'Trackbars', 20, 20, nothing)
     cv2.createTrackbar('Cluster atol', 'Trackbars', 5, 20, nothing)
 
+    frame = cv2.imread(
+        'tests/images/parking_slot_detection/75degrees.jpg')
+
+    #frame = cv2.imread('computer_vision/line_detection/assets/parking/10.png')
+
     while True:
+        copy = frame.copy()
         canny_low_thr = cv2.getTrackbarPos('Canny low threshold','Trackbars')
         canny_high_thr = cv2.getTrackbarPos('Canny high threshold','Trackbars')
         hough_min_length = cv2.getTrackbarPos('Hough minimum line length','Trackbars')
@@ -60,19 +66,19 @@ if __name__ == "__main__":
             cluster_atol = cluster_atol
         )
 
-        ret, frame = cam.read()
-
-        # Commented this out, because it did not work. Need to call it correctly
-
-        data = qr_code.get_data(frame)
+        data = qr_code.get_data(copy)
         qr_code_data = {
             'ret': data['ret'],
             'points': data['points']
         }
+
         parking_lines = parking_slot_detector.detect_parking_lines(
-            frame, qr_code_data)
-        parking_slot_detector.show_lines(frame, parking_lines)
-        cv2.imshow('frame', frame)
+            copy, qr_code_data)
+        if parking_lines is not None:
+            parking_lines.append(
+                parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
+        parking_slot_detector.show_lines(copy, parking_lines)
+        cv2.imshow('frame', copy)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
@@ -85,4 +91,3 @@ if __name__ == "__main__":
     print("cluter", cluster_atol)
     cam.release()
     cv2.destroyAllWindows()
-    

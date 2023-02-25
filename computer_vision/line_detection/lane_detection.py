@@ -269,11 +269,12 @@ class LaneDetector(LineDetector):
         return data
     
     def get_lane_line(self, image):
-        all_lines = self.get_lines(image)
-        avg_lines = self.get_average_lines(all_lines)
-        avg_lines = [self.get_line_coordinates_from_parameters(
-            frame, line) for line in avg_lines]
-        return avg_lines
+        '''get lane lines'''
+        lines = self.get_lines(image)
+        average_lines = self.get_average_lines(lines)
+        average_lines = [self.get_line_coordinates_from_parameters(
+            frame, line) for line in average_lines]
+        return average_lines
 
 
 if __name__ == '__main__':

@@ -6,6 +6,7 @@ from computer_vision.qr_code.qr_code import QRCode
 from computer_vision.environment.src.environment import Environment
 from computer_vision.traffic_sign_detection.main import TrafficSignDetector
 from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
+from computer_vision.line_detection.lane_detection import LaneDetector
 
 # ---------- CONSTANTS ---------- #
 
@@ -31,6 +32,8 @@ if __name__ == '__main__':
 
     ### init lane detector ###
 
+    lane_detector = LaneDetector([50, 150], 5, [100, 250])
+
     ### init parking slot detector ###
     parking_slot_detector = ParkingSlotDetector(
         hough=[200, 5], iterations=[5, 2])
@@ -49,11 +52,14 @@ if __name__ == '__main__':
 
         ### Line detection ###
 
-        ### Trafic Sign Detection ###
+        ### Traffic Sign Detection ###
         # output_signs = traffic_sign_detection.detect_signs(frame)
         # traffic_sign_detection.show_signs(frame, output_signs)
 
         ### Lane Detection ###
+        # avg_lines = lane_detector.get_lane_line(frame)
+        # lane_detector.show_lines(frame, avg_lines)
+        # next_point = lane_detector.get_next_point(frame, avg_lines)
 
         ### Parking Slot Detection ###
         # parking_lines = parking_slot_detector.detect_parking_lines(frame, data)

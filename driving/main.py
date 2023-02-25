@@ -25,38 +25,42 @@ from computer_vision.line_detection.lane_detection import LaneDetector
 
 # ---------- MAIN ---------- #
 if __name__ == '__main__':
-    with open('config.yaml', 'r', encoding=str) as config:
-        yaml.safe_load(config)
+    with open('driving/config.yaml', 'r', encoding='utf8') as file:
+        config = yaml.safe_load(file)
 
     # ---------- INIT ---------- #
     ### init camera ###
     ### init qr code ###
     qr_size = {
-        'px': 76,
-        'mm': 52,
-        'distance': 500
+        'px': config['qr_code_size']['px'],
+        'mm': config['qr_code_size']['mm'],
+        'distance': config['qr_code_size']['distance']
     }
     qr_code = QRCode(qr_size)
 
     ### init traffic sign detector ###
     sign_size = {
-        'px': 10,
-        'mm': 61,
-        'distance': 200
+        'px': config['sign_size']['px'],
+        'mm': config['sign_size']['mm'],
+        'distance': config['sign_size']['distance']
     }
     traffic_sign_detection = TrafficSignDetector(size=sign_size)
 
     ### init lane detector ###
 
-    lane_detector = LaneDetector([50, 150], 5, [100, 250])
+    lane_detector = LaneDetector(
+        config['lane_detector']['canny'],
+        config['lane_detector']['blur'],
+        config['lane_detector']['hough'])
 
     ### init parking slot detector ###
     parking_slot_detector = ParkingSlotDetector(
-        hough=[200, 5], iterations=[5, 2])
+        hough=config['parking_slot_detector']['hough'],
+        iterations=config['parking_slot_detector']['iterations'])
 
     ### init environment ###
-    SIZE = (10, 11)
-    WINDOW_WIDTH = 600
+    SIZE = (config['environment']['sizex'], config['environment']['sizey'])
+    WINDOW_WIDTH = config['gui']['window_width']
     WINDOW_SIZE = (WINDOW_WIDTH* (SIZE[1]/SIZE[0]), WINDOW_WIDTH)
     env= Environment(SIZE, 1, {'object_id': 10})
 

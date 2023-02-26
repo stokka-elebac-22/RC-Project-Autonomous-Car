@@ -267,7 +267,7 @@ class LaneDetector(LineDetector):
         }
 
         return data
-    
+
     def get_lane_line(self, image):
         '''Get lane lines'''
         all_lines = self.get_lines(image)

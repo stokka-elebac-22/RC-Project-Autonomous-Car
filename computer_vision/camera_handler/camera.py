@@ -1,5 +1,6 @@
 '''Camera'''
 import cv2 as cv
+import numpy as np
 
 class Camera:
     '''Camera'''
@@ -7,7 +8,6 @@ class Camera:
         self.camera_id = camera_id
         self.delay = delay
         self.window_name = window_name
-        self.qcd = cv.QRCodeDetector()
         self.cap = cv.VideoCapture(self.camera_id)
         self.qr_code = qr_code
 
@@ -35,11 +35,11 @@ class Camera:
         cv.imshow(name, img)
         cv.waitKey(0)
 
-    def read(self, name=None, resize=1):
+    def read(self, name=None, resize=1) -> tuple[bool, np.ndarray]:
         '''Read'''
         if not name:
             ret, frame = self.cap.read()
             return ret, frame
         frame = cv.imread(name)
         frame = cv.resize(frame, (0, 0), fx = resize, fy = resize)
-        return frame
+        return True, frame

@@ -76,7 +76,7 @@ if __name__ == '__main__':
         camera_id = available_cameras[0].get('id')
         # CAMERA = Camera(camera_id)
 
-    STATUS: Status = None
+    STATUS: Status = Status()
     action = Action
 
     # ---------- LOOP ---------- #

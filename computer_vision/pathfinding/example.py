@@ -46,9 +46,18 @@ if __name__ == '__main__':
     parking_slot_detector = ParkingSlotDetector(
         hough=[200, 5], iterations=[5, 2])
     lane_detector = LaneDetector()
-    traffic_sign_detector = TrafficSignDetector(
-        size_mm=61, size_px=10, distance=200)
-    qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+    sign_size = {
+        'px': 10,
+        'mm': 61,
+        'distance': 200
+    }
+    qr_size = {
+        'px': 10,
+        'mm': 61,
+        'distance': 200
+    }
+    traffic_sign_detection = TrafficSignDetector(size=sign_size)
+    qr_code = QRCode(qr_size)
 
     TILE_SIZE = display.window_size[1]/path_finding.size[0]
 
@@ -79,7 +88,7 @@ if __name__ == '__main__':
             qr_distance_y = qr_data['distances'][0]
             obstacles.append({'values': [
                 (qr_distance_x, qr_distance_y)],
-                'distance': True, 'object_id': 11})
+                'distance': True, 'object_id': 20})
 
         # Use ParkingSlot Module
         qr_code_data = {
@@ -95,7 +104,7 @@ if __name__ == '__main__':
             for lines in parking_lines:
                 obstacles.append({'values': [
                                  (lines[0], lines[1]), (lines[2], lines[3])],
-                    'distance': False, 'object_id': 3})
+                    'distance': False, 'object_id': 30})
 
         # Use lane Module
         all_lines = lane_detector.get_lines(frame)
@@ -107,7 +116,7 @@ if __name__ == '__main__':
                 if line is not None:
                     obstacles.append({'values': [
                                      (line[0], line[1]), (line[2], line[3])],
-                        'distance': False, 'object_id': 4})
+                        'distance': False, 'object_id': 31})
 
             center_diff = lane_detector.get_diff_from_center_info(
                 frame, avg_lines)
@@ -119,15 +128,15 @@ if __name__ == '__main__':
                 CENTER_DIFF_X = center_diff
                 DESIRED_DISTANCE_FORWARD = 100
         # Use Traffic Sign module
-        signs = traffic_sign_detector.detect_signs(frame)
+        signs = traffic_sign_detection.detect_signs(frame)
         if signs is not None:
             for sign in signs:
                 distances = path_finding.point_to_distance(
                     (sign[0]+sign[2]/2, sign[1]))
                 distance_x = distances[0]
-                distance_y = traffic_sign_detector.get_distance()
+                distance_y = traffic_sign_detection.get_distance()
                 obstacles.append({'values': [
-                                 (distance_x, distance_y)], 'distance': True, 'object_id': 5})
+                                 (distance_x, distance_y)], 'distance': True, 'object_id': 40})
 
         path_finding.insert_objects(obstacles)
         # TODO: Remove later since Test point # pylint: disable=W0511
@@ -135,6 +144,8 @@ if __name__ == '__main__':
         path_finding.update_display(path)
         path_finding.display.display()
 
+
+        # CATMULL SPLINE
         TENSION = 0.
 
         new_path = [(value[1], value[0])
@@ -158,6 +169,7 @@ if __name__ == '__main__':
         # if positive: rotate clockwise
         # else rotate counter clockwise
 
+        # DRAW CATMULL LINE
         line_color = (255, 0, 0)
 
         pg.display.flip()

@@ -52,7 +52,8 @@ if __name__ == '__main__':
     lane_detector = LaneDetector(
         config['lane_detector']['canny'],
         config['lane_detector']['blur'],
-        config['lane_detector']['hough'])
+        config['lane_detector']['hough'],
+        config['lane_detector']['width'])
 
     ### init parking slot detector ###
     parking_slot_detector = ParkingSlotDetector(
@@ -87,8 +88,6 @@ if __name__ == '__main__':
 
         ### QR Code ###
         # data = qr_code.get_data(frame)
-
-        ### Traffic Sign ###
 
         ### Line detection ###
 

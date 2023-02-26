@@ -17,6 +17,7 @@ except ImportError:
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
+
 from qr_code.qr_code import QRCode
 
 class ParkingSlotDetector(LineDetector):
@@ -52,10 +53,10 @@ class ParkingSlotDetector(LineDetector):
         roi = cv2.bitwise_and(image, mask)
         return roi
 
-    def cluster_lines(self, lines: np.ndarray) -> list[np.ndarray, np.ndarray]: # pylint: disable=R0914
-        '''Cluster lines that are close to each other'''
-        clustered_lines = []
-        clustered_coords = []
+    def get_group_lines(self, lines: np.ndarray) -> list[list[np.ndarray], list[np.ndarray]]: # pylint: disable=R0914
+        '''Group lines that are close to each other'''
+        group_lines = []
+        group_coords = []
         for line in lines:
             x_1, y_1, x_2, y_2 = line.reshape(4)
             with warnings.catch_warnings():
@@ -65,30 +66,47 @@ class ParkingSlotDetector(LineDetector):
                     slope = parameters[0]
                     intercept = parameters[1]
 
-                    if len(clustered_lines) == 0:
-                        clustered_lines.append([(slope, intercept)])
-                        clustered_coords.append(
+                    if len(group_lines) == 0:
+                        group_lines.append([(slope, intercept)])
+                        group_coords.append(
                             [np.array([x_1, y_1, x_2, y_2])])
                     else:
                         not_stopped = True
                         # Check which cluster the line fits into
-                        for i, cluster in enumerate(clustered_lines):
-                            cluster_line_avg = np.average(cluster, axis=0)
-                            if np.isclose(cluster_line_avg, (slope, intercept),
+                        for i, group in enumerate(group_lines):
+                            avg_line = np.average(group, axis=0)
+                            if np.isclose(avg_line, (slope, intercept),
                                           atol=self.cluster_atol, rtol=1e-9).all():
-                                cluster.append((slope, intercept))
-                                clustered_coords[i].append(
+                                group.append((slope, intercept))
+                                group_coords[i].append(
                                     np.array([x_1, y_1, x_2, y_2]))
                                 not_stopped = False
                                 break
                         # If not, a new cluster
                         if not_stopped:
-                            clustered_lines.append([(slope, intercept)])
-                            clustered_coords.append(
+                            group_lines.append([(slope, intercept)])
+                            group_coords.append(
                                 [np.array([x_1, y_1, x_2, y_2])])
                 except np.RankWarning:
                     pass
+        return group_lines, group_coords
+    
+    def get_clustered_lines(self, lines: list[np.ndarray]) -> list[np.ndarray, np.ndarray]:
+        '''Retrieve the clustered lines'''
+        group_lines, group_coords = self.get_group_lines(lines)
+
+        # calculate average line and coordinates of the clustered lines
+        clustered_coords = []
+        clustered_lines = []
+        for i, cluster in enumerate(group_lines):
+            line = np.average(cluster, axis=0)
+            clustered_lines.append(line)
+            min_x, max_x = self.get_min_max_x(group_coords[i])
+            coordinates = self.get_line_coordinates_from_parameters(
+                min_x, max_x, line)
+            clustered_coords.append(coordinates)
         return clustered_lines, clustered_coords
+
 
     def filter_lines(self,
                      lines: list[np.ndarray],
@@ -158,7 +176,16 @@ class ParkingSlotDetector(LineDetector):
         'points': np.ndarray
     })
 
-    def detect_parking_lines(self,
+    def get_parking_lines(self, image: np.ndarray) -> list[list[np.ndarray], list[np.ndarray]]:
+        '''Get all parking lines in an image'''
+        lines = self.get_lines(image)
+        if lines is None:
+            return None
+
+        clustered_lines, clustered_coords = self.get_clustered_lines(lines)
+        return clustered_lines, clustered_coords
+
+    def get_parking_slot(self,
                              image: np.ndarray,
                              qr_data: QrData
                              ) -> Union[list[np.ndarray], None]:
@@ -170,25 +197,10 @@ class ParkingSlotDetector(LineDetector):
                 (qr_data['points'][0][2][1],
                  qr_data['points'][0][3][1]), 1)
 
-            lines = self.get_lines(image)
-            if lines is None:
-                return None
-
-            clustered_lines, clustered_coords = self.cluster_lines(lines)
-
-            # calculate average line and coordinates of the clustered lines
-            avg_lines_coords = []
-            avg_lines = []
-            for i, cluster in enumerate(clustered_lines):
-                line = np.average(cluster, axis=0)
-                avg_lines.append(line)
-                min_x, max_x = self.get_min_max_x(clustered_coords[i])
-                coordinates = self.get_line_coordinates_from_parameters(
-                    min_x, max_x, line)
-                avg_lines_coords.append(coordinates)
+            clustered_lines, clustered_coords = self.get_parking_lines(image)
             # filter away lines that are close to the QR-code
-            avg_lines, avg_lines_coords = self.filter_lines(
-                avg_lines, avg_lines_coords)
+            _, avg_lines_coords = self.filter_lines(
+                clustered_lines, clustered_coords)
 
             # find the two closesqt lines to the QR-code
             lines = self.get_closest_line(
@@ -247,10 +259,12 @@ if __name__ == '__main__':
         'info': data['info']}
     qr_code.display(img, qr_code_measurements, verbose=2)
 
-    parking_lines = parking_slot_detector.detect_parking_lines(img, qr_code_data)
+    parking_lines = parking_slot_detector.get_parking_slot(img, qr_code_data)
     parking_lines.append(
         parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
     parking_slot_detector.show_lines(img, parking_lines)
+    # test_lines, test_coords = parking_slot_detector.get_parking_lines(img)
+    # parking_slot_detector.show_lines(img, test_coords)
     cv2.imshow('img', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()

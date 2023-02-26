@@ -15,8 +15,10 @@ sys.path.append(parent)
 # pylint: disable=C0413
 from computer_vision.qr_code.qr_code import QRCode
 from computer_vision.environment.src.environment import Environment
+from computer_vision.environment.src.lib import Objects
 # from computer_vision.camera_handler.camera import Camera
 from computer_vision.camera_handler.camera_handler import CameraHandler
+from computer_vision.camera_handler.camera import Camera
 from computer_vision.traffic_sign_detection.main import TrafficSignDetector
 from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
 from computer_vision.line_detection.lane_detection import LaneDetector
@@ -65,10 +67,12 @@ if __name__ == '__main__':
     WINDOW_WIDTH = config['gui']['window_width']
     WINDOW_SIZE = (WINDOW_WIDTH* (SIZE[1]/SIZE[0]), WINDOW_WIDTH)
     env= Environment(SIZE, 1, {'object_id': 10})
+    objects = Objects()
 
     camera_handler = CameraHandler()
     camera_handler.refresh_camera_list()
     available_cameras = camera_handler.get_camera_list()
+    camera = Camera(available_cameras[0]['id'])
 
     # assuming the first camera is the correct one
     CAMERA = None
@@ -77,43 +81,62 @@ if __name__ == '__main__':
         # CAMERA = Camera(camera_id)
 
     STATUS: Status = Status()
-    action = Action
+    action = Action()
+
 
     # ---------- LOOP ---------- #
     while True:
         # ---------- GET CAMERA INFORMATION---------- #
-        # The environment objects is a list of tuples with
-        # an object id, x distance and y distance
-        env_objects: List[Tuple[int, int, int]] = []
+        ### Get frame ###
+        ret, frame = camera.read()
+        # if ret is false, then no frame is available and then should
+        # use the stored actions
+        if ret:
+            # if ret -> replace the actions list
 
-        ### QR Code ###
-        # data = qr_code.get_data(frame)
+            # The environment objects is a list of tuples with
+            # an distance (x and y) and the object id
+            env_objects: List[Tuple[Tuple[int, int], int]] = []
 
-        ### Line detection ###
+            ### QR Code ###
+            data = qr_code.get_data(frame)
+            if data['ret']:
+                qr_id = objects.get_data('QR').id
+                for qr in data:
+                    env_objects.append(qr['distances'], qr['info'][qr_id])
 
-        ### Traffic Sign Detection ###
-        # output_signs = traffic_sign_detection.detect_signs(frame)
-        # traffic_sign_detection.show_signs(frame, output_signs)
+            ### Line detection ###
 
-        ### Lane Detection ###
-        # avg_lines = lane_detector.get_lane_line(frame)
-        # lane_detector.show_lines(frame, avg_lines)
-        # next_point = lane_detector.get_next_point(frame, avg_lines)
+            ### Traffic Sign Detection ###
+            output_signs = traffic_sign_detection.detect_signs(frame)
+            sign_id = objects.get_data('Stop').id
+            for sign in output_signs:
+                output_signs_distance = traffic_sign_detection.get_distance(sign)
+                env_objects.append(output_signs_distance, sign_id)
+            # traffic_sign_detection.show_signs(frame, output_signs)
 
-        ### Parking Slot Detection ###
-        # parking_lines = parking_slot_detector.detect_parking_lines(frame, data)
-        # parking_lines.append(
-        #     parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
-        # parking_slot_detector.show_lines(frame, parking_lines)
+            ### Lane Detection ###
+                avg_lines = lane_detector.get_lane_line(frame)
+            # lane_detector.show_lines(frame, avg_lines)
+            next_point = lane_detector.get_next_point(frame, avg_lines)
 
+            ### Parking Slot Detection ###
+            parking_lines = parking_slot_detector.detect_parking_lines(frame, data)
+            parking_lines.append(
+                parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
+            # parking_slot_detector.show_lines(frame, parking_lines)
 
-        # ---------- UPDATE ENVIRONMENT ---------- #
-        # Insert objects into the environment
-        for obj in env_objects:
-            env.insert((env_objects[1], env_objects[2]),
-                env_objects[0])
+            # ---------- UPDATE ENVIRONMENT ---------- #
+            # Insert objects into the environment
+            for obj in env_objects:
+                env.insert(env_objects[1], env_objects[0])
 
         # ---------- ACTION ---------- #
         match STATUS.active:
             case 'move':
-                action.move(1, 0, 0)
+                ret, current_action = action.next()
+                if ret:
+                    action.move(current_action)
+                else:
+                    # If there is no actions left -> do nothing
+                    action.move(1, 0, 0)

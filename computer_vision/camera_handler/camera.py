@@ -4,12 +4,11 @@ import numpy as np
 
 class Camera:
     '''Camera'''
-    def __init__(self, qr_code, camera_id=0, delay=1, window_name='window'):
+    def __init__(self, camera_id=0, delay=1, window_name='window'):
         self.camera_id = camera_id
         self.delay = delay
         self.window_name = window_name
         self.cap = cv.VideoCapture(self.camera_id)
-        self.qr_code = qr_code
 
     def run(self, name=None, resize=1, verbose=1):
         '''Run'''

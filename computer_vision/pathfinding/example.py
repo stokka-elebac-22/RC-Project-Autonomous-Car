@@ -3,7 +3,7 @@ import math
 import cv2
 import pygame as pg
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
-from main import PathFinding
+from lib import PathFinding
 from spline import catmull_rom_chain
 from helping_functions import get_abs_velo, get_angle
 from matplotlib import pyplot as plt
@@ -107,11 +107,8 @@ if __name__ == '__main__':
                     'distance': False, 'object_id': 30})
 
         # Use lane Module
-        all_lines = lane_detector.get_lines(frame)
-        avg_lines = lane_detector.get_average_lines(all_lines)
+        avg_lines = lane_detector.get_lane_line(frame)
         if avg_lines is not None:
-            avg_lines = [lane_detector.get_line_coordinates_from_parameters(
-                frame, line) for line in avg_lines]
             for line in avg_lines:
                 if line is not None:
                     obstacles.append({'values': [
@@ -122,11 +119,11 @@ if __name__ == '__main__':
                 frame, avg_lines)
             
         #TODO: fix this to use warping instead of just forwarding
-            CENTER_DIFF_X = 0
-            CENTER_DIFF_Y = 0
-            if center_diff is not None:
-                CENTER_DIFF_X = center_diff
-                DESIRED_DISTANCE_FORWARD = 100
+        CENTER_DIFF_X = 0
+        CENTER_DIFF_Y = 0
+        if center_diff is not None:
+            CENTER_DIFF_X = center_diff
+            DESIRED_DISTANCE_FORWARD = 100
         # Use Traffic Sign module
         signs = traffic_sign_detection.detect_signs(frame)
         if signs is not None:

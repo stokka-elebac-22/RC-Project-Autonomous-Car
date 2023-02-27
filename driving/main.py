@@ -22,6 +22,7 @@ from computer_vision.camera_handler.camera import Camera
 from computer_vision.traffic_sign_detection.main import TrafficSignDetector
 from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
 from computer_vision.line_detection.lane_detection import LaneDetector
+from computer_vision.pathfinding.lib import PathFinding
 
 
 # ---------- CONSTANTS ---------- #
@@ -69,6 +70,11 @@ if __name__ == '__main__':
     env= Environment(SIZE, 1, {'object_id': 10})
     objects = Objects()
 
+    ### init pathfinding ###
+    path_finding = PathFinding(
+        (config['environment']['sizey'], config['environment']['sizex']), PIXEL_WIDTH, PIXEL_HEIGHT,
+        CAM_WIDTH, CAM_HEIGHT, center, display=display, env_size=20)
+
     camera_handler = CameraHandler()
     camera_handler.refresh_camera_list()
     available_cameras = camera_handler.get_camera_list()
@@ -99,11 +105,15 @@ if __name__ == '__main__':
             env_objects: List[Tuple[Tuple[int, int], int]] = []
 
             ### QR Code ###
-            data = qr_code.get_data(frame)
-            if data['ret']:
+            qr_data = qr_code.get_data(frame)
+            if qr_data['ret']:
                 qr_id = objects.get_data('QR').id
-                for qr in data:
-                    env_objects.append(qr['distances'], qr['info'][qr_id])
+                distances = path_finding.point_to_distance(
+                    (qr_data['points'][0][3][0]+qr_data['points'][0][2][0]/2,
+                    qr_data['points'][0][0][0]))
+                qr_distance_x = distances[0]
+                qr_distance_y = qr_data['distances'][0]
+                env_objects.append(qr_distance_x, qr_distance_y, qr_id)
 
             ### Line detection ###
 

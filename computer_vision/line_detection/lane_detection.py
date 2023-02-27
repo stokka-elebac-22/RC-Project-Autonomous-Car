@@ -273,7 +273,7 @@ class LaneDetector(LineDetector):
         lines = self.get_lines(image)
         average_lines = self.get_average_lines(lines)
         average_lines = [self.get_line_coordinates_from_parameters(
-            frame, line) for line in average_lines]
+            image, line) for line in average_lines]
         return average_lines
 
 

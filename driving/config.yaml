@@ -1,4 +1,9 @@
 ---
+camera:
+  px_height: 300
+  px_width: 500
+  mm_height: 500
+  mm_width: 800
 qr_code_size:
   px: !!int 76
   mm: !!int 52

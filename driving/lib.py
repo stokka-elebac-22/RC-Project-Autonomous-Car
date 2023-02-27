@@ -14,7 +14,7 @@ class Action:
     '''Action (temporary)'''
     def __init__(self) -> None:
         # the actions contains a list of list with the actions
-        self.actions: List[Tuple[bool, int, int]] = []
+        self.actions: List[Tuple[int, int, int]] = []
 
     def move(self, direction: bool, left_motor: int, right_motor: int):
         '''move'''
@@ -26,3 +26,4 @@ class Action:
         cur = self.actions[0]
         self.actions.remove()
         return True, cur
+

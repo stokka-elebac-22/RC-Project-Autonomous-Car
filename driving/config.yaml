@@ -1,4 +1,9 @@
 ---
+camera:
+  px_height: !!int 300
+  px_width: !!int 500
+  mm_height: !!int 500
+  mm_width: !!int 800
 qr_code_size:
   px: !!int 76
   mm: !!int 52
@@ -12,6 +17,7 @@ lane_detector:
   blur: !!int 5
   hough: !!seq [100, 250]
   width: !!int 200
+  forward: !!int 100
 parking_slot_detector:
   hough: !!seq [200, 5]
   iterations: !!seq [5, 2]

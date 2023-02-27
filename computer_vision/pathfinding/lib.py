@@ -2,6 +2,7 @@
 import os
 import sys
 import math
+import numpy as np
 from typing import TypedDict
 try:
     current = os.path.dirname(os.path.realpath(__file__))
@@ -22,7 +23,7 @@ class PathFinding:
     path with objects that can be hindrances
     '''
     def __init__(self, size: tuple[int, int], pixel_width:int, pixel_height:int
-                ,cam_width:int, cam_height:int, cam_center:list[int, int],
+                ,cam_width:int, cam_height:int,
                 object_id:int=10, display:DisplayEnvironment=None, env_size:int = 20
                 ): # pylint: disable=R0913
         self.ratio_width = cam_width/pixel_width
@@ -31,15 +32,26 @@ class PathFinding:
         self.display = display
         self.env = Environment(
             size, env_size, {'view_point': None, 'object_id': object_id})
-        self.center = cam_center
+        self.center = (pixel_width, pixel_height)
         self.a_star = AStar(weight=2, penalty=100)
 
     def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
+        # Polyfit
+        # polyfit_points_x = [0, 200, 300, 400, 500]
+        # polyfit_points_y = [0, 20, 30, 55, 150]
+        # polyfit_line = np.polyfit(polyfit_points_x, polyfit_points_y, 2)
+
+        HEIGHT = 50
+        base = 1.015
         offset_x = point[0] - self.center[0]/2
         offset_y = self.center[1] - point[1]
         x_distance = offset_x*self.ratio_width
-        y_distance = offset_y*self.ratio_height
+        hyp = offset_y*self.ratio_height
+        new_y = math.sqrt(abs(hyp**2 - HEIGHT**2))
+        y_distance = base**new_y
+        #y_distance = np.polyval(polyfit_line, new_y)
+        print(y_distance)
         return (x_distance, y_distance)
 
     def distance_to_point(self, distance:tuple[float, float]) -> tuple[int, int]:
@@ -98,5 +110,6 @@ class PathFinding:
         if self.display is not None:
             cur_mat = self.env.get_data()
             self.display.update(cur_mat)
-            for pos in path[1:-1]:
-                self.display.insert(pos, 'Path')
+            if path:
+                for pos in path[1:-1]:
+                    self.display.insert(pos, 'Path')

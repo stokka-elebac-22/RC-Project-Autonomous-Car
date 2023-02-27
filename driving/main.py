@@ -92,7 +92,6 @@ if __name__ == '__main__':
     STATUS: Status = Status()
     action = Action()
 
-
     # ---------- LOOP ---------- #
     while True:
         # ---------- GET CAMERA INFORMATION---------- #
@@ -216,7 +215,6 @@ if __name__ == '__main__':
 
                 angle_diff.append(minimum_diff)
                 CURRENT_ANG = next_ang
-
 
         # ---------- ACTION ---------- #
         match STATUS.active:

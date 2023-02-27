@@ -26,8 +26,8 @@ if __name__ == '__main__':
     QR_SIZE_MM = 52
     QR_DISTANCE = 500
 
-    CAM_WIDTH = 800
-    CAM_HEIGHT = 500
+    CAM_WIDTH = 1600
+    CAM_HEIGHT = 1000
 
     BOARD_SIZE = (60, 115)
     ENV_SIZE = 20
@@ -94,6 +94,7 @@ if __name__ == '__main__':
             'ret': qr_data['ret'],
             'points': qr_data['points']
         }
+
         parking_lines, parking_lines_coords = parking_slot_detector.get_parking_lines(frame)
 
         if parking_lines_coords is not None:
@@ -101,37 +102,46 @@ if __name__ == '__main__':
                 obstacles.append({'values': [
                                  (lines[0], lines[1]), (lines[2], lines[3])],
                     'distance': False, 'object_id': 30})
-
+                
         parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
 
-        if parking_slot_coords is not None:
+        if parking_slot_coords is not None and len(parking_slot_coords) == 2:
             closing_line = parking_slot_detector.get_closing_line_of_two_lines(parking_slot_coords)
-            if len(closing_line) == 4:
-                parking_slot_coords.append(closing_line)
-            for lines in parking_slot_coords:
+            if closing_line is not None:
                 obstacles.append({'values': [
-                                 (lines[0], lines[1]), (lines[2], lines[3])],
-                    'distance': False, 'object_id': 30})
+                    (closing_line[0], closing_line[1]), (closing_line[2], closing_line[3])],
+                     'distance': False, 'object_id': 30})
+        
+        # parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
+
+        # if parking_slot_coords is not None:
+        #     closing_line = parking_slot_detector.get_closing_line_of_two_lines(parking_slot_coords)
+        #     if len(closing_line) == 4:
+        #         parking_slot_coords.append(closing_line)
+        #     for lines in parking_slot_coords:
+        #         obstacles.append({'values': [
+        #                          (lines[0], lines[1]), (lines[2], lines[3])],
+        #             'distance': False, 'object_id': 30})
 
 
         # Use lane Module
-        avg_lines = lane_detector.get_lane_line(frame)
-        if avg_lines is not None:
-            for line in avg_lines:
-                if line is not None:
-                    obstacles.append({'values': [
-                                     (line[0], line[1]), (line[2], line[3])],
-                        'distance': False, 'object_id': 31})
+        # avg_lines = lane_detector.get_lane_line(frame)
+        # if avg_lines is not None:
+        #     for line in avg_lines:
+        #         if line is not None:
+        #             obstacles.append({'values': [
+        #                              (line[0], line[1]), (line[2], line[3])],
+        #                 'distance': False, 'object_id': 31})
 
-            center_diff = lane_detector.get_diff_from_center_info(
-                frame, avg_lines)
+        #     center_diff = lane_detector.get_diff_from_center_info(
+        #         frame, avg_lines)
 
         #TODO: fix this to use warping instead of just forwarding
-        CENTER_DIFF_X = 0
-        CENTER_DIFF_Y = 0
-        if center_diff is not None:
-            CENTER_DIFF_X = center_diff
-            DESIRED_DISTANCE_FORWARD = 100
+        # CENTER_DIFF_X = 0
+        # CENTER_DIFF_Y = 0
+        # if center_diff is not None:
+        #     CENTER_DIFF_X = center_diff
+        #     DESIRED_DISTANCE_FORWARD = 100
         # Use Traffic Sign module
         signs = traffic_sign_detection.detect_signs(frame)
         if signs is not None:
@@ -153,38 +163,39 @@ if __name__ == '__main__':
         # CATMULL SPLINE
         TENSION = 0.
 
-        new_path = [(value[1], value[0])
-                    for i, value in enumerate(path) if i % 3 == 0]
-        temp_path = [(path[0][1], path[0][0])]
-        temp_path = temp_path + new_path
-        for _ in range(2):
-            temp_path.append((path[len(path) - 1][1], path[len(path) - 1][0]))
+        if path:
+            new_path = [(value[1], value[0])
+                        for i, value in enumerate(path) if i % 3 == 0]
+            temp_path = [(path[0][1], path[0][0])]
+            temp_path = temp_path + new_path
+            for _ in range(2):
+                temp_path.append((path[len(path) - 1][1], path[len(path) - 1][0]))
 
-        temp_path.reverse()
-        c, v = catmull_rom_chain(temp_path, TENSION)
-        # x_values, y_values = zip(*c)
-        abs_velos = []
-        angles = []
-        for value in v:
-            abs_velos.append(get_abs_velo(value))
-            angles.append(get_angle(value))
+            temp_path.reverse()
+            c, v = catmull_rom_chain(temp_path, TENSION)
+            # x_values, y_values = zip(*c)
+            abs_velos = []
+            angles = []
+            for value in v:
+                abs_velos.append(get_abs_velo(value))
+                angles.append(get_angle(value))
 
-        # CHECK DIFF WITH NEXT ONE TO SEE IF TURN RIGHT OR LEFT AND AMOUNT OF TURN
-        # diff = velocities[i] - velocities[i+1]
-        # if positive: rotate clockwise
-        # else rotate counter clockwise
+            # CHECK DIFF WITH NEXT ONE TO SEE IF TURN RIGHT OR LEFT AND AMOUNT OF TURN
+            # diff = velocities[i] - velocities[i+1]
+            # if positive: rotate clockwise
+            # else rotate counter clockwise
 
-        # DRAW CATMULL LINE
-        line_color = (255, 0, 0)
+            # DRAW CATMULL LINE
+            line_color = (255, 0, 0)
 
-        pg.display.flip()
-        COUNT = 0
-        LEN_C = len(c)
-        while COUNT < LEN_C:
-            pg.draw.line(path_finding.display.display_window, line_color,
-                         (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE),
-                         (c[COUNT+1][0]*TILE_SIZE, c[COUNT+1][1]*TILE_SIZE))
-            COUNT += 2
+            pg.display.flip()
+            COUNT = 0
+            LEN_C = len(c)
+            while COUNT < LEN_C:
+                pg.draw.line(path_finding.display.display_window, line_color,
+                            (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE),
+                            (c[COUNT+1][0]*TILE_SIZE, c[COUNT+1][1]*TILE_SIZE))
+                COUNT += 2
 
         # RUN = True
         # TODO: point for lane line, maybe can remove the get course functions no need? # pylint: disable=W0511

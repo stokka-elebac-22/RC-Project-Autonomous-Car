@@ -19,7 +19,7 @@ class Action:
 
     def move(self, direction: int, left_motor: int, right_motor: int):
         '''move'''
-        os.system(f'{direction} {left_motor} {direction} {right_motor}')
+        os.system(f'sudo stty -F /dev/ttyAMA0 {direction} {left_motor} {direction} {right_motor}')
 
     def next(self) -> Tuple[bool, Tuple[int, int, int]]:
         '''Returns the next action'''
@@ -28,4 +28,3 @@ class Action:
         cur = self.actions[0]
         self.actions.remove()
         return True, cur
-

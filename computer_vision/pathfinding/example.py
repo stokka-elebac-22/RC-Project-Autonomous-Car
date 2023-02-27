@@ -26,8 +26,6 @@ if __name__ == '__main__':
     QR_SIZE_MM = 52
     QR_DISTANCE = 500
 
-    PIXEL_WIDTH = 500
-    PIXEL_HEIGHT = 300
     CAM_WIDTH = 800
     CAM_HEIGHT = 500
 
@@ -37,12 +35,13 @@ if __name__ == '__main__':
 
     img = cv2.imread(
         'computer_vision/line_detection/assets/parking/10.png')
-    center = (img.shape[1], img.shape[0])
     window_size = (W_SIZE * (BOARD_SIZE[1]/BOARD_SIZE[0]), W_SIZE)
     display = DisplayEnvironment(window_size, BOARD_SIZE)
+    PIXEL_WIDTH = img.shape[1]
+    PIXEL_HEIGHT = img.shape[0]
     path_finding = PathFinding(
         BOARD_SIZE, PIXEL_WIDTH, PIXEL_HEIGHT,
-        CAM_WIDTH, CAM_HEIGHT, center, display=display, env_size=20)
+        CAM_WIDTH, CAM_HEIGHT, display=display, env_size=20)
     parking_slot_detector = ParkingSlotDetector(
         hough=[200, 5], iterations=[5, 2])
     lane_detector = LaneDetector()
@@ -95,16 +94,25 @@ if __name__ == '__main__':
             'ret': qr_data['ret'],
             'points': qr_data['points']
         }
-        parking_lines = parking_slot_detector.detect_parking_lines(
-            frame, qr_code_data)
+        parking_lines, parking_lines_coords = parking_slot_detector.get_parking_lines(frame)
 
-        if parking_lines is not None:
-            parking_lines.append(
-                parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
-            for lines in parking_lines:
+        if parking_lines_coords is not None:
+            for lines in parking_lines_coords:
                 obstacles.append({'values': [
                                  (lines[0], lines[1]), (lines[2], lines[3])],
                     'distance': False, 'object_id': 30})
+
+        parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
+
+        if parking_slot_coords is not None:
+            closing_line = parking_slot_detector.get_closing_line_of_two_lines(parking_slot_coords)
+            if len(closing_line) == 4:
+                parking_slot_coords.append(closing_line)
+            for lines in parking_slot_coords:
+                obstacles.append({'values': [
+                                 (lines[0], lines[1]), (lines[2], lines[3])],
+                    'distance': False, 'object_id': 30})
+
 
         # Use lane Module
         avg_lines = lane_detector.get_lane_line(frame)
@@ -117,7 +125,7 @@ if __name__ == '__main__':
 
             center_diff = lane_detector.get_diff_from_center_info(
                 frame, avg_lines)
-            
+
         #TODO: fix this to use warping instead of just forwarding
         CENTER_DIFF_X = 0
         CENTER_DIFF_Y = 0
@@ -131,7 +139,7 @@ if __name__ == '__main__':
                 distances = path_finding.point_to_distance(
                     (sign[0]+sign[2]/2, sign[1]))
                 distance_x = distances[0]
-                distance_y = traffic_sign_detection.get_distance()
+                distance_y = traffic_sign_detection.get_distance(sign)
                 obstacles.append({'values': [
                                  (distance_x, distance_y)], 'distance': True, 'object_id': 40})
 

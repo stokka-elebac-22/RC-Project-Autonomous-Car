@@ -22,7 +22,7 @@ class PathFinding:
     path with objects that can be hindrances
     '''
     def __init__(self, size: tuple[int, int], pixel_width:int, pixel_height:int
-                ,cam_width:int, cam_height:int, cam_center:list[int, int],
+                ,cam_width:int, cam_height:int,
                 object_id:int=10, display:DisplayEnvironment=None, env_size:int = 20
                 ): # pylint: disable=R0913
         self.ratio_width = cam_width/pixel_width
@@ -31,7 +31,7 @@ class PathFinding:
         self.display = display
         self.env = Environment(
             size, env_size, {'view_point': None, 'object_id': object_id})
-        self.center = cam_center
+        self.center = (pixel_width, pixel_height)
         self.a_star = AStar(weight=2, penalty=100)
 
     def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:

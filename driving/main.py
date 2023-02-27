@@ -4,7 +4,8 @@ This file should only contain short code
 '''
 import sys
 import os
-from typing import Tuple, List
+import math
+# from typing import Tuple, List
 import yaml
 from lib import Status, Action
 
@@ -23,7 +24,8 @@ from computer_vision.traffic_sign_detection.main import TrafficSignDetector
 from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
 from computer_vision.line_detection.lane_detection import LaneDetector
 from computer_vision.pathfinding.lib import PathFinding
-
+from computer_vision.pathfinding.helping_functions import get_abs_velo, get_angle
+from computer_vision.pathfinding.spline import catmull_rom_chain
 
 # ---------- CONSTANTS ---------- #
 
@@ -72,8 +74,9 @@ if __name__ == '__main__':
 
     ### init pathfinding ###
     path_finding = PathFinding(
-        (config['environment']['sizey'], config['environment']['sizex']), PIXEL_WIDTH, PIXEL_HEIGHT,
-        CAM_WIDTH, CAM_HEIGHT, center, display=display, env_size=20)
+        (config['environment']['sizey'], config['environment']['sizex']),
+        config['camera']['px_width'], config['camera']['px_height'],
+        config['camera']['mm_width'], config['camera']['mm_width'], None, env_size=20)
 
     camera_handler = CameraHandler()
     camera_handler.refresh_camera_list()
@@ -98,11 +101,13 @@ if __name__ == '__main__':
         # if ret is false, then no frame is available and then should
         # use the stored actions
         if ret:
+
+            env_objects = []
             # if ret -> replace the actions list
 
             # The environment objects is a list of tuples with
             # an distance (x and y) and the object id
-            env_objects: List[Tuple[Tuple[int, int], int]] = []
+            #env_objects: List[Tuple[Tuple[int, int], int]] = []
 
             ### QR Code ###
             qr_data = qr_code.get_data(frame)
@@ -113,33 +118,105 @@ if __name__ == '__main__':
                     qr_data['points'][0][0][0]))
                 qr_distance_x = distances[0]
                 qr_distance_y = qr_data['distances'][0]
-                env_objects.append(qr_distance_x, qr_distance_y, qr_id)
-
-            ### Line detection ###
+                #env_objects.append(qr_distance_x, qr_distance_y, qr_id)
 
             ### Traffic Sign Detection ###
-            output_signs = traffic_sign_detection.detect_signs(frame)
-            sign_id = objects.get_data('Stop').id
-            for sign in output_signs:
-                output_signs_distance = traffic_sign_detection.get_distance(sign)
-                env_objects.append(output_signs_distance, sign_id)
-            # traffic_sign_detection.show_signs(frame, output_signs)
+            signs = traffic_sign_detection.detect_signs(frame)
+            if signs is not None:
+                for sign in signs:
+                    distances = path_finding.point_to_distance(
+                        (sign[0]+sign[2]/2, sign[1]))
+                    distance_x = distances[0]
+                    distance_y = traffic_sign_detection.get_distance(sign)
+                    env_objects.append({'values': [
+                                    (distance_x, distance_y)], 'distance': True, 'object_id': 40})
 
             ### Lane Detection ###
-                avg_lines = lane_detector.get_lane_line(frame)
-            # lane_detector.show_lines(frame, avg_lines)
-            next_point = lane_detector.get_next_point(frame, avg_lines)
 
-            ### Parking Slot Detection ###
-            parking_lines = parking_slot_detector.detect_parking_lines(frame, data)
-            parking_lines.append(
-                parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
-            # parking_slot_detector.show_lines(frame, parking_lines)
+            lane_lines = lane_detector.get_lane_line(frame)
+            if lane_lines is not None:
+                for line in lane_lines:
+                    if line is not None:
+                        env_objects.append({'values': [
+                                        (line[0], line[1]), (line[2], line[3])],
+                            'distance': False, 'object_id': 31})
+
+                # center_diff = lane_detector.get_diff_from_center_info(
+                #     frame, lane_lines)
+                next_point = lane_detector.get_next_point(frame, lane_lines)
+                # TODO: endre 40 til noe annet.
+                env_objects.append({'values': [
+                                    next_point], 'distance': False, 'object_id': 40})
+
+            # Use ParkingSlot Module
+            qr_code_data = {
+                'ret': qr_data['ret'],
+                'points': qr_data['points']
+            }
+            parking_lines, parking_lines_coords = parking_slot_detector.get_parking_lines(frame)
+
+            if parking_lines_coords is not None:
+                for lines in parking_lines_coords:
+                    env_objects.append({'values': [
+                                    (lines[0], lines[1]), (lines[2], lines[3])],
+                        'distance': False, 'object_id': 30})
+
+            parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
+
+            if parking_slot_coords is not None:
+                closing_line = parking_slot_detector.get_closing_line_of_two_lines(
+                    parking_slot_coords)
+                if len(closing_line) == 4:
+                    parking_slot_coords.append(closing_line)
+                for lines in parking_slot_coords:
+                    env_objects.append({'values': [
+                                    (lines[0], lines[1]), (lines[2], lines[3])],
+                        'distance': False, 'object_id': 30})
 
             # ---------- UPDATE ENVIRONMENT ---------- #
             # Insert objects into the environment
-            for obj in env_objects:
-                env.insert(env_objects[1], env_objects[0])
+            path_finding.insert_objects(env_objects)
+            # TODO: add qr or checkpoint as calculated path
+            path = path_finding.calculate_path((460, 120), False)
+            # LANE NEXT POINT
+            # path = path_finding.calculate_path(point, False)
+            # QR CODE
+            # path = path_finding.calculate_path(
+            # (qr_distance_x, config['lane_detector']['forward']), True)
+
+            # ---------- CALCULATE VELOCITY AND ANGLE ---------- #
+            TENSION = 0.
+
+            new_path = [(value[1], value[0])
+                        for i, value in enumerate(path) if i % 3 == 0]
+            temp_path = [(path[0][1], path[0][0])]
+            temp_path = temp_path + new_path
+            for _ in range(2):
+                temp_path.append((path[len(path) - 1][1], path[len(path) - 1][0]))
+
+            temp_path.reverse()
+            c, v = catmull_rom_chain(temp_path, TENSION)
+            # x_values, y_values = zip(*c)
+            abs_velos = []
+            angles = []
+            for value in v:
+                abs_velos.append(get_abs_velo(value))
+                angles.append(get_angle(value))
+
+            CURRENT_ANG = 0
+            angle_diff = []
+            angle_diff_x = []
+            for i, next_ang in enumerate(angles):
+                angle_diff_x.append(i)
+                first_diff = math.dist([CURRENT_ANG], [next_ang])
+                second_diff = 360-abs(first_diff)
+                minimum_diff = min(abs(first_diff), second_diff)
+                if CURRENT_ANG > 0 and next_ang < 0:
+                    minimum_diff = minimum_diff*-1
+
+                angle_diff.append(minimum_diff)
+                CURRENT_ANG = next_ang
+
 
         # ---------- ACTION ---------- #
         match STATUS.active:

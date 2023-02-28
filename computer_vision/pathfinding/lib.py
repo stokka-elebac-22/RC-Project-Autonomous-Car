@@ -43,7 +43,7 @@ class PathFinding:
         # polyfit_line = np.polyfit(polyfit_points_x, polyfit_points_y, 2)
 
         HEIGHT = 50
-        base = 1.015
+        base = 1.001
         offset_x = point[0] - self.center[0]/2
         offset_y = self.center[1] - point[1]
         x_distance = offset_x*self.ratio_width
@@ -51,7 +51,6 @@ class PathFinding:
         new_y = math.sqrt(abs(hyp**2 - HEIGHT**2))
         y_distance = base**new_y
         #y_distance = np.polyval(polyfit_line, new_y)
-        print(y_distance)
         return (x_distance, y_distance)
 
     def distance_to_point(self, distance:tuple[float, float]) -> tuple[int, int]:

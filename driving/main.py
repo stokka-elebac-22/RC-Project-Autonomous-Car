@@ -24,7 +24,7 @@ from computer_vision.traffic_sign_detection.main import TrafficSignDetector
 from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
 from computer_vision.line_detection.lane_detection import LaneDetector
 from computer_vision.pathfinding.lib import PathFinding
-from computer_vision.pathfinding.helping_functions import get_abs_velo, get_angle
+from computer_vision.pathfinding.helping_functions import get_abs_velo, get_angle, get_angle_diff
 from computer_vision.pathfinding.spline import catmull_rom_chain
 
 # ---------- CONSTANTS ---------- #
@@ -202,19 +202,7 @@ if __name__ == '__main__':
                 abs_velos.append(get_abs_velo(value))
                 angles.append(get_angle(value))
 
-            CURRENT_ANG = 0
-            angle_diff = []
-            angle_diff_x = []
-            for i, next_ang in enumerate(angles):
-                angle_diff_x.append(i)
-                first_diff = math.dist([CURRENT_ANG], [next_ang])
-                second_diff = 360-abs(first_diff)
-                minimum_diff = min(abs(first_diff), second_diff)
-                if CURRENT_ANG > 0 and next_ang < 0:
-                    minimum_diff = minimum_diff*-1
-
-                angle_diff.append(minimum_diff)
-                CURRENT_ANG = next_ang
+            angle_diff = get_angle_diff(angles)
 
         # ---------- ACTION ---------- #
         match STATUS.active:

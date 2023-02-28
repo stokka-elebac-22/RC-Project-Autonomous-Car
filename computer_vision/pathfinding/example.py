@@ -5,7 +5,7 @@ import pygame as pg
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
 from lib import PathFinding
 from spline import catmull_rom_chain
-from helping_functions import get_abs_velo, get_angle
+from helping_functions import get_abs_velo, get_angle, get_angle_diff
 from matplotlib import pyplot as plt
 try:
     from line_detection.parking_slot_detection import ParkingSlotDetector
@@ -215,19 +215,21 @@ if __name__ == '__main__':
     vx_values = [i[0] for i in v]
     vy_values = [i[1] for i in v]
 
-    CURRENT_ANG = 0
-    angle_diff = []
-    angle_diff_x = []
-    for i, next_ang in enumerate(angles):
-        angle_diff_x.append(i)
-        first_diff = math.dist([CURRENT_ANG], [next_ang])
-        second_diff = 360-abs(first_diff)
-        minimum_diff = min(abs(first_diff), second_diff)
-        if CURRENT_ANG > 0 and next_ang < 0:
-            minimum_diff = minimum_diff*-1
+    # CURRENT_ANG = 0
+    # angle_diff = []
+    # angle_diff_x = []
+    # for i, next_ang in enumerate(angles):
+    #     angle_diff_x.append(i)
+    #     first_diff = math.dist([CURRENT_ANG], [next_ang])
+    #     second_diff = 360-abs(first_diff)
+    #     minimum_diff = min(abs(first_diff), second_diff)
+    #     if CURRENT_ANG > 0 and next_ang < 0:
+    #         minimum_diff = minimum_diff*-1
 
-        angle_diff.append(minimum_diff)
-        CURRENT_ANG = next_ang
+    #     angle_diff.append(minimum_diff)
+    #     CURRENT_ANG = next_ang
+
+    angle_diff, angle_diff_x = get_angle_diff(angles)
 
     fig, axs = plt.subplots(1, 3)
     fig.suptitle('Horizontally stacked subplots')

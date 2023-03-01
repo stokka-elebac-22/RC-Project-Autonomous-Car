@@ -4,7 +4,7 @@ from qr_code import QRCode
 
 if __name__ == '__main__':
     DIRECTORY = 'tests/images/qr_code/logi_1080p'
-    CAMERA_ID_LEFT = 0
+    CAMERA_ID_LEFT = 1
     CAMERA_ID_RIGHT = 2
     cam1 = cv.VideoCapture(CAMERA_ID_LEFT)
     cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)

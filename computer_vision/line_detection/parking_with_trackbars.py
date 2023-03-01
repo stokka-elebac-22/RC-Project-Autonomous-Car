@@ -13,7 +13,7 @@ def nothing(_):
     '''Empty function'''
 
 if __name__ == "__main__":
-    cam = cv2.VideoCapture(0)
+    cam = cv2.VideoCapture(1)
 
     # Global Constants
     QR_SIZE_PX = 76
@@ -69,7 +69,8 @@ if __name__ == "__main__":
             'ret': data['ret'],
             'points': data['points']
         }
-        parking_lines = parking_slot_detector.detect_parking_lines(
+        print(data['ret'])
+        parking_lines = parking_slot_detector.get_parking_slot(
             frame, qr_code_data)
         parking_slot_detector.show_lines(frame, parking_lines)
         cv2.imshow('frame', frame)
@@ -85,4 +86,3 @@ if __name__ == "__main__":
     print("cluter", cluster_atol)
     cam.release()
     cv2.destroyAllWindows()
-    

@@ -2,12 +2,10 @@
 import cv2
 
 if __name__ == '__main__':
-    DIRECTORY = 'tests/images/parking_slot_detection/'
-    CAMERA_ID_LEFT = 1
-    CAMERA_ID_RIGHT = 0
-    cam = cv2.VideoCapture(0)
+    DIRECTORY = 'tests/images/parking_slot_detection_2/'
+    cam = cv2.VideoCapture(1)
 
-    COUNT = 4000
+    COUNT = 0
     while True:
         frames = []
         RETS = True
@@ -26,4 +24,4 @@ if __name__ == '__main__':
             print('Capturing...')
             for frame, title in frames:
                 cv2.imwrite(f'{DIRECTORY}/{title}_{COUNT}.jpg', frame)
-            COUNT -= 500
+            COUNT += 1

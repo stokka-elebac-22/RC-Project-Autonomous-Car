@@ -2,7 +2,7 @@
 import cv2 as cv
 
 if __name__ == '__main__':
-    DIRECTORY = 'tests/images/stereoscopic_vision/test/11'
+    DIRECTORY = 'tests/images/'
     CAMERA_ID_LEFT = 1
     CAMERA_ID_RIGHT = 0
     cam1 = cv.VideoCapture(CAMERA_ID_LEFT)

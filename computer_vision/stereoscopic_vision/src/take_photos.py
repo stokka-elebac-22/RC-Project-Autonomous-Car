@@ -2,7 +2,7 @@
 import cv2 as cv
 
 if __name__ == '__main__':
-    DIRECTORY = 'tests/images/stereoscopic_vision/distance/logi_1080p/v2'
+    DIRECTORY = 'tests/images/stereoscopic_vision/test/11'
     CAMERA_ID_LEFT = 1
     CAMERA_ID_RIGHT = 0
     cam1 = cv.VideoCapture(CAMERA_ID_LEFT)
@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     qcd = cv.QRCodeDetector()
 
-    COUNT = 4000
+    COUNT = 0
     while True:
         frames = []
         RETS = True
@@ -33,5 +33,5 @@ if __name__ == '__main__':
         if cv.waitKey(1) & 0xFF == ord('c'):
             print('Capturing...')
             for frame, title in frames:
-                cv.imwrite(f'{DIRECTORY}/{title}/{title}_{COUNT}.jpg', frame)
-            COUNT -= 500
+                cv.imwrite(f'{DIRECTORY}//{title}_{COUNT}.jpg', frame)
+            COUNT += 1

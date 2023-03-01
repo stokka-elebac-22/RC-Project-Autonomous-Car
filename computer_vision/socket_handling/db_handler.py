@@ -1,13 +1,13 @@
 import sqlite3
 
-from abstract_storage import abstract_storage
+from abstract_storage import AbstractStorage
 
-class db_handler(abstract_storage):
-    
+class DbHandler(AbstractStorage):
+    '''DB-handler for sensor-data'''
     def __init__(self, db_name):
-        self.db_name = db_name 
+        self.db_name = db_name
         self.create_project_tables()
-        
+
     def add_log(self, pos, sensor_type, value, timestamp=0):
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
@@ -32,15 +32,15 @@ class db_handler(abstract_storage):
             value int, \
             Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP )")
         conn.commit
-    
+
     def get_sensor_data(self, pos, sensor_type):
-        conn = sqlite3.connect(self.db_name)        
+        conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
         cur.execute("SELECT timestamp, value FROM sensor \
             WHERE position=? and sensor_type=?", (pos, sensor_type))
         rows = cur.fetchall()
         return rows
-    
+
     def get_recent_sensor_data(self):
         conn = sqlite3.connect(self.db_name, uri=True)
         cur = conn.cursor()
@@ -51,12 +51,11 @@ class db_handler(abstract_storage):
         # SELECT DISTINCT position, sensor_type FROM sensor \
 
 if __name__ == "__main__":
-    database = db_handler(":memory:")
+    database = DbHandler(":memory:")
     # database = db_handler("db_file.db")
     for x in range(100):
         database.add_log(1,0,x, 0)
     for row in database.get_recent_sensor_data():
-        print(row)        
+        print(row)
     for row in database.get_sensor_data(1,0):
         print(row)
-

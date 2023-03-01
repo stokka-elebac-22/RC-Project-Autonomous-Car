@@ -53,8 +53,8 @@ if __name__ == '__main__':
             please check if it exists in the script folder')
         sys.exit(0)
 
-    with open(args.config_file + '.yml') as f:
-        config = yaml.load(f, Loader=SafeLoader)
+    with open(args.config_file + '.yml', encoding="utf8") as f:
+        config = yaml.load(f, Loader=yaml.Loader.SafeLoader)
 
     FULL_SCREEN = args.full_screen.lower() in ['true', 1]
     os.environ['QT_DEVICE_PIXEL_RATIO'] = '0'
@@ -64,5 +64,8 @@ if __name__ == '__main__':
 
     HOST = '10.0.10.95'
     PORT = 2004  # socket server port number
-    window = Ui(args.theme + '.ui', (HOST, PORT), FULL_SCREEN)
+    if args.headless:
+        pass
+    else:
+        window = Ui(args.theme + '.ui', (HOST, PORT), FULL_SCREEN)
     sys.exit(0)

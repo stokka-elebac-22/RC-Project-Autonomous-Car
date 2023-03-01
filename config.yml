@@ -3,7 +3,19 @@
   network:
     host:
     port:
+    port_cam0:
+    port_cam1:
   serial:
     active: false
     port: 0
+  can:
+    active: false
+    interface: "socketcan"
+    channel: "can0"
+  camera0:
+    id: 0
+    size:
+      px: 76
+      mm: 52
+      distance: 500
 ...

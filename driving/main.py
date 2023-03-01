@@ -204,6 +204,14 @@ if __name__ == '__main__':
 
             angle_diff = get_angle_diff(angles)
 
+            for vel, ang in zip(abs_velos, angles):
+                ratio = vel / (vel*math.acos(ang))
+                if ang < 0:
+                    action.actions.append(1, -vel, vel*ratio)
+                else:
+                    action.actions.append(1, vel, -vel*ratio)
+
+
         # ---------- ACTION ---------- #
         match STATUS.active:
             case 'move':

@@ -25,10 +25,14 @@ def get_angle_diff(angles: float) -> list[list[np.ndarray], list[np.ndarray]]:
         first_diff = math.dist([CURRENT_ANG], [next_ang])
         second_diff = 360-abs(first_diff)
         minimum_diff = min(abs(first_diff), second_diff)
-        if CURRENT_ANG > 0 and next_ang < 0:
-            minimum_diff = minimum_diff*-1
+        if CURRENT_ANG > next_ang:
+            if abs(first_diff) == minimum_diff:
+                minimum_diff = minimum_diff*-1
+        else:
+            if abs(second_diff) == minimum_diff:
+                minimum_diff = minimum_diff*-1
         angle_diff.append(minimum_diff)
         CURRENT_ANG = next_ang
     return angle_diff
 
-    
+

@@ -37,20 +37,13 @@ class PathFinding:
 
     def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
-        # Polyfit
-        # polyfit_points_x = [0, 200, 300, 400, 500]
-        # polyfit_points_y = [0, 20, 30, 55, 150]
-        # polyfit_line = np.polyfit(polyfit_points_x, polyfit_points_y, 2)
-
-        HEIGHT = 50
-        base = 1.001
         offset_x = point[0] - self.center[0]/2
         offset_y = self.center[1] - point[1]
-        x_distance = offset_x*self.ratio_width
-        hyp = offset_y*self.ratio_height
-        new_y = math.sqrt(abs(hyp**2 - HEIGHT**2))
-        y_distance = base**new_y
-        #y_distance = np.polyval(polyfit_line, new_y)
+        y_distance = -87.5961/(1-1.2048*math.e**(-0.0007*offset_y))
+        ratio_x = 0.0001*offset_y**2-0.0044*offset_y+0.6254
+        ratio_test= 0.0013 * y_distance - 0.0015
+        x_distance = offset_x*ratio_test
+        y_distance = -87.5961/(1-1.2048*math.e**(-0.0007*offset_y))
         return (x_distance, y_distance)
 
     def distance_to_point(self, distance:tuple[float, float]) -> tuple[int, int]:
@@ -85,7 +78,7 @@ class PathFinding:
                         (coords[0], coords[1]), (coords[2], coords[3]))
                     if result is not None:
                         for point in result:
-                            self.env.insert_by_index(point, 1)
+                            self.env.insert_by_index(point, groups['object_id'])
 
 
     def calculate_path(self, value: tuple[int, int], distance: bool) -> list[tuple]:

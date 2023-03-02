@@ -3,9 +3,9 @@ import cv2
 
 if __name__ == '__main__':
     DIRECTORY = 'tests/images/parking_slot_detection_2/'
-    cam = cv2.VideoCapture(1)
+    cam = cv2.VideoCapture(0)
 
-    COUNT = 0
+    COUNT = 5
     while True:
         frames = []
         RETS = True

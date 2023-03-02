@@ -22,19 +22,15 @@ except ImportError:
 
 if __name__ == '__main__':
 
-    QR_SIZE_PX = 76
-    QR_SIZE_MM = 52
-    QR_DISTANCE = 500
-
     CAM_WIDTH = 1600
     CAM_HEIGHT = 1000
 
-    BOARD_SIZE = (60, 115)
-    ENV_SIZE = 20
+    BOARD_SIZE = (150, 215)
+    ENV_SIZE = 50
     W_SIZE = 720
 
     img = cv2.imread(
-        'computer_vision/line_detection/assets/parking/10.png')
+        'tests/images/parking_slot_detection_2/frame_5_test.jpg')
     window_size = (W_SIZE * (BOARD_SIZE[1]/BOARD_SIZE[0]), W_SIZE)
     display = DisplayEnvironment(window_size, BOARD_SIZE)
     PIXEL_WIDTH = img.shape[1]
@@ -43,7 +39,12 @@ if __name__ == '__main__':
         BOARD_SIZE, PIXEL_WIDTH, PIXEL_HEIGHT,
         CAM_WIDTH, CAM_HEIGHT, display=display, env_size=20)
     parking_slot_detector = ParkingSlotDetector(
-        hough=[200, 5], iterations=[5, 2])
+        canny=[38, 85],
+        hough=[91, 107],
+        blur=2,
+        iterations=[0, 0],
+        filter_atol=[20, 20],
+        cluster_atol=2)
     lane_detector = LaneDetector()
     sign_size = {
         'px': 10,
@@ -75,7 +76,7 @@ if __name__ == '__main__':
 
         # Should change this to camera frame later
         frame = cv2.imread(
-            'computer_vision/line_detection/assets/parking/10.png')
+        'tests/images/parking_slot_detection_2/frame_5_test.jpg')
         obstacles = []
 
         qr_data = qr_code.get_data(frame)
@@ -85,9 +86,9 @@ if __name__ == '__main__':
                  qr_data['points'][0][0][0]))
             qr_distance_x = distances[0]
             qr_distance_y = qr_data['distances'][0]
-            obstacles.append({'values': [
-                (qr_distance_x, qr_distance_y)],
-                'distance': True, 'object_id': 20})
+            # obstacles.append({'values': [
+            #     (qr_distance_x, qr_distance_y)],
+            #     'distance': True, 'object_id': 20})
 
         # Use ParkingSlot Module
         qr_code_data = {
@@ -143,15 +144,15 @@ if __name__ == '__main__':
         #     CENTER_DIFF_X = center_diff
         #     DESIRED_DISTANCE_FORWARD = 100
         # Use Traffic Sign module
-        signs = traffic_sign_detection.detect_signs(frame)
-        if signs is not None:
-            for sign in signs:
-                distances = path_finding.point_to_distance(
-                    (sign[0]+sign[2]/2, sign[1]))
-                distance_x = distances[0]
-                distance_y = traffic_sign_detection.get_distance(sign)
-                obstacles.append({'values': [
-                                 (distance_x, distance_y)], 'distance': True, 'object_id': 40})
+        # signs = traffic_sign_detection.detect_signs(frame)
+        # if signs is not None:
+        #     for sign in signs:
+        #         distances = path_finding.point_to_distance(
+        #             (sign[0]+sign[2]/2, sign[1]))
+        #         distance_x = distances[0]
+        #         distance_y = traffic_sign_detection.get_distance(sign)
+        #         obstacles.append({'values': [
+        #                          (distance_x, distance_y)], 'distance': True, 'object_id': 40})
 
         path_finding.insert_objects(obstacles)
         # TODO: Remove later since Test point # pylint: disable=W0511
@@ -209,11 +210,11 @@ if __name__ == '__main__':
         # USE PATH variable!!!
 
 
-    # ANGLE DIFF calculation
-    x_values = [i[0] for i in c]
-    y_values = [i[1] for i in c]
-    vx_values = [i[0] for i in v]
-    vy_values = [i[1] for i in v]
+            # ANGLE DIFF calculation
+            x_values = [i[0] for i in c]
+            y_values = [i[1] for i in c]
+            vx_values = [i[0] for i in v]
+            vy_values = [i[1] for i in v]
 
     # CURRENT_ANG = 0
     # angle_diff = []

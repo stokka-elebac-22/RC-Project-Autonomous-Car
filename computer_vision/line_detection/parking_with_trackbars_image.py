@@ -52,6 +52,14 @@ if __name__ == "__main__":
     frame = cv2.imread(
         'tests/images/parking_slot_detection_2/frame_6.jpg')
 
+    SCALE_PERCENT = 30  # percent of original size
+    new_width = int(frame.shape[1] * SCALE_PERCENT / 100)
+    new_height = int(frame.shape[0] * SCALE_PERCENT / 100)
+    dim = (new_width, new_height)
+
+    # resize image
+    # frame = cv2.resize(frame, dim, interpolation=cv2.INTER_AREA)
+
     #frame = cv2.imread('computer_vision/line_detection/assets/parking/10.png')
 
     while True:
@@ -99,10 +107,11 @@ if __name__ == "__main__":
             parking_lines.append(
                 parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
         parking_slot_detector.show_lines(copy, parking_lines)
-        # all = parking_slot_detector.get_parking_lines(copy)
-        # if all is not None:
-        #     lines, coords = parking_slot_detector.get_parking_lines(copy)
-        #     parking_slot_detector.show_lines(copy, coords)
+
+        all = parking_slot_detector.get_parking_lines(copy)
+        if all is not None:
+            lines, coords = parking_slot_detector.get_parking_lines(copy)
+            parking_slot_detector.show_lines(copy, coords)
         cv2.imshow('frame', copy)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

@@ -2,7 +2,7 @@
 import cv2 as cv
 
 if __name__ == '__main__':
-    DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_small/'
+    DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_mac/'
     CAMERA_ID_LEFT = 1
     CAMERA_ID_RIGHT = 0
     BOARD_DIMENSIONS = (8, 6)

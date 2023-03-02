@@ -38,12 +38,17 @@ class PathFinding:
     def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
         offset_x = point[0] - self.center[0]/2
-        offset_y = self.center[1] - point[1]
-        y_distance = -87.5961/(1-1.2048*math.e**(-0.0007*offset_y))
+        offset_y = point[1]
+        #y_distance = -87.5961/(1-1.2048*math.e**(-0.0007*offset_y))
+        y_distance = (-0.2243/(1-1.0751*math.e**(-0.0003*offset_y)))*146
         ratio_x = 0.0001*offset_y**2-0.0044*offset_y+0.6254
         ratio_test= 0.0013 * y_distance - 0.0015
         x_distance = offset_x*ratio_test
         y_distance = -87.5961/(1-1.2048*math.e**(-0.0007*offset_y))
+        print(point)
+        print(y_distance)
+        # x_distance = offset_x*self.ratio_width
+        # y_distance = offset_y*self.ratio_height
         return (x_distance, y_distance)
 
     def distance_to_point(self, distance:tuple[float, float]) -> tuple[int, int]:

@@ -22,29 +22,29 @@ except ImportError:
 
 if __name__ == '__main__':
 
-    CAM_WIDTH = 1600
-    CAM_HEIGHT = 1000
+    CAM_WIDTH = 1000
+    CAM_HEIGHT = 600
 
-    BOARD_SIZE = (150, 215)
-    ENV_SIZE = 50
+    BOARD_SIZE = (60, 115)
+    ENV_SIZE = 20
     W_SIZE = 720
 
     img = cv2.imread(
-        'tests/images/parking_slot_detection_2/frame_5_test.jpg')
+        'tests/images/parking_slot_detection_2/frame_6.jpg')
     window_size = (W_SIZE * (BOARD_SIZE[1]/BOARD_SIZE[0]), W_SIZE)
     display = DisplayEnvironment(window_size, BOARD_SIZE)
     PIXEL_WIDTH = img.shape[1]
     PIXEL_HEIGHT = img.shape[0]
     path_finding = PathFinding(
         BOARD_SIZE, PIXEL_WIDTH, PIXEL_HEIGHT,
-        CAM_WIDTH, CAM_HEIGHT, display=display, env_size=20)
+        CAM_WIDTH, CAM_HEIGHT, display=display, env_size=ENV_SIZE)
     parking_slot_detector = ParkingSlotDetector(
-        canny=[38, 85],
-        hough=[91, 107],
-        blur=2,
-        iterations=[0, 0],
+        canny=[50, 100],
+        hough=[200, 50],
+        blur=5,
+        iterations=[1, 1],
         filter_atol=[20, 20],
-        cluster_atol=2)
+        cluster_atol=5)
     lane_detector = LaneDetector()
     sign_size = {
         'px': 10,
@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
         # Should change this to camera frame later
         frame = cv2.imread(
-        'tests/images/parking_slot_detection_2/frame_5_test.jpg')
+        'tests/images/parking_slot_detection_2/frame_6.jpg')
         obstacles = []
 
         qr_data = qr_code.get_data(frame)
@@ -96,22 +96,24 @@ if __name__ == '__main__':
             'points': qr_data['points']
         }
 
-        parking_lines, parking_lines_coords = parking_slot_detector.get_parking_lines(frame)
+        parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
 
-        if parking_lines_coords is not None:
-            for lines in parking_lines_coords:
+        if parking_slot_coords is not None:
+            closing_line = parking_slot_detector.get_closing_line_of_two_lines(parking_slot_coords)
+            if len(closing_line) == 4:
+                parking_slot_coords.append(closing_line)
+            for lines in parking_slot_coords:
                 obstacles.append({'values': [
                                  (lines[0], lines[1]), (lines[2], lines[3])],
                     'distance': False, 'object_id': 30})
-                
-        parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
+        parking_lines, parking_lines_coords = parking_slot_detector.get_parking_lines(frame)
 
-        if parking_slot_coords is not None and len(parking_slot_coords) == 2:
-            closing_line = parking_slot_detector.get_closing_line_of_two_lines(parking_slot_coords)
-            if closing_line is not None:
-                obstacles.append({'values': [
-                    (closing_line[0], closing_line[1]), (closing_line[2], closing_line[3])],
-                     'distance': False, 'object_id': 30})
+        # if parking_lines_coords is not None:
+        #     for lines in parking_lines_coords:
+        #         obstacles.append({'values': [
+        #                          (lines[0], lines[1]), (lines[2], lines[3])],
+        #             'distance': False, 'object_id': 30})
+                
         
         # parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
 

@@ -6,7 +6,7 @@ https://learnopencv.com/making-a-low-cost-stereo-camera-using-opencv/
 
 the code is highly inspired from the sources, but modified to fit our use case
 '''
-from typing import TypedDict, List
+from typing import TypedDict, List, Tuple
 import glob
 import numpy as np
 import cv2 as cv
@@ -34,7 +34,7 @@ class Calibrate:
         'right': List[np.ndarray],
     })
 
-    def calculate_object_and_image_points(self) -> tuple(CalibratePoints, ImagesReturned):
+    def calculate_object_and_image_points(self) -> Tuple[CalibratePoints, ImagesReturned]:
         '''Calculate object points and image points for valid images'''
         # arrays to store object poitns and image points from all the images
         point = {
@@ -146,9 +146,9 @@ class Calibrate:
 if __name__ == '__main__':
     CHECKERBOARD_DIMENSION = (8, 6)
     CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-    DIRECTORY_LEFT = 'computer_vision/stereoscopic_vision/images/calibrate_small/left/*.jpg'
-    DIRECTORY_RIGHT = 'computer_vision/stereoscopic_vision/images/calibrate_small/right/*.jpg'
-    DESTINATION_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps.xml'
+    DIRECTORY_LEFT = 'computer_vision/stereoscopic_vision/images/calibrate_mac/left/*.jpg'
+    DIRECTORY_RIGHT = 'computer_vision/stereoscopic_vision/images/calibrate_mac/right/*.jpg'
+    DESTINATION_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps_mac.xml'
 
     # Calibrate left camera
     calibrate = Calibrate(CRITERIA, CHECKERBOARD_DIMENSION, DIRECTORY_LEFT, DIRECTORY_RIGHT)

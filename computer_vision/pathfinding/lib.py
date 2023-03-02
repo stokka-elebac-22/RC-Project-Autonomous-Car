@@ -38,15 +38,15 @@ class PathFinding:
     def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
         offset_x = point[0] - self.center[0]/2
-        offset_y = point[1]
-        #y_distance = -87.5961/(1-1.2048*math.e**(-0.0007*offset_y))
-        y_distance = (-0.2243/(1-1.0751*math.e**(-0.0003*offset_y)))*146
-        ratio_x = 0.0001*offset_y**2-0.0044*offset_y+0.6254
-        ratio_test= 0.0013 * y_distance - 0.0015
-        x_distance = offset_x*ratio_test
-        y_distance = -87.5961/(1-1.2048*math.e**(-0.0007*offset_y))
-        print(point)
-        print(y_distance)
+        offset_y = 800-point[1]
+        y_distance = 0.0000005405*pow(np.int64(offset_y), np.int64(4))-0.0002915424*pow(np.int64(offset_y), np.int64(3))+0.0579638581*pow(np.int64(offset_y), np.int64(2))-2.4604486471*offset_y+430.4886090479
+        # # BEST ONE TILL NOW
+        # #y_distance = 0.0001128043*offset_y**3-0.0378472981*offset_y**2+4.7352668458*offset_y+390.8927589848
+        # #y_distance = -0.0000002057*offset_y**3+0.0008988358*offset_y**2-1.359741782*offset_y+1212.4564904223
+        ratio_x= 0.0008111433472 * y_distance - 0.0096054187869
+        if y_distance > 2500:
+            y_distance=2500
+        x_distance = offset_x*ratio_x
         # x_distance = offset_x*self.ratio_width
         # y_distance = offset_y*self.ratio_height
         return (x_distance, y_distance)

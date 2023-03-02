@@ -50,7 +50,7 @@ if __name__ == "__main__":
     cv2.createTrackbar('Cluster', 'Trackbars', 5, 20, nothing)
 
     frame = cv2.imread(
-        'tests/images/parking_slot_detection_2/frame_6.jpg')
+        'tests/images/parking_slot_detection_2/frame_5_test.jpg')
 
     SCALE_PERCENT = 30  # percent of original size
     new_width = int(frame.shape[1] * SCALE_PERCENT / 100)

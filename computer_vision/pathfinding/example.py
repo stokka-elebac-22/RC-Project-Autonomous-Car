@@ -30,7 +30,7 @@ if __name__ == '__main__':
     W_SIZE = 720
 
     img = cv2.imread(
-        'tests/images/parking_slot_detection_2/frame_6.jpg')
+        'tests/images/parking_slot_detection_2/frame_5_test.jpg')
     window_size = (W_SIZE * (BOARD_SIZE[1]/BOARD_SIZE[0]), W_SIZE)
     display = DisplayEnvironment(window_size, BOARD_SIZE)
     PIXEL_WIDTH = img.shape[1]
@@ -63,7 +63,6 @@ if __name__ == '__main__':
 
     RUN = True
     while RUN:
-
         # Add hindrances using mouse
         for event in pg.event.get():
             if event.type == QUIT:
@@ -76,7 +75,7 @@ if __name__ == '__main__':
 
         # Should change this to camera frame later
         frame = cv2.imread(
-        'tests/images/parking_slot_detection_2/frame_6.jpg')
+        'tests/images/parking_slot_detection_2/frame_5_test.jpg')
         obstacles = []
 
         qr_data = qr_code.get_data(frame)

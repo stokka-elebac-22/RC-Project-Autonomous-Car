@@ -260,21 +260,25 @@ if __name__ == '__main__':
     #     'computer_vision/stereoscopic_vision/images/test/test_left.png'
     # DIRECTORY_RIGHT_IMAGE = \
     #     'computer_vision/stereoscopic_vision/images/test/test_right.png'
+    DIRECTORY_LEFT_IMAGE = \
+        'tests/images/stereoscopic_vision/test/11/left/left_7.jpg'
+    DIRECTORY_RIGHT_IMAGE = \
+        'tests/images/stereoscopic_vision/test/11/right/right_7.jpg'
 
-    # if not os.path.exists(DIRECTORY_LEFT_IMAGE):
-    #     print(f'{DIRECTORY_LEFT_IMAGE} does not exists')
-    #     raise Exception
-    # if not os.path.exists(DIRECTORY_RIGHT_IMAGE):
-    #     print(f'{DIRECTORY_RIGHT_IMAGE} does not exists')
-    #     raise Exception
+    if not os.path.exists(DIRECTORY_LEFT_IMAGE):
+        print(f'{DIRECTORY_LEFT_IMAGE} does not exists')
+        raise Exception
+    if not os.path.exists(DIRECTORY_RIGHT_IMAGE):
+        print(f'{DIRECTORY_RIGHT_IMAGE} does not exists')
+        raise Exception
 
     print('Running...')
     while True:
-        ret_left, frame_left = cam_left.read()
-        ret_right, frame_right = cam_right.read()
-        # ret_left, ret_right = True, True
-        # frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
-        # frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
+        # ret_left, frame_left = cam_left.read()
+        # ret_right, frame_right = cam_right.read()
+        ret_left, ret_right = True, True
+        frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
+        frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
 
         if ret_left and ret_right:
             # NOTE: it might help to blur the image to reduce noise

@@ -20,9 +20,9 @@ if __name__ == "__main__":
     QR_SIZE_MM = 52
     QR_DISTANCE = 500
     qr_size = {
-        'px': 76,
-        'mm': 52,
-        'distance': 500
+        'px': 136,
+        'mm': 79,
+        'distance': 745
     }
     qr_code = QRCode(size=qr_size)
 
@@ -108,10 +108,10 @@ if __name__ == "__main__":
                 parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
         parking_slot_detector.show_lines(copy, parking_lines)
 
-        all = parking_slot_detector.get_parking_lines(copy)
-        if all is not None:
-            lines, coords = parking_slot_detector.get_parking_lines(copy)
-            parking_slot_detector.show_lines(copy, coords)
+        # all = parking_slot_detector.get_parking_lines(copy)
+        # if all is not None:
+        #     lines, coords = parking_slot_detector.get_parking_lines(copy)
+        #     parking_slot_detector.show_lines(copy, coords)
         cv2.imshow('frame', copy)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

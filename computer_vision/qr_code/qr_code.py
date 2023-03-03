@@ -244,10 +244,16 @@ def local_read_camera(name: str=None, resize: int=1):
 if __name__ == '__main__':
     # ----- ORIGINAL MEASUREMENTS -----
     # QR Code measured, 55mm lense
+    # SIZE = {
+    #     'px': 76,
+    #     'mm': 52,
+    #     'distance': 500
+    # }
+
     SIZE = {
-        'px': 76,
-        'mm': 52,
-        'distance': 500
+        'px': 136,
+        'mm': 79,
+        'distance': 745
     }
     qr_code = QRCode(SIZE)
     CAMERA_ID = 0
@@ -279,19 +285,18 @@ if __name__ == '__main__':
     distances_lists = [[0 for _ in range(VALUES_LENGTH)]]
 
     while True:
-        img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
+        img = cv.imread('tests/images/parking_slot_detection_2/QR_10.jpg')
         img = local_read_camera()
         qr_data = qr_code.get_data(img)
-
-        if len(angles_lists) < len(qr_data['angles']):
-            for _ in range(len(qr_data['angles']) - len(angles_lists)):
-                angles_lists.append([0 for _ in range(VALUES_LENGTH)])
-        if len(distances_lists) < len(qr_data['distances']):
-            for _ in range(len(qr_data['distances']) - len(distances_lists)):
-                distances_lists.append([0 for _ in range(VALUES_LENGTH)])
-        filter_angle(qr_data['angles'])
-        filter_distance(qr_data['distances'])
         if qr_data['ret']:
+            if len(angles_lists) < len(qr_data['angles']):
+                for _ in range(len(qr_data['angles']) - len(angles_lists)):
+                    angles_lists.append([0 for _ in range(VALUES_LENGTH)])
+            if len(distances_lists) < len(qr_data['distances']):
+                for _ in range(len(qr_data['distances']) - len(distances_lists)):
+                    distances_lists.append([0 for _ in range(VALUES_LENGTH)])
+            filter_angle(qr_data['angles'])
+            filter_distance(qr_data['distances'])
             average_angles = [int(sum(angles_list)//VALUES_LENGTH) \
                 for angles_list in angles_lists]
             average_distance = [int(sum(distances_list)//VALUES_LENGTH) \

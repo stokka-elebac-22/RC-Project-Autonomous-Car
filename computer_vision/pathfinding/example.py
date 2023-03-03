@@ -25,7 +25,7 @@ if __name__ == '__main__':
     CAM_WIDTH = 1000
     CAM_HEIGHT = 600
 
-    BOARD_SIZE = (60, 115)
+    BOARD_SIZE = (70, 115)
     ENV_SIZE = 20
     W_SIZE = 720
 
@@ -51,13 +51,19 @@ if __name__ == '__main__':
         'mm': 61,
         'distance': 200
     }
-    qr_size = {
-        'px': 10,
-        'mm': 61,
-        'distance': 200
+    # qr_size = {
+    #     'px': 10,
+    #     'mm': 61,
+    #     'distance': 200
+    # }
+
+    SIZE = {
+        'px': 136,
+        'mm': 79,
+        'distance': 745
     }
     traffic_sign_detection = TrafficSignDetector(size=sign_size)
-    qr_code = QRCode(qr_size)
+    qr_code = QRCode(SIZE)
 
     TILE_SIZE = display.window_size[1]/path_finding.size[0]
 
@@ -95,23 +101,28 @@ if __name__ == '__main__':
             'points': qr_data['points']
         }
 
-        parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
+        # TODO: TAKE THIS BACK
+        # parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
 
-        if parking_slot_coords is not None:
-            closing_line = parking_slot_detector.get_closing_line_of_two_lines(parking_slot_coords)
-            if len(closing_line) == 4:
-                parking_slot_coords.append(closing_line)
-            for lines in parking_slot_coords:
-                obstacles.append({'values': [
-                                 (lines[0], lines[1]), (lines[2], lines[3])],
-                    'distance': False, 'object_id': 30})
-        parking_lines, parking_lines_coords = parking_slot_detector.get_parking_lines(frame)
-
-        # if parking_lines_coords is not None:
-        #     for lines in parking_lines_coords:
+        # if parking_slot_coords is not None:
+        #     closing_line = parking_slot_detector.get_closing_line_of_two_lines(parking_slot_coords)
+        #     if len(closing_line) == 4:
+        #         parking_slot_coords.append(closing_line)
+        #     for lines in parking_slot_coords:
         #         obstacles.append({'values': [
         #                          (lines[0], lines[1]), (lines[2], lines[3])],
         #             'distance': False, 'object_id': 30})
+        # parking_lines, parking_lines_coords = parking_slot_detector.get_parking_lines(frame)
+
+        parking_lines_coords = [[64, 642, 207, 556],
+[427, 648, 460, 561],
+[795, 648, 718, 565],
+[1143, 650, 967, 565]]
+        if parking_lines_coords is not None:
+            for lines in parking_lines_coords:
+                obstacles.append({'values': [
+                                 (lines[0], lines[1]), (lines[2], lines[3])],
+                    'distance': False, 'object_id': 30})
                 
         
         # parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
@@ -201,11 +212,11 @@ if __name__ == '__main__':
 
         # RUN = True
         # TODO: point for lane line, maybe can remove the get course functions no need? # pylint: disable=W0511
-        # path_finding.calculate_path((CENTER_DIFF_X, CENTER_DIFF_Y), True)
+        # path_finding.calculate_path((CENTER_DIFF_X, DESIRED_DISTANCE_FORWARD), True)
 
         # With distance from Parking using QR!!!
         # TODO: DOES NOT WORK WHY?? maybe bcus of calibration constants # pylint: disable=W0511
-        # path_finding.calculate_path((qr_distance_x, DESIRED_DISTANCE_FORWARD), True)
+        # path_finding.calculate_path((qr_distance_x, qr_distance_y), True)
 
         # TODO: add catmull rom spline based on points given by path # pylint: disable=W0511
         # USE PATH variable!!!
@@ -231,23 +242,24 @@ if __name__ == '__main__':
     #     angle_diff.append(minimum_diff)
     #     CURRENT_ANG = next_ang
 
-    angle_diff, angle_diff_x = get_angle_diff(angles)
+            angle_diff = get_angle_diff(angles)
+            angle_diff_x = [i for i in range(len(angle_diff))]
 
-    fig, axs = plt.subplots(1, 3)
-    fig.suptitle('Horizontally stacked subplots')
-    axs[0].plot(x_values, y_values)
-    axs[0].quiver(x_values, y_values, vx_values, vy_values, linewidths=1)
-    axs[1].plot(angle_diff_x, angles)
-    axs[2].plot(angle_diff_x, angle_diff)
-    plt.show()
+            fig, axs = plt.subplots(1, 3)
+            fig.suptitle('Horizontally stacked subplots')
+            axs[0].plot(x_values, y_values)
+            axs[0].quiver(x_values, y_values, vx_values, vy_values, linewidths=1)
+            axs[1].plot(angle_diff_x, angles)
+            axs[2].plot(angle_diff_x, angle_diff)
+            plt.show()
 
-    # 2D TO 3D, need to put in function?
-    for i, value in enumerate(c):
-        if i % 30 == 0:
-            distance_x = (value[0]-math.ceil(path_finding.env.size[1]/2)) \
-                            *path_finding.env.real_size
-            distance_y = (path_finding.env.size[0] - (value[1]+1))*path_finding.env.real_size
-            point = path_finding.distance_to_point((distance_x, distance_y))
-            frame = cv2.circle(frame, point, 3, (255, 0, 0), -1)
+            # 2D TO 3D, need to put in function?
+            for i, value in enumerate(c):
+                if i % 30 == 0:
+                    distance_x = (value[0]-math.ceil(path_finding.env.size[1]/2)) \
+                                    *path_finding.env.real_size
+                    distance_y = (path_finding.env.size[0] - (value[1]+1))*path_finding.env.real_size
+                    point = path_finding.distance_to_point((distance_x, distance_y))
+                    frame = cv2.circle(frame, point, 3, (255, 0, 0), -1)
     cv2.imshow('frame', frame)
     cv2.waitKey(0)

@@ -17,6 +17,7 @@ sys.path.append(parent)
 from computer_vision.qr_code.qr_code import QRCode, QRSize
 from computer_vision.environment.src.environment import Environment
 from computer_vision.environment.src.lib import Objects
+from computer_vision.environment.src.a_star import AStar
 
 # ---------- CONSTANTS ---------- #
 
@@ -40,6 +41,13 @@ if __name__ == '__main__':
     sys.stdout.write(f'Connecting to camera {available_cameras[0]}')
     camera = cv.VideoCapture(available_cameras[0])
 
+    ### init environment ###
+    SIZE = (config['environment']['sizex'], config['environment']['sizey'])
+    WINDOW_WIDTH = config['gui']['window_width']
+    WINDOW_SIZE = (WINDOW_WIDTH* (SIZE[1]/SIZE[0]), WINDOW_WIDTH)
+    env= Environment(SIZE, 1, {'object_id': 10})
+    objects = Objects()
+
     ### init qr code ###
     QR_SIZE: QRSize = {
         'px': config['qr_code_size']['px'],
@@ -47,13 +55,7 @@ if __name__ == '__main__':
         'distance': config['qr_code_size']['distance'],
     }
     qr_code = QRCode(QR_SIZE)
-
-    ### init environment ###
-    SIZE = (config['environment']['sizex'], config['environment']['sizey'])
-    WINDOW_WIDTH = config['gui']['window_width']
-    WINDOW_SIZE = (WINDOW_WIDTH* (SIZE[1]/SIZE[0]), WINDOW_WIDTH)
-    env= Environment(SIZE, 1, {'object_id': 10})
-    objects = Objects()
+    qr_code_id = objects.get_data('QR').id
 
     # ---------- LOOP ---------- #
     while True:
@@ -67,7 +69,16 @@ if __name__ == '__main__':
         if not qr_data['ret']:
             continue
 
+        # insert the qr codes to the environment
+        for i in range(len(qr_data['info'])):
+            env.insert(qr_data['distances'][i], qr_code_id)
+
         # ---------- UPDATE ENVIRONMENT ---------- #
-        env.
+        start_pos_path = env.get_pos(10)
+        end_pos_path = env.get_pos(11)
+        cur_mat = env.get_data()
+
+        # ---------- PATH ---------- #
+        ret, path = AStar().get_data(cur_mat, start_pos_path, end_pos_path)
 
         # ---------- ACTION ---------- #

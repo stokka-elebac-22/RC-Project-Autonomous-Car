@@ -21,6 +21,8 @@ sys.path.append(parent)
 if __name__ == '__main__':
     # ---------- INIT ---------- #
     ### init camera ###
+    # need to run this command to get VideoCapture to work after every restart of pi
+    os.system('sudo chmod 777 /dev/video0')
 
     ret, available_cameras = get_available_cameras()
 

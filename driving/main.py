@@ -5,14 +5,14 @@ This file should only contain short code
 
 import sys
 import os
+from lib import get_available_cameras
+import cv2 as cv
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
 # pylint: disable=C0413
-from computer_vision.camera_handler.camera_handler import CameraHandler
-from computer_vision.camera_handler.camera import Camera
 
 
 # ---------- CONSTANTS ---------- #
@@ -21,21 +21,15 @@ from computer_vision.camera_handler.camera import Camera
 if __name__ == '__main__':
     # ---------- INIT ---------- #
     ### init camera ###
-    camera_handler = CameraHandler()
-    camera_handler.refresh_camera_list()
-    available_cameras = camera_handler.get_camera_list()
 
-    if len(available_cameras) == 0:
+    ret, available_cameras = get_available_cameras()
+
+    if not ret:
         sys.stdout.write('There is no available cameras')
         raise ConnectionError
 
-    CAMERA_STRING = 'Cameras: \n'
-    for camera in available_cameras:
-        CAMERA_STRING += camera_handler.get_camera_string(camera['id'])
-
-    sys.stdout.write(CAMERA_STRING)
-
-    camera = Camera(available_cameras[0]['id'])
+    sys.stdout.write(f'Connecting to camera {available_cameras[0]}')
+    camera = cv.VideoCapture(available_cameras[0])
 
     ### init qr code ###
     ### init environment ###

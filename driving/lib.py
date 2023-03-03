@@ -8,17 +8,14 @@ def get_available_cameras() -> Tuple[bool, List[int]]:
     Returns the index of the available cameras and
     a bool value, indicating if the list is empty or not'''
     index = 0
-    arr = []
+    cameras = []
     while True:
-        try:
-            cap = cv.VideoCapture(index)
-        except:
+        ret, cap = cv.VideoCapture(index)
+        if not ret:
             break
-        if not cap.read()[0]:
-            break
-        arr.append(index)
+        cameras.append(index)
         cap.release()
         index += 1
-    if len(arr) == 0:
+    if len(cameras) == 0:
         return False, None
-    return True, arr
+    return True, cameras

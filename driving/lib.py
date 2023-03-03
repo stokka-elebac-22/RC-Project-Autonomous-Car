@@ -11,7 +11,7 @@ def get_available_cameras() -> Tuple[bool, List[int]]:
     cameras = []
     while True:
         cap = cv.VideoCapture(index)
-        if not cap[0]:
+        if not cap.read()[0]:
             break
         cameras.append(index)
         cap.release()

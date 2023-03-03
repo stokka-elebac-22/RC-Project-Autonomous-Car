@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # open yaml file
     with open('driving/config.yaml', 'r', encoding='utf8') as file:
         config = yaml.safe_load(file)
-
+        
     ret, available_cameras = get_available_cameras()
 
     if not ret:
@@ -57,6 +57,7 @@ if __name__ == '__main__':
     qr_code = QRCode(QR_SIZE)
     qr_code_id = objects.get_data('QR').id
 
+    ### init environment ###
     # ---------- LOOP ---------- #
     while True:
         # ---------- GET CAMERA INFORMATION---------- #

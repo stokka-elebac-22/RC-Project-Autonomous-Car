@@ -58,7 +58,7 @@ if __name__ == '__main__':
         sys.stdout.write(f'\
         QR Code: \n \
         Distance: {qr_data["distances"][0]} \n \
-        Angle: {qr_data["angles"][0]} \n')
+        Angle: {qr_data["angles"][0]} \n\n ')
 
 
         ### Line detection ###

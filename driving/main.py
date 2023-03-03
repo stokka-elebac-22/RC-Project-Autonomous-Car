@@ -13,6 +13,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 # pylint: disable=C0413
+from computer_vision.qr_code.qr_code import QRCode, QRSize
 
 
 # ---------- CONSTANTS ---------- #
@@ -34,13 +35,31 @@ if __name__ == '__main__':
     camera = cv.VideoCapture(available_cameras[0])
 
     ### init qr code ###
+    QR_SIZE: QRSize = {
+        'px': 76,
+        'mm': 52,
+        'distance': 500
+    }
+    qr_code = QRCode(QR_SIZE)
+
     ### init environment ###
     # ---------- LOOP ---------- #
     while True:
-        sys.stdout.write('The code is running.')
         # ---------- GET CAMERA INFORMATION---------- #
+        ret, frame = camera.read()
+        if not ret:
+            continue
+
         ### QR Code ###
-        # qr_code.get_data(frame)
+        qr_data = qr_code.get_data(frame)
+        if not qr_data['ret']:
+            continue
+
+        sys.stdout.write(f'QR Code: \n \
+                    Distance: {qr_data["distances"][0]} \n \
+                    Angle: {qr_data["angles"][0]} \
+                   ')
+
 
         ### Line detection ###
 

@@ -2,8 +2,18 @@
 The main file for the driving logic.
 This file should only contain short code
 '''
-from computer_vision.qr_code.qr_code import QRCode
-from computer_vision.environment.src.environment import Environment
+
+import sys
+import os
+
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
+# pylint: disable=C0413
+from computer_vision.camera_handler.camera_handler import CameraHandler
+from computer_vision.camera_handler.camera import Camera
+
 
 # ---------- CONSTANTS ---------- #
 
@@ -11,19 +21,27 @@ from computer_vision.environment.src.environment import Environment
 if __name__ == '__main__':
     # ---------- INIT ---------- #
     ### init camera ###
-    ### init qr code ###
-    QR_CODE_SIZE_PX = 76
-    QR_CODE_SIZE_MM = 52
-    QR_CODE_DISTANCE = 500
-    qr_code = QRCode(QR_CODE_SIZE_PX, QR_CODE_SIZE_MM, QR_CODE_DISTANCE)
-    ### init environment ###
-    SIZE = (10, 11)
-    WINDOW_WIDTH = 600
-    WINDOW_SIZE = (WINDOW_WIDTH* (SIZE[1]/SIZE[0]), WINDOW_WIDTH)
-    env= Environment(SIZE, 1, {'object_id': 10})
+    camera_handler = CameraHandler()
+    camera_handler.refresh_camera_list()
+    available_cameras = camera_handler.get_camera_list()
 
+    if len(available_cameras) == 0:
+        sys.stdout.write('There is no available cameras')
+        raise ConnectionError
+
+    CAMERA_STRING = 'Cameras: \n'
+    for camera in available_cameras:
+        CAMERA_STRING += camera_handler.get_camera_string(camera['id'])
+
+    sys.stdout.write(CAMERA_STRING)
+
+    camera = Camera(available_cameras[0]['id'])
+
+    ### init qr code ###
+    ### init environment ###
     # ---------- LOOP ---------- #
     while True:
+        sys.stdout.write('The code is running.')
         # ---------- GET CAMERA INFORMATION---------- #
         ### QR Code ###
         # qr_code.get_data(frame)
@@ -33,4 +51,3 @@ if __name__ == '__main__':
         # ---------- UPDATE ENVIRONMENT ---------- #
 
         # ---------- ACTION ---------- #
-        pass

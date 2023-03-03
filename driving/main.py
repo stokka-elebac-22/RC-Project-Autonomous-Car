@@ -55,10 +55,10 @@ if __name__ == '__main__':
         if not qr_data['ret']:
             continue
 
-        sys.stdout.write(f'QR Code: \n \
-                    Distance: {qr_data["distances"][0]} \n \
-                    Angle: {qr_data["angles"][0]} \
-                   ')
+        sys.stdout.write(f'\
+        QR Code: \n \
+        Distance: {qr_data["distances"][0]} \n \
+        Angle: {qr_data["angles"][0]} \n')
 
 
         ### Line detection ###

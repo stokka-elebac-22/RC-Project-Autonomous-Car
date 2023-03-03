@@ -14,7 +14,7 @@ class Environment:
         '''View point is the position in a 2d matrix where everyting should be relativ too'''
         self.size = size
         self.real_size = real_size # the real unit size per square
-        self.map = np.zeros(size)
+        self.map = np.zeros(self.size)
 
         self.view_point = (self.size[0]-1, self.size[1]//2)
         object_id = 0
@@ -28,6 +28,10 @@ class Environment:
 
     def update(self):
         '''Update the map'''
+
+    def reset(self):
+        '''Reset the map'''
+        self.map = np.zeros(self.size)
 
     def get_data(self):
         '''

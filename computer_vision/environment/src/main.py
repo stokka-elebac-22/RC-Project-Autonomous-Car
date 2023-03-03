@@ -33,7 +33,6 @@ if __name__ == '__main__': # pylint: disable=R0801
         cur_mat = env.get_data()
         display.update(cur_mat)
         cur_mat = env.get_data()
-        print(cur_mat)
         ret, path = AStar().get_data(cur_mat, start_pos_path, end_pos_path)
 
         if ret:

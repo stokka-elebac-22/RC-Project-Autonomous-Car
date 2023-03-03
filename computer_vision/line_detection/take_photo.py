@@ -10,7 +10,7 @@ if __name__ == '__main__':
     # cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     # cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
-    COUNT = 18
+    COUNT = 21
     while True:
         #frames = []
         RETS = True

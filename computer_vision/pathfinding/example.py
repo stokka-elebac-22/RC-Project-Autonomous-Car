@@ -1,6 +1,7 @@
 '''Main'''
 import math
 import cv2
+import numpy as np
 import pygame as pg
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
 from lib import PathFinding
@@ -28,6 +29,8 @@ if __name__ == '__main__':
     BOARD_SIZE = (70, 115)
     ENV_SIZE = 20
     W_SIZE = 720
+
+    cam = cv2.VideoCapture(0)
 
     img = cv2.imread(
         'tests/images/parking_slot_detection_2/frame_5_test.jpg')
@@ -80,14 +83,17 @@ if __name__ == '__main__':
                 path_finding.env.insert_by_index((int(row), int(col)), '1')
 
         # Should change this to camera frame later
-        frame = cv2.imread(
-        'tests/images/parking_slot_detection_2/title_12.jpg')
+        # frame = cv2.imread(
+        # 'tests/images/parking_slot_detection_2/title_12.jpg')
+        ret, frame = cam.read()
+
         obstacles = []
 
         qr_data = qr_code.get_data(frame)
         if qr_data['ret']:
+            #print(qr_data['points'])
             distances = path_finding.point_to_distance(
-                (qr_data['points'][0][3][0]+qr_data['points'][0][2][0]/2,
+                (qr_data['points'][0][0][0]+(qr_data['points'][0][1][0]-qr_data['points'][0][0][0])/2,
                  qr_data['points'][0][0][0]))
             qr_distance_x = distances[0]
             qr_distance_y = qr_data['distances'][0]
@@ -167,12 +173,24 @@ if __name__ == '__main__':
         #                          (distance_x, distance_y)], 'distance': True, 'object_id': 40})
 
         path_finding.insert_objects(obstacles)
+        # TODO: point for lane line, maybe can remove the get course functions no need? # pylint: disable=W0511
+        # path = path_finding.calculate_path((CENTER_DIFF_X, DESIRED_DISTANCE_FORWARD), True)
+
+        # With distance from Parking using QR!!!
+        # TODO: DOES NOT WORK WHY?? maybe bcus of calibration constants # pylint: disable=W0511
+        path = path_finding.calculate_path((qr_distance_x, qr_distance_y), True)
+
         # TODO: Remove later since Test point # pylint: disable=W0511
-        path = path_finding.calculate_path((460, 120), False)
+        # path = path_finding.calculate_path((460, 120), False)
         path_finding.update_display(path)
         path_finding.display.display()
-
-
+        
+        board = path_finding.env.get_data()
+        path_finding.env.map = np.full_like(board, 0)
+        path_finding.env.insert_by_index((path_finding.env.size[0]-1, path_finding.env.size[1]//2), 10)
+        # new_board = np.full_like(board, 0)
+        # path_finding.display.update(new_board)
+        
         # CATMULL SPLINE
         TENSION = 0.
 
@@ -211,13 +229,7 @@ if __name__ == '__main__':
                 COUNT += 2
 
         # RUN = True
-        # TODO: point for lane line, maybe can remove the get course functions no need? # pylint: disable=W0511
-        # path_finding.calculate_path((CENTER_DIFF_X, DESIRED_DISTANCE_FORWARD), True)
-
-        # With distance from Parking using QR!!!
-        # TODO: DOES NOT WORK WHY?? maybe bcus of calibration constants # pylint: disable=W0511
-        # path_finding.calculate_path((qr_distance_x, qr_distance_y), True)
-
+        
         # TODO: add catmull rom spline based on points given by path # pylint: disable=W0511
         # USE PATH variable!!!
 
@@ -245,13 +257,13 @@ if __name__ == '__main__':
             angle_diff = get_angle_diff(angles)
             angle_diff_x = [i for i in range(len(angle_diff))]
 
-            fig, axs = plt.subplots(1, 3)
-            fig.suptitle('Horizontally stacked subplots')
-            axs[0].plot(x_values, y_values)
-            axs[0].quiver(x_values, y_values, vx_values, vy_values, linewidths=1)
-            axs[1].plot(angle_diff_x, angles)
-            axs[2].plot(angle_diff_x, angle_diff)
-            plt.show()
+            # fig, axs = plt.subplots(1, 3)
+            # fig.suptitle('Horizontally stacked subplots')
+            # axs[0].plot(x_values, y_values)
+            # axs[0].quiver(x_values, y_values, vx_values, vy_values, linewidths=1)
+            # axs[1].plot(angle_diff_x, angles)
+            # axs[2].plot(angle_diff_x, angle_diff)
+            # plt.show()
 
             # 2D TO 3D, need to put in function?
             for i, value in enumerate(c):

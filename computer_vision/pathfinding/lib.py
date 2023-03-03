@@ -39,7 +39,8 @@ class PathFinding:
         '''Converts point to distance'''
         offset_x = point[0] - self.center[0]/2
         offset_y = 800-point[1]
-        y_distance = 0.0000005405*pow(np.int64(offset_y), np.int64(4))-0.0002915424*pow(np.int64(offset_y), np.int64(3))+0.0579638581*pow(np.int64(offset_y), np.int64(2))-2.4604486471*offset_y+430.4886090479
+        # Added 150 offset
+        y_distance = 0.0000005405*pow(np.int64(offset_y), np.int64(4))-0.0002915424*pow(np.int64(offset_y), np.int64(3))+0.0579638581*pow(np.int64(offset_y), np.int64(2))-2.4604486471*offset_y+430.4886090479 - 150
         # # BEST ONE TILL NOW
         # #y_distance = 0.0001128043*offset_y**3-0.0378472981*offset_y**2+4.7352668458*offset_y+390.8927589848
         # #y_distance = -0.0000002057*offset_y**3+0.0008988358*offset_y**2-1.359741782*offset_y+1212.4564904223

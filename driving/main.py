@@ -5,6 +5,7 @@ This file should only contain short code
 
 import sys
 import os
+from lib import get_available_cameras
 import cv2 as cv
 
 current = os.path.dirname(os.path.realpath(__file__))
@@ -12,7 +13,6 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 # pylint: disable=C0413
-from driving.lib import get_available_cameras
 
 
 # ---------- CONSTANTS ---------- #

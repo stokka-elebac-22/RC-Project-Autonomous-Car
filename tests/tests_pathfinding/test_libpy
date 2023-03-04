@@ -1,6 +1,6 @@
 '''Importing needed libraries'''
 import pytest
-from computer_vision.pathfinding.lib import PathFinding
+from computer_vision.pathfinding.pathfinding import PathFinding
 
 class TestParametrized:
     '''

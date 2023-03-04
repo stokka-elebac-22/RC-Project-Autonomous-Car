@@ -14,7 +14,7 @@ class Environment:
         '''View point is the position in a 2d matrix where everyting should be relativ too'''
         self.size = size
         self.real_size = real_size # the real unit size per square
-        self.map = np.zeros(size)
+        self.map = np.zeros(self.size)
 
         self.view_point = (self.size[0]-1, self.size[1]//2)
         object_id = 0
@@ -26,10 +26,14 @@ class Environment:
                 object_id = view_point_object.get('object_id')
         self.map[self.view_point[0]][self.view_point[1]] = object_id
 
-    def update(self):
+    def update(self) -> None:
         '''Update the map'''
 
-    def get_data(self):
+    def reset(self):
+        '''Reset the map'''
+        self.map = np.zeros(self.size)
+
+    def get_data(self) -> np.ndarray:
         '''
         Returns the data
         map: the matrix
@@ -37,7 +41,7 @@ class Environment:
         # needs do send a copy of the map, else it will get modified
         return copy.deepcopy(self.map)
 
-    def get_pos(self, object_id: int):
+    def get_pos(self, object_id: int) -> Tuple[int, int]:
         '''Find the position of the tile with corresponding id'''
         for i, row in enumerate(self.map):
             for j, col in enumerate(row):

@@ -36,12 +36,27 @@ class TestEnvironment:
                         2.5, (3, -1), 1], [False, [[0,0,0],[0,0,0],[0,2,0]]]),
         ]
     )
+
     def test_insert(self, param, exp):
         '''Testing inserting object into the environment'''
         env = Environment(param[0], param[2], param[1])
         ret = env.insert(param[3], param[4])
         data = env.get_data()
         assert ret[0] == exp[0] and are_same(data, exp[1])
+
+    @pytest.mark.parametrize(['param', 'exp'],
+    [
+        ([(3,3), 1, [[0,0,0],[0,0,0],[0,0,0]]], [[0,0,0],[0,0,0],[0,0,0]]),
+        ([(3,3), 1, [[1,2,3],[0,1,3],[0,1,0]]], [[0,0,0],[0,0,0],[0,0,0]]),
+        ([(3,3), 1, [[0,0,0],[0,0,0],[0,1,1]]], [[0,0,0],[0,0,0],[0,0,0]]),
+    ])
+
+    def test_reset(self, param, exp):
+        '''Testing the reset method'''
+        env = Environment(param[0], param[1])
+        env.map = param[2]
+        env.reset()
+        env.map = exp
 
     @pytest.mark.parametrize(
         ['param', 'exp'],

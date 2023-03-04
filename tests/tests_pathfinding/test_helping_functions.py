@@ -1,6 +1,6 @@
 '''Importing needed libraries'''
 import pytest
-from computer_vision.pathfinding.helping_functions import get_abs_velo, get_angle, get_angle_diff
+from computer_vision.pathfinding.lib import get_abs_velo, get_angle, get_angle_diff
 
 class TestParametrized:
     '''

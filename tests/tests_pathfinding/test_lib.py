@@ -9,16 +9,14 @@ class TestParametrized:
 
     # SHOULD FAIL WHEN CHANGED LATER
     @pytest.mark.parametrize('point, expected', [
-        ((20, 300), (-346.6666666, 1.21355)),
-        ((10, 50), (-373.3333333, 1.5636))])
+        ((20, 300), (-28.32843655299916, 280.4886090479)),
+        ((10, 50), (-94.51080737361255, 844.0957035229))])
     def test_point_to_distance(self, point, expected):
         '''Testing point to distance'''
         pathfinding = PathFinding(
             size= (60, 115),
             pixel_height=500,
             pixel_width=300,
-            cam_width=800,
-            cam_height=500,
             object_id=10
         )
         result = pathfinding.point_to_distance(point)
@@ -27,16 +25,14 @@ class TestParametrized:
 
     # SHOULD FAIL WHEN CHANGED LATER
     @pytest.mark.parametrize('distance, expected', [
-        ((-1013.33, 200.0), (-230, 300)),
-        ((-1040.0, 450.0), (-240, 50))])
+        ((-1013.33, 200.0), (-714, 300)),
+        ((-1040.0, 450.0), (-740, 50))])
     def test_distance_to_point(self, distance, expected):
         '''Testing distance to point'''
         pathfinding = PathFinding(
             size= (60, 115),
             pixel_height=500,
             pixel_width=300,
-            cam_width=800,
-            cam_height=500,
             object_id=10
         )
         result = pathfinding.distance_to_point(distance)

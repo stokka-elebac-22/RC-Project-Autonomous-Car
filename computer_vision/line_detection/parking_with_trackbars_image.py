@@ -50,7 +50,7 @@ if __name__ == "__main__":
     cv2.createTrackbar('Cluster', 'Trackbars', 5, 20, nothing)
 
     frame = cv2.imread(
-        'tests/images/parking_slot_detection_2/frame_5_test.jpg')
+        'tests/images/parking_slot_detection_2/title_21.jpg')
 
     SCALE_PERCENT = 30  # percent of original size
     new_width = int(frame.shape[1] * SCALE_PERCENT / 100)
@@ -108,10 +108,10 @@ if __name__ == "__main__":
                 parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
         parking_slot_detector.show_lines(copy, parking_lines)
 
-        # all = parking_slot_detector.get_parking_lines(copy)
-        # if all is not None:
-        #     lines, coords = parking_slot_detector.get_parking_lines(copy)
-        #     parking_slot_detector.show_lines(copy, coords)
+        all = parking_slot_detector.get_parking_lines(copy)
+        if all is not None:
+            lines, coords = parking_slot_detector.get_parking_lines(copy)
+            parking_slot_detector.show_lines(copy, coords)
         cv2.imshow('frame', copy)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

@@ -39,8 +39,7 @@ if __name__ == '__main__':
     PIXEL_WIDTH = img.shape[1]
     PIXEL_HEIGHT = img.shape[0]
     path_finding = PathFinding(
-        BOARD_SIZE, PIXEL_WIDTH, PIXEL_HEIGHT,
-        CAM_WIDTH, CAM_HEIGHT, display=display, env_size=ENV_SIZE)
+        BOARD_SIZE, PIXEL_WIDTH, PIXEL_HEIGHT, display=display, env_size=ENV_SIZE)
     parking_slot_detector = ParkingSlotDetector(
         canny=[50, 100],
         hough=[200, 50],

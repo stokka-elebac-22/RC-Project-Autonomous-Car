@@ -22,12 +22,11 @@ class PathFinding:
     Class using 2D environment mapping to calculate shortest
     path with objects that can be hindrances
     '''
-    def __init__(self, size: tuple[int, int], pixel_width:int, pixel_height:int
-                ,cam_width:int, cam_height:int,
+    def __init__(self, size: tuple[int, int], pixel_width:int, pixel_height:int,
                 object_id:int=10, display:DisplayEnvironment=None, env_size:int = 20
                 ): # pylint: disable=R0913
-        self.ratio_width = cam_width/pixel_width
-        self.ratio_height = cam_height/pixel_height
+        self.pixel_width = pixel_width 
+        self.pixel_height = pixel_height
         self.size = size
         self.display = display
         self.env = Environment(
@@ -38,24 +37,25 @@ class PathFinding:
     def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
         offset_x = point[0] - self.center[0]/2
-        offset_y = 800-point[1]
+        offset_y = self.pixel_width - point[1]
         # Added 150 offset
         y_distance = 0.0000005405*pow(np.int64(offset_y), np.int64(4))-0.0002915424*pow(np.int64(offset_y), np.int64(3))+0.0579638581*pow(np.int64(offset_y), np.int64(2))-2.4604486471*offset_y+430.4886090479 - 150
-        # # BEST ONE TILL NOW
-        # #y_distance = 0.0001128043*offset_y**3-0.0378472981*offset_y**2+4.7352668458*offset_y+390.8927589848
-        # #y_distance = -0.0000002057*offset_y**3+0.0008988358*offset_y**2-1.359741782*offset_y+1212.4564904223
         ratio_x= 0.0008111433472 * y_distance - 0.0096054187869
         if y_distance > 2500:
             y_distance=2500
         x_distance = offset_x*ratio_x
-        # x_distance = offset_x*self.ratio_width
-        # y_distance = offset_y*self.ratio_height
         return (x_distance, y_distance)
 
+    # TODO: Maybe fix later
     def distance_to_point(self, distance:tuple[float, float]) -> tuple[int, int]:
         '''Converts distance to point'''
-        p_x = math.floor((distance[0]/self.ratio_width) + self.center[0]/2)
-        p_y = math.floor(self.center[1] - (distance[1]/self.ratio_height))
+        # x_0 = 5.405*10**(-7)*pow(np.int64(self.pixel_height), np.int64(4)) - 0.0002915424*pow(np.int64(self.pixel_height), np.int64(3))+0.0579638581*pow(np.int64(self.pixel_height), np.int64(2))-2.4604486471*self.pixel_height+430.4886090479-150
+        # x_1 = -0.00002162*pow(np.int64(self.pixel_height), np.int64(3))+0.0008746272*pow(np.int64(self.pixel_height), np.int64(2))-0.1159277162*self.pixel_height+2.4604486471
+        # x_2 = 0.000003243*pow(np.int64(self.pixel_height), np.int64(2))-0.0008746272*self.pixel_width+0.0579638581
+        # x_3 = -0.000002162*self.pixel_width+0.0002915424
+        # x_4 = 5.405*10**(-7)
+        p_x = math.floor((distance[0]/1) + self.center[0]/1)
+        p_y = math.floor(self.center[1] - (distance[1]/1))
         return (p_x, p_y)
 
     Objects = TypedDict('Objects', {

@@ -31,7 +31,7 @@ if __name__ == '__main__':
     os.system('sudo chmod 777 /dev/video0')
 
     # open yaml file
-    with open('driving/config.yaml', 'r', encoding='utf8') as file:
+    with open('config.yaml', 'r', encoding='utf8') as file:
         config = yaml.safe_load(file)
 
     ret, available_cameras = get_available_cameras()

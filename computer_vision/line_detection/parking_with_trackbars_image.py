@@ -7,6 +7,7 @@ import cv2
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
+# pylint: disable=C0413
 from qr_code.qr_code import QRCode
 
 def nothing(_):
@@ -108,8 +109,7 @@ if __name__ == "__main__":
                 parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
         parking_slot_detector.show_lines(copy, parking_lines)
 
-        all = parking_slot_detector.get_parking_lines(copy)
-        if all is not None:
+        if parking_lines is not None:
             lines, coords = parking_slot_detector.get_parking_lines(copy)
             parking_slot_detector.show_lines(copy, coords)
         cv2.imshow('frame', copy)
@@ -122,6 +122,6 @@ if __name__ == "__main__":
     print("blur", gaussian_kernel)
     print("iter", dilate_iter, erode_iter)
     print("filter", filter_atol_slope, filter_atol_intercept)
-    print("cluter", cluster_atol)
+    print("cluster", cluster_atol)
     #cam.release()
     cv2.destroyAllWindows()

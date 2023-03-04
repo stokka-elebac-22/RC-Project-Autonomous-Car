@@ -12,49 +12,90 @@ try:
     from line_detection.lane_detection import LaneDetector
     from traffic_sign_detection.main import TrafficSignDetector
     from environment.src.display import DisplayEnvironment
-    from qr_code.qr_code import QRCode
+    from environment.src.environment import Environment, ViewPointObject
+    from environment.src.a_star import AStar
+    from qr_code.qr_code import QRCode, QRSize
 except ImportError:
     from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
     from computer_vision.line_detection.lane_detection import LaneDetector
-    from computer_vision.traffic_sign_detection.main import TrafficSignDetector
+    from computer_vision.traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
     from computer_vision.environment.src.display import DisplayEnvironment
+    from computer_vision.environment.src.environment import Environment, ViewPointObject
+    from computer_vision.environment.src.a_star import AStar
     from computer_vision.qr_code.qr_code import QRCode
 
 if __name__ == '__main__':
 
-    QR_SIZE_PX = 76
-    QR_SIZE_MM = 52
-    QR_DISTANCE = 500
+    # ----- QR CODE ----- #
+    QR_SIZE: QRSize = {
+        'px': 76,
+        'mm': 52,
+        'distance': 500,
+    }
 
+    # ----- CAMERA ----- #
     PIXEL_WIDTH = 500
     PIXEL_HEIGHT = 300
     CAM_WIDTH = 800
     CAM_HEIGHT = 500
 
+    # ----- ENVIRONMENT ----- #
     BOARD_SIZE = (60, 115)
     ENV_SIZE = 20
     W_SIZE = 720
 
-    img = cv2.imread(
-        'computer_vision/line_detection/assets/parking/10.png')
+    # ----- PARKING SLOT DETECTOR ----- #
+    HOUGH = [200, 5]
+    ITERATIONS = [5, 2]
+
+    # ----- TRAFFIC SIGN DETECTOR ----- #
+    TRAFFIC_SIGN_SIZE_MM = 61
+    TRAFFIC_SIGN_SIZE_PX = 10
+    TRAFFIC_SIGN_DISTANCE = 200
+
+    # reading image
+    IMG_PATH = 'computer_vision/line_detection/assets/parking/10.png'
+    img = cv2.imread(IMG_PATH)
+
+    # find center and window size
     center = (img.shape[1], img.shape[0])
     window_size = (W_SIZE * (BOARD_SIZE[1]/BOARD_SIZE[0]), W_SIZE)
+
+    # environment
+    view_point_object: ViewPointObject = {
+        'view_point': None,
+        'object_id': 10,
+    }
+    env = Environment(BOARD_SIZE, ENV_SIZE, view_point_object)
+
+    # pathfinding algorithm
+    a_star = AStar()
+
+    # display
     display = DisplayEnvironment(window_size, BOARD_SIZE)
+
     path_finding = PathFinding(
-        BOARD_SIZE, PIXEL_WIDTH, PIXEL_HEIGHT,
-        CAM_WIDTH, CAM_HEIGHT, center, display=display, env_size=20)
+        [PIXEL_WIDTH, PIXEL_HEIGHT],
+        [CAM_WIDTH, CAM_HEIGHT],
+        center,
+        env,
+        a_star)
+
     parking_slot_detector = ParkingSlotDetector(
-        hough=[200, 5], iterations=[5, 2])
+        hough=HOUGH,
+        iterations=ITERATIONS)
     lane_detector = LaneDetector()
     traffic_sign_detector = TrafficSignDetector(
-        size_mm=61, size_px=10, distance=200)
-    qr_code = QRCode(QR_SIZE_PX, QR_SIZE_MM, QR_DISTANCE)
+        size_mm=TRAFFIC_SIGN_SIZE_MM,
+        size_px=TRAFFIC_SIGN_SIZE_PX,
+        distance=TRAFFIC_SIGN_DISTANCE)
+
+    qr_code = QRCode(QR_SIZE)
 
     TILE_SIZE = display.window_size[1]/path_finding.size[0]
 
     RUN = True
     while RUN:
-
         # Add hindrances using mouse
         for event in pg.event.get():
             if event.type == QUIT:
@@ -66,8 +107,7 @@ if __name__ == '__main__':
                 path_finding.env.insert_by_index((int(row), int(col)), '1')
 
         # Should change this to camera frame later
-        frame = cv2.imread(
-            'computer_vision/line_detection/assets/parking/10.png')
+        frame = cv2.imread(IMG_PATH)
         obstacles = []
 
         qr_data = qr_code.get_data(frame)
@@ -118,6 +158,7 @@ if __name__ == '__main__':
             if center_diff is not None:
                 CENTER_DIFF_X = center_diff
                 DESIRED_DISTANCE_FORWARD = 100
+
         # Use Traffic Sign module
         signs = traffic_sign_detector.detect_signs(frame)
         if signs is not None:

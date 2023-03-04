@@ -23,7 +23,7 @@ class PathFinding:
     #             ,cam_width:int, cam_height:int, cam_center:list[int, int],
     #             object_id:int=10, display:Displayenvironmentironment=None, env_size:int = 20
     #             ): # pylint: disable=R0913
-    def __init__(self, size: tuple[int, int],
+    def __init__(self,
                  pixel_size: Tuple[int, int],
                  cam_size: Tuple[int, int],
                  cam_center:list[int, int],
@@ -39,7 +39,6 @@ class PathFinding:
             'width': cam_size[0]/pixel_size[0],
             'height': cam_size[1]/pixel_size[1]
         }
-        self.size = size
         # self.display = display
         self.environment = environment
         self.center = cam_center

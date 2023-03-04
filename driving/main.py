@@ -63,7 +63,7 @@ if __name__ == '__main__':
     # finding the center of the camera
 
     _, frame = camera.read()
-    cam_center = get_cam_center(camera.read(frame))
+    cam_center = get_cam_center(frame)
     pathfinding = PathFinding(
         pixel_size=config['pathfinding']['pixel_size'],
         cam_size=config['pathfinding']['cam_size'],

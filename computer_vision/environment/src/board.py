@@ -20,6 +20,8 @@ class Board:
         for i, row in enumerate(self.board):
             for j, col in enumerate(row):
                 object_data = Objects().get_data(int(col))
+                if object_data is None:
+                    continue
                 color = object_data.color
                 thickness = object_data.thickness
                 pg.draw.rect(

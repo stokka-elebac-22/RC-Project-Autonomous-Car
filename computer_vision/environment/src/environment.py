@@ -17,13 +17,16 @@ class Environment:
         self.map = np.zeros(self.size)
 
         self.view_point = (self.size[0]-1, self.size[1]//2)
-        object_id = 0
+        self.view_point_object = view_point_object
 
-        if view_point_object is not None:
-            if view_point_object.get('view_point') is not None:
-                self.view_point = view_point_object.get('view_point')
-            if view_point_object.get('object_id') is not None:
-                object_id = view_point_object.get('object_id')
+    def __init_object(self) -> None:
+        '''Init object'''
+        object_id = 0
+        if self.view_point_object is not None:
+            if self.view_point_object.get('view_point') is not None:
+                self.view_point = self.view_point_object.get('view_point')
+            if self.view_point_object.get('object_id') is not None:
+                object_id = self.view_point_object.get('object_id')
         self.map[self.view_point[0]][self.view_point[1]] = object_id
 
     def update(self) -> None:
@@ -32,6 +35,7 @@ class Environment:
     def reset(self):
         '''Reset the map'''
         self.map = np.zeros(self.size)
+        self.__init_object()
 
     def get_data(self) -> np.ndarray:
         '''

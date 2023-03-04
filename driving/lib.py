@@ -23,4 +23,5 @@ def get_available_cameras() -> Tuple[bool, List[int]]:
 
 def get_cam_center(frame: np.ndarray) -> Tuple[int, int]:
     '''Returns the shape of the frame'''
-    return [frame.shape[1], frame.shape[0]]
+    height, width, _ = frame.shape
+    return [width, height]

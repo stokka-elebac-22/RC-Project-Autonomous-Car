@@ -27,6 +27,8 @@ environment:
 a_star:
   weight: !!int 4
   penalty: !!int 2
+spline:
+  tension: !!int 0
 gui:
   window_width: !!int 600
 headless: !!bool true

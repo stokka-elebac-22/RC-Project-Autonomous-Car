@@ -3,9 +3,9 @@ import math
 import cv2
 import pygame as pg
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
-from main import PathFinding
+from pathfinding import PathFinding
 from spline import catmull_rom_chain
-from helping_functions import get_abs_velo, get_angle
+from lib import get_abs_velo, get_angle
 from matplotlib import pyplot as plt
 try:
     from line_detection.parking_slot_detection import ParkingSlotDetector
@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
             center_diff = lane_detector.get_diff_from_center_info(
                 frame, avg_lines)
-            
+
         #TODO: fix this to use warping instead of just forwarding
             CENTER_DIFF_X = 0
             CENTER_DIFF_Y = 0

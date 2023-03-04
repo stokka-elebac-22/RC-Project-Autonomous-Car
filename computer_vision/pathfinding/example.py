@@ -88,7 +88,6 @@ if __name__ == '__main__':
 
         qr_data = qr_code.get_data(frame)
         if qr_data['ret']:
-            #print(qr_data['points'])
             distances = path_finding.point_to_distance(
                 (qr_data['points'][0][0][0]+
                  (qr_data['points'][0][1][0]-qr_data['points'][0][0][0])/2,
@@ -116,31 +115,12 @@ if __name__ == '__main__':
                 obstacles.append({'values': [
                                  (lines[0], lines[1]), (lines[2], lines[3])],
                     'distance': False, 'object_id': 30})
-        # parking_lines, parking_lines_coords = parking_slot_detector.get_parking_lines(frame)
-
-#         parking_lines_coords = [[64, 642, 207, 556],
-# [427, 648, 460, 561],
-# [795, 648, 718, 565],
-# [1143, 650, 967, 565]]
-#         if parking_lines_coords is not None:
-#             for lines in parking_lines_coords:
-#                 obstacles.append({'values': [
-#                                  (lines[0], lines[1]), (lines[2], lines[3])],
-#                     'distance': False, 'object_id': 30})
-
-
-        # parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
-
-        # if parking_slot_coords is not None:
-        #     closing_line =
-        #          parking_slot_detector.get_closing_line_of_two_lines(parking_slot_coords)
-        #     if len(closing_line) == 4:
-        #         parking_slot_coords.append(closing_line)
-        #     for lines in parking_slot_coords:
-        #         obstacles.append({'values': [
-        #                          (lines[0], lines[1]), (lines[2], lines[3])],
-        #             'distance': False, 'object_id': 30})
-
+        parking_lines, parking_lines_coords = parking_slot_detector.get_parking_lines(frame)
+        if parking_slot_coords is not None:
+            for lines in parking_lines_coords:
+                obstacles.append({'values': [
+                                 (lines[0], lines[1]), (lines[2], lines[3])],
+                    'distance': False, 'object_id': 30})
 
         # Use lane Module
         # avg_lines = lane_detector.get_lane_line(frame)
@@ -159,7 +139,7 @@ if __name__ == '__main__':
         # CENTER_DIFF_Y = 0
         # if center_diff is not None:
         #     CENTER_DIFF_X = center_diff
-        #     DESIRED_DISTANCE_FORWARD = 100
+
         # Use Traffic Sign module
         # signs = traffic_sign_detection.detect_signs(frame)
         # if signs is not None:
@@ -180,8 +160,6 @@ if __name__ == '__main__':
         # TODO: DOES NOT WORK WHY?? maybe bcus of calibration constants # pylint: disable=W0511
         path = path_finding.calculate_path((qr_distance_x, qr_distance_y), True)
 
-        # TODO: Remove later since Test point # pylint: disable=W0511
-        # path = path_finding.calculate_path((460, 120), False)
         path_finding.update_display(path)
         path_finding.display.display()
 
@@ -189,8 +167,7 @@ if __name__ == '__main__':
         path_finding.env.map = np.full_like(board, 0)
         path_finding.env.insert_by_index(
             (path_finding.env.size[0]-1, path_finding.env.size[1]//2), 10)
-        # new_board = np.full_like(board, 0)
-        # path_finding.display.update(new_board)
+
         # CATMULL SPLINE
         TENSION = 0.
         CONSTANT_VELOCITY = 10
@@ -206,7 +183,7 @@ if __name__ == '__main__':
             c, v = catmull_rom_chain(temp_path, TENSION)
             lengths = approx_segment_lengths(c)
             times = [x / CONSTANT_VELOCITY for x in lengths]
-            # x_values, y_values = zip(*c)
+
             # TODO: muligens trenge ikke abs velo
             # ENDRE VELOCITYCONSTANT Eller numpoints i catmull spline
             abs_velos = []
@@ -215,10 +192,7 @@ if __name__ == '__main__':
                 abs_velos.append(get_abs_velo(value))
                 angles.append(get_angle(value))
 
-            # CHECK DIFF WITH NEXT ONE TO SEE IF TURN RIGHT OR LEFT AND AMOUNT OF TURN
-            # diff = velocities[i] - velocities[i+1]
-            # if positive: rotate clockwise
-            # else rotate counter clockwise
+            angle_diff = get_angle_diff(angles)
 
             # DRAW CATMULL LINE
             line_color = (255, 0, 0)
@@ -231,43 +205,6 @@ if __name__ == '__main__':
                             (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE),
                             (c[COUNT+1][0]*TILE_SIZE, c[COUNT+1][1]*TILE_SIZE))
                 COUNT += 2
-
-        # RUN = True
-
-        # TODO: add catmull rom spline based on points given by path # pylint: disable=W0511
-        # USE PATH variable!!!
-
-
-            # ANGLE DIFF calculation
-            x_values = [i[0] for i in c]
-            y_values = [i[1] for i in c]
-            vx_values = [i[0] for i in v]
-            vy_values = [i[1] for i in v]
-
-    # CURRENT_ANG = 0
-    # angle_diff = []
-    # angle_diff_x = []
-    # for i, next_ang in enumerate(angles):
-    #     angle_diff_x.append(i)
-    #     first_diff = math.dist([CURRENT_ANG], [next_ang])
-    #     second_diff = 360-abs(first_diff)
-    #     minimum_diff = min(abs(first_diff), second_diff)
-    #     if CURRENT_ANG > 0 and next_ang < 0:
-    #         minimum_diff = minimum_diff*-1
-
-    #     angle_diff.append(minimum_diff)
-    #     CURRENT_ANG = next_ang
-
-            angle_diff = get_angle_diff(angles)
-            angle_diff_x = [i for i in range(len(angle_diff))]
-
-            # fig, axs = plt.subplots(1, 3)
-            # fig.suptitle('Horizontally stacked subplots')
-            # axs[0].plot(x_values, y_values)
-            # axs[0].quiver(x_values, y_values, vx_values, vy_values, linewidths=1)
-            # axs[1].plot(angle_diff_x, angles)
-            # axs[2].plot(angle_diff_x, angle_diff)
-            # plt.show()
 
             # 2D TO 3D, need to put in function?
             # for i, value in enumerate(c):

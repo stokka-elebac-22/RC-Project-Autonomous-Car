@@ -69,7 +69,7 @@ if __name__ == "__main__":
             'ret': data['ret'],
             'points': data['points']
         }
-        parking_lines = parking_slot_detector.detect_parking_lines(
+        parking_lines = parking_slot_detector.get_parking_slot(
             frame, qr_code_data)
         parking_slot_detector.show_lines(frame, parking_lines)
         cv2.imshow('frame', frame)

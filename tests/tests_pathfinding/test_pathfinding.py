@@ -4,10 +4,9 @@ from computer_vision.pathfinding.pathfinding import PathFinding
 
 class TestParametrized:
     '''
-    DOC: Testing PathFinding Lib
+    DOC: Testing PathFinding
     '''
 
-    # SHOULD FAIL WHEN CHANGED LATER
     @pytest.mark.parametrize('point, expected', [
         ((20, 300), (-28.32843655299916, 280.4886090479)),
         ((10, 50), (-94.51080737361255, 844.0957035229))])

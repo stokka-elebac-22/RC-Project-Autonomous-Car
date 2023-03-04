@@ -5,7 +5,7 @@ This file should only contain short code
 
 import sys
 import os
-from lib import get_available_cameras
+from lib import get_available_cameras, get_cam_center
 import cv2 as cv
 import yaml
 
@@ -20,6 +20,7 @@ from computer_vision.environment.src.lib import Objects
 from computer_vision.environment.src.a_star import AStar
 from computer_vision.pathfinding.spline import catmull_rom_chain
 from computer_vision.pathfinding.lib import angle_and_velocity_from_derivative
+from computer_vision.pathfinding.pathfinding import PathFinding
 
 # ---------- CONSTANTS ---------- #
 
@@ -42,17 +43,34 @@ if __name__ == '__main__':
 
     sys.stdout.write(f'Connecting to camera {available_cameras[0]}\n')
     camera = cv.VideoCapture(available_cameras[0])
+    # test if the camera gives out frame
+    ret, _ = camera.read()
+    if not ret:
+        raise ConnectionError
     sys.stdout.write('Connected\n')
 
     # ---------- INIT ENVIRONMENT ---------- #
-    SIZE = (config['environment']['sizex'], config['environment']['sizey'])
+    SIZE = config['environment']['size']
     WINDOW_WIDTH = config['gui']['window_width']
     WINDOW_SIZE = (WINDOW_WIDTH* (SIZE[1]/SIZE[0]), WINDOW_WIDTH)
     env= Environment(SIZE, 1, {'object_id': 10})
     objects = Objects()
 
-    # ---------- INIT PATHFINDING ---------- #
+    # ---------- INIT PATHFINDING ALGORITHM ---------- #
     a_star = AStar(config['a_star']['weight'], config['a_star']['penalty'])
+
+    # ---------- INIT PATHFINDING ---------- #
+    # finding the center of the camera
+
+    _, frame = camera.read()
+    cam_center = get_cam_center(camera.read(frame))
+    pathfinding = PathFinding(
+        pixel_size=config['pathfinding']['pixel_size'],
+        cam_size=config['pathfinding']['cam_size'],
+        cam_center=cam_center,
+        environment=env,
+        pathfinding_algorithm=a_star
+    )
 
     # ---------- INIT QR CODE ---------- #
     QR_SIZE: QRSize = {

@@ -22,8 +22,10 @@ parking_slot_detector:
   hough: !!seq [200, 5]
   iterations: !!seq [5, 2]
 environment:
-  sizex: !!int 10
-  sizey: !!int 11
+  size: !!seq [10, 11]
+pathfinding:
+  pixel_size: !!seq [500, 300]
+  cam_size: !!seq [800, 500]
 a_star:
   weight: !!int 4
   penalty: !!int 2

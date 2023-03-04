@@ -13,8 +13,9 @@ class TrafficSignDetector:
     DOC:
     '''
     def __init__(self,
-            model='computer_vision/traffic_sign_detection/stop_sign_model.xml',
+            model: str='computer_vision/traffic_sign_detection/stop_sign_model.xml',
             size: SignSize=None):
+
         self.cascade = cv2.CascadeClassifier(model)
 
         if size is None:

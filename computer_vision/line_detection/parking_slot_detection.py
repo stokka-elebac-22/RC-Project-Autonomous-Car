@@ -17,7 +17,7 @@ except ImportError:
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-
+# pylint: disable=C0413
 from qr_code.qr_code import QRCode
 
 class ParkingSlotDetector(LineDetector):
@@ -89,8 +89,10 @@ class ParkingSlotDetector(LineDetector):
                                 [np.array([x_1, y_1, x_2, y_2])])
                 except np.RankWarning:
                     pass
+                except RuntimeWarning:
+                    pass
         return group_lines, group_coords
-    
+
     def get_clustered_lines(self, lines: list[np.ndarray]) -> list[np.ndarray, np.ndarray]:
         '''Retrieve the clustered lines'''
         group_lines, group_coords = self.get_group_lines(lines)
@@ -167,9 +169,10 @@ class ParkingSlotDetector(LineDetector):
                     if point[0] - points[2][0] < right_diff:
                         right_index = i
                         right_diff = point[0] - points[2][0]
-
-        lines = [line_coords[left_index], line_coords[right_index]]
-        return lines
+        if len(line_coords) > left_index and len(line_coords) > right_index:
+            lines = [line_coords[left_index], line_coords[right_index]]
+            return lines
+        return None
 
     QrData = TypedDict('QrData', {
         'ret': bool,
@@ -196,16 +199,17 @@ class ParkingSlotDetector(LineDetector):
                  qr_data['points'][0][3][0]),
                 (qr_data['points'][0][2][1],
                  qr_data['points'][0][3][1]), 1)
+            line_and_coords = self.get_parking_lines(image)
+            if line_and_coords is not None:
+                clustered_lines, clustered_coords = self.get_parking_lines(image)
+                # filter away lines that are close to the QR-code
+                _, avg_lines_coords = self.filter_lines(
+                    clustered_lines, clustered_coords)
 
-            clustered_lines, clustered_coords = self.get_parking_lines(image)
-            # filter away lines that are close to the QR-code
-            _, avg_lines_coords = self.filter_lines(
-                clustered_lines, clustered_coords)
-
-            # find the two closesqt lines to the QR-code
-            lines = self.get_closest_line(
-                avg_lines_coords, qr_data['points'][0])
-            return lines
+                # find the two closesqt lines to the QR-code
+                lines = self.get_closest_line(
+                    avg_lines_coords, qr_data['points'][0])
+                return lines
         return None
 
     def get_line_coordinates_from_parameters(self,

@@ -63,6 +63,7 @@ class PathFinding:
         'distances': list[tuple[int, int]],
         'object_id': int
     })
+
     def insert_objects(self, objects: Objects) -> None:
         '''Insert objects into environmentironment'''
         for groups in objects:

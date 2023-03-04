@@ -5,9 +5,10 @@ This file should only contain short code
 
 import sys
 import os
-from lib import get_available_cameras, get_cam_center
-import cv2 as cv
 import yaml
+from typing import List
+from lib import get_available_cameras, get_cam_center, get_qr_code_distance
+import cv2 as cv
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -64,7 +65,7 @@ if __name__ == '__main__':
 
     _, frame = camera.read()
     cam_center = get_cam_center(frame)
-    pathfinding = PathFinding(
+    path_finding = PathFinding(
         pixel_size=config['pathfinding']['pixel_size'],
         cam_size=config['pathfinding']['cam_size'],
         cam_center=cam_center,
@@ -79,10 +80,14 @@ if __name__ == '__main__':
         'distance': config['qr_code_size']['distance'],
     }
     qr_code = QRCode(QR_SIZE)
-    qr_code_id = objects.get_data('QR').id
+    QR_CODE_ID = objects.get_data('QR').id
+    CAR_ID = objects.get_data('Car').id
 
     # ---------- LOOP ---------- #
     while True:
+        # ---------- INIT ---------- #
+        objects: List[path_finding.Objects] = []
+
         # ---------- GET CAMERA INFORMATION---------- #
         ret, frame = camera.read()
         if not ret:
@@ -93,16 +98,25 @@ if __name__ == '__main__':
         if not qr_data['ret']:
             continue
 
-        # insert the qr codes to the environment
-        for i in range(len(qr_data['info'])):
-            env.insert((qr_data['distances'][i], ), qr_code_id)
+        # add qr code to the objects list
+
+        qr_code_distances = get_qr_code_distance(qr_data, path_finding)
+
+        path_finding_object: path_finding.Objects = {
+            'values': qr_code_distances,
+            'distance': True,
+            'object_id': QR_CODE_ID
+        }
+
+        objects.append(path_finding_object)
 
         # ---------- UPDATE ENVIRONMENT ---------- #
-        env.reset()
+        path_finding.env.reset()
+        path_finding.insert_objects(objects)
 
-        start_pos_path = env.get_pos(10)
-        end_pos_path = env.get_pos(11)
-        cur_mat = env.get_data()
+        start_pos_path = path_finding.env.get_pos(CAR_ID)
+        end_pos_path = path_finding.env.get_pos(QR_CODE_ID)
+        cur_mat = path_finding.env.get_data()
 
         # ---------- PATH ---------- #
         ret, path = a_star.get_data(cur_mat, start_pos_path, end_pos_path)

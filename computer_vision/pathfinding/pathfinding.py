@@ -2,7 +2,7 @@
 import os
 import sys
 import math
-from typing import TypedDict
+from typing import TypedDict, Tuple
 try:
     current = os.path.dirname(os.path.realpath(__file__))
     parent = os.path.dirname(current)
@@ -21,16 +21,26 @@ class PathFinding:
     Class using 2D environment mapping to calculate shortest
     path with objects that can be hindrances
     '''
-    def __init__(self, size: tuple[int, int], pixel_width:int, pixel_height:int
-                ,cam_width:int, cam_height:int, cam_center:list[int, int],
-                object_id:int=10, display:DisplayEnvironment=None, env_size:int = 20
-                ): # pylint: disable=R0913
-        self.ratio_width = cam_width/pixel_width
-        self.ratio_height = cam_height/pixel_height
+    # def __init__(self, size: tuple[int, int], pixel_width:int, pixel_height:int
+    #             ,cam_width:int, cam_height:int, cam_center:list[int, int],
+    #             object_id:int=10, display:DisplayEnvironment=None, env_size:int = 20
+    #             ): # pylint: disable=R0913
+    def __init__(self, size: tuple[int, int],
+                 pixel_size: Tuple[int, int],
+                 cam_size: Tuple[int, int],
+                 cam_center:list[int, int],
+                 environment: Environment):
+                # pylint: disable=R0913
+        '''
+        pixel_size contains a width and a height
+        cam_size contains a width and a height
+        '''
+        # object_id:int=10, display:DisplayEnvironment=None, env_size:int = 20
+        self.ratio_width = cam_size[0]/pixel_size[0]
+        self.ratio_height = cam_size[1]/pixel_size[1]
         self.size = size
-        self.display = display
-        self.env = Environment(
-            size, env_size, {'view_point': None, 'object_id': object_id})
+        # self.display = display
+        self.environment = environment
         self.center = cam_center
         self.a_star = AStar(weight=2, penalty=100)
 

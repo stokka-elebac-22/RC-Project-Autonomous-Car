@@ -5,7 +5,7 @@ import pygame as pg
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
 from pathfinding import PathFinding
 from spline import catmull_rom_chain
-from lib import get_abs_velo, get_angle
+from lib import get_abs_velo, get_angle, update_display
 from matplotlib import pyplot as plt
 
 try:
@@ -16,9 +16,7 @@ try:
     from environment.src.environment import Environment, ViewPointObject
     from environment.src.a_star import AStar
     from qr_code.qr_code import QRCode, QRSize
-    from lib import update_display
 except ImportError:
-    from computer_vision.pathfinding.lib import update_display
     from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
     from computer_vision.line_detection.lane_detection import LaneDetector
     from computer_vision.traffic_sign_detection.traffic_sign_detector import TrafficSignDetector, SignSize

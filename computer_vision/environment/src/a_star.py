@@ -120,7 +120,7 @@ class AStar:
                 object_id = mat[pos[0]][pos[1]]
                 object_data = objects.get_data(object_id)
                 # if the object is a hindrance(not valid)
-                if object_data.name not in self.valid:
+                if object_data is None or object_data.name not in self.valid:
                     continue
 
                 # check if node already in the list

@@ -100,5 +100,5 @@ class PathFinding:
         end_pos_path = self.environment.get_pos(12)
 
         cur_mat = self.environment.get_data()
-        _, path = self.a_star.get_data(cur_mat, start_pos_path, end_pos_path)
+        _, path = self.pathfinding_algorithm.get_data(cur_mat, start_pos_path, end_pos_path)
         return path

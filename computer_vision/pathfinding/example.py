@@ -7,18 +7,21 @@ from pathfinding import PathFinding
 from spline import catmull_rom_chain
 from lib import get_abs_velo, get_angle
 from matplotlib import pyplot as plt
+
 try:
     from line_detection.parking_slot_detection import ParkingSlotDetector
     from line_detection.lane_detection import LaneDetector
-    from traffic_sign_detection.main import TrafficSignDetector
+    from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector, SignSize
     from environment.src.display import DisplayEnvironment
     from environment.src.environment import Environment, ViewPointObject
     from environment.src.a_star import AStar
     from qr_code.qr_code import QRCode, QRSize
+    from lib import update_display
 except ImportError:
+    from computer_vision.pathfinding.lib import update_display
     from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
     from computer_vision.line_detection.lane_detection import LaneDetector
-    from computer_vision.traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
+    from computer_vision.traffic_sign_detection.traffic_sign_detector import TrafficSignDetector, SignSize
     from computer_vision.environment.src.display import DisplayEnvironment
     from computer_vision.environment.src.environment import Environment, ViewPointObject
     from computer_vision.environment.src.a_star import AStar
@@ -52,14 +55,22 @@ if __name__ == '__main__':
     TRAFFIC_SIGN_SIZE_MM = 61
     TRAFFIC_SIGN_SIZE_PX = 10
     TRAFFIC_SIGN_DISTANCE = 200
+    sign_size: SignSize = {
+        'px': 61,
+        'mm': 10,
+        'distance': 200,
+    }
 
     # reading image
     IMG_PATH = 'computer_vision/line_detection/assets/parking/10.png'
     img = cv2.imread(IMG_PATH)
 
     # find center and window size
-    center = (img.shape[1], img.shape[0])
-    window_size = (W_SIZE * (BOARD_SIZE[1]/BOARD_SIZE[0]), W_SIZE)
+    CENTER = (img.shape[1], img.shape[0])
+    WINDOW_SIZE = (W_SIZE * (BOARD_SIZE[1]/BOARD_SIZE[0]), W_SIZE)
+
+    # calculate tile size
+    TILE_SIZE = WINDOW_SIZE[1]/BOARD_SIZE[0]
 
     # environment
     view_point_object: ViewPointObject = {
@@ -72,12 +83,12 @@ if __name__ == '__main__':
     a_star = AStar()
 
     # display
-    display = DisplayEnvironment(window_size, BOARD_SIZE)
+    display = DisplayEnvironment(WINDOW_SIZE, BOARD_SIZE)
 
     path_finding = PathFinding(
         [PIXEL_WIDTH, PIXEL_HEIGHT],
         [CAM_WIDTH, CAM_HEIGHT],
-        center,
+        CENTER,
         env,
         a_star)
 
@@ -85,14 +96,9 @@ if __name__ == '__main__':
         hough=HOUGH,
         iterations=ITERATIONS)
     lane_detector = LaneDetector()
-    traffic_sign_detector = TrafficSignDetector(
-        size_mm=TRAFFIC_SIGN_SIZE_MM,
-        size_px=TRAFFIC_SIGN_SIZE_PX,
-        distance=TRAFFIC_SIGN_DISTANCE)
+    traffic_sign_detector = TrafficSignDetector(size=sign_size)
 
     qr_code = QRCode(QR_SIZE)
-
-    TILE_SIZE = display.window_size[1]/path_finding.size[0]
 
     RUN = True
     while RUN:
@@ -104,7 +110,7 @@ if __name__ == '__main__':
                 mouse_pos = pg.mouse.get_pos()
                 col = mouse_pos[0] // TILE_SIZE
                 row = mouse_pos[1] // TILE_SIZE
-                path_finding.env.insert_by_index((int(row), int(col)), '1')
+                path_finding.environment.insert_by_index((int(row), int(col)), '1')
 
         # Should change this to camera frame later
         frame = cv2.imread(IMG_PATH)
@@ -126,16 +132,12 @@ if __name__ == '__main__':
             'ret': qr_data['ret'],
             'points': qr_data['points']
         }
-        parking_lines = parking_slot_detector.detect_parking_lines(
+
+        parking_lines = parking_slot_detector.get_parking_slot(
             frame, qr_code_data)
 
-        if parking_lines is not None:
-            parking_lines.append(
-                parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
-            for lines in parking_lines:
-                obstacles.append({'values': [
-                                 (lines[0], lines[1]), (lines[2], lines[3])],
-                    'distance': False, 'object_id': 3})
+        parking_lines.append(
+            parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
 
         # Use lane Module
         all_lines = lane_detector.get_lines(frame)
@@ -173,8 +175,9 @@ if __name__ == '__main__':
         path_finding.insert_objects(obstacles)
         # TODO: Remove later since Test point # pylint: disable=W0511
         path = path_finding.calculate_path((460, 120), False)
-        path_finding.update_display(path)
-        path_finding.display.display()
+
+        update_display(display, env, path)
+        display.display()
 
         TENSION = 0.
 
@@ -205,7 +208,7 @@ if __name__ == '__main__':
         COUNT = 0
         LEN_C = len(c)
         while COUNT < LEN_C:
-            pg.draw.line(path_finding.display.display_window, line_color,
+            pg.draw.line(display.display_window, line_color,
                          (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE),
                          (c[COUNT+1][0]*TILE_SIZE, c[COUNT+1][1]*TILE_SIZE))
             COUNT += 2

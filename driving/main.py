@@ -52,6 +52,13 @@ if __name__ == '__main__':
     ### init pathfinding ###
     a_star = AStar(config['a_star']['weight'], config['a_star']['penalty'])
 
+    ### init environment ###
+    SIZE = (config['environment']['sizex'], config['environment']['sizey'])
+    WINDOW_WIDTH = config['gui']['window_width']
+    WINDOW_SIZE = (WINDOW_WIDTH* (SIZE[1]/SIZE[0]), WINDOW_WIDTH)
+    env= Environment(SIZE, 1, {'object_id': 10})
+    objects = Objects()
+
     ### init qr code ###
     QR_SIZE: QRSize = {
         'px': config['qr_code_size']['px'],

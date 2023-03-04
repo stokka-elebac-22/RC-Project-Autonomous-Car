@@ -37,31 +37,24 @@ if __name__ == '__main__':
     ret, available_cameras = get_available_cameras()
 
     if not ret:
-        sys.stdout.write('There is no available cameras')
+        sys.stdout.write('There is no available cameras\n')
         raise ConnectionError
 
-    sys.stdout.write(f'Connecting to camera {available_cameras[0]}')
+    sys.stdout.write(f'Connecting to camera {available_cameras[0]}\n')
     camera = cv.VideoCapture(available_cameras[0])
-    sys.stdout.write('Connected')
+    sys.stdout.write('Connected\n')
 
-    ### init environment ###
+    # ---------- INIT ENVIRONMENT ---------- #
     SIZE = (config['environment']['sizex'], config['environment']['sizey'])
     WINDOW_WIDTH = config['gui']['window_width']
     WINDOW_SIZE = (WINDOW_WIDTH* (SIZE[1]/SIZE[0]), WINDOW_WIDTH)
     env= Environment(SIZE, 1, {'object_id': 10})
     objects = Objects()
 
-    ### init pathfinding ###
+    # ---------- INIT PATHFINDING ---------- #
     a_star = AStar(config['a_star']['weight'], config['a_star']['penalty'])
 
-    ### init environment ###
-    SIZE = (config['environment']['sizex'], config['environment']['sizey'])
-    WINDOW_WIDTH = config['gui']['window_width']
-    WINDOW_SIZE = (WINDOW_WIDTH* (SIZE[1]/SIZE[0]), WINDOW_WIDTH)
-    env= Environment(SIZE, 1, {'object_id': 10})
-    objects = Objects()
-
-    ### init qr code ###
+    # ---------- INIT QR CODE ---------- #
     QR_SIZE: QRSize = {
         'px': config['qr_code_size']['px'],
         'mm': config['qr_code_size']['mm'],
@@ -84,7 +77,7 @@ if __name__ == '__main__':
 
         # insert the qr codes to the environment
         for i in range(len(qr_data['info'])):
-            env.insert(qr_data['distances'][i], qr_code_id)
+            env.insert((qr_data['distances'][i], ), qr_code_id)
 
         # ---------- UPDATE ENVIRONMENT ---------- #
         start_pos_path = env.get_pos(10)

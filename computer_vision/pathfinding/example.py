@@ -1,12 +1,11 @@
 '''Main'''
-import math
 import cv2
 import numpy as np
 import pygame as pg
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
-from lib import PathFinding
-from spline import catmull_rom_chain
-from helping_functions import get_abs_velo, get_angle, get_angle_diff
+from pathfinding import PathFinding
+from spline import catmull_rom_chain, approx_segment_lengths
+from lib import get_abs_velo, get_angle, get_angle_diff
 try:
     from line_detection.parking_slot_detection import ParkingSlotDetector
     from line_detection.lane_detection import LaneDetector
@@ -194,7 +193,7 @@ if __name__ == '__main__':
         # path_finding.display.update(new_board)
         # CATMULL SPLINE
         TENSION = 0.
-
+        CONSTANT_VELOCITY = 10
         if path:
             new_path = [(value[1], value[0])
                         for i, value in enumerate(path) if i % 3 == 0]
@@ -205,7 +204,11 @@ if __name__ == '__main__':
 
             temp_path.reverse()
             c, v = catmull_rom_chain(temp_path, TENSION)
+            lengths = approx_segment_lengths(c)
+            times = [x / CONSTANT_VELOCITY for x in lengths]
             # x_values, y_values = zip(*c)
+            # TODO: muligens trenge ikke abs velo
+            # ENDRE VELOCITYCONSTANT Eller numpoints i catmull spline
             abs_velos = []
             angles = []
             for value in v:
@@ -267,13 +270,13 @@ if __name__ == '__main__':
             # plt.show()
 
             # 2D TO 3D, need to put in function?
-            for i, value in enumerate(c):
-                if i % 30 == 0:
-                    distance_x = (value[0]-math.ceil(path_finding.env.size[1]/2)) \
-                                    *path_finding.env.real_size
-                    distance_y = (path_finding.env.size[0] - 
-                                  (value[1]+1))*path_finding.env.real_size
-                    point = path_finding.distance_to_point((distance_x, distance_y))
-                    frame = cv2.circle(frame, point, 3, (255, 0, 0), -1)
+            # for i, value in enumerate(c):
+            #     if i % 30 == 0:
+            #         distance_x = (value[0]-math.ceil(path_finding.env.size[1]/2)) \
+            #                         *path_finding.env.real_size
+            #         distance_y = (path_finding.env.size[0] - 
+            #                       (value[1]+1))*path_finding.env.real_size
+            #         point = path_finding.distance_to_point((distance_x, distance_y))
+            #         frame = cv2.circle(frame, point, 3, (255, 0, 0), -1)
     cv2.imshow('frame', frame)
     cv2.waitKey(0)

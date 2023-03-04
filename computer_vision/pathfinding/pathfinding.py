@@ -2,8 +2,8 @@
 import os
 import sys
 import math
-import numpy as np
 from typing import TypedDict
+import numpy as np
 try:
     current = os.path.dirname(os.path.realpath(__file__))
     parent = os.path.dirname(current)

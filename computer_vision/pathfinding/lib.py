@@ -1,8 +1,8 @@
 '''Importing libraries'''
 import math
 from typing import Tuple
-from environment.src.display import DisplayEnvironment
-from environment.src.environment import Environment
+from computer_vision.environment.src.display import DisplayEnvironment
+from computer_vision.environment.src.environment import Environment
 
 def get_angle(vec: list) -> float:
     '''Get the angle from -180 to 180 where y-axis is 0'''

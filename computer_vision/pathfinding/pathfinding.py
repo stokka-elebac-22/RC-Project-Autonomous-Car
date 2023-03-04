@@ -12,10 +12,15 @@ try:
     from environment.src.display import DisplayEnvironment
     from environment.src.a_star import AStar
     from bresenham import bresenham
+    from spline import catmull_rom_chain, approx_segment_lengths
+    from lib import get_abs_velo, get_angle, get_angle_diff
 except ImportError:
     from computer_vision.environment.src.environment import Environment
     from computer_vision.environment.src.display import DisplayEnvironment
     from computer_vision.environment.src.a_star import AStar
+    from computer_vision.pathfinding.bresenham import bresenham
+    from computer_vision.pathfinding.spline import catmull_rom_chain, approx_segment_lengths
+    from computer_vision.pathfinding.lib import get_abs_velo, get_angle, get_angle_diff
 
 class PathFinding:
     '''
@@ -23,12 +28,14 @@ class PathFinding:
     path with objects that can be hindrances
     '''
     def __init__(self, size: tuple[int, int], pixel_width:int, pixel_height:int,
-                object_id:int=10, display:DisplayEnvironment=None, env_size:int = 20
+                object_id:int=10, tension:float=0., velocity:float = 10, display:DisplayEnvironment=None, env_size:int = 20
                 ): # pylint: disable=R0913
         self.pixel_width = pixel_width 
         self.pixel_height = pixel_height
         self.size = size
         self.display = display
+        self.tension = tension
+        self.velocity = velocity
         self.env = Environment(
             size, env_size, {'view_point': None, 'object_id': object_id})
         self.center = (pixel_width, pixel_height)
@@ -101,7 +108,37 @@ class PathFinding:
 
         cur_mat = self.env.get_data()
         _, path = self.a_star.get_data(cur_mat, start_pos_path, end_pos_path)
-        return path
+
+        if path:
+            new_path = [(value[1], value[0])
+                        for i, value in enumerate(path) if i % 3 == 0]
+            temp_path = [(path[0][1], path[0][0])]
+            temp_path = temp_path + new_path
+            for _ in range(2):
+                temp_path.append((path[len(path) - 1][1], path[len(path) - 1][0]))
+
+            temp_path.reverse()
+            c, v = catmull_rom_chain(temp_path, self.tension)
+            lengths = approx_segment_lengths(c)
+            times = [x / self.velocity for x in lengths]
+
+            # TODO: muligens trenge ikke abs velo
+            # ENDRE VELOCITYCONSTANT Eller numpoints i catmull spline
+            abs_velos = []
+            angles = []
+            for value in v:
+                abs_velos.append(get_abs_velo(value))
+                angles.append(get_angle(value))
+
+            angle_diff = get_angle_diff(angles)
+
+            return {
+                'path': path,
+                'curve': c,
+                'angles': angle_diff,
+                'times': times,
+            }
+        return None
 
     def update_display(self, path):
         '''Update display if there are new changes'''

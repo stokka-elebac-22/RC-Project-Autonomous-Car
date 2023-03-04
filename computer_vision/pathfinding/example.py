@@ -1,11 +1,8 @@
 '''Main'''
 import cv2
-import numpy as np
 import pygame as pg
 from pygame.locals import QUIT  # pylint: disable=no-name-in-module
 from pathfinding import PathFinding
-from spline import catmull_rom_chain, approx_segment_lengths
-from lib import get_abs_velo, get_angle, get_angle_diff
 try:
     from line_detection.parking_slot_detection import ParkingSlotDetector
     from line_detection.lane_detection import LaneDetector
@@ -158,42 +155,18 @@ if __name__ == '__main__':
 
         # With distance from Parking using QR!!!
         # TODO: DOES NOT WORK WHY?? maybe bcus of calibration constants # pylint: disable=W0511
-        path = path_finding.calculate_path((qr_distance_x, qr_distance_y), True)
+        path_data = path_finding.calculate_path((qr_distance_x, qr_distance_y), True)
 
-        path_finding.update_display(path)
+        path_finding.update_display(path_data['curve'])
         path_finding.display.display()
 
-        board = path_finding.env.get_data()
-        path_finding.env.map = np.full_like(board, 0)
+        path_finding.env.reset()
         path_finding.env.insert_by_index(
             (path_finding.env.size[0]-1, path_finding.env.size[1]//2), 10)
 
         # CATMULL SPLINE
-        TENSION = 0.
-        CONSTANT_VELOCITY = 10
-        if path:
-            new_path = [(value[1], value[0])
-                        for i, value in enumerate(path) if i % 3 == 0]
-            temp_path = [(path[0][1], path[0][0])]
-            temp_path = temp_path + new_path
-            for _ in range(2):
-                temp_path.append((path[len(path) - 1][1], path[len(path) - 1][0]))
-
-            temp_path.reverse()
-            c, v = catmull_rom_chain(temp_path, TENSION)
-            lengths = approx_segment_lengths(c)
-            times = [x / CONSTANT_VELOCITY for x in lengths]
-
-            # TODO: muligens trenge ikke abs velo
-            # ENDRE VELOCITYCONSTANT Eller numpoints i catmull spline
-            abs_velos = []
-            angles = []
-            for value in v:
-                abs_velos.append(get_abs_velo(value))
-                angles.append(get_angle(value))
-
-            angle_diff = get_angle_diff(angles)
-
+        if path_data is not None:
+            c = path_data['curve']
             # DRAW CATMULL LINE
             line_color = (255, 0, 0)
 

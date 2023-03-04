@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
         # ---------- UPDATE ENVIRONMENT ---------- #
         env.reset()
-        
+
         start_pos_path = env.get_pos(10)
         end_pos_path = env.get_pos(11)
         cur_mat = env.get_data()

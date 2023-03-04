@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # open yaml file
     with open('driving/config.yaml', 'r', encoding='utf8') as file:
         config = yaml.safe_load(file)
-        
+
     ret, available_cameras = get_available_cameras()
 
     if not ret:
@@ -40,6 +40,17 @@ if __name__ == '__main__':
 
     sys.stdout.write(f'Connecting to camera {available_cameras[0]}')
     camera = cv.VideoCapture(available_cameras[0])
+    sys.stdout.write('Connected')
+
+    ### init environment ###
+    SIZE = (config['environment']['sizex'], config['environment']['sizey'])
+    WINDOW_WIDTH = config['gui']['window_width']
+    WINDOW_SIZE = (WINDOW_WIDTH* (SIZE[1]/SIZE[0]), WINDOW_WIDTH)
+    env= Environment(SIZE, 1, {'object_id': 10})
+    objects = Objects()
+
+    ### init pathfinding ###
+    a_star = AStar(config['a_star']['weight'], config['a_star']['penalty'])
 
     ### init environment ###
     SIZE = (config['environment']['sizex'], config['environment']['sizey'])
@@ -57,7 +68,6 @@ if __name__ == '__main__':
     qr_code = QRCode(QR_SIZE)
     qr_code_id = objects.get_data('QR').id
 
-    ### init environment ###
     # ---------- LOOP ---------- #
     while True:
         # ---------- GET CAMERA INFORMATION---------- #
@@ -80,6 +90,6 @@ if __name__ == '__main__':
         cur_mat = env.get_data()
 
         # ---------- PATH ---------- #
-        ret, path = AStar().get_data(cur_mat, start_pos_path, end_pos_path)
+        ret, path = a_star.get_data(cur_mat, start_pos_path, end_pos_path)
 
         # ---------- ACTION ---------- #

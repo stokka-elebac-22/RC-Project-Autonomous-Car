@@ -24,6 +24,9 @@ parking_slot_detector:
 environment:
   sizex: !!int 10
   sizey: !!int 11
+a_star:
+  weight: !!int 4
+  penalty: !!int 2
 gui:
   window_width: !!int 600
 headless: !!bool true

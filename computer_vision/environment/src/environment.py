@@ -18,6 +18,7 @@ class Environment:
 
         self.view_point = (self.size[0]-1, self.size[1]//2)
         self.view_point_object = view_point_object
+        self.__init_object()
 
     def __init_object(self) -> None:
         '''Init object'''

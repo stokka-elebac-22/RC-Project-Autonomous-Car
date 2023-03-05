@@ -27,6 +27,8 @@ class QRGeometry:
             pts = [[0,0],[0,0],[0,0],[0,0]]
         self.update(pts)
 
+        self.focal_length = (self.size.get('px') / self.size.get('mm')) * self.size.get('distance')
+
     def update(self, pts):
         '''update points, used by qrcode.'''
         if pts is None:
@@ -66,8 +68,7 @@ class QRGeometry:
     def get_distance(self) -> float:
         '''Return the distance'''
         height_px = self.get_height()
-        focal_length = (self.size.get('px') / self.size.get('mm')) * self.size.get('distance')
-        distance = (self.size.get('mm') * focal_length) / height_px
+        distance = (self.size.get('mm') * self.focal_length) / height_px
         return distance
 
 QRData = TypedDict('QRData', {
@@ -142,6 +143,7 @@ class QRCode:
             self.qr_geometries[i].update(points)
             angles.append(self.qr_geometries[i].get_angle())
             distances.append(self.qr_geometries[i].get_distance())
+
         return {
             'ret': ret_qr,
             'distances': distances,
@@ -283,15 +285,17 @@ if __name__ == '__main__':
         img = local_read_camera()
         qr_data = qr_code.get_data(img)
 
-        if len(angles_lists) < len(qr_data['angles']):
-            for _ in range(len(qr_data['angles']) - len(angles_lists)):
-                angles_lists.append([0 for _ in range(VALUES_LENGTH)])
-        if len(distances_lists) < len(qr_data['distances']):
-            for _ in range(len(qr_data['distances']) - len(distances_lists)):
-                distances_lists.append([0 for _ in range(VALUES_LENGTH)])
-        filter_angle(qr_data['angles'])
-        filter_distance(qr_data['distances'])
         if qr_data['ret']:
+            if len(angles_lists) < len(qr_data['angles']):
+                for _ in range(len(qr_data['angles']) - len(angles_lists)):
+                    angles_lists.append([0 for _ in range(VALUES_LENGTH)])
+            if len(distances_lists) < len(qr_data['distances']):
+                for _ in range(len(qr_data['distances']) - len(distances_lists)):
+                    distances_lists.append([0 for _ in range(VALUES_LENGTH)])
+
+            filter_angle(qr_data['angles'])
+            filter_distance(qr_data['distances'])
+
             average_angles = [int(sum(angles_list)//VALUES_LENGTH) \
                 for angles_list in angles_lists]
             average_distance = [int(sum(distances_list)//VALUES_LENGTH) \

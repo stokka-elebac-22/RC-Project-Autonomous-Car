@@ -73,14 +73,23 @@ class QRGeometry:
 
     def get_qr_code_distance_x(self, center: Tuple[int, int]):
         '''Get qr code distance x'''
-        min_dist_x = min(
-            abs(self.points[0][0] - center[0]),
-            abs(self.points[1][0] - center[0]),
-            abs(self.points[1][0] - center[0]),
-            abs(self.points[2][0] - center[0]),
-        )
+        # just use the first option as a base
+        min_dist = abs(self.points[0][0] - center[0])
+        min_dist_idx = 0
+
+        options = [
+            self.points[0][0] - center[0],
+            self.points[1][0] - center[0],
+            self.points[1][0] - center[0],
+            self.points[2][0] - center[0],
+        ]
+        for i, opt in enumerate(options):
+            if abs(opt) < min_dist:
+                min_dist = abs(opt)
+                min_dist_idx = i
+
         ratio = self.size['mm'] / self.get_width()
-        return ratio * min_dist_x
+        return ratio * options[min_dist_idx]
 
 
 QRData = TypedDict('QRData', {

@@ -51,21 +51,7 @@ class MergeLines():
 
     def orientation(self, p_a, p_b):
         '''Calculate the orientation of a line represented from two points between 0 and PI'''
-        try:
-            if p_a[0] > p_b[0]:
-                start = p_a
-                end = p_b
-            else:
-                start = p_b
-                end = p_a
-            numerator = start[1]-end[1]
-            denomerator = start[0]-end[0]
-            tan = numerator/denomerator
-            angle = math.atan(tan)
-        except ZeroDivisionError:
-            angle = math.pi/2
-        except FloatingPointError:
-            angle = 0
+        angle = math.atan2(abs((p_a[1] - p_b[1])), abs((p_a[0] - p_b[0])))
         return angle
     
     def merged_line_orientation(self, p_a, p_b, p_c, p_d):
@@ -101,11 +87,15 @@ class MergeLines():
     def merge_lines(self, p_a, p_b, p_c, p_d):
         '''Merge lines'''
         centroid = self.centroid(p_a, p_b, p_c, p_d)
-        orientation = self.merged_line_orientation(p_a, p_b, p_c, p_d)
-        new_p_a = self.transform_to_another_axis(centroid, p_a, orientation)
-        new_p_b = self.transform_to_another_axis(centroid, p_b, orientation)
-        new_p_c = self.transform_to_another_axis(centroid, p_c, orientation)
-        new_p_d = self.transform_to_another_axis(centroid, p_d, orientation)
+        orientation_r = self.merged_line_orientation(p_a, p_b, p_c, p_d)
+        orientation_i = self.orientation(p_a, p_b)
+        orientation_j = self.orientation(p_c, p_d)
+        if abs(orientation_i-orientation_j) > math.pi/8:
+            return None
+        new_p_a = self.transform_to_another_axis(centroid, p_a, orientation_r)
+        new_p_b = self.transform_to_another_axis(centroid, p_b, orientation_r)
+        new_p_c = self.transform_to_another_axis(centroid, p_c, orientation_r)
+        new_p_d = self.transform_to_another_axis(centroid, p_d, orientation_r)
         new_points = [new_p_a, new_p_b, new_p_c, new_p_d]
         new_x = [p[0] for p in new_points]
         max_value = max(new_x)
@@ -116,8 +106,8 @@ class MergeLines():
         start = new_points[max_index]
         stop = new_points[min_index]
 
-        m_p_one = self.transform_to_orig_axis(centroid, start, orientation)
-        m_p_two = self.transform_to_orig_axis(centroid, stop, orientation)
+        m_p_one = self.transform_to_orig_axis(centroid, start, orientation_r)
+        m_p_two = self.transform_to_orig_axis(centroid, stop, orientation_r)
 
         # Case 1
         if abs(l_r) >= (abs(new_p_a[0]-new_p_b[0])+abs(new_p_c[0]-new_p_d[0])):

@@ -5,9 +5,9 @@ This file should only contain short code
 
 import sys
 import os
-import yaml
 from typing import List
 from lib import get_available_cameras, get_cam_center, get_qr_code_distance
+import yaml
 import cv2 as cv
 
 current = os.path.dirname(os.path.realpath(__file__))

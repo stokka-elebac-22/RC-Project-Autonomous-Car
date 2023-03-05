@@ -1,9 +1,16 @@
 '''This is the library for the driving logic'''
 # ---------- Camera handler ----------#
+import os
+import sys
 from typing import List, Tuple
 import numpy as np
 import cv2 as cv
 
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
+# pylint: disable=C0413
 from computer_vision.pathfinding.pathfinding import PathFinding
 from computer_vision.qr_code.qr_code import QRData
 

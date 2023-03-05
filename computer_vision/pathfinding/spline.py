@@ -1,5 +1,6 @@
 '''Import_ing Libraries'''
 import numpy as np
+import math
 
 # Source: https://stackoverflow.com/quest_ions/1251438/catmull-rom-splines-in-python
 # based on formula from wikipedia!!
@@ -66,5 +67,20 @@ def catmull_rom_chain(points, alpha, num_points=100):
         )
         curve.extend(c_value)
         derivative.extend(d_value)
-
+    
     return curve, derivative
+
+def approx_segment_lengths(points):
+    '''Approximate the length of a segment (between two points)'''
+    lengths = []
+    prev_point = None
+
+    for p in points:
+        if prev_point is None:
+            prev_point = p
+            continue
+        curr_point = p
+        lengths.append(math.sqrt((curr_point[0]-prev_point[0])**2+(curr_point[1]-prev_point[1])**2))
+        prev_point = curr_point
+
+    return lengths

@@ -1,6 +1,7 @@
 '''Importing libraries'''
 import math
 from typing import Tuple
+import numpy as np
 from computer_vision.environment.src.display import DisplayEnvironment
 from computer_vision.environment.src.environment import Environment
 
@@ -33,6 +34,24 @@ def angle_and_velocity_from_derivative(derivative) -> Tuple[int, int]:
         abs_velos.append(get_abs_velo(value))
         angles.append(get_angle(value))
     return abs_velos, angles
+
+def get_angle_diff(angles: float) -> list[list[np.ndarray], list[np.ndarray]]:
+    '''Calculate the change in angle'''
+    current_ang = 0
+    angle_diff = []
+    for next_ang in angles:
+        first_diff = math.dist([current_ang], [next_ang])
+        second_diff = 360-abs(first_diff)
+        minimum_diff = min(abs(first_diff), second_diff)
+        if current_ang > next_ang:
+            if abs(first_diff) == minimum_diff:
+                minimum_diff = minimum_diff*-1
+        else:
+            if abs(second_diff) == minimum_diff:
+                minimum_diff = minimum_diff*-1
+        angle_diff.append(minimum_diff)
+        current_ang = next_ang
+    return angle_diff
 
 def update_display(
           display: DisplayEnvironment,

@@ -64,7 +64,8 @@ class LineDetector:
                     try: 
                         x_1, y_1, x_2, y_2 = line.reshape(4)
                         cv2.line(image, (x_1, y_1), (x_2, y_2), (255, 0, 0), 5)
-                    except cv2.error:
+                    except cv2.error as e:
+                        print(e)
                         print("error")
 
 

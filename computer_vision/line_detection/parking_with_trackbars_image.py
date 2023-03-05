@@ -110,8 +110,10 @@ if __name__ == "__main__":
         parking_slot_detector.show_lines(copy, parking_lines)
 
         if parking_lines is not None:
-            lines, coords = parking_slot_detector.get_parking_lines(copy)
-            parking_slot_detector.show_lines(copy, coords)
+            all_parking_lines = parking_slot_detector.get_parking_lines(copy)
+            if all_parking_lines is not None:
+                lines, coords = parking_slot_detector.get_parking_lines(copy)
+                parking_slot_detector.show_lines(copy, coords)
         cv2.imshow('frame', copy)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

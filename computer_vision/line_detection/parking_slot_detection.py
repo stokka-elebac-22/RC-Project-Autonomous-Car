@@ -3,6 +3,7 @@ import warnings
 from typing import Union, TypedDict
 import sys
 import os
+import math
 import cv2
 import numpy as np
 try:
@@ -19,6 +20,138 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 # pylint: disable=C0413
 from qr_code.qr_code import QRCode
+
+np.seterr(all='raise')
+
+class MergeLines():
+    '''Merge close lines together'''
+    def __init__(self, d_max_xg = 8*20, d_max_yg = None):
+        '''Init'''
+        self.d_max_xg = d_max_xg
+        if d_max_yg is None:
+            d_max_yg = [10, 25, 2]
+            d_max_yg = [x * 20 for x in d_max_yg]
+        self.d_max_yg = d_max_yg
+
+    def length(self, x1, y1, x2, y2):
+        '''Calculate length of a line'''
+        return math.sqrt((x1-x2)**2+(y1-y2)**2)
+
+    def centroid(self, p_a, p_b, p_c, p_d):
+        '''
+        Calculate centroid of two lines defined by
+        Line one: a, b
+        Line two: c, d
+        '''
+        l_i = self.length(p_a[0], p_a[1], p_b[0], p_b[1])
+        l_j = self.length(p_c[0], p_c[1], p_d[0], p_d[1])
+        x_g = (l_i*(p_a[0]+p_b[0])+l_j*(p_c[0]+p_d[0]))/2*(l_i+l_j)
+        y_g = (l_i*(p_a[1]+p_b[1])+l_j*(p_c[1]+p_d[1]))/2*(l_i+l_j)
+        return (x_g, y_g)
+
+    def orientation(self, p_a, p_b):
+        '''Calculate the orientation of a line represented from two points between 0 and PI'''
+        try:
+            if p_a[0] > p_b[0]:
+                start = p_a
+                end = p_b
+            else:
+                start = p_b
+                end = p_a
+            numerator = start[1]-end[1]
+            denomerator = start[0]-end[0]
+            tan = numerator/denomerator
+            angle = math.atan(tan)
+        except ZeroDivisionError:
+            angle = math.pi/2
+        except FloatingPointError:
+            angle = 0
+        return angle
+    
+    def merged_line_orientation(self, p_a, p_b, p_c, p_d):
+        '''Merged line orientation'''
+        orientation_i = self.orientation(p_a, p_b)
+        orientation_j = self.orientation(p_c, p_d)
+        l_i = self.length(p_a[0], p_a[1], p_b[0], p_b[1])
+        l_j = self.length(p_c[0], p_c[1], p_d[0], p_d[1])
+
+        if abs(orientation_i-orientation_j) <= math.pi/2:
+            orientation_r = (l_i*orientation_i + l_j*orientation_j)/(l_i + l_j)
+        else:
+            orientation_r = (l_i*orientation_i + l_j*(orientation_j - math.pi*orientation_j/abs(orientation_j)))/(l_i + l_j)
+        return orientation_r
+
+    def transform_to_another_axis(self, centroid, point, orientation):
+        '''Transform the given point to a new axis centered on the centroid with the given orientation'''
+        new_x = (point[1]-centroid[1])*math.sin(orientation) + (point[0]-centroid[0])*math.cos(orientation)
+        new_y = (point[1]-centroid[1])*math.cos(orientation) + (point[0]-centroid[0])*math.sin(orientation)
+        return (new_x, new_y)
+    
+    def transform_to_orig_axis(self, centroid, point, orientation):
+        '''Transform the given point to original axis'''
+        try:
+            orig_x = (((point[0]+centroid[1]*math.sin(orientation)+centroid[0]*math.cos(orientation))/math.sin(orientation))*math.cos(orientation)-centroid[1]*math.cos(orientation)+centroid[0]*math.sin(orientation)-point[1])/(math.cos(orientation)**2/math.sin(orientation)+math.sin(orientation))
+            orig_y = (point[0]+centroid[1]*math.sin(orientation)-orig_x*math.cos(orientation)+centroid[0]*math.cos(orientation))/math.sin(orientation)
+        except ZeroDivisionError:
+            orig_x = point[0]+centroid[0]
+            orig_y = point[1]+centroid[1]
+        return (int(orig_x), int(orig_y))
+        
+    
+    def merge_lines(self, p_a, p_b, p_c, p_d):
+        '''Merge lines'''
+        centroid = self.centroid(p_a, p_b, p_c, p_d)
+        orientation = self.merged_line_orientation(p_a, p_b, p_c, p_d)
+        new_p_a = self.transform_to_another_axis(centroid, p_a, orientation)
+        new_p_b = self.transform_to_another_axis(centroid, p_b, orientation)
+        new_p_c = self.transform_to_another_axis(centroid, p_c, orientation)
+        new_p_d = self.transform_to_another_axis(centroid, p_d, orientation)
+        new_points = [new_p_a, new_p_b, new_p_c, new_p_d]
+        new_x = [p[0] for p in new_points]
+        max_value = max(new_x)
+        max_index = new_x.index(max_value)
+        min_value = min(new_x)
+        min_index = new_x.index(min_value)
+        l_r = max_value - min_value
+        start = new_points[max_index]
+        stop = new_points[min_index]
+
+        m_p_one = self.transform_to_orig_axis(centroid, start, orientation)
+        m_p_two = self.transform_to_orig_axis(centroid, stop, orientation)
+
+        # Case 1
+        if abs(l_r) >= (abs(new_p_a[0]-new_p_b[0])+abs(new_p_c[0]-new_p_d[0])):
+            if abs(l_r) - abs(new_p_a[0]-new_p_b[0]) + abs(new_p_c[0]-new_p_d[0]) <= self.d_max_xg and abs(new_points[max_index][1]-new_points[min_index][1]) <= self.d_max_yg[0]:
+                return np.array([m_p_one[0], m_p_one[1], m_p_two[0], m_p_two[1]])
+        # Case 2
+        if abs(l_r) == abs(new_p_a[0]-new_p_b[0]) or abs(l_r) == abs(new_p_c[0]-new_p_d[0]):
+            if abs(new_points[max_index][1]-new_points[min_index][1]) <= self.d_max_yg[1]:
+                return np.array([m_p_one[0], m_p_one[1], m_p_two[0], m_p_two[1]])
+        
+        # Case 3
+        if abs(l_r) < (abs(new_p_a[0]-new_p_b[0])+abs(new_p_c[0]-new_p_d[0])):
+            if abs(new_points[max_index][1]-new_points[min_index][1]) <= self.d_max_yg[2]:
+                return np.array([m_p_one[0], m_p_one[1], m_p_two[0], m_p_two[1]])
+        return None
+    
+    def merge_all_lines(self, lines):
+        '''Merge all lines'''
+        merged_index = []
+        merged_lines = []
+        for a, i in enumerate(lines):
+            if a in merged_index:
+                continue
+            merged_index.append(a)
+            current_line = i
+            for b, j in enumerate(lines):
+                if b in merged_index:
+                    continue
+                new_merged_line = self.merge_lines((current_line[0], current_line[1]), (current_line[2], current_line[3]), (j[0], j[1]), (j[2], j[3])) 
+                if new_merged_line is not None:
+                    current_line = new_merged_line
+                    merged_index.append(b)
+            merged_lines.append(current_line)
+        return merged_lines
 
 class ParkingSlotDetector(LineDetector):
     '''DOC: Detects parking slot'''
@@ -182,8 +315,11 @@ class ParkingSlotDetector(LineDetector):
     def get_parking_lines(self, image: np.ndarray) -> list[list[np.ndarray], list[np.ndarray]]:
         '''Get all parking lines in an image'''
         lines = self.get_lines(image)
+        merge_lines = MergeLines()
         if lines is None:
             return None
+        lines = [i[0] for i in lines]
+        lines = merge_lines.merge_all_lines(lines)
 
         clustered_lines, clustered_coords = self.get_clustered_lines(lines)
         return clustered_lines, clustered_coords

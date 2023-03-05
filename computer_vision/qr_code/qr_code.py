@@ -42,7 +42,7 @@ class QRGeometry:
     def get_width(self) -> int:
         '''Return the width'''
         width_px = max(abs(self.points[0][0] - self.points[1][0]),
-        abs(self.points[2][0] - self.points[2][0]))
+        abs(self.points[2][0] - self.points[3][0]))
         return width_px
 
     def get_height(self) -> int:
@@ -70,6 +70,18 @@ class QRGeometry:
         height_px = self.get_height()
         distance = (self.size.get('mm') * self.focal_length) / height_px
         return distance
+
+    def get_qr_code_distance_x(self, center: Tuple[int, int]):
+        '''Get qr code distance x'''
+        min_dist_x = min(
+            abs(self.points[0][0] - center[0]),
+            abs(self.points[1][0] - center[0]),
+            abs(self.points[1][0] - center[0]),
+            abs(self.points[2][0] - center[0]),
+        )
+        ratio = self.size['mm'] / self.get_width()
+        return ratio * min_dist_x
+
 
 QRData = TypedDict('QRData', {
     'ret': bool,
@@ -281,7 +293,7 @@ if __name__ == '__main__':
     distances_lists = [[0 for _ in range(VALUES_LENGTH)]]
 
     while True:
-        img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
+        # img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
         img = local_read_camera()
         qr_data = qr_code.get_data(img)
 
@@ -305,6 +317,7 @@ if __name__ == '__main__':
                 'angles': average_angles,
                 'info': qr_data['info']}
             qr_code.display(img, qr_code_measurements, verbose=2)
+            screen_height, screen_width, _ = img.shape
         cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):
             break

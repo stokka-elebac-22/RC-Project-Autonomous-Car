@@ -51,15 +51,15 @@ if __name__ == '__main__':
 
     # ----- PARKING SLOT DETECTOR ----- #
     P_CANNY = [50, 100]
-    P_HOUGH = [200, 5]
+    P_HOUGH = [80, 200, 5]
     P_ITERATIONS = [1, 1]
     P_BLUR = 5
     P_FILTER_ATOL = [20, 20]
     P_CLUSTER_ATOL = 5
 
     # ----- LANE DETECTOR ----- #
-    L_CANNY = None
-    L_HOUGH = None
+    L_CANNY = [50, 100]
+    L_HOUGH = [80, 200, 5]
     L_BLUR = 5
 
     # ----- TRAFFIC SIGN DETECTOR ----- #

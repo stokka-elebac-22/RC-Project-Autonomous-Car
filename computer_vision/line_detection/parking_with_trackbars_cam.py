@@ -31,6 +31,7 @@ if __name__ == "__main__":
     cv2.namedWindow('Trackbars')
     cv2.createTrackbar('Canny low threshold', 'Trackbars', 100, 500, nothing)
     cv2.createTrackbar('Canny high threshold', 'Trackbars', 200, 500, nothing)
+    cv2.createTrackbar('Hough threshold', 'Trackbars', 80, 500, nothing)
     cv2.createTrackbar('Hough minimum line length', 'Trackbars', 200, 500, nothing)
     cv2.createTrackbar('Hough maximum line gap', 'Trackbars', 300, 500, nothing)
     cv2.createTrackbar('Gaussian blur kernel size', 'Trackbars', 5, 20, nothing)
@@ -43,6 +44,7 @@ if __name__ == "__main__":
     while True:
         canny_low_thr = cv2.getTrackbarPos('Canny low threshold','Trackbars')
         canny_high_thr = cv2.getTrackbarPos('Canny high threshold','Trackbars')
+        hough_threshold = cv2.getTrackbarPos('Hough threshold','Trackbars')
         hough_min_length = cv2.getTrackbarPos('Hough minimum line length','Trackbars')
         hough_max_gap = cv2.getTrackbarPos('Hough maximum line gap','Trackbars')
         gaussian_kernel = cv2.getTrackbarPos('Gaussian blur kernel size','Trackbars')
@@ -54,7 +56,7 @@ if __name__ == "__main__":
 
         parking_slot_detector = ParkingSlotDetector(
             canny = [canny_low_thr, canny_high_thr],
-            hough = [hough_min_length, hough_max_gap],
+            hough = [hough_threshold, hough_min_length, hough_max_gap],
             blur = gaussian_kernel,
             iterations=[dilate_iter, erode_iter],
             filter_atol=[filter_atol_slope, filter_atol_intercept],
@@ -79,7 +81,7 @@ if __name__ == "__main__":
             break
 
     print("canny", canny_low_thr, canny_high_thr)
-    print("hough", hough_min_length, hough_max_gap)
+    print("hough", hough_threshold, hough_min_length, hough_max_gap)
     print("blur", gaussian_kernel)
     print("iter", dilate_iter, erode_iter)
     print("filter", filter_atol_slope, filter_atol_intercept)

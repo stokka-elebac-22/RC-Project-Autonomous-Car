@@ -15,11 +15,11 @@ sign_size:
 lane_detector:
   canny: !!seq [50, 150]
   blur: !!int 5
-  hough: !!seq [100, 250]
+  hough: !!seq [80, 100, 250]
   width: !!int 200
   forward: !!int 100
 parking_slot_detector:
-  hough: !!seq [200, 5]
+  hough: !!seq [80, 200, 5]
   iterations: !!seq [5, 2]
 environment:
   sizex: !!int 10

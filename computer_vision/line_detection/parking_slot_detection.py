@@ -81,17 +81,20 @@ class MergeLines():
         except ZeroDivisionError:
             orig_x = point[0]+centroid[0]
             orig_y = point[1]+centroid[1]
+        except FloatingPointError:
+            orig_x = point[0]+centroid[0]
+            orig_y = point[1]+centroid[1]
         return (int(orig_x), int(orig_y))
         
     
     def merge_lines(self, p_a, p_b, p_c, p_d):
         '''Merge lines'''
-        centroid = self.centroid(p_a, p_b, p_c, p_d)
-        orientation_r = self.merged_line_orientation(p_a, p_b, p_c, p_d)
         orientation_i = self.orientation(p_a, p_b)
         orientation_j = self.orientation(p_c, p_d)
         if abs(orientation_i-orientation_j) > math.pi/8:
             return None
+        centroid = self.centroid(p_a, p_b, p_c, p_d)
+        orientation_r = self.merged_line_orientation(p_a, p_b, p_c, p_d)
         new_p_a = self.transform_to_another_axis(centroid, p_a, orientation_r)
         new_p_b = self.transform_to_another_axis(centroid, p_b, orientation_r)
         new_p_c = self.transform_to_another_axis(centroid, p_c, orientation_r)
@@ -149,7 +152,7 @@ class ParkingSlotDetector(LineDetector):
     def __init__(self,
                  canny: list[int, int] = None,
                  blur: int = 3,
-                 hough: list[int, int] = None,
+                 hough: list[int, int, int] = None,
                  iterations: list[int, int] = None,
                  filter_atol: list[int, int] = None,
                  cluster_atol: int = 5):
@@ -370,7 +373,7 @@ class ParkingSlotDetector(LineDetector):
 if __name__ == '__main__':
     # ORIGINAL: hough=[200,5]
     parking_slot_detector = ParkingSlotDetector(
-        hough=[200, 5], iterations=[5, 2])
+        hough=[80, 200, 5], iterations=[5, 2])
     img = cv2.imread('computer_vision/line_detection/assets/parking/10.png')
     qr_size = {
         'px': 76,

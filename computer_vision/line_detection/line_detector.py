@@ -14,7 +14,7 @@ class LineDetector:
                  iterations: list[int, int] = None):
         '''
         CANNY: [low_threshold, high_threshold]
-        HOUGH_LINES: [min_line_length, max_line_gap]
+        HOUGH_LINES: [threshold, min_line_length, max_line_gap]
         '''
         if canny is None:
             canny = [100, 200]

@@ -51,6 +51,6 @@ if __name__ == '__main__':
             break
 
     print("canny", canny_low_thr, canny_high_thr)
-    print("hough", hough_min_length, hough_max_gap)
+    print("hough", hough_threshold, hough_min_length, hough_max_gap)
     print("blur", gaussian_kernel)
     cv2.destroyAllWindows()

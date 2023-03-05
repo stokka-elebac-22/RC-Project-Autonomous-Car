@@ -120,9 +120,10 @@ if __name__ == '__main__':
 
         # ---------- PATH ---------- #
         ret, path = a_star.get_data(cur_mat, start_pos_path, end_pos_path)
+        print(path)
 
         # ---------- SPLINES ---------- #
-        cure, derivative = catmull_rom_chain(path, config['spline']['tension'])
+        curve, derivative = catmull_rom_chain(path, config['spline']['tension'])
         angles, velocity = angle_and_velocity_from_derivative(derivative)
 
         sys.stdout.write(f'angle: {angles[0]}\n\

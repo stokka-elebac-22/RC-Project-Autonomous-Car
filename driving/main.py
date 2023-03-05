@@ -100,7 +100,7 @@ if __name__ == '__main__':
         # add qr code to the objects list
         qr_code_distances = []
         for geo in qr_code.qr_geometries:
-            qr_code_distances.append((geo.get_distance_x(), geo.get_distance()))
+            qr_code_distances.append((geo.get_qr_code_distance_x(cam_center), geo.get_distance()))
 
         path_finding_object: path_finding.Objects = {
             'values': qr_code_distances,

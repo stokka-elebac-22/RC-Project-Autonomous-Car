@@ -1,5 +1,4 @@
 '''main_headless.py: DATBAC23 Car system main.'''
-
 import sys
 from defines import States
 from socket_handling.abstract_server import NetworkSettings
@@ -85,5 +84,5 @@ class Headless():
             elif self.state is States.DRIVING:
                 # example:
                 self.car_comm.set_motor_speed(1, 100, 1, 100)
-                pass
+
 

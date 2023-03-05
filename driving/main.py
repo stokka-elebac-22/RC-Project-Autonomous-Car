@@ -111,7 +111,7 @@ if __name__ == '__main__':
         objects.append(path_finding_object)
 
         # ---------- UPDATE ENVIRONMENT ---------- #
-        path_finding.env.reset()
+        path_finding.environment.reset()
         path_finding.insert_objects(objects)
 
         start_pos_path = path_finding.env.get_pos(CAR_ID)

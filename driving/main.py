@@ -108,14 +108,14 @@ if __name__ == '__main__':
             'object_id': QR_CODE_ID
         }
 
-        # objects.append(path_finding_object)
-
-        for distance in qr_code_distances:
-            path_finding.environment.insert(distance, QR_CODE_ID)
+        objects.append(path_finding_object)
 
         # ---------- UPDATE ENVIRONMENT ---------- #
         path_finding.environment.reset()
         path_finding.insert_objects(objects)
+        for distance in qr_code_distances:
+            path_finding.environment.insert(distance, QR_CODE_ID)
+
 
         start_pos_path = path_finding.environment.get_pos(CAR_ID)
         end_pos_path = path_finding.environment.get_pos(QR_CODE_ID)

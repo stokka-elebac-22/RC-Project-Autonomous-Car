@@ -1,102 +1,77 @@
 '''main_headless.py: DATBAC23 Car system main.'''
 
 import sys
-from typing import Tuple
 from defines import States
+from socket_handling.abstract_server import NetworkSettings
 from socket_handling.multi_socket_server import MultiSocketServer
-from camera_handler.camera_handler import CameraHandler, VideoThread
+from camera_handler.camera_headless import CameraHandler
+from camera_handler.camera_sock_server import CamSocketStream
 from traffic_sign_detection.main import TrafficSignDetector
 from qr_code.qr_code import QRCode
 import numpy as np
 
-# Run in thread, not qthread?
-# class Worker(QObject, ):  # pylint: disable=R0903
-#     '''Worker thread'''
-#     finished = pyqtSignal()
-#     def __init__(self, cam_handler: CameraHandler):
-#         self.cam_handler = cam_handler
-#         super().__init__()
-
-#     def update_webcam_list(self):
-#         '''Long-running task.'''
-#         self.cam_handler.refresh_camera_list()
-#         self.finished.emit()
-
-
 class Headless():
     '''Class handling headless running'''
-    def __init__(self, connection: Tuple[str, int]):
-        self.state = States.WAITING
-        self.socket_server = MultiSocketServer()
-        self.connection_details = connection
-        self.camera_handler = CameraHandler()
-        # Create an instance of QtWidgets.QApplication
+    def __init__(self, conf: dict):
+        self.state = States.WAITING  # Start in "idle" state
+
+        # Network config for main connection + camera(s)
+        self.net_main = NetworkSettings(conf["network"]["host"], conf["network"]["port"])
+        self.net_cam0 = NetworkSettings(conf["network"]["host"], conf["network"]["port_cam0"])
+        self.net_cam1 = NetworkSettings(conf["network"]["host"], conf["network"]["port_cam1"])
+
+        # Start main socket server for connections
+        self.socket_server = MultiSocketServer(self.net_main)
+        self.socket_server.start()
+
+        self.cam0_stream = CamSocketStream(self.net_cam0)
+        if conf["network"]["stream_en_cam0"] is True:
+            self.cam0_stream.start()
+
+        self.cam1_stream = CamSocketStream(self.net_cam1)
+        if conf["network"]["stream_en_cam1"] is True:
+            self.cam1_stream.start()
 
         # Get size from config
         size = {
-            'px': 76,
-            'mm': 52,
-            'distance': 500,
+            'px': conf["camera0"]["size"]["px"],
+            'mm': conf["camera0"]["size"]["mm"],
+            'distance': conf["camera0"]["size"]["distance"],
         }
+
+        self.cam0_handler = CameraHandler(conf["camera0"]["id"])
 
         self.qr_code = QRCode(size)
         self.stop_sign_detector = TrafficSignDetector('stop_sign_model.xml')
 
-        self.refresh_webcam_list()
-
-        '''Possible logic:'''
         while True:
-            '''Handle things happening, request/take new picture?'''
-            match self.state:
-                case States.WAITING:
-                    pass
-                case States.PARKING:
-                    pass
-                case States.DRIVING:
-                    pass
+            # Take new picture, handle socket transfers
+            ret, frame0 = self.cam0_handler.get_cv_frame()
+            if ret is True:
+                self.cam0_stream.send_to_all(frame0)
+                self.cam1_stream.send_to_all(frame0)
 
-    '''Or, run logic on new image from camera similar to pyQt way'''
-    #@pyqtSlot(np.ndarray)
-    def update_image(self, cv_img):
-        '''Updates the image_label with a new opencv image'''
-        output_frame = cv_img
-        qt_img = self.camera_handler.convert_cv_qt(
-            cv_img, self.img_input[0].width(), self.img_input[0].height())
-        current_qr_data = self.qr_code.get_data(cv_img)
-        output_data = 'Data: \n'
-        # print(current_qr_data)
-        if current_qr_data['ret']:
-            self.qr_code.display(output_frame, current_qr_data, verbose=0)
-            for i in range(len(current_qr_data['distances'])):
-                output_data += \
-                    f"QR-Code {str(i)} \n \
-                        Distance: {round(current_qr_data['distances'][i])} \n \
-                        Angle: {current_qr_data['angles'][i]} \n"
+            if self.state is States.WAITING:  # Prints detected data (testing)
+                current_qr_data = self.qr_code.get_data(frame0)
+                output_data = 'Data: \n'
+                # print(current_qr_data)
+                if current_qr_data['ret']:
+                    for i in range(len(current_qr_data['distances'])):
+                        output_data += \
+                            f"QR-Code {str(i)} \n \
+                                Distance: {round(current_qr_data['distances'][i])} \n \
+                                Angle: {current_qr_data['angles'][i]} \n"
 
-                output_data += 'Data: ' + current_qr_data['info'][i] + '\n'
+                        output_data += 'Data: ' + current_qr_data['info'][i] + '\n'
 
-        current_stop_sign = self.stop_sign_detector.detect_signs(cv_img)
-        self.stop_sign_detector.show_signs(output_frame, current_stop_sign)
+                current_stop_sign = self.stop_sign_detector.detect_signs(frame0)
+                if current_qr_data['distances'] is not None and len(current_qr_data['distances']) > 0:
+                    print(output_data)
+                if len(current_stop_sign) > 0:
+                    print(current_stop_sign)
 
-        output_img = self.camera_handler.convert_cv_qt(
-            cv_img, self.img_output.width(), self.img_output.height())
+            elif self.state is States.PARKING:
+                pass
+            elif self.state is States.DRIVING:
+                pass
 
-        # print('Setting new image')
-        self.img_input[0].setPixmap(qt_img)
-        self.img_output.setPixmap(output_img)
-        self.output_text.setText(output_data)
-
-
-    def callback_func_update_camera_cbo(self):
-        '''Callback function for webcam check thread'''
-        for cbo in self.camera_cbo:
-            for camera in self.camera_handler.get_camera_list():
-                cbo.addItem(
-                    self.camera_handler.get_camera_string(camera['id']))
-                # create the video capture thread
-        self.thread2 = VideoThread(1)  # pylint: disable=W0201
-        # connect its signal to the update_image slot
-        self.thread2.change_pixmap_signal.connect(self.update_image)
-        # start the thread
-        self.thread2.start()
-    # def update_plot_data(self):

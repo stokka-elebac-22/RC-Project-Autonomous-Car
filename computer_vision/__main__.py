@@ -19,6 +19,7 @@ import sys
 import argparse
 import yaml
 from main_window_ui import Ui
+from main_headless import Headless
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -34,7 +35,7 @@ if __name__ == '__main__':
     parser.add_argument('--storage', dest='storage',
                         default='tmp_db.db',
                         help='Choose SQLite storage (default: tmp_db.db)')
-    parser.add_argument('--headless', dest='headless',
+    parser.add_argument('--headless', dest='headless',  # in config, not used, could be override
                         default='false',
                         help='activate headless-mode (default: false)')
     parser.add_argument('--config-file', dest='config_file',
@@ -54,7 +55,7 @@ if __name__ == '__main__':
         sys.exit(0)
 
     with open(args.config_file + '.yml', encoding="utf8") as f:
-        config = yaml.load(f, Loader=yaml.Loader.SafeLoader)
+        config = yaml.load(f, Loader=yaml.SafeLoader)
 
     FULL_SCREEN = args.full_screen.lower() in ['true', 1]
     os.environ['QT_DEVICE_PIXEL_RATIO'] = '0'
@@ -62,10 +63,8 @@ if __name__ == '__main__':
     os.environ['QT_SCREEN_SCALE_FACTORS'] = '1'
     os.environ['QT_SCALE_FACTOR'] = '1'
 
-    HOST = '10.0.10.95'
-    PORT = 2004  # socket server port number
-    if args.headless:
-        pass
+    if config["headless"] is True:
+        main_thread = Headless(config)
     else:
-        window = Ui(args.theme + '.ui', (HOST, PORT), FULL_SCREEN)
+        window = Ui(args.theme + '.ui', config, FULL_SCREEN)
     sys.exit(0)

@@ -93,6 +93,14 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 testing = ["pre-commit"]
 
 [[package]]
+name = "imutils"
+version = "0.5.4"
+description = "A series of convenience functions to make basic image processing functions such as translation, rotation, resizing, skeletonization, displaying Matplotlib images, sorting contours, detecting edges, and much more easier with OpenCV and both Python 2.7 and Python 3."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "iniconfig"
 version = "2.0.0"
 description = "brain-dead simple config-ini parsing"
@@ -423,7 +431,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "481ffa779d075e1a971dc94e17fff401ecc21fc8ac44a8cb3fcf58dc5273b2ef"
+content-hash = "7ca66e9e7ba8c3740071914f2f39db8f39a8c8a38a8c7fc218bec5ac23b52bee"
 
 [metadata.files]
 astroid = [
@@ -505,6 +513,9 @@ exceptiongroup = [
 execnet = [
     {file = "execnet-1.9.0-py2.py3-none-any.whl", hash = "sha256:a295f7cc774947aac58dde7fdc85f4aa00c42adf5d8f5468fc630c1acf30a142"},
     {file = "execnet-1.9.0.tar.gz", hash = "sha256:8f694f3ba9cc92cab508b152dcfe322153975c29bda272e2fd7f3f00f36e47c5"},
+]
+imutils = [
+    {file = "imutils-0.5.4.tar.gz", hash = "sha256:03827a9fca8b5c540305c0844a62591cf35a0caec199cb0f2f0a4a0fb15d8f24"},
 ]
 iniconfig = [
     {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},

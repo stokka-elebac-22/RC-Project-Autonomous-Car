@@ -1,21 +1,23 @@
 ---
-  headless: false
+  headless: True
   network:
-    host:
-    port:
-    port_cam0:
-    port_cam1:
+    host: !!str '10.0.11.116'
+    port: !!int 2004
+    port_cam0: !!int 2005
+    stream_en_cam0: !!bool True
+    port_cam1: !!int 2006
+    stream_en_cam1: !!bool False
   serial:
-    active: false
-    port: 0
+    active: !!bool false
+    port: !!int 0
   can:
-    active: false
-    interface: "socketcan"
-    channel: "can0"
+    active: !!bool false
+    interface: !!str "socketcan"
+    channel: !!str "can0"
   camera0:
-    id: 0
+    id: !!int 0
     size:
-      px: 76
-      mm: 52
-      distance: 500
+      px: !!int 76
+      mm: !!int 52
+      distance: !!int 500
 ...

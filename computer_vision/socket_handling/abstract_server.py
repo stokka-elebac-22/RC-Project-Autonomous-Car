@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 """abstract_server.py: Abstract class for communication server."""
-
+from dataclasses import dataclass
 from abc import (ABC, abstractmethod,)
+
+@dataclass
+class NetworkSettings:
+    '''Network settings'''
+    host: str
+    port: int
 
 class BasicServer(ABC):
   '''Basic server'''
 
-  def __init__(self):
+  def __init__(self, network_settings: NetworkSettings):
     '''Initialized server object'''
 
   @abstractmethod

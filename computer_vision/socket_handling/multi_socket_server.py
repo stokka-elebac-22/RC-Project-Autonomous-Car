@@ -5,14 +5,14 @@ import socket
 import time
 import queue
 from _thread import start_new_thread
-from abstract_server import BasicServer
+from socket_handling.abstract_server import BasicServer, NetworkSettings
 
 class MultiSocketServer(BasicServer):
     '''Socket Server for multiple clients'''
-    def __init__(self):
+    def __init__(self, net_sett: NetworkSettings):
         self.server_side_socket = socket.socket()
-        self.host = '10.0.10.95'
-        self.port = 2004
+        self.host = net_sett.host # '10.0.10.95'
+        self.port = net_sett.port # 2004
         self.thread_count = 0
         self.running = False
         self.clients = []
@@ -86,7 +86,8 @@ if __name__ == "__main__":
     # Receive message from socket, send message to all connected clients, and sleep.
     # This is meant for basic testing of server/client functionality by enabling basic transfer.
     print("Starting init")
-    socket_server = multi_socket_server()
+    network_settings = NetworkSettings('10.0.10.95', 2004)
+    socket_server = MultiSocketServer(network_settings)
     print("Created object")
     socket_server.start()
     print("Started server")

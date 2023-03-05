@@ -25,17 +25,16 @@ np.seterr(all='raise')
 
 class MergeLines():
     '''Merge close lines together'''
-    def __init__(self, d_max_xg = 8*20, d_max_yg = None):
+    def __init__(self, d_max_xg = 200, d_max_yg = None):
         '''Init'''
         self.d_max_xg = d_max_xg
         if d_max_yg is None:
-            d_max_yg = [10, 25, 2]
-            d_max_yg = [x * 20 for x in d_max_yg]
+            d_max_yg = [30, 30, 30]
         self.d_max_yg = d_max_yg
 
-    def length(self, x1, y1, x2, y2):
+    def length(self, x_1, y_1, x_2, y_2):
         '''Calculate length of a line'''
-        return math.sqrt((x1-x2)**2+(y1-y2)**2)
+        return math.sqrt((x_1-x_2)**2+(y_1-y_2)**2)
 
     def centroid(self, p_a, p_b, p_c, p_d):
         '''
@@ -45,8 +44,8 @@ class MergeLines():
         '''
         l_i = self.length(p_a[0], p_a[1], p_b[0], p_b[1])
         l_j = self.length(p_c[0], p_c[1], p_d[0], p_d[1])
-        x_g = (l_i*(p_a[0]+p_b[0])+l_j*(p_c[0]+p_d[0]))/2*(l_i+l_j)
-        y_g = (l_i*(p_a[1]+p_b[1])+l_j*(p_c[1]+p_d[1]))/2*(l_i+l_j)
+        x_g = (l_i*(p_a[0]+p_b[0])+l_j*(p_c[0]+p_d[0]))/(2*(l_i+l_j))
+        y_g = (l_i*(p_a[1]+p_b[1])+l_j*(p_c[1]+p_d[1]))/(2*(l_i+l_j))
         return (x_g, y_g)
 
     def orientation(self, p_a, p_b):
@@ -70,9 +69,9 @@ class MergeLines():
     def transform_to_another_axis(self, centroid, point, orientation):
         '''Transform the given point to a new axis centered on the centroid with the given orientation'''
         new_x = (point[1]-centroid[1])*math.sin(orientation) + (point[0]-centroid[0])*math.cos(orientation)
-        new_y = (point[1]-centroid[1])*math.cos(orientation) + (point[0]-centroid[0])*math.sin(orientation)
+        new_y = (point[1]-centroid[1])*math.cos(orientation) - (point[0]-centroid[0])*math.sin(orientation)
         return (new_x, new_y)
-    
+
     def transform_to_orig_axis(self, centroid, point, orientation):
         '''Transform the given point to original axis'''
         try:
@@ -84,49 +83,55 @@ class MergeLines():
         except FloatingPointError:
             orig_x = point[0]+centroid[0]
             orig_y = point[1]+centroid[1]
-        return (int(orig_x), int(orig_y))
-        
-    
+        return (int(round(orig_x))), int(round(orig_y))
+
     def merge_lines(self, p_a, p_b, p_c, p_d):
         '''Merge lines'''
         orientation_i = self.orientation(p_a, p_b)
         orientation_j = self.orientation(p_c, p_d)
+ 
         if abs(orientation_i-orientation_j) > math.pi/8:
             return None
+
         centroid = self.centroid(p_a, p_b, p_c, p_d)
         orientation_r = self.merged_line_orientation(p_a, p_b, p_c, p_d)
         new_p_a = self.transform_to_another_axis(centroid, p_a, orientation_r)
         new_p_b = self.transform_to_another_axis(centroid, p_b, orientation_r)
         new_p_c = self.transform_to_another_axis(centroid, p_c, orientation_r)
         new_p_d = self.transform_to_another_axis(centroid, p_d, orientation_r)
+
         new_points = [new_p_a, new_p_b, new_p_c, new_p_d]
         new_x = [p[0] for p in new_points]
-        max_value = max(new_x)
-        max_index = new_x.index(max_value)
-        min_value = min(new_x)
-        min_index = new_x.index(min_value)
-        l_r = max_value - min_value
-        start = new_points[max_index]
-        stop = new_points[min_index]
+        max_x_value = max(new_x)
+        max_x_index = new_x.index(max_x_value)
+        min_x_value = min(new_x)
+        min_x_index = new_x.index(min_x_value)
+        new_y = [p[1] for p in new_points]
+        max_y_value = max(new_y)
+        max_y_index = new_y.index(max_y_value)
+        min_y_value = min(new_y)
+        min_y_index = new_y.index(min_y_value)
+        l_r = max_x_value - min_x_value
+        start_x = (new_points[max_x_index][0], 0)
+        stop_x = (new_points[min_x_index][0], 0)
 
-        m_p_one = self.transform_to_orig_axis(centroid, start, orientation_r)
-        m_p_two = self.transform_to_orig_axis(centroid, stop, orientation_r)
+        m_p_one = self.transform_to_orig_axis(centroid, start_x, orientation_r)
+        m_p_two = self.transform_to_orig_axis(centroid, stop_x, orientation_r)
 
         # Case 1
         if abs(l_r) >= (abs(new_p_a[0]-new_p_b[0])+abs(new_p_c[0]-new_p_d[0])):
-            if abs(l_r) - abs(new_p_a[0]-new_p_b[0]) + abs(new_p_c[0]-new_p_d[0]) <= self.d_max_xg and abs(new_points[max_index][1]-new_points[min_index][1]) <= self.d_max_yg[0]:
+            if abs(l_r) - abs(new_p_a[0]-new_p_b[0]) + abs(new_p_c[0]-new_p_d[0]) <= self.d_max_xg and abs(new_points[max_y_index][1]-new_points[min_y_index][1]) <= self.d_max_yg[0]:
                 return np.array([m_p_one[0], m_p_one[1], m_p_two[0], m_p_two[1]])
         # Case 2
         if abs(l_r) == abs(new_p_a[0]-new_p_b[0]) or abs(l_r) == abs(new_p_c[0]-new_p_d[0]):
-            if abs(new_points[max_index][1]-new_points[min_index][1]) <= self.d_max_yg[1]:
+            if abs(new_points[max_y_index][1]-new_points[min_y_index][1]) <= self.d_max_yg[1]:
                 return np.array([m_p_one[0], m_p_one[1], m_p_two[0], m_p_two[1]])
-        
         # Case 3
         if abs(l_r) < (abs(new_p_a[0]-new_p_b[0])+abs(new_p_c[0]-new_p_d[0])):
-            if abs(new_points[max_index][1]-new_points[min_index][1]) <= self.d_max_yg[2]:
+            if abs(new_points[max_y_index][1]-new_points[min_y_index][1]) <= self.d_max_yg[2]:
                 return np.array([m_p_one[0], m_p_one[1], m_p_two[0], m_p_two[1]])
         return None
-    
+
     def merge_all_lines(self, lines):
         '''Merge all lines'''
         merged_index = []
@@ -144,6 +149,8 @@ class MergeLines():
                     current_line = new_merged_line
                     merged_index.append(b)
             merged_lines.append(current_line)
+        
+        
         return merged_lines
 
 class ParkingSlotDetector(LineDetector):
@@ -251,9 +258,9 @@ class ParkingSlotDetector(LineDetector):
 
     def get_min_max_x(self, coordinates: list[np.ndarray]) -> list[int, int]:
         '''Get the minimum and maximum x values from a set of coordinates'''
-        max_values = np.argmax(coordinates, axis=0)
-        max_x = np.max([coordinates[max_values[0]]
-                        [0], coordinates[max_values[2]][2]])
+        max_x_values = np.argmax(coordinates, axis=0)
+        max_x = np.max([coordinates[max_x_values[0]]
+                        [0], coordinates[max_x_values[2]][2]])
         min_values = np.argmin(coordinates, axis=0)
         min_x = np.min([coordinates[min_values[0]]
                         [0], coordinates[min_values[2]][2]])
@@ -311,8 +318,10 @@ class ParkingSlotDetector(LineDetector):
         merge_lines = MergeLines()
         if lines is None:
             return None
+        print("old", len(lines))
         lines = [i[0] for i in lines]
         lines = merge_lines.merge_all_lines(lines)
+        print("new", len(lines))
 
         clustered_lines, clustered_coords = self.get_clustered_lines(lines)
         return clustered_lines, clustered_coords
@@ -359,8 +368,8 @@ class ParkingSlotDetector(LineDetector):
         line_coords = []
         if len(lines) == 2:
             for line in lines:
-                max_value = min(line[1], line[3])
-                min_index = np.where(line == max_value)[0][0]
+                max_x_value = min(line[1], line[3])
+                min_index = np.where(line == max_x_value)[0][0]
                 if min_index == 1:
                     line_coords.append(line[0])
                     line_coords.append(line[1])
@@ -373,7 +382,7 @@ class ParkingSlotDetector(LineDetector):
 if __name__ == '__main__':
     # ORIGINAL: hough=[200,5]
     parking_slot_detector = ParkingSlotDetector(
-        hough=[80, 200, 5], iterations=[5, 2])
+        hough=[80, 200, 5], iterations=[5, 2], cluster_atol=0)
     img = cv2.imread('computer_vision/line_detection/assets/parking/10.png')
     qr_size = {
         'px': 76,
@@ -396,8 +405,8 @@ if __name__ == '__main__':
     parking_lines.append(
         parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
     parking_slot_detector.show_lines(img, parking_lines)
-    # test_lines, test_coords = parking_slot_detector.get_parking_lines(img)
-    # parking_slot_detector.show_lines(img, test_coords)
+    test_lines, test_coords = parking_slot_detector.get_parking_lines(img)
+    parking_slot_detector.show_lines(img, test_coords)
     cv2.imshow('img', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()

@@ -64,10 +64,11 @@ if __name__ == '__main__':
     # finding the center of the camera
 
     _, frame = camera.read()
-    cam_center = get_cam_center(frame)
+    cam_size_px = get_cam_center(frame)
+    cam_center = (cam_size_px[0]/2, cam_size_px[0]/2)
     path_finding = PathFinding(
-        pixel_size=config['pathfinding']['pixel_size'],
-        cam_size=config['pathfinding']['cam_size'],
+        pixel_size=cam_size_px,
+        cam_size=config['camera']['size_mm'],
         cam_center=cam_center,
         environment=env,
         pathfinding_algorithm=a_star

@@ -1,9 +1,6 @@
 ---
 camera:
-  px_height: !!int 300
-  px_width: !!int 500
-  mm_height: !!int 500
-  mm_width: !!int 800
+  size_mm: !!seq [800, 500]
 qr_code_size:
   px: !!int 76
   mm: !!int 52
@@ -23,9 +20,6 @@ parking_slot_detector:
   iterations: !!seq [5, 2]
 environment:
   size: !!seq [10, 11]
-pathfinding:
-  pixel_size: !!seq [500, 300]
-  cam_size: !!seq [800, 500]
 a_star:
   weight: !!int 4
   penalty: !!int 2

@@ -34,7 +34,7 @@ def get_available_cameras() -> Tuple[bool, List[int]]:
 def get_cam_center(frame: np.ndarray) -> Tuple[int, int]:
     '''Returns the shape of the frame'''
     height, width, _ = frame.shape
-    return [width, height]
+    return (width, height)
 
 def get_qr_code_distance(data: QRData, path_finding: PathFinding) -> List[Tuple[int]]:
     '''Return the distances from the QR Code'''

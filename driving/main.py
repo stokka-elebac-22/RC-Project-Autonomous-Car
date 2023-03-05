@@ -114,9 +114,9 @@ if __name__ == '__main__':
         path_finding.environment.reset()
         path_finding.insert_objects(objects)
 
-        start_pos_path = path_finding.env.get_pos(CAR_ID)
-        end_pos_path = path_finding.env.get_pos(QR_CODE_ID)
-        cur_mat = path_finding.env.get_data()
+        start_pos_path = path_finding.environment.get_pos(CAR_ID)
+        end_pos_path = path_finding.environment.get_pos(QR_CODE_ID)
+        cur_mat = path_finding.environment.get_data()
 
         # ---------- PATH ---------- #
         ret, path = a_star.get_data(cur_mat, start_pos_path, end_pos_path)

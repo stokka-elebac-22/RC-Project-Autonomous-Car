@@ -7,6 +7,7 @@
     stream_en_cam0: !!bool True
     port_cam1: !!int 2006
     stream_en_cam1: !!bool False
+  car_comm_interface: !!str "serial"
   serial:
     active: !!bool false
     port: !!int 0

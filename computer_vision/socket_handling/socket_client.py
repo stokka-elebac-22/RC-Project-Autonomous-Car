@@ -2,6 +2,7 @@
 
 import socket
 from _thread import start_new_thread
+from socket_handling.abstract_server import NetworkSettings
 try:
     from computer_vision.defines import MessageId, Position
 except ImportError:
@@ -11,15 +12,16 @@ from db_handler import DbHandler
 
 class SocketClient():
     '''Socket Client'''
-    def __init__(self, storage_class: AbstractStorage, connection: tuple[str, int]):
+    def __init__(self, storage_class: AbstractStorage):
         self.storage = storage_class
-        self.conn_details = connection
+        self.connection = NetworkSettings("", 0)
         self.client_socket = socket.socket()
         self.running = False
 
-    def start(self) -> None:
+    def start(self, connection: NetworkSettings) -> None:
         '''Start Socket client'''
         self.running = True
+        self.connection = connection
         start_new_thread(self.run_server, )
 
     def run_server(self) -> None:

@@ -7,6 +7,10 @@ from socket_handling.multi_socket_server import MultiSocketServer
 from camera_handler.camera_headless import CameraHandler
 from camera_handler.camera_sock_server import CamSocketStream
 from traffic_sign_detection.main import TrafficSignDetector
+from car_communication.abstract_communication import AbstractCommunication
+from car_communication.can_bus_communication import CanBusCommunication
+from car_communication.car_serial_communication import CarSerialCommunication
+
 from qr_code.qr_code import QRCode
 import numpy as np
 
@@ -14,6 +18,12 @@ class Headless():
     '''Class handling headless running'''
     def __init__(self, conf: dict):
         self.state = States.WAITING  # Start in "idle" state
+        self.car_comm: AbstractCommunication
+
+        if conf["car_comm_interface"] == "serial":
+            self.car_comm = CarSerialCommunication(conf["serial"])
+        elif conf["car_comm_interface"] == "can":
+            self.car_comm = CanBusCommunication(conf["can"])
 
         # Network config for main connection + camera(s)
         self.net_main = NetworkSettings(conf["network"]["host"], conf["network"]["port"])
@@ -73,5 +83,7 @@ class Headless():
             elif self.state is States.PARKING:
                 pass
             elif self.state is States.DRIVING:
+                # example:
+                self.car_comm.set_motor_speed(1, 100, 1, 100)
                 pass
 

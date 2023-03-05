@@ -119,7 +119,6 @@ if __name__ == '__main__':
         cur_mat = path_finding.environment.get_data()
 
         # ---------- PATH ---------- #
-        path = path_finding.calculate_path()
         path = a_star.get_data(cur_mat, start_pos_path, end_pos_path)
 
         # ---------- SPLINES ---------- #

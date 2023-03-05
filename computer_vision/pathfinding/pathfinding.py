@@ -88,8 +88,9 @@ class PathFinding:
                             self.environment.insert_by_index(point, 1)
 
 
-    def calculate_path(self, value: tuple[int, int], distance: bool) -> Tuple[bool, list[tuple]]:
+    def calculate_path(self, value: tuple[int, int], distance: bool) -> list[tuple]:
         '''Calculate the shortest path to a specific point using AStar algorithm'''
+        self.environment.remove(12)
         if not distance:
             point = self.point_to_distance(value)
         else:
@@ -100,5 +101,5 @@ class PathFinding:
         end_pos_path = self.environment.get_pos(12)
 
         cur_mat = self.environment.get_data()
-        ret, path = self.pathfinding_algorithm.get_data(cur_mat, start_pos_path, end_pos_path)
-        return ret, path
+        _, path = self.pathfinding_algorithm.get_data(cur_mat, start_pos_path, end_pos_path)
+        return path

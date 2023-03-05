@@ -318,7 +318,6 @@ if __name__ == '__main__':
                 'info': qr_data['info']}
             qr_code.display(img, qr_code_measurements, verbose=2)
             screen_height, screen_width, _ = img.shape
-            print(qr_code.qr_geometries[0].get_qr_code_distance_x((screen_width/2, screen_height/2)))
         cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):
             break

@@ -38,6 +38,7 @@ if __name__ == '__main__':
     # ----- CAMERA ----- #
     PIXEL_WIDTH = img.shape[1]
     PIXEL_HEIGHT = img.shape[0]
+    MM_WIDTH = 200
 
     # ----- ENVIRONMENT ----- #
     BOARD_SIZE = (60, 115)
@@ -60,7 +61,6 @@ if __name__ == '__main__':
     L_CANNY = None
     L_HOUGH = None
     L_BLUR = 5
-    L_WIDTH = 200
 
     # ----- TRAFFIC SIGN DETECTOR ----- #
     SIGN_SIZE: SignSize = {
@@ -109,7 +109,7 @@ if __name__ == '__main__':
         canny=L_CANNY,
         blur=L_BLUR,
         hough=L_HOUGH,
-        width=L_WIDTH
+        width=MM_WIDTH
     )
 
     traffic_sign_detector = TrafficSignDetector(size=SIGN_SIZE)

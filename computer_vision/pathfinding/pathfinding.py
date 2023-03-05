@@ -46,7 +46,7 @@ class PathFinding:
 
     def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
-        offset_x = point[0] - self.center[0]/2
+        offset_x = point[0] - self.center[0]
         offset_y = self.center[1] - point[1]
         x_distance = offset_x*self.ratio['width']
         y_distance = offset_y*self.ratio['height']

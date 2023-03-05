@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
         # add qr code to the objects list
 
-        qr_code_distances = get_qr_code_distance(qr_data, path_finding)
+        qr_code_distances = get_qr_code_distance(qr_data, qr_code, path_finding)
 
         print(qr_code_distances)
 

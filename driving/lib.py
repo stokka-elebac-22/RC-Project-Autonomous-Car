@@ -38,7 +38,7 @@ def get_cam_center(frame: np.ndarray) -> Tuple[int, int]:
 
 def get_qr_code_distance(data: QRData, path_finding: PathFinding) -> List[Tuple[int]]:
     '''Return the distances from the QR Code'''
-    distances: List[Tuple[int, int]] = []
+    qr_distances: List[Tuple[int, int]] = []
     for i in range(len(data['info'])):
         # point to distance get different x values as input and return a distance
         distances = path_finding.point_to_distance(
@@ -47,5 +47,5 @@ def get_qr_code_distance(data: QRData, path_finding: PathFinding) -> List[Tuple[
              data['points'][i][0][0]))
         distance_x = distances[0]
         distance_y = data['distances'][0]
-        distances.append((distance_x, distance_y))
-    return distances
+        qr_distances.append((distance_x, distance_y))
+    return qr_distances

@@ -6,7 +6,7 @@ This file should only contain short code
 import sys
 import os
 from typing import List
-from lib import get_available_cameras, get_cam_center, get_qr_code_distance
+from lib import get_available_cameras, get_cam_center
 import yaml
 import cv2 as cv
 
@@ -65,11 +65,9 @@ if __name__ == '__main__':
 
     _, frame = camera.read()
     cam_size_px = get_cam_center(frame)
-    cam_center = (cam_size_px[0]/2, cam_size_px[0]/2)
+    cam_center = (cam_size_px[0]/2, cam_size_px[1]/2)
     path_finding = PathFinding(
         pixel_size=cam_size_px,
-        cam_size=config['camera']['size_mm'],
-        cam_center=cam_center,
         environment=env,
         pathfinding_algorithm=a_star
     )
@@ -100,10 +98,9 @@ if __name__ == '__main__':
             continue
 
         # add qr code to the objects list
-
-        qr_code_distances = get_qr_code_distance(qr_data, qr_code, path_finding)
-
-        print(qr_code_distances)
+        qr_code_distances = []
+        for geo in qr_code.qr_geometries:
+            qr_code_distances.append((geo.get_distance_x(), geo.get_distance()))
 
         path_finding_object: path_finding.Objects = {
             'values': qr_code_distances,

@@ -126,7 +126,8 @@ if __name__ == '__main__':
             curve, derivative = catmull_rom_chain(path, config['spline']['tension'])
             angles, velocity = angle_and_velocity_from_derivative(derivative)
 
-            sys.stdout.write(f'angle: {angles[0]}\n\
-                    velocity:{velocity[0]}\n\n')
+            sys.stdout.write(
+                f'angle: {angles[0]}\n\
+                velocity:{velocity[0]}\n\n')
 
         # ---------- ACTION ---------- #

@@ -109,6 +109,7 @@ if __name__ == '__main__':
         }
 
         objects.append(path_finding_object)
+        print(objects)
 
         # ---------- UPDATE ENVIRONMENT ---------- #
         path_finding.environment.reset()
@@ -117,7 +118,6 @@ if __name__ == '__main__':
         start_pos_path = path_finding.environment.get_pos(CAR_ID)
         end_pos_path = path_finding.environment.get_pos(QR_CODE_ID)
         cur_mat = path_finding.environment.get_data()
-        print(cur_mat)
 
         # ---------- PATH ---------- #
         ret, path = a_star.get_data(cur_mat, start_pos_path, end_pos_path)

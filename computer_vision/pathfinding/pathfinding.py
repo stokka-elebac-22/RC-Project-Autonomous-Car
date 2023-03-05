@@ -38,12 +38,11 @@ class PathFinding:
         self.velocity = velocity
         self.env = Environment(
             size, env_size, {'view_point': None, 'object_id': object_id})
-        self.center = (pixel_width, pixel_height)
         self.a_star = AStar(weight=2, penalty=100)
 
     def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
-        offset_x = point[0] - self.center[0]/2
+        offset_x = point[0] - self.pixel_width/2
         offset_y = self.pixel_width - point[1]
         # Added 150 offset
         y_distance = 0.0000005405*pow(np.int64(offset_y), np.int64(4))-0.0002915424*pow(np.int64(offset_y), np.int64(3))+0.0579638581*pow(np.int64(offset_y), np.int64(2))-2.4604486471*offset_y+430.4886090479 - 150

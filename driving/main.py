@@ -6,7 +6,6 @@ This file should only contain short code
 import sys
 import os
 from typing import List
-from lib import get_available_cameras, get_cam_center
 import yaml
 import cv2 as cv
 
@@ -15,6 +14,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 # pylint: disable=C0413
+from driving.lib import get_available_cameras, get_cam_center
 from computer_vision.qr_code.qr_code import QRCode, QRSize
 from computer_vision.environment.src.environment import Environment
 from computer_vision.environment.src.lib import Objects
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     SIZE = config['environment']['size']
     WINDOW_WIDTH = config['gui']['window_width']
     WINDOW_SIZE = (WINDOW_WIDTH* (SIZE[1]/SIZE[0]), WINDOW_WIDTH)
-    env= Environment(SIZE, 1, {'object_id': 10})
+    env= Environment(SIZE, config['environment']['real_size'], {'object_id': 10})
     objects = Objects()
 
     # ---------- INIT PATHFINDING ALGORITHM ---------- #

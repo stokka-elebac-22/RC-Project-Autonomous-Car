@@ -20,6 +20,7 @@ parking_slot_detector:
   iterations: !!seq [5, 2]
 environment:
   size: !!seq [10, 11]
+  real_size: !!int 50
 a_star:
   weight: !!int 4
   penalty: !!int 2

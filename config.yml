@@ -1,0 +1,24 @@
+---
+  headless: True
+  network:
+    host: !!str '10.0.11.116'
+    port: !!int 2004
+    port_cam0: !!int 2005
+    stream_en_cam0: !!bool True
+    port_cam1: !!int 2006
+    stream_en_cam1: !!bool False
+  car_comm_interface: !!str "serial"   # "serial", "can", "pwm"
+  serial:
+    active: !!bool false
+    port: !!int 0
+  can:
+    active: !!bool false
+    interface: !!str "socketcan"
+    channel: !!str "can0"
+  camera0:
+    id: !!int 0
+    size:
+      px: !!int 76
+      mm: !!int 52
+      distance: !!int 500
+...

@@ -102,6 +102,7 @@ class VideoThread(QThread):
         self._run_flag = False
         self.wait()
 
+# pylint: disable=R0902
 if __name__ == '__main__':
     camera_handler = CameraHandler()
     cameras = camera_handler.refresh_camera_list()

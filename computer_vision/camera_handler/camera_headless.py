@@ -52,6 +52,7 @@ class CameraHandler:
             return self.cv_camera.read()
         return None
 
+# pylint: disable=R0902
 if __name__ == '__main__':
     camera_handler = CameraHandler()
     cameras = camera_handler.refresh_camera_list()

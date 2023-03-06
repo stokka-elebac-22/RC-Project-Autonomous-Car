@@ -13,6 +13,7 @@ from qr_code.qr_code import QRCode
 
 class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
+    # pylint: disable=R0902
     def __init__(self, conf: dict): # pylint: disable=R0912
         self.state = States.WAITING  # Start in "idle" state
         self.car_comm: AbstractCommunication

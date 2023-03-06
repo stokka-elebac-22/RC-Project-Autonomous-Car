@@ -67,7 +67,7 @@ def catmull_rom_chain(points, alpha, num_points=100):
         )
         curve.extend(c_value)
         derivative.extend(d_value)
-    
+
     return curve, derivative
 
 def approx_segment_lengths(points):

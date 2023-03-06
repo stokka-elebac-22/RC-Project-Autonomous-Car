@@ -102,6 +102,7 @@ class PathFinding:
                             self.environment.insert_by_index(point, groups['object_id'])
 
 
+    # pylint: disable=R0914
     def calculate_path(self, value: tuple[int, int], distance: bool) -> list[tuple]:
         '''Calculate the shortest path to a specific point using AStar algorithm'''
         self.environment.remove(2)
@@ -109,7 +110,8 @@ class PathFinding:
             point = self.point_to_distance(value)
         else:
             point = value
-        self.environment.insert(point, 12)
+
+        self.environment.insert(point, 2)
 
         start_pos_path = self.environment.get_pos(10)
         end_pos_path = self.environment.get_pos(12)

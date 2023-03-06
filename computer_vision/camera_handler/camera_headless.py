@@ -50,6 +50,7 @@ class CameraHandler:
         '''Returns a new CV frame'''
         if self.cv_camera is not None:
             return self.cv_camera.read()
+        return None
 
 if __name__ == '__main__':
     camera_handler = CameraHandler()

@@ -1,6 +1,6 @@
 import sqlite3
 
-from abstract_storage import AbstractStorage
+from socket_handling.abstract_storage import AbstractStorage
 
 class DbHandler(AbstractStorage):
     '''DB-handler for sensor-data'''

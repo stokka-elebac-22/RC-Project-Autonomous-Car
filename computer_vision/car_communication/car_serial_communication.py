@@ -6,7 +6,7 @@ import queue
 import time
 import sys
 import glob
-from abstract_communication import AbstractCommunication
+from car_communication.abstract_communication import AbstractCommunication
 import serial
 
 class CarSerialCommunication(AbstractCommunication):

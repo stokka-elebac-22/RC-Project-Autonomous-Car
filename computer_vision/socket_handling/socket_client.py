@@ -3,12 +3,12 @@
 import socket
 from _thread import start_new_thread
 from socket_handling.abstract_server import NetworkSettings
+from socket_handling.abstract_storage import AbstractStorage
+from socket_handling.db_handler import DbHandler
 try:
     from computer_vision.defines import MessageId, Position
 except ImportError:
     from defines import MessageId, Position
-from abstract_storage import AbstractStorage
-from db_handler import DbHandler
 
 class SocketClient():
     '''Socket Client'''
@@ -64,6 +64,6 @@ if __name__ == '__main__':
     database = DbHandler(":memory:")
     HOST = "10.0.10.95"
     PORT = 2004
-    client_conn = SocketClient(database, (HOST, PORT))
+    # client_conn = SocketClient(database, (HOST, PORT))
     while True:
         pass

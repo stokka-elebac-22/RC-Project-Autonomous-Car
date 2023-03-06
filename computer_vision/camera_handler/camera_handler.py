@@ -54,7 +54,6 @@ class CameraHandler:
     def get_cv_frame(self, cam_id: int): # pylint: disable=R0201
         '''Returns a new CV frame'''
         print(cam_id)
-        return None
 
     def convert_cv_qt(self, cv_img, scale_w: int, scale_h: int) -> QPixmap: # pylint: disable=R0201
         '''Convert from an opencv image to QPixmap'''

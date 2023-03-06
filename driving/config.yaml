@@ -1,9 +1,6 @@
 ---
 camera:
-  px_height: !!int 300
-  px_width: !!int 500
-  mm_height: !!int 500
-  mm_width: !!int 800
+  size_mm: !!seq [800, 500]
 qr_code_size:
   px: !!int 76
   mm: !!int 52
@@ -22,11 +19,14 @@ parking_slot_detector:
   hough: !!seq [80, 200, 5]
   iterations: !!seq [5, 2]
 environment:
-  sizex: !!int 10
-  sizey: !!int 11
+  size: !!seq [10, 11]
+  real_size: !!int 50
 a_star:
   weight: !!int 4
   penalty: !!int 2
+spline:
+  tension: !!int 0
+  velocity: !!float 20
 gui:
   window_width: !!int 600
 headless: !!bool true

@@ -19,7 +19,6 @@ except ImportError:
     from computer_vision.pathfinding.bresenham import bresenham
     from computer_vision.pathfinding.spline import catmull_rom_chain, approx_segment_lengths
     from computer_vision.pathfinding.lib import get_abs_velo, get_angle, get_angle_diff
-
 class PathFinding:
     '''
     Class using 2D environmentironment mapping to calculate shortest
@@ -75,6 +74,7 @@ class PathFinding:
         'distances': list[tuple[int, int]],
         'object_id': int
     })
+
     def insert_objects(self, objects: Objects) -> None:
         '''Insert objects into environment'''
         for groups in objects:
@@ -99,6 +99,7 @@ class PathFinding:
                             self.environment.insert_by_index(point, groups['object_id'])
 
 
+    # pylint: disable=R0914
     def calculate_path(self, value: tuple[int, int], distance: bool) -> list[tuple]:
         '''Calculate the shortest path to a specific point using AStar algorithm'''
         self.environment.remove(2)
@@ -106,10 +107,11 @@ class PathFinding:
             point = self.point_to_distance(value)
         else:
             point = value
-        self.environment.insert(point, 12)
+
+        self.environment.insert(point, 2)
 
         start_pos_path = self.environment.get_pos(10)
-        end_pos_path = self.environment.get_pos(12)
+        end_pos_path = self.environment.get_pos(2)
 
         cur_mat = self.environment.get_data()
         _, path = self.pathfinding_algorithm.get_data(cur_mat, start_pos_path, end_pos_path)
@@ -144,4 +146,3 @@ class PathFinding:
                 'times': times,
             }
         return None
-    

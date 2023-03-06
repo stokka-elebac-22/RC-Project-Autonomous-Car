@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     # TODO: remove later
     img = cv2.imread(
-        'tests/images/parking_slot_detection_2/frame_5_test.jpg')
+        'tests/images/parking_slot_detection_2/title_21.jpg')
 
     # ----- QR CODE ----- #
     QR_SIZE: QRSize = {
@@ -129,9 +129,9 @@ if __name__ == '__main__':
                 path_finding.environment.insert_by_index((int(row), int(col)), '1')
 
         # Should change this to camera frame later
-        # frame = cv2.imread(
-        # 'tests/images/parking_slot_detection_2/title_12.jpg')
-        ret, frame = cam.read()
+        frame = cv2.imread(
+             'tests/images/parking_slot_detection_2/title_21.jpg')
+        # ret, frame = cam.read()
 
         obstacles = []
 
@@ -147,89 +147,89 @@ if __name__ == '__main__':
                 (qr_distance_x, qr_distance_y)],
                 'distance': True, 'object_id': 20})
 
-        # Use ParkingSlot Module
-        qr_code_data = {
-            'ret': qr_data['ret'],
-            'points': qr_data['points']
-        }
+            # Use ParkingSlot Module
+            qr_code_data = {
+                'ret': qr_data['ret'],
+                'points': qr_data['points']
+            }
 
-        parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
+            parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
 
-        if parking_slot_coords is not None:
-            closing_line = parking_slot_detector.get_closing_line_of_two_lines(parking_slot_coords)
-            if len(closing_line) == 4:
-                parking_slot_coords.append(closing_line)
-            for lines in parking_slot_coords:
-                obstacles.append({'values': [
-                                 (lines[0], lines[1]), (lines[2], lines[3])],
-                    'distance': False, 'object_id': 30})
-        parking_lines, parking_lines_coords = parking_slot_detector.get_parking_lines(frame)
-        if parking_slot_coords is not None:
-            for lines in parking_lines_coords:
-                obstacles.append({'values': [
-                                 (lines[0], lines[1]), (lines[2], lines[3])],
-                    'distance': False, 'object_id': 30})
+            if parking_slot_coords is not None:
+                closing_line = parking_slot_detector.\
+                    get_closing_line_of_two_lines(parking_slot_coords)
+                if len(closing_line) == 4:
+                    parking_slot_coords.append(closing_line)
+                for lines in parking_slot_coords:
+                    obstacles.append({'values': [
+                                    (lines[0], lines[1]), (lines[2], lines[3])],
+                        'distance': False, 'object_id': 30})
+            parking_lines, parking_lines_coords = parking_slot_detector.get_parking_lines(frame)
+            if parking_slot_coords is not None:
+                for lines in parking_lines_coords:
+                    obstacles.append({'values': [
+                                    (lines[0], lines[1]), (lines[2], lines[3])],
+                        'distance': False, 'object_id': 30})
 
-        # Use lane Module
-        # avg_lines = lane_detector.get_lane_line(frame)
-        # if avg_lines is not None:
-        #     for line in avg_lines:
-        #         if line is not None:
-        #             obstacles.append({'values': [
-        #                              (line[0], line[1]), (line[2], line[3])],
-        #                 'distance': False, 'object_id': 31})
+            # Use lane Module
+            # avg_lines = lane_detector.get_lane_line(frame)
+            # if avg_lines is not None:
+            #     for line in avg_lines:
+            #         if line is not None:
+            #             obstacles.append({'values': [
+            #                              (line[0], line[1]), (line[2], line[3])],
+            #                 'distance': False, 'object_id': 31})
 
-        #     center_diff = lane_detector.get_diff_from_center_info(
-        #         frame, avg_lines)
+            #     center_diff = lane_detector.get_diff_from_center_info(
+            #         frame, avg_lines)
 
-        # Use Traffic Sign module
-        # signs = traffic_sign_detection.detect_signs(frame)
-        # if signs is not None:
-        #     for sign in signs:
-        #         distances = path_finding.point_to_distance(
-        #             (sign[0]+sign[2]/2, sign[1]))
-        #         distance_x = distances[0]
-        #         distance_y = traffic_sign_detection.get_distance(sign)
-        #         obstacles.append({'values': [
-        #                          (distance_x, distance_y)], 'distance': True, 'object_id': 40})
+            # Use Traffic Sign module
+            # signs = traffic_sign_detection.detect_signs(frame)
+            # if signs is not None:
+            #     for sign in signs:
+            #         distances = path_finding.point_to_distance(
+            #             (sign[0]+sign[2]/2, sign[1]))
+            #         distance_x = distances[0]
+            #         distance_y = traffic_sign_detection.get_distance(sign)
+            #         obstacles.append({'values': [
+            #         (distance_x, distance_y)], 'distance': True, 'object_id': 40})
 
-        path_finding.insert_objects(obstacles)
-        # TODO: point for lane line, maybe can remove the get course functions no need? # pylint: disable=W0511
-        # check_point = lane_detector.get_next_point(frame, avg_lines)
-        # path = path_finding.calculate_path(check_point, True)
+            path_finding.insert_objects(obstacles)
+            # TODO: point for lane line, maybe can remove the get course functions no need? # pylint: disable=W0511
+            # check_point = lane_detector.get_next_point(frame, avg_lines)
+            # path = path_finding.calculate_path(check_point, True)
 
-        # With distance from Parking using QR!!!
-        # TODO: DOES NOT WORK WHY?? maybe bcus of calibration constants # pylint: disable=W0511
-        path_data = path_finding.calculate_path((qr_distance_x, qr_distance_y), True)
+            # With distance from Parking using QR!!!
+            # TODO: DOES NOT WORK WHY?? maybe bcus of calibration constants # pylint: disable=W0511
+            path_data = path_finding.calculate_path((qr_distance_x, qr_distance_y), True)
+            update_display(display, path_finding.environment, path_data['path'])
+            display.display()
 
-        update_display(display, path_finding.environment, path_data['path'])
-        display.display()
+            path_finding.environment.reset()
 
-        path_finding.environment.reset()
+            # CATMULL SPLINE
+            if path_data is not None:
+                c = path_data['curve']
+                # DRAW CATMULL LINE
+                line_color = (255, 0, 0)
 
-        # CATMULL SPLINE
-        if path_data is not None:
-            c = path_data['curve']
-            # DRAW CATMULL LINE
-            line_color = (255, 0, 0)
+                pg.display.flip()
+                COUNT = 0
+                LEN_C = len(c)
+                while COUNT < LEN_C:
+                    pg.draw.line(display.display_window, line_color,
+                                (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE),
+                                (c[COUNT+1][0]*TILE_SIZE, c[COUNT+1][1]*TILE_SIZE))
+                    COUNT += 2
 
-            pg.display.flip()
-            COUNT = 0
-            LEN_C = len(c)
-            while COUNT < LEN_C:
-                pg.draw.line(display.display_window, line_color,
-                            (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE),
-                            (c[COUNT+1][0]*TILE_SIZE, c[COUNT+1][1]*TILE_SIZE))
-                COUNT += 2
-
-            # 2D TO 3D, need to put in function?
-            # for i, value in enumerate(c):
-            #     if i % 30 == 0:
-            #         distance_x = (value[0]-math.ceil(path_finding.env.size[1]/2)) \
-            #                         *path_finding.env.real_size
-            #         distance_y = (path_finding.env.size[0] -
-            #                       (value[1]+1))*path_finding.env.real_size
-            #         point = path_finding.distance_to_point((distance_x, distance_y))
-            #         frame = cv2.circle(frame, point, 3, (255, 0, 0), -1)
+                # 2D TO 3D, need to put in function?
+                # for i, value in enumerate(c):
+                #     if i % 30 == 0:
+                #         distance_x = (value[0]-math.ceil(path_finding.env.size[1]/2)) \
+                #                         *path_finding.env.real_size
+                #         distance_y = (path_finding.env.size[0] -
+                #                       (value[1]+1))*path_finding.env.real_size
+                #         point = path_finding.distance_to_point((distance_x, distance_y))
+                #         frame = cv2.circle(frame, point, 3, (255, 0, 0), -1)
     cv2.imshow('frame', frame)
     cv2.waitKey(0)

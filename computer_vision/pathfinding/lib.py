@@ -2,8 +2,12 @@
 import math
 from typing import Tuple
 import numpy as np
-from computer_vision.environment.src.display import DisplayEnvironment
-from computer_vision.environment.src.environment import Environment
+try:
+    from computer_vision.environment.src.display import DisplayEnvironment
+    from computer_vision.environment.src.environment import Environment
+except ImportError:
+    from environment.src.display import DisplayEnvironment
+    from environment.src.environment import Environment
 
 def get_angle(vec: list) -> float:
     '''Get the angle from -180 to 180 where y-axis is 0'''

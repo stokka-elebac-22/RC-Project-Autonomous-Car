@@ -13,10 +13,10 @@ from qr_code.qr_code import QRCode
 
 class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
-    def __init__(self, conf: dict):
+    def __init__(self, conf: dict): # pylint: disable=R0912
         self.state = States.WAITING  # Start in "idle" state
         self.car_comm: AbstractCommunication
-
+        # pylint: disable=R0903
         if conf["car_comm_interface"] == "serial":
             self.car_comm = CarSerialCommunication(conf["serial"])
         elif conf["car_comm_interface"] == "can":

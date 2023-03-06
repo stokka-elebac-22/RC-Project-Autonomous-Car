@@ -1,5 +1,4 @@
 '''main_headless.py: DATBAC23 Car system main.'''
-import sys
 from defines import States
 from socket_handling.abstract_server import NetworkSettings
 from socket_handling.multi_socket_server import MultiSocketServer
@@ -11,14 +10,14 @@ from car_communication.can_bus_communication import CanBusCommunication
 from car_communication.car_serial_communication import CarSerialCommunication
 
 from qr_code.qr_code import QRCode
-import numpy as np
 
-class Headless():
+class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
-    def __init__(self, conf: dict):
+    # pylint: disable=R0902
+    def __init__(self, conf: dict): # pylint: disable=R0912
         self.state = States.WAITING  # Start in "idle" state
         self.car_comm: AbstractCommunication
-
+        # pylint: disable=R0903
         if conf["car_comm_interface"] == "serial":
             self.car_comm = CarSerialCommunication(conf["serial"])
         elif conf["car_comm_interface"] == "can":
@@ -74,7 +73,8 @@ class Headless():
                         output_data += 'Data: ' + current_qr_data['info'][i] + '\n'
 
                 current_stop_sign = self.stop_sign_detector.detect_signs(frame0)
-                if current_qr_data['distances'] is not None and len(current_qr_data['distances']) > 0:
+                if current_qr_data['distances'] is not None and \
+                        len(current_qr_data['distances']) > 0:
                     print(output_data)
                 if len(current_stop_sign) > 0:
                     print(current_stop_sign)
@@ -84,5 +84,3 @@ class Headless():
             elif self.state is States.DRIVING:
                 # example:
                 self.car_comm.set_motor_speed(1, 100, 1, 100)
-
-

@@ -7,15 +7,15 @@ import cv2
 import imutils
 from socket_handling.abstract_server import BasicServer, NetworkSettings
 
-class CamSocketStream(BasicServer):
+class CamSocketStream(BasicServer): # pylint: disable=R0902
     '''Class for streaming socket video'''
 
     def __init__(self, net_conf: NetworkSettings) -> None:
         # host_name = socket.gethostname()
         # host_ip = socket.gethostbyname(host_name)
         # print(host_ip)
-        self.BUFF_SIZE = 65536
-        self.WIDTH = 400
+        self.BUFF_SIZE = 65536   # pylint: disable=C0103
+        self.WIDTH = 400         # pylint: disable=C0103
         self.host_ip = net_conf.host
         self.port = net_conf.port
         self.socket_address = (self.host_ip, self.port)
@@ -58,20 +58,20 @@ class CamSocketStream(BasicServer):
         if self.running:
             self.frame = message
 
-    def get_next_message(self):
+    def get_next_message(self): # pylint: disable=R0201
         '''Will not receive data on the socket video stream'''
         return None
 
-                # fps,st,frames_to_count,cnt = (0,0,20,0)
-                # Old FPS calculation here:
-                # frame = cv2.putText(frame,'FPS: '+str(fps),(10,40),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,0,255),2)
-                # cv2.imshow('TRANSMITTING VIDEO',frame)
-
-                # if cnt == frames_to_count:
-                #     try:
-                #         fps = round(frames_to_count/(time.time()-st))
-                #         st=time.time()
-                #         cnt=0
-                #     except: # pylint: disable=W0702
-                #         pass
-                # cnt+=1
+# fps,st,frames_to_count,cnt = (0,0,20,0)
+# Old FPS calculation here:
+# frame = cv2.putText(frame,'FPS: '+str(fps),
+# (10,40),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,0,255),2)
+# cv2.imshow('TRANSMITTING VIDEO',frame)
+# if cnt == frames_to_count:
+#     try:
+#         fps = round(frames_to_count/(time.time()-st))
+#         st=time.time()
+#         cnt=0
+#     except: # pylint: disable=W0702
+#         pass
+# cnt+=1

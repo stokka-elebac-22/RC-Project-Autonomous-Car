@@ -9,8 +9,7 @@ __email__ = 'asbjorn@maxit-as.com'
 __status__ = 'Testing'
 
 import sys
-from typing import Tuple
-from socket_handling.socket_client import SocketClient
+from socket_handling.socket_client import SocketClient # pylint: disable=W0611
 from camera_handler.camera_handler import CameraHandler, VideoThread
 from traffic_sign_detection.main import TrafficSignDetector
 from qr_code.qr_code import QRCode

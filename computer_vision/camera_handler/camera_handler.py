@@ -16,6 +16,7 @@ class CameraHandler:
         '''Initialize an empty list of cameras'''
         self.available_camera_list = []
 
+    # pylint: disable=R0801
     def get_camera_string(self, camera_id: int) -> str:
         '''Return a string describing camera with id'''
         return 'Cam' + str(self.available_camera_list[camera_id]['id']) + ': ' \
@@ -23,10 +24,12 @@ class CameraHandler:
             + str(self.available_camera_list[camera_id]['res_h']) \
             + ' (' + str(self.available_camera_list[camera_id]['fps']) + 'fps)'
 
+    # pylint: disable=R0801
     def get_camera_list(self) -> List[dict]:
         '''Return the list of cameras'''
         return self.available_camera_list
 
+    # pylint: disable=R0801
     def refresh_camera_list(self) -> List[dict]:
         '''Test camera input to create a list of available cameras'''
         index = 0
@@ -51,11 +54,13 @@ class CameraHandler:
         self.available_camera_list = arr
         return arr
 
-    def get_cv_frame(self, cam_id: int):
+    # pylint: disable=R0801
+    def get_cv_frame(self, cam_id: int): # pylint: disable=R0201
         '''Returns a new CV frame'''
         print(cam_id)
 
-    def convert_cv_qt(self, cv_img, scale_w: int, scale_h: int) -> QPixmap:
+    # pylint: disable=R0801
+    def convert_cv_qt(self, cv_img, scale_w: int, scale_h: int) -> QPixmap: # pylint: disable=R0201
         '''Convert from an opencv image to QPixmap'''
         rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
         # pylint: disable=C0103
@@ -97,6 +102,7 @@ class VideoThread(QThread):
         self._run_flag = False
         self.wait()
 
+# pylint: disable=R0902
 if __name__ == '__main__':
     camera_handler = CameraHandler()
     cameras = camera_handler.refresh_camera_list()

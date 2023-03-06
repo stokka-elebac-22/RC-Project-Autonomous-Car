@@ -26,6 +26,7 @@ a_star:
   penalty: !!int 2
 spline:
   tension: !!int 0
+  velocity: !!float 20
 gui:
   window_width: !!int 600
 headless: !!bool true

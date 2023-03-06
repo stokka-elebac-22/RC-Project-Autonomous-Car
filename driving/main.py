@@ -19,8 +19,6 @@ from computer_vision.qr_code.qr_code import QRCode, QRSize
 from computer_vision.environment.src.environment import Environment
 from computer_vision.environment.src.lib import Objects
 from computer_vision.environment.src.a_star import AStar
-from computer_vision.pathfinding.spline import catmull_rom_chain
-from computer_vision.pathfinding.lib import angle_and_velocity_from_derivative
 from computer_vision.pathfinding.pathfinding import PathFinding
 
 # ---------- CONSTANTS ---------- #
@@ -69,7 +67,9 @@ if __name__ == '__main__':
     path_finding = PathFinding(
         pixel_size=cam_size_px,
         environment=env,
-        pathfinding_algorithm=a_star
+        pathfinding_algorithm=a_star,
+        tension=config['spline']['tension'],
+        velocity=config['spline']['velocity']
     )
 
     # ---------- INIT QR CODE ---------- #
@@ -119,16 +119,14 @@ if __name__ == '__main__':
         cur_mat = path_finding.environment.get_data()
 
         # ---------- PATH ---------- #
-        data = path_finding.calculate_path(start_pos_path, )
-        ret, path = a_star.get_data(cur_mat, start_pos_path, end_pos_path)
-
+        if len(qr_code_distances) > 0:
+            data = path_finding.calculate_path(qr_code_distances[0], True)
         # ---------- SPLINES ---------- #
-        if ret:
-            curve, derivative = catmull_rom_chain(path, config['spline']['tension'])
-            angles, velocity = angle_and_velocity_from_derivative(derivative)
-
-            sys.stdout.write(
-                f'angle: {angles[0]}\n\
-                velocity:{velocity[0]}\n\n')
+            if data is not None:
+                angles = data['angles']
+                times = data['times']
+                sys.stdout.write(
+                    f'angle: {angles[0]}\n\
+                    time:{times[0]}\n\n')
 
         # ---------- ACTION ---------- #

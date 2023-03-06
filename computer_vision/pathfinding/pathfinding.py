@@ -4,11 +4,9 @@ import sys
 import math
 from typing import TypedDict, Tuple
 import numpy as np
-
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-
 try:
     from environment.src.environment import Environment
     from environment.src.a_star import AStar
@@ -114,7 +112,7 @@ class PathFinding:
         self.environment.insert(point, 2)
 
         start_pos_path = self.environment.get_pos(10)
-        end_pos_path = self.environment.get_pos(12)
+        end_pos_path = self.environment.get_pos(2)
 
         cur_mat = self.environment.get_data()
         _, path = self.pathfinding_algorithm.get_data(cur_mat, start_pos_path, end_pos_path)

@@ -23,7 +23,7 @@ class LaneDetector(LineDetector):
     '''
 
     def __init__(self, canny: list[int, int] = None,
-                 blur: int = 5, hough: list[int, int] = None, width=200):
+                 blur: int = 5, hough: list[int, int, int] = None, width=200):
         '''Initialize the Line Detector'''
         LineDetector.__init__(self, canny, blur, hough)
         self.width = width
@@ -290,7 +290,7 @@ if __name__ == '__main__':
     # resize image
     frame = cv2.resize(frame, dim, interpolation=cv2.INTER_AREA)
 
-    lane_detector = LaneDetector([50, 150], 5, [100, 250])
+    lane_detector = LaneDetector([50, 150], 5, [80, 100, 250])
 
     while True:
         # ret, frame = cap.read()

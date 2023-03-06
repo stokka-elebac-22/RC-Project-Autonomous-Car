@@ -7,12 +7,15 @@ import cv2
 import numpy as np
 try:
     from line_detector import LineDetector
+    from lib import MergeLines
 except ImportError:
     try:
         from computer_vision.line_detection.line_detector import LineDetector
         from computer_vision.qr_code.qr_code import QRCode
+        from computer_vision.line_detection.lib import MergeLines
     except ImportError:
         from line_detection.line_detector import LineDetector
+        from line_detection.lib import MergeLines
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -26,7 +29,7 @@ class ParkingSlotDetector(LineDetector):
     def __init__(self,
                  canny: list[int, int] = None,
                  blur: int = 3,
-                 hough: list[int, int] = None,
+                 hough: list[int, int, int] = None,
                  iterations: list[int, int] = None,
                  filter_atol: list[int, int] = None,
                  cluster_atol: int = 5):
@@ -125,9 +128,9 @@ class ParkingSlotDetector(LineDetector):
 
     def get_min_max_x(self, coordinates: list[np.ndarray]) -> list[int, int]:
         '''Get the minimum and maximum x values from a set of coordinates'''
-        max_values = np.argmax(coordinates, axis=0)
-        max_x = np.max([coordinates[max_values[0]]
-                        [0], coordinates[max_values[2]][2]])
+        max_x_values = np.argmax(coordinates, axis=0)
+        max_x = np.max([coordinates[max_x_values[0]]
+                        [0], coordinates[max_x_values[2]][2]])
         min_values = np.argmin(coordinates, axis=0)
         min_x = np.min([coordinates[min_values[0]]
                         [0], coordinates[min_values[2]][2]])
@@ -184,6 +187,9 @@ class ParkingSlotDetector(LineDetector):
         lines = self.get_lines(image)
         if lines is None:
             return None
+        merge_lines = MergeLines()
+        lines = [i[0] for i in lines]
+        lines = merge_lines.merge_all_lines(lines)
 
         clustered_lines, clustered_coords = self.get_clustered_lines(lines)
         return clustered_lines, clustered_coords
@@ -230,8 +236,8 @@ class ParkingSlotDetector(LineDetector):
         line_coords = []
         if len(lines) == 2:
             for line in lines:
-                max_value = min(line[1], line[3])
-                min_index = np.where(line == max_value)[0][0]
+                max_x_value = min(line[1], line[3])
+                min_index = np.where(line == max_x_value)[0][0]
                 if min_index == 1:
                     line_coords.append(line[0])
                     line_coords.append(line[1])
@@ -244,7 +250,7 @@ class ParkingSlotDetector(LineDetector):
 if __name__ == '__main__':
     # ORIGINAL: hough=[200,5]
     parking_slot_detector = ParkingSlotDetector(
-        hough=[200, 5], iterations=[5, 2])
+        hough=[80, 200, 5], iterations=[5, 2], cluster_atol=0)
     img = cv2.imread('computer_vision/line_detection/assets/parking/10.png')
     qr_size = {
         'px': 76,
@@ -267,8 +273,9 @@ if __name__ == '__main__':
     parking_lines.append(
         parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
     parking_slot_detector.show_lines(img, parking_lines)
-    # test_lines, test_coords = parking_slot_detector.get_parking_lines(img)
-    # parking_slot_detector.show_lines(img, test_coords)
+    test_lines, test_coords = parking_slot_detector.get_parking_lines(img)
+    parking_slot_detector.show_lines(img, test_coords)
+
     cv2.imshow('img', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()

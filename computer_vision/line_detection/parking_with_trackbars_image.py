@@ -31,6 +31,7 @@ if __name__ == "__main__":
     cv2.namedWindow('Trackbars')
     # cv2.createTrackbar('Canny low threshold', 'Trackbars', 100, 500, nothing)
     # cv2.createTrackbar('Canny high threshold', 'Trackbars', 200, 500, nothing)
+    # cv2.createTrackbar('Hough threshold', 'Trackbars', 80, 500, nothing)
     # cv2.createTrackbar('Hough minimum line length', 'Trackbars', 200, 500, nothing)
     # cv2.createTrackbar('Hough maximum line gap', 'Trackbars', 300, 500, nothing)
     # cv2.createTrackbar('Gaussian blur kernel size', 'Trackbars', 5, 20, nothing)
@@ -41,6 +42,7 @@ if __name__ == "__main__":
     # cv2.createTrackbar('Cluster atol', 'Trackbars', 5, 20, nothing)
     cv2.createTrackbar('Canny low', 'Trackbars', 50, 500, nothing)
     cv2.createTrackbar('Canny high', 'Trackbars', 100, 500, nothing)
+    cv2.createTrackbar('Hough thresh', 'Trackbars', 80, 500, nothing)
     cv2.createTrackbar('Hough min', 'Trackbars', 200, 500, nothing)
     cv2.createTrackbar('Hough max', 'Trackbars', 50, 500, nothing)
     cv2.createTrackbar('Gaussian', 'Trackbars', 5, 20, nothing)
@@ -48,7 +50,7 @@ if __name__ == "__main__":
     cv2.createTrackbar('Erode', 'Trackbars', 1, 20, nothing)
     cv2.createTrackbar('Filter slope', 'Trackbars', 20, 20, nothing)
     cv2.createTrackbar('Filter intercept', 'Trackbars', 20, 20, nothing)
-    cv2.createTrackbar('Cluster', 'Trackbars', 5, 20, nothing)
+    cv2.createTrackbar('Cluster', 'Trackbars', 0, 20, nothing)
 
     frame = cv2.imread(
         'tests/images/parking_slot_detection_2/title_21.jpg')
@@ -67,6 +69,7 @@ if __name__ == "__main__":
         copy = frame.copy()
         # canny_low_thr = cv2.getTrackbarPos('Canny low threshold','Trackbars')
         # canny_high_thr = cv2.getTrackbarPos('Canny high threshold','Trackbars')
+        # hough_threshold = cv2.getTrackbarPos('Hough threshold','Trackbars')
         # hough_min_length = cv2.getTrackbarPos('Hough minimum line length','Trackbars')
         # hough_max_gap = cv2.getTrackbarPos('Hough maximum line gap','Trackbars')
         # gaussian_kernel = cv2.getTrackbarPos('Gaussian blur kernel size','Trackbars')
@@ -78,6 +81,7 @@ if __name__ == "__main__":
 
         canny_low_thr = cv2.getTrackbarPos('Canny low','Trackbars')
         canny_high_thr = cv2.getTrackbarPos('Canny high','Trackbars')
+        hough_threshold = cv2.getTrackbarPos('Hough thresh','Trackbars')
         hough_min_length = cv2.getTrackbarPos('Hough min','Trackbars')
         hough_max_gap = cv2.getTrackbarPos('Hough max','Trackbars')
         gaussian_kernel = cv2.getTrackbarPos('Gaussian','Trackbars')
@@ -89,7 +93,7 @@ if __name__ == "__main__":
 
         parking_slot_detector = ParkingSlotDetector(
             canny = [canny_low_thr, canny_high_thr],
-            hough = [hough_min_length, hough_max_gap],
+            hough = [hough_threshold, hough_min_length, hough_max_gap],
             blur = gaussian_kernel,
             iterations=[dilate_iter, erode_iter],
             filter_atol=[filter_atol_slope, filter_atol_intercept],
@@ -107,18 +111,20 @@ if __name__ == "__main__":
         if parking_lines is not None:
             parking_lines.append(
                 parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
-        parking_slot_detector.show_lines(copy, parking_lines)
+        # parking_slot_detector.show_lines(copy, parking_lines)
 
         if parking_lines is not None:
-            lines, coords = parking_slot_detector.get_parking_lines(copy)
-            parking_slot_detector.show_lines(copy, coords)
+            all_parking_lines = parking_slot_detector.get_parking_lines(copy)
+            if all_parking_lines is not None:
+                lines, coords = parking_slot_detector.get_parking_lines(copy)
+                parking_slot_detector.show_lines(copy, coords)
         cv2.imshow('frame', copy)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
     print("canny", canny_low_thr, canny_high_thr)
-    print("hough", hough_min_length, hough_max_gap)
+    print("hough", hough_threshold, hough_min_length, hough_max_gap)
     print("blur", gaussian_kernel)
     print("iter", dilate_iter, erode_iter)
     print("filter", filter_atol_slope, filter_atol_intercept)

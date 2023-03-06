@@ -50,7 +50,7 @@ if __name__ == "__main__":
     cv2.createTrackbar('Erode', 'Trackbars', 1, 20, nothing)
     cv2.createTrackbar('Filter slope', 'Trackbars', 20, 20, nothing)
     cv2.createTrackbar('Filter intercept', 'Trackbars', 20, 20, nothing)
-    cv2.createTrackbar('Cluster', 'Trackbars', 5, 20, nothing)
+    cv2.createTrackbar('Cluster', 'Trackbars', 0, 20, nothing)
 
     frame = cv2.imread(
         'tests/images/parking_slot_detection_2/title_21.jpg')
@@ -111,7 +111,7 @@ if __name__ == "__main__":
         if parking_lines is not None:
             parking_lines.append(
                 parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
-        parking_slot_detector.show_lines(copy, parking_lines)
+        # parking_slot_detector.show_lines(copy, parking_lines)
 
         if parking_lines is not None:
             all_parking_lines = parking_slot_detector.get_parking_lines(copy)

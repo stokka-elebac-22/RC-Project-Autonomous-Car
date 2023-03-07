@@ -153,22 +153,15 @@ if __name__ == '__main__':
                 'points': qr_data['points']
             }
 
-            parking_slot_coords = parking_slot_detector.get_parking_slot(frame, qr_data)
-
-            if parking_slot_coords is not None:
-                closing_line = parking_slot_detector.\
-                    get_closing_line_of_two_lines(parking_slot_coords)
-                if len(closing_line) == 4:
-                    parking_slot_coords.append(closing_line)
-                for lines in parking_slot_coords:
+            line_dict = parking_slot_detector.get_parking_slot(img, qr_code_data)
+            if line_dict is not None:
+                for lines in line_dict['all_lines']:
                     obstacles.append({'values': [
-                                    (lines[0], lines[1]), (lines[2], lines[3])],
+                        (lines[0], lines[1]), (lines[2], lines[3])],
                         'distance': False, 'object_id': 30})
-            parking_lines, parking_lines_coords = parking_slot_detector.get_parking_lines(frame)
-            if parking_slot_coords is not None:
-                for lines in parking_lines_coords:
+                for lines in line_dict['slot_lines']:
                     obstacles.append({'values': [
-                                    (lines[0], lines[1]), (lines[2], lines[3])],
+                        (lines[0], lines[1]), (lines[2], lines[3])],
                         'distance': False, 'object_id': 30})
 
             # Use lane Module

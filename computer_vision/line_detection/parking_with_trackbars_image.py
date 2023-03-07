@@ -106,18 +106,12 @@ if __name__ == "__main__":
             'points': data['points']
         }
 
-        parking_lines = parking_slot_detector.get_parking_slot(
-            copy, qr_code_data)
-        if parking_lines is not None:
-            parking_lines.append(
-                parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
-        # parking_slot_detector.show_lines(copy, parking_lines)
+        line_dict = parking_slot_detector.get_parking_slot(frame, qr_code_data)
 
-        if parking_lines is not None:
-            all_parking_lines = parking_slot_detector.get_parking_lines(copy)
-            if all_parking_lines is not None:
-                lines, coords = parking_slot_detector.get_parking_lines(copy)
-                parking_slot_detector.show_lines(copy, coords)
+        if line_dict is not None:
+            parking_slot_detector.show_lines(copy, line_dict['slot_lines'])
+            parking_slot_detector.show_lines(copy, line_dict['all_lines'])
+        
         cv2.imshow('frame', copy)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

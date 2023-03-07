@@ -212,10 +212,17 @@ class ParkingSlotDetector(LineDetector):
                 _, avg_lines_coords = self.filter_lines(
                     clustered_lines, clustered_coords)
 
-                # find the two closesqt lines to the QR-code
+                # find the two closest lines to the QR-code
                 lines = self.get_closest_line(
                     avg_lines_coords, qr_data['points'][0])
-                return lines
+
+                lines.append(
+                    self.get_closing_line_of_two_lines(lines))
+
+                return {
+                    'slot_lines': lines,
+                    'all_lines': clustered_coords
+                }
         return None
 
     def get_line_coordinates_from_parameters(self,
@@ -269,12 +276,11 @@ if __name__ == '__main__':
         'info': data['info']}
     qr_code.display(img, qr_code_measurements, verbose=2)
 
-    parking_lines = parking_slot_detector.get_parking_slot(img, qr_code_data)
-    parking_lines.append(
-        parking_slot_detector.get_closing_line_of_two_lines(parking_lines))
-    parking_slot_detector.show_lines(img, parking_lines)
-    test_lines, test_coords = parking_slot_detector.get_parking_lines(img)
-    parking_slot_detector.show_lines(img, test_coords)
+    line_dict = parking_slot_detector.get_parking_slot(img, qr_code_data)
+
+    if line_dict is not None:
+        parking_slot_detector.show_lines(img, line_dict['slot_lines'])
+        parking_slot_detector.show_lines(img, line_dict['all_lines'])
 
     cv2.imshow('img', img)
     cv2.waitKey(0)

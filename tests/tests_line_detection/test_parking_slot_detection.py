@@ -49,8 +49,6 @@ class TestParametrized:
         parking_slot_detector = ParkingSlotDetector()
         clustered_lines, clustered_coords = parking_slot_detector.get_clustered_lines(
             lines)
-        print(clustered_lines)
-        print(clustered_coords)
         for i, line in enumerate(clustered_lines):
             for j, value in enumerate(line):
                 assert value == pytest.approx(expected[0][i][j], 0.001)
@@ -113,9 +111,9 @@ class TestParametrized:
         assert len(lines) == expected
 
     @pytest.mark.parametrize('img_source, expected', [
-        ('4.png', 2),
-        ('7.png', 2),
-        ('8.png', 2)
+        ('4.png', 3),
+        ('7.png', 3),
+        ('8.png', 3)
     ])
     def test_get_parking_slot(self, img_source, expected):
         '''Test get_parking_slot method of ParkingSlotDetector'''
@@ -132,9 +130,10 @@ class TestParametrized:
             'ret': data['ret'],
             'points': data['points']
         }
-        lines = parking_slot_detector.get_parking_slot(
+        lines_dict = parking_slot_detector.get_parking_slot(
             image, qr_code_data)
-        assert len(lines) == expected
+        assert len(lines_dict['slot_lines']) == expected
+        assert lines_dict['all_lines'] is not None
 
     @pytest.mark.parametrize('min_x, max_x, line_parameters, expected', [
         (200, 400, [1, 50], np.array([200, 250, 400, 450])),

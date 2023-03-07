@@ -118,6 +118,7 @@ if __name__ == '__main__':
 
     RUN = True
     while RUN:
+        objects = []
         # Add hindrances using mouse
         for event in pg.event.get():
             if event.type == QUIT:
@@ -126,7 +127,13 @@ if __name__ == '__main__':
                 mouse_pos = pg.mouse.get_pos()
                 col = mouse_pos[0] // TILE_SIZE
                 row = mouse_pos[1] // TILE_SIZE
-                path_finding.environment.insert_by_index((int(row), int(col)), '1')
+                objects.append({
+                    'values': (int(row), int(col)),
+                    'distance': False,
+                    'object_id': 1
+                })
+
+        path_finding.insert_objects(objects)
 
         # Should change this to camera frame later
         frame = cv2.imread(
@@ -194,11 +201,13 @@ if __name__ == '__main__':
 
             # With distance from Parking using QR!!!
             # TODO: DOES NOT WORK WHY?? maybe bcus of calibration constants # pylint: disable=W0511
-            path_data = path_finding.calculate_path((qr_distance_x, qr_distance_y), True)
-            update_display(display, path_finding.environment, path_data['path'])
+            QR_CODE_ID = 20
+            CAR_ID = 10
+            path_data = path_finding.calculate_path(CAR_ID, QR_CODE_ID)
+            update_display(display, path_finding.get_environment(), path_data['path'])
             display.display()
 
-            path_finding.environment.reset()
+            path_finding.reset()
 
             # CATMULL SPLINE
             if path_data is not None:

@@ -65,16 +65,17 @@ if __name__ == "__main__":
 
         ret, frame = cam.read()
 
-        # Commented this out, because it did not work. Need to call it correctly
-
         data = qr_code.get_data(frame)
         qr_code_data = {
             'ret': data['ret'],
             'points': data['points']
         }
-        parking_lines = parking_slot_detector.get_parking_slot(
-            frame, qr_code_data)
-        parking_slot_detector.show_lines(frame, parking_lines)
+        line_dict = parking_slot_detector.get_parking_slot(frame, qr_code_data)
+
+        if line_dict is not None:
+            parking_slot_detector.show_lines(frame, line_dict['slot_lines'])
+            parking_slot_detector.show_lines(frame, line_dict['all_lines'])
+
         cv2.imshow('frame', frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

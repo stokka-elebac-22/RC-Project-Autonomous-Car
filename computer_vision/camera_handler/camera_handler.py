@@ -54,8 +54,6 @@ class CameraHandler:
         self.available_camera_list = arr
         return arr
 
-<<<<<<< HEAD
-=======
     # pylint: disable=R0801
     def get_cv_frame(self, cam_id: int): # pylint: disable=R0201
         '''Returns a new CV frame'''
@@ -74,7 +72,6 @@ class CameraHandler:
         return QPixmap.fromImage(p)
 
 
->>>>>>> 1de12a23307dea659b9a4e14428af76d64cdd6f8
 class VideoThread(QThread):
     '''Video Thread'''
     change_pixmap_signal = pyqtSignal(np.ndarray)
@@ -105,26 +102,7 @@ class VideoThread(QThread):
         self._run_flag = False
         self.wait()
 
-<<<<<<< HEAD
-def get_cv_frame(cam_id: int):
-    '''Returns a new CV frame'''
-    print(cam_id)
-
-def convert_cv_qt(cv_img, scale_w: int, scale_h: int) -> QPixmap:
-    '''Convert from an opencv image to QPixmap'''
-    rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
-    # pylint: disable=C0103
-    h, w, ch = rgb_image.shape
-    bytes_per_line = ch * w
-    convert_to_Qt_format = QImage(
-        rgb_image.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
-    p = convert_to_Qt_format.scaled(scale_w, scale_h, Qt.AspectRatioMode.KeepAspectRatio)
-    return QPixmap.fromImage(p)
-
-
-=======
 # pylint: disable=R0902
->>>>>>> 1de12a23307dea659b9a4e14428af76d64cdd6f8
 if __name__ == '__main__':
     camera_handler = CameraHandler()
     cameras = camera_handler.refresh_camera_list()

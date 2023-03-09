@@ -11,7 +11,7 @@ __status__ = 'Testing'
 import sys
 from socket_handling.socket_client import SocketClient # pylint: disable=W0611
 from camera_handler.camera_handler import CameraHandler, VideoThread
-from traffic_sign_detection.main import TrafficSignDetector
+from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
 from qr_code.qr_code import QRCode
 from PyQt6 import QtWidgets, uic, QtCore
 from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
@@ -34,15 +34,10 @@ class Worker(QObject, ):  # pylint: disable=R0903
 
 class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     '''Class handling Qt GUI control'''
-<<<<<<< HEAD
-    def __init__(self, ui_file, connection: Tuple[str, int], fullscreen):
+    def __init__(self, ui_file, conf: dict, fullscreen: bool):
         self.fps_count = 0
         self.output_data = ''
-        self.connection_details = connection
-=======
-    def __init__(self, ui_file, conf: dict, fullscreen: bool):
         self.connection_details = conf["network"]
->>>>>>> 1de12a23307dea659b9a4e14428af76d64cdd6f8
         self.camera_handler = CameraHandler()
         # Create an instance of QtWidgets.QApplication
         self.app = QtWidgets.QApplication(sys.argv)

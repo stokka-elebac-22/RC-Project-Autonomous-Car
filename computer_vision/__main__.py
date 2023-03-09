@@ -5,20 +5,21 @@ Computer vision control panel GUI tool.
 # This causes linting error because it is similar in another file
 # as described in: https://www.pythonclear.com/programs/python-
 #                   file-header/#Format_for_writing_Python_File_Header
-# __author__ = 'Asbjørn Stokka'
 # __copyright__ = 'Copyright 2023, DATBAC'
-# __credits__ = ['Asbjørn Stokka']
 # __license__ = 'Apache-2.0'
 # __version__ = '0.1.0'
-# __maintainer__ = 'Asbjørn Stokka'
-# __email__ = 'asbjorn@maxit-as.com'
 # __status__ = 'Testing'
 
 import os
 import sys
 import argparse
 import yaml
-from main_window_ui import Ui
+try:
+    from main_window_ui import Ui
+    GUI_POSSIBLE = True
+except: # pylint: disable=W0702
+    print("Unable to run in GUI mode")
+    GUI_POSSIBLE = False
 from main_headless import Headless
 
 if __name__ == '__main__':
@@ -63,7 +64,7 @@ if __name__ == '__main__':
     os.environ['QT_SCREEN_SCALE_FACTORS'] = '1'
     os.environ['QT_SCALE_FACTOR'] = '1'
 
-    if config["headless"] is True:
+    if config["headless"] is True or GUI_POSSIBLE is False:
         main_thread = Headless(config)
     else:
         window = Ui(args.theme + '.ui', config, FULL_SCREEN)

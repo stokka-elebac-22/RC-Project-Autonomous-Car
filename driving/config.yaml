@@ -1,0 +1,33 @@
+---
+camera:
+  size_mm: !!seq [800, 500]
+qr_code_size:
+  px: !!int 76
+  mm: !!int 52
+  distance: !!int 500
+sign_size:
+  px: !!int 10
+  mm: !!int 61
+  distance: !!int 200
+lane_detector:
+  canny: !!seq [50, 150]
+  blur: !!int 5
+  hough: !!seq [80, 100, 250]
+  width: !!int 200
+  forward: !!int 100
+parking_slot_detector:
+  hough: !!seq [80, 200, 5]
+  iterations: !!seq [5, 2]
+environment:
+  size: !!seq [10, 11]
+  real_size: !!int 50
+a_star:
+  weight: !!int 4
+  penalty: !!int 2
+spline:
+  tension: !!int 0
+  velocity: !!float 20
+gui:
+  window_width: !!int 600
+headless: !!bool true
+...

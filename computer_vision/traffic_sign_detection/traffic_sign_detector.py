@@ -11,12 +11,19 @@ SignSize = TypedDict('SignSize', {
 class TrafficSignDetector:
     """
     DOC:
+<<<<<<< HEAD:computer_vision/traffic_sign_detection/main.py
     """
 
     def __init__(
             self,
             model='computer_vision/traffic_sign_detection/stop_sign_model.xml',
+=======
+    '''
+    def __init__(self,
+            model: str='computer_vision/traffic_sign_detection/stop_sign_model.xml',
+>>>>>>> 1de12a23307dea659b9a4e14428af76d64cdd6f8:computer_vision/traffic_sign_detection/traffic_sign_detector.py
             size: SignSize=None):
+
         self.cascade = cv2.CascadeClassifier(model)
 
         if size is None:

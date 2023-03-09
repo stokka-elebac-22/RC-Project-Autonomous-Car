@@ -9,7 +9,7 @@ __email__ = 'asbjorn@maxit-as.com'
 __status__ = 'Testing'
 
 import sys
-from typing import Tuple
+from socket_handling.socket_client import SocketClient # pylint: disable=W0611
 from camera_handler.camera_handler import CameraHandler, VideoThread
 from traffic_sign_detection.main import TrafficSignDetector
 from qr_code.qr_code import QRCode
@@ -34,10 +34,15 @@ class Worker(QObject, ):  # pylint: disable=R0903
 
 class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     '''Class handling Qt GUI control'''
+<<<<<<< HEAD
     def __init__(self, ui_file, connection: Tuple[str, int], fullscreen):
         self.fps_count = 0
         self.output_data = ''
         self.connection_details = connection
+=======
+    def __init__(self, ui_file, conf: dict, fullscreen: bool):
+        self.connection_details = conf["network"]
+>>>>>>> 1de12a23307dea659b9a4e14428af76d64cdd6f8
         self.camera_handler = CameraHandler()
         # Create an instance of QtWidgets.QApplication
         self.app = QtWidgets.QApplication(sys.argv)
@@ -55,10 +60,11 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
             self.findChild(QtWidgets.QLabel, 'input_img_2')
         ]
 
+        # Get size from config
         size = {
-            'px': 76,
-            'mm': 52,
-            'distance': 500,
+            'px': conf["camera0"]["size"]["px"],
+            'mm': conf["camera0"]["size"]["mm"],
+            'distance': conf["camera0"]["size"]["distance"],
         }
 
         self.qr_code = QRCode(size)

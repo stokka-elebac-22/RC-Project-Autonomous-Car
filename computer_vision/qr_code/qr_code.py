@@ -27,6 +27,8 @@ class QRGeometry:
             pts = [[0,0],[0,0],[0,0],[0,0]]
         self.update(pts)
 
+        self.focal_length = (self.size.get('px') / self.size.get('mm')) * self.size.get('distance')
+
     def update(self, pts):
         '''update points, used by qrcode.'''
         if pts is None:
@@ -40,7 +42,7 @@ class QRGeometry:
     def get_width(self) -> int:
         '''Return the width'''
         width_px = max(abs(self.points[0][0] - self.points[1][0]),
-        abs(self.points[2][0] - self.points[2][0]))
+        abs(self.points[2][0] - self.points[3][0]))
         return width_px
 
     def get_height(self) -> int:
@@ -66,16 +68,36 @@ class QRGeometry:
     def get_distance(self) -> float:
         '''Return the distance'''
         height_px = self.get_height()
-        focal_length = (self.size.get('px') / self.size.get('mm')) * self.size.get('distance')
-        distance = (self.size.get('mm') * focal_length) / height_px
+        distance = (self.size.get('mm') * self.focal_length) / height_px
         return distance
+
+    def get_qr_code_distance_x(self, center: Tuple[int, int]):
+        '''Get qr code distance x'''
+        # just use the first option as a base
+        min_dist = abs(self.points[0][0] - center[0])
+        min_dist_idx = 0
+
+        options = [
+            self.points[0][0] - center[0],
+            self.points[1][0] - center[0],
+            self.points[1][0] - center[0],
+            self.points[2][0] - center[0],
+        ]
+        for i, opt in enumerate(options):
+            if abs(opt) < min_dist:
+                min_dist = abs(opt)
+                min_dist_idx = i
+
+        ratio = self.size['mm'] / self.get_width()
+        return ratio * options[min_dist_idx]
+
 
 QRData = TypedDict('QRData', {
     'ret': bool,
     'distances': List[float],
     'angles': List[float],
     'info': List[str],
-    'points': List[Tuple],
+    'points': List[Tuple[int, int]],
     'rest': int,
 })
 
@@ -142,6 +164,7 @@ class QRCode:
             self.qr_geometries[i].update(points)
             angles.append(self.qr_geometries[i].get_angle())
             distances.append(self.qr_geometries[i].get_distance())
+
         return {
             'ret': ret_qr,
             'distances': distances,
@@ -279,19 +302,21 @@ if __name__ == '__main__':
     distances_lists = [[0 for _ in range(VALUES_LENGTH)]]
 
     while True:
-        img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
+        # img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
         img = local_read_camera()
         qr_data = qr_code.get_data(img)
 
-        if len(angles_lists) < len(qr_data['angles']):
-            for _ in range(len(qr_data['angles']) - len(angles_lists)):
-                angles_lists.append([0 for _ in range(VALUES_LENGTH)])
-        if len(distances_lists) < len(qr_data['distances']):
-            for _ in range(len(qr_data['distances']) - len(distances_lists)):
-                distances_lists.append([0 for _ in range(VALUES_LENGTH)])
-        filter_angle(qr_data['angles'])
-        filter_distance(qr_data['distances'])
         if qr_data['ret']:
+            if len(angles_lists) < len(qr_data['angles']):
+                for _ in range(len(qr_data['angles']) - len(angles_lists)):
+                    angles_lists.append([0 for _ in range(VALUES_LENGTH)])
+            if len(distances_lists) < len(qr_data['distances']):
+                for _ in range(len(qr_data['distances']) - len(distances_lists)):
+                    distances_lists.append([0 for _ in range(VALUES_LENGTH)])
+
+            filter_angle(qr_data['angles'])
+            filter_distance(qr_data['distances'])
+
             average_angles = [int(sum(angles_list)//VALUES_LENGTH) \
                 for angles_list in angles_lists]
             average_distance = [int(sum(distances_list)//VALUES_LENGTH) \
@@ -301,6 +326,7 @@ if __name__ == '__main__':
                 'angles': average_angles,
                 'info': qr_data['info']}
             qr_code.display(img, qr_code_measurements, verbose=2)
+            screen_height, screen_width, _ = img.shape
         cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):
             break

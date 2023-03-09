@@ -2,8 +2,24 @@
 The main file for the driving logic.
 This file should only contain short code
 '''
-from computer_vision.qr_code.qr_code import QRCode
+
+import sys
+import os
+from typing import List
+import yaml
+import cv2 as cv
+
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
+# pylint: disable=C0413
+from driving.lib import get_available_cameras, get_cam_center
+from computer_vision.qr_code.qr_code import QRCode, QRSize
 from computer_vision.environment.src.environment import Environment
+from computer_vision.environment.src.lib import Objects
+from computer_vision.environment.src.a_star import AStar
+from computer_vision.pathfinding.pathfinding import PathFinding
 
 # ---------- CONSTANTS ---------- #
 
@@ -11,26 +27,106 @@ from computer_vision.environment.src.environment import Environment
 if __name__ == '__main__':
     # ---------- INIT ---------- #
     ### init camera ###
-    ### init qr code ###
-    QR_CODE_SIZE_PX = 76
-    QR_CODE_SIZE_MM = 52
-    QR_CODE_DISTANCE = 500
-    qr_code = QRCode(QR_CODE_SIZE_PX, QR_CODE_SIZE_MM, QR_CODE_DISTANCE)
-    ### init environment ###
-    SIZE = (10, 11)
-    WINDOW_WIDTH = 600
+    # need to run this command to get VideoCapture to work after every restart of pi
+    os.system('sudo chmod 777 /dev/video0')
+
+    # open yaml file
+    with open('config.yaml', 'r', encoding='utf8') as file:
+        config = yaml.safe_load(file)
+
+    ret, available_cameras = get_available_cameras()
+
+    if not ret:
+        sys.stdout.write('There is no available cameras\n')
+        raise ConnectionError
+
+    sys.stdout.write(f'Connecting to camera {available_cameras[0]}\n')
+    camera = cv.VideoCapture(available_cameras[0])
+    # test if the camera gives out frame
+    ret, _ = camera.read()
+    if not ret:
+        raise ConnectionError
+    sys.stdout.write('Connected\n')
+
+    # ---------- INIT ENVIRONMENT ---------- #
+    SIZE = config['environment']['size']
+    WINDOW_WIDTH = config['gui']['window_width']
     WINDOW_SIZE = (WINDOW_WIDTH* (SIZE[1]/SIZE[0]), WINDOW_WIDTH)
-    env= Environment(SIZE, 1, {'object_id': 10})
+    env= Environment(SIZE, config['environment']['real_size'], {'object_id': 10})
+    objects = Objects()
+
+    # ---------- INIT PATHFINDING ALGORITHM ---------- #
+    a_star = AStar(config['a_star']['weight'], config['a_star']['penalty'])
+
+    # ---------- INIT PATHFINDING ---------- #
+    # finding the center of the camera
+
+    _, frame = camera.read()
+    cam_size_px = get_cam_center(frame)
+    cam_center = (cam_size_px[0]/2, cam_size_px[1]/2)
+    path_finding = PathFinding(
+        pixel_size=cam_size_px,
+        environment=env,
+        pathfinding_algorithm=a_star,
+        tension=config['spline']['tension'],
+        velocity=config['spline']['velocity']
+    )
+
+    # ---------- INIT QR CODE ---------- #
+    QR_SIZE: QRSize = {
+        'px': config['qr_code_size']['px'],
+        'mm': config['qr_code_size']['mm'],
+        'distance': config['qr_code_size']['distance'],
+    }
+    qr_code = QRCode(QR_SIZE)
+    QR_CODE_ID = objects.get_data('QR').id
+    CAR_ID = objects.get_data('Car').id
 
     # ---------- LOOP ---------- #
     while True:
-        # ---------- GET CAMERA INFORMATION---------- #
-        ### QR Code ###
-        # qr_code.get_data(frame)
+        # ---------- INIT ---------- #
+        objects: List[path_finding.Objects] = []
 
-        ### Line detection ###
+        # ---------- GET CAMERA INFORMATION---------- #
+        ret, frame = camera.read()
+        if not ret:
+            continue
+
+        ### QR Code ###
+        qr_data = qr_code.get_data(frame)
+        if not qr_data['ret']:
+            continue
+
+        # add qr code to the objects list
+        qr_code_distances = []
+        for geo in qr_code.qr_geometries:
+            qr_code_distances.append((geo.get_qr_code_distance_x(cam_center), geo.get_distance()))
+
+        path_finding_object: path_finding.Objects = {
+            'values': qr_code_distances,
+            'distance': True,
+            'object_id': QR_CODE_ID
+        }
+
+        objects.append(path_finding_object)
 
         # ---------- UPDATE ENVIRONMENT ---------- #
+        path_finding.environment.reset()
+        path_finding.insert_objects(objects)
+
+        start_pos_path = path_finding.environment.get_pos(CAR_ID)
+        end_pos_path = path_finding.environment.get_pos(QR_CODE_ID)
+        cur_mat = path_finding.environment.get_data()
+
+        # ---------- PATH ---------- #
+        if len(qr_code_distances) > 0:
+            data = path_finding.calculate_path(qr_code_distances[0], True)
+        # ---------- SPLINES ---------- #
+            if data is not None:
+                angles = data['angles']
+                times = data['times']
+                sys.stdout.write(
+                    f'angle: {angles[0]}\n\
+                    time:{times[0]}\n\n')
 
         # ---------- ACTION ---------- #
-        pass

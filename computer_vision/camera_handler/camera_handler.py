@@ -3,6 +3,7 @@ __copyright__ = 'Copyright 2023, DATBAC23'
 __license__ = 'Apache-2.0'
 __version__ = '0.1.0'
 __status__ = 'Testing'
+import sys
 from typing import List
 from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import pyqtSignal, Qt, QThread
@@ -15,6 +16,7 @@ class CameraHandler:
         '''Initialize an empty list of cameras'''
         self.available_camera_list = []
 
+    # pylint: disable=R0801
     def get_camera_string(self, camera_id: int) -> str:
         '''Return a string describing camera with id'''
         return 'Cam' + str(self.available_camera_list[camera_id]['id']) + ': ' \
@@ -22,17 +24,22 @@ class CameraHandler:
             + str(self.available_camera_list[camera_id]['res_h']) \
             + ' (' + str(self.available_camera_list[camera_id]['fps']) + 'fps)'
 
+    # pylint: disable=R0801
     def get_camera_list(self) -> List[dict]:
         '''Return the list of cameras'''
         return self.available_camera_list
 
+    # pylint: disable=R0801
     def refresh_camera_list(self) -> List[dict]:
         '''Test camera input to create a list of available cameras'''
         index = 0
         testing = 1
         arr = []
         while testing:
-            cap = cv2.VideoCapture(index)
+            if sys.platform.startswith('win'):
+                cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
+            else:
+                cap = cv2.VideoCapture(index)
             if not cap.read()[0]:
                 testing = 0
             else:
@@ -47,6 +54,27 @@ class CameraHandler:
         self.available_camera_list = arr
         return arr
 
+<<<<<<< HEAD
+=======
+    # pylint: disable=R0801
+    def get_cv_frame(self, cam_id: int): # pylint: disable=R0201
+        '''Returns a new CV frame'''
+        print(cam_id)
+
+    # pylint: disable=R0801
+    def convert_cv_qt(self, cv_img, scale_w: int, scale_h: int) -> QPixmap: # pylint: disable=R0201
+        '''Convert from an opencv image to QPixmap'''
+        rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+        # pylint: disable=C0103
+        h, w, ch = rgb_image.shape
+        bytes_per_line = ch * w
+        convert_to_Qt_format = QImage(
+            rgb_image.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
+        p = convert_to_Qt_format.scaled(scale_w, scale_h, Qt.AspectRatioMode.KeepAspectRatio)
+        return QPixmap.fromImage(p)
+
+
+>>>>>>> 1de12a23307dea659b9a4e14428af76d64cdd6f8
 class VideoThread(QThread):
     '''Video Thread'''
     change_pixmap_signal = pyqtSignal(np.ndarray)
@@ -60,7 +88,10 @@ class VideoThread(QThread):
     def run(self): # pylint: disable=R0801
         '''Run'''
         # capture from web cam
-        cap = cv2.VideoCapture(0)
+        if sys.platform.startswith('win'):
+            cap = cv2.VideoCapture(self.camera_id, cv2.CAP_DSHOW)
+        else:
+            cap = cv2.VideoCapture(self.camera_id)
         while self._run_flag:
             ret, cv_img = cap.read()
             if ret:
@@ -74,6 +105,7 @@ class VideoThread(QThread):
         self._run_flag = False
         self.wait()
 
+<<<<<<< HEAD
 def get_cv_frame(cam_id: int):
     '''Returns a new CV frame'''
     print(cam_id)
@@ -90,6 +122,9 @@ def convert_cv_qt(cv_img, scale_w: int, scale_h: int) -> QPixmap:
     return QPixmap.fromImage(p)
 
 
+=======
+# pylint: disable=R0902
+>>>>>>> 1de12a23307dea659b9a4e14428af76d64cdd6f8
 if __name__ == '__main__':
     camera_handler = CameraHandler()
     cameras = camera_handler.refresh_camera_list()

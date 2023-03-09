@@ -23,6 +23,11 @@ class Position(Enum):
     BACK_LEFT = 2
     FRONT_LEFT = 3
 
+class States(Enum):
+    '''Enum for headless states'''
+    WAITING = 0
+    PARKING = 1
+    DRIVING = 2
 
 class MessageId(Enum):
     '''Enum for CAN message Ids'''

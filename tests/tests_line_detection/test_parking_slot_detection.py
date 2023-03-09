@@ -26,16 +26,35 @@ class TestParametrized:
             [[np.array([20, 120, 400,  20]), np.array([20, 120, 400,  20])],
              [np.array([123, 232, 234, 100])]]]),
     ])
-    def test_cluster_lines(self, lines, expected):
-        '''Test cluster_lines method of ParkingSlotDetector'''
+    def test_get_group_lines(self, lines, expected):
+        '''Test get_group_lines method of ParkingSlotDetector'''
         parking_slot_detector = ParkingSlotDetector()
-        clustered_lines, clustered_coords = parking_slot_detector.cluster_lines(
+        group_lines, group_coords = parking_slot_detector.get_group_lines(
+            lines)
+        for i, line in enumerate(group_lines):
+            for j, value in enumerate(line):
+                assert value == pytest.approx(expected[0][i][j], 0.001)
+        for i, coords in enumerate(group_coords):
+            assert (np.array(coords) == np.array(expected[1][i])).all()
+
+    @pytest.mark.parametrize('lines, expected', [
+        ([np.array((20, 120, 400, 20)), np.array((20, 120, 400, 20)),
+        np.array((123, 232, 234, 100))],
+         [[np.array([ -0.26315789, 125.26315789]), np.array([ -1.18918919, 378.27027027])],
+          [np.array([ 20, 120, 400,  20]), np.array([123, 231, 234,  99])]],
+         ),
+    ])
+    def test_get_clustered_lines(self, lines, expected):
+        '''Test get_clustered_lines of ParkingSlotDetector'''
+        parking_slot_detector = ParkingSlotDetector()
+        clustered_lines, clustered_coords = parking_slot_detector.get_clustered_lines(
             lines)
         for i, line in enumerate(clustered_lines):
             for j, value in enumerate(line):
                 assert value == pytest.approx(expected[0][i][j], 0.001)
         for i, coords in enumerate(clustered_coords):
             assert (np.array(coords) == np.array(expected[1][i])).all()
+
 
     @pytest.mark.parametrize('lines, coords, expected', [
         ([[-1, 100], [1, 2]], [[123, 123, 321, 321], [123, 123, 321, 321]],
@@ -79,13 +98,25 @@ class TestParametrized:
         for i, line in enumerate(lines):
             assert (line == expected[i]).all()
 
-    @pytest.mark.parametrize('img_source', [
-        ('4.png'),
-        ('7.png'),
-        ('8.png')
+    @pytest.mark.parametrize('img_source, expected', [
+        ('4.png', 2),
+        ('7.png', 2),
+        ('8.png', 2)
     ])
-    def test_detect_parking_lines(self, img_source):
-        '''Test parking_lines method of ParkingSlotDetector'''
+    def test_get_parking_lines(self, img_source, expected):
+        '''Test get_parking_lines method of ParkingSlotDetector'''
+        image = self.get_image(img_source)
+        parking_slot_detector = ParkingSlotDetector()
+        lines = parking_slot_detector.get_parking_lines(image)
+        assert len(lines) == expected
+
+    @pytest.mark.parametrize('img_source, expected', [
+        ('4.png', 3),
+        ('7.png', 3),
+        ('8.png', 3)
+    ])
+    def test_get_parking_slot(self, img_source, expected):
+        '''Test get_parking_slot method of ParkingSlotDetector'''
         size = {
             'px': 76,
             'mm': 52,
@@ -99,9 +130,10 @@ class TestParametrized:
             'ret': data['ret'],
             'points': data['points']
         }
-        lines = parking_slot_detector.detect_parking_lines(
+        lines_dict = parking_slot_detector.get_parking_slot(
             image, qr_code_data)
-        assert len(lines) > 0
+        assert len(lines_dict['slot_lines']) == expected
+        assert lines_dict['all_lines'] is not None
 
     @pytest.mark.parametrize('min_x, max_x, line_parameters, expected', [
         (200, 400, [1, 50], np.array([200, 250, 400, 450])),

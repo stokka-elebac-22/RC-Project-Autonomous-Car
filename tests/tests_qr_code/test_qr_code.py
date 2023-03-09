@@ -2,7 +2,7 @@
 # test_qr_code.py
 import pytest
 import cv2 as cv
-from computer_vision.qr_code.qr_code import QRGeometry, QRCode
+from computer_vision.qr_code.qr_code import QRGeometry, QRCode, QRSize
 
 class TestQRCode:
     '''Test QRCode'''
@@ -152,3 +152,21 @@ class TestQRCode:
         frame = cv.imread('tests/images/qr_code/multi/' + path)
         data = qr_code.get_data(frame)
         assert data['ret'] == exp[0] and len(data['distances']) == exp[1]
+
+    @pytest.mark.parametrize(
+        ['param', 'exp'],
+        [
+            ([[(2,3), (4,3), (4,5), (2,5)], (5, 10)], -5),
+            ([[(6,3), (8,3), (8,5), (6,5)], (5, 10)], 5)
+        ]
+    )
+
+    def test_get_qr_code_distance_x(self, param, exp):
+        '''test get qr code distance_x'''
+        qr_size: QRSize = {
+            'px': 20,
+            'mm': 10,
+            'distance': 200,
+        }
+        qr_geometry = QRGeometry(qr_size, param[0])
+        assert exp == qr_geometry.get_qr_code_distance_x(param[1])

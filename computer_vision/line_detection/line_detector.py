@@ -2,6 +2,7 @@
 import cv2
 import numpy as np
 
+
 class LineDetector:
     '''
     DOC: Detecting lines
@@ -9,16 +10,16 @@ class LineDetector:
 
     def __init__(self, canny: list[int, int] = None,
                  blur: int = 5,
-                 hough: list[int, int] = None,
+                 hough: list[int, int, int] = None,
                  iterations: list[int, int] = None):
         '''
         CANNY: [low_threshold, high_threshold]
-        HOUGH_LINES: [min_line_length, max_line_gap]
+        HOUGH_LINES: [threshold, min_line_length, max_line_gap]
         '''
         if canny is None:
             canny = [100, 200]
         if hough is None:
-            hough = [200, 30]
+            hough = [40, 200, 30]
         if iterations is None:
             iterations = [1, 0]
 
@@ -27,8 +28,9 @@ class LineDetector:
 
         self.blur_kernel_size = blur*2 + 1
 
-        self.hough_min_line_length = hough[0]
-        self.hough_max_line_gap = hough[1]
+        self.hough_threshold = hough[0]
+        self.hough_min_line_length = hough[1]
+        self.hough_max_line_gap = hough[2]
 
         self.iterations = iterations
 
@@ -51,7 +53,7 @@ class LineDetector:
         erode = cv2.erode(dilate, (3, 3), iterations=self.iterations[1])
         roi = self.get_region_of_interest(erode)
         lines = cv2.HoughLinesP(
-            roi, 1, np.pi / 180, 40, np.array([]),
+            roi, 1, np.pi / 180, self.hough_threshold, np.array([]),
             minLineLength=self.hough_min_line_length, maxLineGap=self.hough_max_line_gap
         )
         return lines
@@ -61,11 +63,11 @@ class LineDetector:
         if lines is not None:
             for line in lines:
                 if line is not None:
-                    try: 
+                    try:
                         x_1, y_1, x_2, y_2 = line.reshape(4)
                         cv2.line(image, (x_1, y_1), (x_2, y_2), (255, 0, 0), 5)
-                    except cv2.error:
-                        print("error")
+                    except cv2.error as err:
+                        print(err)
 
 
 if __name__ == '__main__':

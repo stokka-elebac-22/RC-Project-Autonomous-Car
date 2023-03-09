@@ -16,10 +16,10 @@ import argparse
 import yaml
 try:
     from main_window_ui import Ui
-    gui_possible = True
-except: 
+    GUI_POSSIBLE = True
+except: # pylint: disable=W0702
     print("Unable to run in GUI mode")
-    gui_possible = False
+    GUI_POSSIBLE = False
 from main_headless import Headless
 
 if __name__ == '__main__':
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     os.environ['QT_SCREEN_SCALE_FACTORS'] = '1'
     os.environ['QT_SCALE_FACTOR'] = '1'
 
-    if config["headless"] is True or gui_possible is False:
+    if config["headless"] is True or GUI_POSSIBLE is False:
         main_thread = Headless(config)
     else:
         window = Ui(args.theme + '.ui', config, FULL_SCREEN)

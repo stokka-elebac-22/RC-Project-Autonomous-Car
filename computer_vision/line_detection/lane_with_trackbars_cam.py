@@ -18,8 +18,6 @@ if __name__ == '__main__':
     cv2.createTrackbar('Hough maximum line gap', 'Trackbars', 300, 500, nothing)
     cv2.createTrackbar('Gaussian blur kernel size', 'Trackbars', 5, 20, nothing)
 
-    
-
     while True:
         canny_low_thr = cv2.getTrackbarPos('Canny low threshold','Trackbars')
         canny_high_thr = cv2.getTrackbarPos('Canny high threshold','Trackbars')
@@ -60,3 +58,4 @@ if __name__ == '__main__':
     print("blur", gaussian_kernel)
     cam.release()
     cv2.destroyAllWindows()
+    

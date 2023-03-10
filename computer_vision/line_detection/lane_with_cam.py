@@ -10,17 +10,17 @@ if __name__ == '__main__':
     avg_center_diff = []
 
     while True:
-        canny_low_thr = 50
-        canny_high_thr = 67
-        hough_threshold = 80
-        hough_min_length = 500
-        hough_max_gap = 246
-        gaussian_kernel = 4
+        CANNY_LOW_THR = 50
+        CANNY_HIGH_THR = 67
+        HOUGH_THRESHOLD = 80
+        HOUGH_MIN_LENGTH = 500
+        HOUGH_MAX_GAP = 246
+        GAUSSIAN_KERNEL = 4
 
         lane_detector = LaneDetector(
-            canny = [canny_low_thr, canny_high_thr],
-            hough = [hough_threshold, hough_min_length, hough_max_gap],
-            blur = gaussian_kernel,
+            canny = [CANNY_LOW_THR, CANNY_HIGH_THR],
+            hough = [HOUGH_THRESHOLD, HOUGH_MIN_LENGTH, HOUGH_MAX_GAP],
+            blur = GAUSSIAN_KERNEL,
         )
 
         ret, frame = cam.read()
@@ -30,7 +30,7 @@ if __name__ == '__main__':
         avg_lines = [lane_detector.get_line_coordinates_from_parameters(
             frame, line) for line in avg_lines]
         lane_detector.show_lines(frame, avg_lines)
-        center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)
+        center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines[0], avg_lines[1])
         if center_diff is not None:
             avg_center_diff.append(center_diff)
             if len(avg_center_diff) > 3:

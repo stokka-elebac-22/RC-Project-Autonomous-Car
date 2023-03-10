@@ -39,7 +39,7 @@ if __name__ == '__main__':
         avg_lines = [lane_detector.get_line_coordinates_from_parameters(
             copy, line) for line in avg_lines]
         lane_detector.show_lines(copy, avg_lines)
-        center_diff = lane_detector.get_diff_from_center_info(copy, avg_lines)
+        center_diff = lane_detector.get_diff_from_center_info(copy, avg_lines[0], avg_lines[1])
         if center_diff is not None:
             cv2.putText(
                 copy, f'Diff from center: {center_diff}', (50, 50),
@@ -54,3 +54,4 @@ if __name__ == '__main__':
     print("hough", hough_threshold, hough_min_length, hough_max_gap)
     print("blur", gaussian_kernel)
     cv2.destroyAllWindows()
+    

@@ -89,7 +89,7 @@ class LaneDetector(LineDetector):
             return np.array([left_fit_average, right_fit_average], dtype=object)
         return np.array([None, None])
 
-    def get_diff_from_center_info(self, image: np.ndarray, 
+    def get_diff_from_center_info(self, image: np.ndarray,
                                   left_line: np.ndarray, right_line: np.ndarray) -> float:
         '''Calculate the difference from car center to lane center'''
         width = image.shape[1]
@@ -122,7 +122,7 @@ class LaneDetector(LineDetector):
         '''Get a point on the center line'''
         if lines is None or len(lines) < 2 or (lines[0] is None and lines[1] is None):
             return None
-        
+
         height = image.shape[0]
         width = image.shape[1]
         if lines[0] is None:

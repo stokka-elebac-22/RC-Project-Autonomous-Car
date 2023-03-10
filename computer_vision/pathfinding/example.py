@@ -181,7 +181,7 @@ if __name__ == '__main__':
             #                 'distance': False, 'object_id': 31})
 
             #     center_diff = lane_detector.get_diff_from_center_info(
-            #         frame, avg_lines)
+            #         frame, avg_lines[0], avg_lines[1])
 
             # Use Traffic Sign module
             # signs = traffic_sign_detection.detect_signs(frame)

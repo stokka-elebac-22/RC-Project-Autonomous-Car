@@ -68,24 +68,24 @@ class StereoscopicVision:
         gray_right = cv.cvtColor(image_right, cv.COLOR_BGR2GRAY)
 
         # Applying stereo image rectification on the left image
-        # rect_left = cv.remap(
-        #     gray_left,
-        #     self.stereo_map_left[0],
-        #     self.stereo_map_left[1],
-        #     cv.INTER_LINEAR,
-        #     cv.BORDER_CONSTANT,
-        #     0)
+        rect_left = cv.remap(
+            gray_left,
+            self.stereo_map_left[0],
+            self.stereo_map_left[1],
+            cv.INTER_LINEAR,
+            cv.BORDER_CONSTANT,
+            0)
         # Applying stereo image rectification on the right image
-        # rect_right = cv.remap(
-        #     gray_right,
-        #     self.stereo_map_right[0],
-        #     self.stereo_map_right[1],
-        #     cv.INTER_LINEAR,
-        #     cv.BORDER_CONSTANT,
-        #     0)
+        rect_right = cv.remap(
+            gray_right,
+            self.stereo_map_right[0],
+            self.stereo_map_right[1],
+            cv.INTER_LINEAR,
+            cv.BORDER_CONSTANT,
+            0)
 
         # disparity = self.stereo.compute(gray_left, gray_right)
-        disparity = self.stereo.compute(gray_left, gray_right)
+        disparity = self.stereo.compute(rect_left, rect_right)
         # NOTE: Code returns a 16bit signed single channel image (CV_16S),
         # containing a disparity map scaled by 16.
         # Hence it is essential to convert it to CV_32F and scale it down 16 times.
@@ -286,9 +286,9 @@ if __name__ == '__main__':
     # DIRECTORY_RIGHT_IMAGE = \
     #     'tests/images/stereoscopic_vision/distance/logi_1080p/right/right_300.jpg'
     DIRECTORY_LEFT_IMAGE = \
-        'computer_vision/stereoscopic_vision/images/test_images/stereo-corridor_l.png'
+        'computer_vision/stereoscopic_vision/images/calibrate_small/left/left_0.jpg'
     DIRECTORY_RIGHT_IMAGE = \
-        'computer_vision/stereoscopic_vision/images/test_images/stereo-corridor_r.png'
+        'computer_vision/stereoscopic_vision/images/calibrate_small/right/right_0.jpg'
 
     if not os.path.exists(DIRECTORY_LEFT_IMAGE):
         print(f'{DIRECTORY_LEFT_IMAGE} does not exists')

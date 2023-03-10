@@ -41,7 +41,7 @@ if __name__ == '__main__':
         avg_lines = [lane_detector.get_line_coordinates_from_parameters(
             frame, line) for line in avg_lines]
         lane_detector.show_lines(frame, avg_lines)
-        center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)
+        center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines[0], avg_lines[1 ])
         if center_diff is not None:
             avg_center_diff.append(center_diff)
             if len(avg_center_diff) > 100:

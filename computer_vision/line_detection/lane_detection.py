@@ -11,7 +11,7 @@ except ImportError:
     except ImportError:
         from line_detection.line_detector import LineDetector
 
-#from main import LineDetector
+# from main import LineDetector
 
 
 # SOURCE
@@ -89,46 +89,57 @@ class LaneDetector(LineDetector):
             return np.array([left_fit_average, right_fit_average], dtype=object)
         return np.array([None, None])
 
-    def get_diff_from_center_info(self, image: np.ndarray, lines: np.ndarray) -> float:
+    def get_diff_from_center_info(self, image: np.ndarray, 
+                                  left_line: np.ndarray, right_line: np.ndarray) -> float:
         '''Calculate the difference from car center to lane center'''
-        if lines is not None:
-            width = image.shape[1]
-            center_car = width/2
-            center_lane = 0
-            start = None
-            stop = None
+        width = image.shape[1]
+        center_car = width/2
+        center_lane = 0
+        start = None
+        stop = None
 
-            for line in lines:
-                if line is not None:
-                    x_1, _, _, _ = line.reshape(4)
-                    if start is None:
-                        start = x_1
-                    elif stop is None:
-                        stop = x_1
+        if left_line is not None:
+            x_1, _, x_2, _ = left_line.reshape(4)
+            if x_1 > x_2:
+                start = x_2
+            else:
+                start = x_1
+        if right_line is not None:
+            x_1, _, x_2, _ = right_line.reshape(4)
+            if x_1 > x_2:
+                stop = x_2
+            else:
+                stop = x_1
 
-            diff = None
-            if start is not None and stop is not None:
-                center_lane = start + (stop-start)/2
-                diff = (center_car - center_lane)/width * self.width
+        diff = None
+        if start is not None and stop is not None:
+            center_lane = start + (stop-start)/2
+            diff = (center_car - center_lane)/width * self.width
             return diff
         return None
 
-    def get_next_point(self, image: np.ndarray, lines:np.ndarray) -> Tuple[int, int]:
+    def get_next_point(self, image: np.ndarray, lines: np.ndarray) -> Tuple[int, int]:
         '''Get a point on the center line'''
-        if lines is None or len(lines) < 2 or lines[0] is None or lines[1] is None:
+        if lines is None or len(lines) < 2 or (lines[0] is None and lines[1] is None):
             return None
+        
+        height = image.shape[0]
+        width = image.shape[1]
+        if lines[0] is None:
+            point = (int(width/2 - width*0.05), int(height*0.9))
+            return point
+        if lines[1] is None:
+            point = (int(width/2 + width*0.05), int(height*0.9))
+            return point
 
         coordinates_x = [lines[0][0], lines[1][0]]
-        # coordinates_y = [points_coordinates[0][3], points_coordinates[1][3]]
+
         width = max(coordinates_x) - min(coordinates_x)
 
-        # TODO: need to change size here, measure in real life # pylint: disable=W0511
-        height = image.shape[0]
-
         pt_input = np.float32([[0, 0],
-                                [0, height],
-                                [width, height],
-                                [width, 0]])
+                               [0, height],
+                               [width, height],
+                               [width, 0]])
 
         pt_output = np.float32([[lines[0][2], lines[0][3]],
                                [lines[0][0], lines[0][1]],
@@ -141,9 +152,9 @@ class LaneDetector(LineDetector):
             pt_input, pt_output)
 
         p_x = (matrix[0][0]*point[0] + matrix[0][1]*point[1] + matrix[0][2]) \
-        /(matrix[2][0]*point[0] + matrix[2][1]*point[1] + matrix[2][2])
+            / (matrix[2][0]*point[0] + matrix[2][1]*point[1] + matrix[2][2])
         p_y = (matrix[1][0]*point[0] + matrix[1][1]*point[1] + matrix[1][2]) \
-        /(matrix[2][0]*point[0] + matrix[2][1]*point[1] + matrix[2][2])
+            / (matrix[2][0]*point[0] + matrix[2][1]*point[1] + matrix[2][2])
 
         return (int(p_x), int(p_y))
 
@@ -157,7 +168,7 @@ class LaneDetector(LineDetector):
     })
 
     # TODO: maybe remove later, no need, cus have pathfinding?
-    def get_course(self, image: np.ndarray, lines: np.ndarray) -> CourseData: # pylint: disable=R0914
+    def get_course(self, image: np.ndarray, lines: np.ndarray) -> CourseData:  # pylint: disable=R0914
         '''Returns polys that define the course and points used to define the polys'''
         if lines is None:
             return None
@@ -298,7 +309,7 @@ if __name__ == '__main__':
         #    break
         avg_lines = lane_detector.get_lane_line(frame)
         lane_detector.show_lines(frame, avg_lines)
-        center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines)
+        center_diff = lane_detector.get_diff_from_center_info(frame, avg_lines[0], avg_lines[1])
         if center_diff is not None:
             cv2.putText(
                 frame, f'Diff from center: {center_diff}', (50, 50),
@@ -311,7 +322,7 @@ if __name__ == '__main__':
 
         if next_point is not None:
             frame = cv2.circle(
-                frame, (next_point[0], next_point[1]), 5, (0, 0, 255), 5)
+                frame, (next_point[0], next_point[1]), 20, (0, 0, 255), 5)
 
             NO_NONE = True
             if course_data is not None:
@@ -322,17 +333,15 @@ if __name__ == '__main__':
 
                 if NO_NONE:
                     images = lane_detector.show_course(
-                            frame,
-                            course_data['warped_shape'],
-                            course_data['points'],
-                            course_data['perspective_transform'],
-                            course_data['polys']
-                        )
+                        frame,
+                        course_data['warped_shape'],
+                        course_data['points'],
+                        course_data['perspective_transform'],
+                        course_data['polys']
+                    )
                     cv2.imshow('warped', images['warped'])
                     cv2.imshow('course', images['weighted'])
         cv2.imshow('image', frame)
-
-        # cv2.imshow('frame', frame)
         cv2.waitKey(0)
         break
 

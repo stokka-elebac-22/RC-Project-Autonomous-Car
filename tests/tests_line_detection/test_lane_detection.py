@@ -94,7 +94,7 @@ class TestParametrized:
         lane_detector = LaneDetector()
         image = self.get_image(img_source)
         diff = np.round(
-            lane_detector.get_diff_from_center_info(image, lines), 3)
+            lane_detector.get_diff_from_center_info(image, lines[0], lines[1]), 3)
         assert diff == expected
 
     @pytest.mark.parametrize('img_source, lines, expected', [

@@ -3,7 +3,6 @@ import dataclasses
 import os.path
 import cv2 as cv
 import numpy as np
-from matplotlib import pyplot as plt
 
 @dataclasses.dataclass
 class DisparityParameters:
@@ -22,9 +21,9 @@ class DisparityParameters:
         self.speckle_window_size = 0
         self.disparity_max_diff = 0
         self.min_disparity = 0
-        self.obstacle_area = 0
-        self.contour_area = 0
-        self.measurement = 40
+        self.obstacle_area = 0.0001
+        self.contour_area = 0.0001
+        self.measurement = 1
 
         if os.path.exists(path):
             cv_file_read = cv.FileStorage(path, cv.FILE_STORAGE_READ)
@@ -109,13 +108,16 @@ class StereoscopicVision:
         cv_file.release()
         return (stereo_map_left_x, stereo_map_left_y), (stereo_map_right_x, stereo_map_right_y)
 
-    # def obstacle_detection(self, depth_map, area, min_dist, thresh_dist):
+    # def obstacle_detection(self, disparity, min_dist, max_dist):
     #     '''Detecting depth to obstacles in cm'''
     #     # Mask to segment regions with depth less than threshold
-    #     mask = cv.inRange(depth_map, min_dist, thresh_dist)
+    #     # depth_map_dist = self.parameters.measurement/disparity # for depth in cm
+    #     mask = cv.inRange(disparity, min_dist, max_dist)
+    #     depth_map = cv.bitwise_and(disparity, disparity, mask=mask)
 
     #     # Check if a significantly large obstacle is present and filter out smalle noisy regions
-    #     if np.sum(mask)/255.0 > area['obstacle']*mask.shape[0]*mask.shape[1]:
+    #     if np.sum(mask)/255.0 > self.parameters.obstacle_area*mask.shape[0]*mask.shape[1]:
+    #     # if np.sum(mask)/255.0 > 0.0001*mask.shape[0]*mask.shape[1]:
     #         # Contour detection
     #         contours, _ = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
@@ -126,8 +128,10 @@ class StereoscopicVision:
     #         depth_mean = [[None]]
     #         # Because of the huge size of cnts,
     #         # a binary search method will be used instead of linear
+
     #         for cnt in contours:
-    #             if cv.contourArea(cnt) > area['contour']*mask.shape[0]*mask.shape[1]:
+    #             if cv.contourArea(cnt) > self.parameters.contour_area*mask.shape[0]*mask.shape[1]:
+    #             # if cv.contourArea(cnt) > 0.01*mask.shape[0]*mask.shape[1]:
     #                 # finding average depth of the contour
     #                 mask2 = np.zeros_like(mask)
     #                 cv.drawContours(mask2, cnt, 0, (255), -1)
@@ -142,20 +146,21 @@ class StereoscopicVision:
     #         return True, depth_mean, (x_pos, y_pos), (w_rect, h_rect)
     #     return False, None, None, None
 
-    def obstacle_detection(self, depth_map, area, min_dist, thresh_dist):
+    def obstacle_detection(self, disparity, min_dist, max_dist):
         '''Detecting depth to obstacles in cm'''
-        mask = cv.inRange(depth_map,10,thresh_dist)
+        # depth_map_dist = self.parameters.measurement/disparity # for depth in cm
+        mask = cv.inRange(disparity, min_dist, max_dist)
+        depth_map = cv.bitwise_and(disparity, disparity, mask=mask)
 
-        if np.sum(mask)/255.0 > 0.01*mask.shape[0]*mask.shape[1]:
+        if np.sum(depth_map)/255.0 > self.parameters.obstacle_area*depth_map.shape[0]*depth_map.shape[1]:
 
 		    # Contour detection
             contours, _ = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
             cnts = sorted(contours, key=cv.contourArea, reverse=True)
 
 		    # Check if detected contour is significantly large (to avoid multiple tiny regions)
-            if cv.contourArea(cnts[0]) > 0.01*mask.shape[0]*mask.shape[1]:
-
-                x,y,w,h = cv.boundingRect(cnts[0])
+            if cv.contourArea(cnts[0]) > self.parameters.contour_area*depth_map.shape[0]*depth_map.shape[1]:
+                x_pos, y_pos, w_rect, h_rect = cv.boundingRect(cnts[0])
 
 			    # finding average depth of region represented by the largest contour
                 mask2 = np.zeros_like(mask)
@@ -163,26 +168,17 @@ class StereoscopicVision:
 
 			    # Calculating the average depth of the object closer than the safe distance
                 depth_mean, _ = cv.meanStdDev(depth_map, mask=mask2)
-        else:
-            return False, None, None, None
 
-        return True, depth_mean, (x, y), (w, h)
+                if depth_mean:
+                    return True, depth_mean, (x_pos, y_pos), (w_rect, h_rect)
+        return False, None, None, None
 
-    def get_data(self, disparity, min_dist, max_dist, thresh_dist):
+    def get_data(self, disparity, min_dist, max_dist):
         '''Returns bool value, depth, position and size'''
-        depth_map_dist = self.parameters.measurement/disparity # for depth in cm
-        mask_tmp = cv.inRange(depth_map_dist, min_dist, max_dist)
-        depth_map_dist = cv.bitwise_and(depth_map_dist, depth_map_dist, mask=mask_tmp)
-
-        area = {
-            'obstacle': self.parameters.obstacle_area,
-            'contour': self.parameters.contour_area
-        }
         retval, depth, pos, size = self.obstacle_detection(
-            depth_map_dist,
-            area,
+            disparity,
             min_dist,
-            thresh_dist)
+            max_dist)
 
         return retval, depth, pos, size
 
@@ -190,10 +186,10 @@ class StereoscopicVision:
 if __name__ == '__main__':
     from camera import Camera
     PARAMETER_PATH = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
-    MAPS_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps_large.xml'
-    MAX_DIST = 1000 # max distance to recognize objects (mm)
+    MAPS_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps_home.xml'
+    MAX_DIST = 255 # max distance to recognize objects (mm)
     MIN_DIST = 0 # min distance to recognize objects (mm)
-    THRESH_DIST = MAX_DIST
+    THRESH_DIST = 255
     M = 1 # base value, the real one is from the xml file (and is calculated in a previous test)
     Z = MAX_DIST # The depth, for used for calculating M
 
@@ -281,14 +277,10 @@ if __name__ == '__main__':
 
     cv.setMouseCallback('disparity', mouse_click)
 
-    # DIRECTORY_LEFT_IMAGE = \
-    #     'tests/images/stereoscopic_vision/distance/logi_1080p/left/left_300.jpg'
-    # DIRECTORY_RIGHT_IMAGE = \
-    #     'tests/images/stereoscopic_vision/distance/logi_1080p/right/right_300.jpg'
     DIRECTORY_LEFT_IMAGE = \
-        'computer_vision/stereoscopic_vision/images/calibrate_small/left/left_0.jpg'
+        'computer_vision/stereoscopic_vision/images/test_images/stereo-corridor_l.png'
     DIRECTORY_RIGHT_IMAGE = \
-        'computer_vision/stereoscopic_vision/images/calibrate_small/right/right_0.jpg'
+        'computer_vision/stereoscopic_vision/images/test_images/stereo-corridor_r.png'
 
     if not os.path.exists(DIRECTORY_LEFT_IMAGE):
         print(f'{DIRECTORY_LEFT_IMAGE} does not exists')
@@ -299,11 +291,11 @@ if __name__ == '__main__':
 
     print('Running...')
     while True:
-        # ret_left, frame_left = cam_left.read()
-        # ret_right, frame_right = cam_right.read()
-        ret_left, ret_right = True, True
-        frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
-        frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
+        ret_left, frame_left = cam_left.read()
+        ret_right, frame_right = cam_right.read()
+        # ret_left, ret_right = True, True
+        # frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
+        # frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
 
         if ret_left and ret_right:
             # NOTE: it might help to blur the image to reduce noise
@@ -352,7 +344,7 @@ if __name__ == '__main__':
 
             current_disparity = stereo_vision.get_disparity(frame_left, frame_right)
             ret_val, depth_val, pos_val, size_val = stereo_vision.get_data(
-                current_disparity, MIN_DIST, MAX_DIST, THRESH_DIST)
+                current_disparity, MIN_DIST, MAX_DIST)
 
             if ret_val and depth_val[0][0] is not None:
                 average.pop()

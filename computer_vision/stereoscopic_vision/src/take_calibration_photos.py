@@ -1,21 +1,28 @@
 '''DOC'''
+import time
 import cv2 as cv
+from camera import Camera
 
 if __name__ == '__main__':
     # DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_large/'
-    DIRECTORY = 'computer_vision/stereoscopic_vision/images/depth_test'
+    DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_home'
     # DIRECTORY = 'tests/images/stereoscopic_vision/images/depth_test/'
-    CAMERA_ID_LEFT = 1
-    CAMERA_ID_RIGHT = 0
-    BOARD_DIMENSIONS = (8, 6)
-    cam1 = cv.VideoCapture(CAMERA_ID_LEFT)
-    cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)
-    cameras = [(cam1, 'left_1'), (cam2, 'right_1')]
+    CAMERA_ID_LEFT = 0
+    CAMERA_ID_RIGHT = 1
+    BOARD_DIMENSIONS = (13, 9)
+    cam_left = Camera(CAMERA_ID_LEFT)
+    cam_right = Camera(CAMERA_ID_RIGHT)
+    cameras = [(cam_left, 'left'), (cam_right, 'right')]
 
     qcd = cv.QRCodeDetector()
 
     TRIGGER = False
     COUNT = 0
+
+    start_time = time.time()
+
+    TIME_TH = 3 # 2 seconds between each photo
+
     while True:
         frames = []
         RETS = True
@@ -31,7 +38,9 @@ if __name__ == '__main__':
             print('Stopping...')
             break
 
-        if cv.waitKey(1) & 0xFF == ord('c'):
+        cur_time = time.time()
+        ts = cur_time - start_time
+        if ts >= TIME_TH and TRIGGER is False:
             print('Capturing...')
             TRIGGER = True
 
@@ -50,6 +59,8 @@ if __name__ == '__main__':
 
             print('Done\n')
             for frame, title in frames:
-                cv.imwrite(f'{DIRECTORY}/{title}_{COUNT}.jpg', frame)
+                cv.imwrite(f'{DIRECTORY}/{title}/{title}_{COUNT}.jpg', frame)
             COUNT += 1
             TRIGGER = False
+
+            start_time = time.time()

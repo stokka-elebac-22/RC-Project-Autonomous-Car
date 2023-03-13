@@ -3,6 +3,7 @@ import dataclasses
 from typing import TypedDict, Tuple, List
 import numpy as np
 import cv2 as cv
+from computer_vision.stereoscopic_vision.src.camera import Camera
 
 QRSize = TypedDict('QRSize', {
     'px': int,
@@ -229,16 +230,16 @@ class DisplayQRCode:
         cv.putText(frame, f'distance = {int(distance)}', (10, 50), \
                 self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
-def local_read_camera(name: str=None, resize: int=1):
-    '''Local read camera '''
-    if not name:
-        ret, frame = cap.read()
-        if not ret:
-            raise SystemError
-    else:
-        frame = cv.imread(name)
-    frame = cv.resize(frame, (0, 0), fx = resize, fy = resize)
-    return frame
+# def local_read_camera(name: str=None, resize: int=1):
+#     '''Local read camera '''
+#     if not name:
+#         ret, frame = cap.read()
+#         if not ret:
+#             raise SystemError
+#     else:
+#         frame = cv.imread(name)
+#     frame = cv.resize(frame, (0, 0), fx = resize, fy = resize)
+#     return frame
 
 
 if __name__ == '__main__':
@@ -253,7 +254,8 @@ if __name__ == '__main__':
     CAMERA_ID = 0
     DELAY = 1
     WINDOW_NAME = 'window'
-    cap = cv.VideoCapture(CAMERA_ID)
+    # cap = cv.VideoCapture(CAMERA_ID)
+    cam = Camera(CAMERA_ID)
     VERBOSE = 1
 
     ##### VALUES #####
@@ -279,8 +281,11 @@ if __name__ == '__main__':
     distances_lists = [[0 for _ in range(VALUES_LENGTH)]]
 
     while True:
-        img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
-        img = local_read_camera()
+        # img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
+        # img = local_read_camera()
+        ret, img = cam.read()
+        if not ret:
+            continue
         qr_data = qr_code.get_data(img)
 
         if len(angles_lists) < len(qr_data['angles']):

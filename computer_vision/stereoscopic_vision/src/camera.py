@@ -15,8 +15,8 @@ class Camera: # pylint: disable=R0903
             # Windows...
             self.cap = cv.VideoCapture(self.camera_id, cv.CAP_DSHOW)
             self.cap.set(cv.CAP_PROP_AUTOFOCUS, 0) # turn the autofocus off
-            self.cap.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
-            self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+            self.cap.set(cv.CAP_PROP_FRAME_WIDTH, 1280)
+            self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, 800)
 
     def read(self):
         '''Read'''

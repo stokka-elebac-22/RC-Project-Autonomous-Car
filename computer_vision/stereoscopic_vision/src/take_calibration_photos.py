@@ -4,15 +4,20 @@ import cv2 as cv
 from camera import Camera
 
 if __name__ == '__main__':
-    # DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_large/'
-    DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_home'
-    # DIRECTORY = 'tests/images/stereoscopic_vision/images/depth_test/'
-    CAMERA_ID_LEFT = 0
-    CAMERA_ID_RIGHT = 1
+    DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_home_web_light_off'
+    CAMERA_ID_LEFT = 1
+    CAMERA_ID_RIGHT = 2
     BOARD_DIMENSIONS = (13, 9)
     cam_left = Camera(CAMERA_ID_LEFT)
     cam_right = Camera(CAMERA_ID_RIGHT)
     cameras = [(cam_left, 'left'), (cam_right, 'right')]
+
+    # check if all cameras work
+    for cam in cameras:
+        ret, _ = cam[0].read()
+        if not ret:
+            print(f'{cam[1]} camera could not connect...')
+            raise ConnectionError
 
     qcd = cv.QRCodeDetector()
 

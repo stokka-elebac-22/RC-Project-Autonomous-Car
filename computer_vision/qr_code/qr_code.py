@@ -264,12 +264,12 @@ if __name__ == '__main__':
     # ----- ORIGINAL MEASUREMENTS -----
     # QR Code measured, 55mm lense
     SIZE = {
-        'px': 380,
-        'mm': 141,
+        'px': 126,
+        'mm': 52,
         'distance': 500
     }
     qr_code = QRCode(SIZE)
-    CAMERA_ID = 0
+    CAMERA_ID = 1
     DELAY = 1
     WINDOW_NAME = 'window'
     # cap = cv.VideoCapture(CAMERA_ID)

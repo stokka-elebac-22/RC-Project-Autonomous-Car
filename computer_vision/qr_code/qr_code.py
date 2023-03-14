@@ -1,9 +1,17 @@
 '''QR code module.'''
 import dataclasses
 from typing import TypedDict, Tuple, List
+import os
+import sys
 import numpy as np
 import cv2 as cv
-from computer_vision.stereoscopic_vision.src.camera import Camera
+try:
+    current = os.path.dirname(os.path.realpath(__file__))
+    parent = os.path.dirname(current)
+    sys.path.append(parent)
+    from stereoscopic_vision.src.camera import Camera
+except ImportError:
+    from computer_vision.stereoscopic_vision.src.camera import Camera
 
 QRSize = TypedDict('QRSize', {
     'px': int,
@@ -113,6 +121,16 @@ class QRCode:
         get_measurements(self, frame, resize=1) -> bool, float, float
         '''
         qcd = cv.QRCodeDetector()
+        if frame is None:
+            return {
+            'ret': False,
+            'distances': None,
+            'angles': None,
+            'info': None,
+            'points': None,
+            'rest': None
+            }
+
         ret_qr, decoded_info , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
 
         # add more QRGeometry if needed or delete if too many
@@ -246,8 +264,8 @@ if __name__ == '__main__':
     # ----- ORIGINAL MEASUREMENTS -----
     # QR Code measured, 55mm lense
     SIZE = {
-        'px': 76,
-        'mm': 52,
+        'px': 380,
+        'mm': 141,
         'distance': 500
     }
     qr_code = QRCode(SIZE)
@@ -288,24 +306,25 @@ if __name__ == '__main__':
             continue
         qr_data = qr_code.get_data(img)
 
-        if len(angles_lists) < len(qr_data['angles']):
-            for _ in range(len(qr_data['angles']) - len(angles_lists)):
-                angles_lists.append([0 for _ in range(VALUES_LENGTH)])
-        if len(distances_lists) < len(qr_data['distances']):
-            for _ in range(len(qr_data['distances']) - len(distances_lists)):
-                distances_lists.append([0 for _ in range(VALUES_LENGTH)])
-        filter_angle(qr_data['angles'])
-        filter_distance(qr_data['distances'])
-        if qr_data['ret']:
-            average_angles = [int(sum(angles_list)//VALUES_LENGTH) \
-                for angles_list in angles_lists]
-            average_distance = [int(sum(distances_list)//VALUES_LENGTH) \
-                for distances_list in distances_lists]
-            qr_code_measurements = {
-                'distances': average_distance,
-                'angles': average_angles,
-                'info': qr_data['info']}
-            qr_code.display(img, qr_code_measurements, verbose=2)
+        if qr_data['angles'] and qr_data['distances']:
+            if len(angles_lists) < len(qr_data['angles']):
+                for _ in range(len(qr_data['angles']) - len(angles_lists)):
+                    angles_lists.append([0 for _ in range(VALUES_LENGTH)])
+            if len(distances_lists) < len(qr_data['distances']):
+                for _ in range(len(qr_data['distances']) - len(distances_lists)):
+                    distances_lists.append([0 for _ in range(VALUES_LENGTH)])
+            filter_angle(qr_data['angles'])
+            filter_distance(qr_data['distances'])
+            if qr_data['ret']:
+                average_angles = [int(sum(angles_list)//VALUES_LENGTH) \
+                    for angles_list in angles_lists]
+                average_distance = [int(sum(distances_list)//VALUES_LENGTH) \
+                    for distances_list in distances_lists]
+                qr_code_measurements = {
+                    'distances': average_distance,
+                    'angles': average_angles,
+                    'info': qr_data['info']}
+                qr_code.display(img, qr_code_measurements, verbose=2)
         cv.imshow(WINDOW_NAME, img)
         if cv.waitKey(DELAY) & 0xFF == ord('q'):
             break

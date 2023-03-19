@@ -79,6 +79,9 @@ class Calibrate:
                 # draw and display the corners
                 cv.drawChessboardCorners(image_left, self.board_dim, corners_left, ret_left)
                 cv.drawChessboardCorners(image_right, self.board_dim, corners_right, ret_right)
+                left_name = left.split('\\')[-1]
+                right_name = right.split('\\')[-1]
+                print(f'{left_name} | {right_name}')
                 cv.imshow('left', image_left)
                 cv.imshow('right', image_right)
                 cv.waitKey(0)
@@ -113,7 +116,7 @@ class Calibrate:
                 data['distance'], None, data['new_camera_matrix'], (width, height), 5)
         dst = cv.remap(data['image'], mapx, mapy, cv.INTER_LINEAR)
 
-        # crop image
+        # crop imageq
         pos_x, pos_y, roi_width, roi_height = data['roi']
         dst = dst[pos_y:pos_y+roi_height, pos_x:pos_x+roi_width]
         # cv.imwrite('Stereoscopic Vision\images\calibrate_results\calibrated.png', dst)
@@ -148,9 +151,9 @@ if __name__ == '__main__':
     CHECKERBOARD_DIMENSION = (13, 9)
     SQUARE_SIZE = 1
     CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-    DIRECTORY_LEFT = "computer_vision/stereoscopic_vision/images/calibrate_web_light_sun/left/*.jpg"
-    DIRECTORY_RIGHT = "computer_vision/stereoscopic_vision/images/calibrate_web_light_sun/right/*.jpg"
-    DESTINATION_PATH = "computer_vision/stereoscopic_vision/data/stereo_rectify_maps_web_light_sun.xml"
+    DIRECTORY_LEFT = "computer_vision/stereoscopic_vision/images/calibrate_web/left/*.jpg"
+    DIRECTORY_RIGHT = "computer_vision/stereoscopic_vision/images/calibrate_web/right/*.jpg"
+    DESTINATION_PATH = "computer_vision/stereoscopic_vision/data/stereo_rectify_maps_web.xml"
 
     # Calibrate left camera
     calibrate = Calibrate(

@@ -4,7 +4,7 @@ import cv2 as cv
 from camera import Camera
 
 if __name__ == '__main__':
-    DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_web'
+    DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_web_light'
     CAMERA_ID_LEFT = 1
     CAMERA_ID_RIGHT = 2
     BOARD_DIMENSIONS = (13, 9)

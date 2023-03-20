@@ -56,7 +56,8 @@ class StereoscopicVision:
 
         # The path is the path to the calibration paramters (xml file)
         self.stereo_map_left, self.stereo_map_right = self.read_stereo_map(path)
-        self.stereo = cv.StereoBM_create(
+        # stereoSGBM
+        self.stereo = cv.StereoSGBM_create(
             numDisparities=int(self.parameters.num_disparities),
             blockSize=int(self.parameters.block_size))
 
@@ -83,8 +84,8 @@ class StereoscopicVision:
             cv.BORDER_CONSTANT,
             0)
 
-        # disparity = self.stereo.compute(gray_left, gray_right)
         disparity = self.stereo.compute(rect_left, rect_right)
+        disparity = self.stereo.compute(gray_left, gray_right)
         # NOTE: Code returns a 16bit signed single channel image (CV_16S),
         # containing a disparity map scaled by 16.
         # Hence it is essential to convert it to CV_32F and scale it down 16 times.
@@ -186,7 +187,7 @@ class StereoscopicVision:
 if __name__ == '__main__':
     from camera import Camera
     PARAMETER_PATH = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
-    MAPS_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps_web_sun.xml'
+    MAPS_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps_web_light.xml'
     MAX_DIST = 255 # max distance to recognize objects (mm)
     MIN_DIST = 0 # min distance to recognize objects (mm)
     THRESH_DIST = 255
@@ -277,10 +278,14 @@ if __name__ == '__main__':
 
     cv.setMouseCallback('disparity', mouse_click)
 
+    # DIRECTORY_LEFT_IMAGE = \
+    #     'computer_vision/stereoscopic_vision/images/test_images/stereo-corridor_l.png'
+    # DIRECTORY_RIGHT_IMAGE = \
+    #     'computer_vision/stereoscopic_vision/images/test_images/stereo-corridor_r.png'
     DIRECTORY_LEFT_IMAGE = \
-        'computer_vision/stereoscopic_vision/images/test_images/stereo-corridor_l.png'
+        'computer_vision/stereoscopic_vision/images/calibrate_web_light/left/left_0.jpg'
     DIRECTORY_RIGHT_IMAGE = \
-        'computer_vision/stereoscopic_vision/images/test_images/stereo-corridor_r.png'
+        'computer_vision/stereoscopic_vision/images/calibrate_web_light/right/right_0.jpg'
 
     if not os.path.exists(DIRECTORY_LEFT_IMAGE):
         print(f'{DIRECTORY_LEFT_IMAGE} does not exists')
@@ -291,11 +296,11 @@ if __name__ == '__main__':
 
     print('Running...')
     while True:
-        ret_left, frame_left = cam_left.read()
-        ret_right, frame_right = cam_right.read()
-        # ret_left, ret_right = True, True
-        # frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
-        # frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
+        # ret_left, frame_left = cam_left.read()
+        # ret_right, frame_right = cam_right.read()
+        ret_left, ret_right = True, True
+        frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
+        frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
 
         if ret_left and ret_right:
             # NOTE: it might help to blur the image to reduce noise

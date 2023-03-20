@@ -202,7 +202,6 @@ if __name__ == '__main__':
 
     cv.namedWindow('disp', cv.WINDOW_NORMAL)
     cv.namedWindow('disparity', cv.WINDOW_NORMAL)
-    # cv.resizeWindow('disp', 800,600)
 
     def nothing(_):
         '''Empty function'''
@@ -296,11 +295,13 @@ if __name__ == '__main__':
 
     print('Running...')
     while True:
-        # ret_left, frame_left = cam_left.read()
-        # ret_right, frame_right = cam_right.read()
-        ret_left, ret_right = True, True
-        frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
-        frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
+        ret_left, frame_left = cam_left.read()
+        ret_right, frame_right = cam_right.read()
+        # frame_left = blurImg = cv.blur(frame_left,(20,20))
+        # frame_right = blurImg = cv.blur(frame_right,(20,20))
+        # ret_left, ret_right = True, True
+        # frame_left = cv.imread(DIRECTORY_LEFT_IMAGE)
+        # frame_right = cv.imread(DIRECTORY_RIGHT_IMAGE)
 
         if ret_left and ret_right:
             # NOTE: it might help to blur the image to reduce noise

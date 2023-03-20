@@ -151,9 +151,9 @@ if __name__ == '__main__':
     CHECKERBOARD_DIMENSION = (13, 9)
     SQUARE_SIZE = 1
     CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-    DIRECTORY_LEFT = "computer_vision/stereoscopic_vision/images/calibrate_web_light/left/*.jpg"
-    DIRECTORY_RIGHT = "computer_vision/stereoscopic_vision/images/calibrate_web_light/right/*.jpg"
-    DESTINATION_PATH = "computer_vision/stereoscopic_vision/data/stereo_rectify_maps_web_light.xml"
+    DIRECTORY_LEFT = "computer_vision/stereoscopic_vision/images/calibrate_logi_light/left/*.jpg"
+    DIRECTORY_RIGHT = "computer_vision/stereoscopic_vision/images/calibrate_logi_light/right/*.jpg"
+    DESTINATION_PATH = "computer_vision/stereoscopic_vision/data/stereo_rectify_maps_logi_light.xml"
 
     # Calibrate left camera
     calibrate = Calibrate(

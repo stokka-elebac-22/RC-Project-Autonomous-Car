@@ -4,9 +4,9 @@ import cv2 as cv
 from camera import Camera
 
 if __name__ == '__main__':
-    DIRECTORY = 'computer_vision/stereoscopic_vision/images/calibrate_logi_light'
-    CAMERA_ID_LEFT = 0
-    CAMERA_ID_RIGHT = 1
+    DIRECTORY = 'computer_vision/stereoscopic_vision/images/test_images'
+    CAMERA_ID_LEFT = 1
+    CAMERA_ID_RIGHT = 2
     BOARD_DIMENSIONS = (13, 9)
     cam_left = Camera(CAMERA_ID_LEFT)
     cam_right = Camera(CAMERA_ID_RIGHT)
@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-    TIME_TH = 2 # 2 seconds between each photo
+    TIME_TH = 5 # 2 seconds between each photo
 
     while True:
         frames = []
@@ -56,6 +56,7 @@ if __name__ == '__main__':
             for frame, _ in frames:
                 gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
                 ret, _ = cv.findChessboardCorners(gray, BOARD_DIMENSIONS, None)
+                ret = True
                 if not ret:
                     RETS = False
                     break

@@ -47,8 +47,8 @@ class DrivingSetup:
         while self.running:
             actions = self.next()
             if actions is None:
-                return
-            self.display(actions[0])
+                continue
+            self.display(actions)
         print('Stopping...')
 
     def next(self) -> List[ActionsDict]:
@@ -65,7 +65,7 @@ class DrivingSetup:
         if os.path.exists(self.image_paths['arrow']):
             img = cv.imread(self.image_paths['arrow'])
             # rotate image
-            roated_image = rotate_image(img, action['angle'])
+            roated_image = rotate_image(img, action['angles'][0])
             cv.imshow('', roated_image)
             cv.waitKey(0)
         else:

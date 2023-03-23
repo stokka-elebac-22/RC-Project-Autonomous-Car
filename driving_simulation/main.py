@@ -58,8 +58,7 @@ if __name__ == '__main__':
     environment: Environment = Environment(
         conf['environment']['size'],
         conf['environment']['real_size'],
-        {'object_id': 10},
-        view_point_object=view_point_object,
+        view_point_object,
     )
 
     # ----- INIT PATHFINDING ----- #

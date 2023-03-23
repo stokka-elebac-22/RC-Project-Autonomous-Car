@@ -8,11 +8,13 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 # pylint: disable=C0413
 from computer_vision.pathfinding.pathfinding import PathFinding
+from computer_vision.qr_code.qr_code import QRCode
 class Driving:
     '''Driving class'''
-    def __init__(self, pathfinding: PathFinding):
+    def __init__(self, pathfinding: PathFinding, qr_code: QRCode):
         '''Init'''
         self.pathfinding = pathfinding
+        self.qr_code = qr_code
 
     def driving(self):
         '''Driving'''

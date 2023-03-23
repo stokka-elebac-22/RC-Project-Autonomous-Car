@@ -53,7 +53,6 @@ class DrivingSetup:
         '''Display the arrow or other symbols'''
         if os.path.exists(self.image_paths['arrow']):
             img = cv.imread(self.image_paths['arrow'])
-            print(img)
             cv.imshow('', img)
             cv.waitKey(0)
         else:

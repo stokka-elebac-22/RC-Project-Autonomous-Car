@@ -15,6 +15,7 @@ from computer_vision.camera_handler.camera import Camera
 from computer_vision.pathfinding.pathfinding import PathFinding
 from computer_vision.environment.src.a_star import AStar
 from computer_vision.environment.src.environment import Environment
+from computer_vision.qr_code.qr_code import QRSize, QRCode
 
 CONFIG_FILE = 'driving_simulation/config'
 
@@ -64,9 +65,19 @@ if __name__ == '__main__':
         pathfinding_algorithm=a_star,
     )
 
+    # ----- INIT QR CODE ----- #
+    qr_size: QRSize = {
+        'px': conf['qr_code_size']['px'],
+        'mm': conf['qr_code_size']['mm'],
+        'distance': conf['qr_code_size']['distance'],
+    }
+    qr_code = QRCode(qr_size)
+
     # ----- DRIVING ----- #
     print('Start running...')
-    driving = Driving(pathfinding=path_finding)
+    driving = Driving(
+        pathfinding=path_finding,
+        qr_code=qr_code)
     driving_setup = DrivingSetup(
         conf=conf,
         driving=driving,

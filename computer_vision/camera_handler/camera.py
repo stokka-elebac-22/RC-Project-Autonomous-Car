@@ -31,6 +31,6 @@ class Camera:
 
     def get_dimensions(self) -> Tuple[float, float]:
         '''Returns width and height'''
-        width  = self.cap.get(cv.cv.CV_CAP_PROP_FRAME_WIDTH)   # float `width`
-        height = self.cap.get(cv.cv.CV_CAP_PROP_FRAME_HEIGHT)  # float `height`
+        width  = self.cap.get(cv.CAP_PROP_FRAME_WIDTH)   # float `width`
+        height = self.cap.get(cv.CAP_PROP_FRAME_HEIGHT)  # float `height`
         return width, height

@@ -3,7 +3,7 @@ from sys import platform
 from typing import Tuple
 import cv2 as cv
 
-class Camera:
+class Camera: # pylint: disable=R0903
     '''Camera'''
     def __init__(self, camera_id=0, window_name='window', resolution: Tuple[int, int] = None):
         '''
@@ -12,7 +12,7 @@ class Camera:
         '''
         self.camera_id = camera_id
         self.window_name = window_name
-        if platform =='linux' or platform == 'linux2' or platform == 'darwin':
+        if platform in ['linux', 'linux2', 'darwin']:
             # linux or OSX
             self.cap = cv.VideoCapture(self.camera_id)
             self.cap.set(cv.CAP_PROP_AUTOFOCUS, 0) # turn autofocus off

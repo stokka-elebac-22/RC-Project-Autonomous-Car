@@ -3,6 +3,7 @@ import os
 import sys
 import cv2 as cv
 from driving import Driving
+from defines import States
 # from pynput import keyboard
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -16,6 +17,9 @@ class DrivingSetup:
         self.driving = driving
         self.camera = camera
         self.image_paths = image_paths
+
+        # STATES:
+        self.state = States.DRIVING
 
         # ----- INTERRUPTS ----- #
         self.running = True
@@ -40,11 +44,11 @@ class DrivingSetup:
         while self.running:
             self.next()
             self.display()
-
         print('Stopping...')
 
     def next(self):
         '''The next iteration in the loop'''
+
 
     def display(self):
         '''Display the arrow or other symbols'''

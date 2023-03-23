@@ -18,6 +18,7 @@ if __name__ == '__main__':
             print(exc)
 
     # ----- CAMERAS ----- #
+    print('Setting up cameras...')
     camera_handler = CameraHandler()
     cameras = camera_handler.refresh_camera_list()
     # finding the resolution
@@ -31,6 +32,13 @@ if __name__ == '__main__':
         cam = Camera(cameras[0]['id'])
     else:
         cam = Camera(cameras[0]['id'], RESOLUTION)
+
+    # ----- DRIVING ----- #
+    print('Start running...')
     driving = Driving()
-    driving_setup = DrivingSetup(conf=conf, driving=driving, camera=cam)
+    driving_setup = DrivingSetup(
+        conf=conf,
+        driving=driving,
+        camera=cam,
+        image_paths=conf['image_paths'])
     driving_setup.run()

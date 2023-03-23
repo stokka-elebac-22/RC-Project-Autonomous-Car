@@ -20,7 +20,7 @@ if __name__ == '__main__':
     camera_handler = CameraHandler()
     cameras = camera_handler.refresh_camera_list()
     cam = Camera(cameras[0]['id'])
-    print(cam)
+    print(cameras)
     driving = Driving()
     driving_setup = DrivingSetup(conf=config_file, driving=driving, camera=cam)
     driving_setup.run()

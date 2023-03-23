@@ -38,6 +38,5 @@ class DrivingSetup:
             self.__next()
         print('Stopping...')
 
-    def __next(self):
+    def next(self):
         '''The next iteration in the loop'''
-

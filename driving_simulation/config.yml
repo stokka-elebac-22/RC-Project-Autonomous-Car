@@ -15,4 +15,4 @@ camera:
   camera_resolution:
     web: !!seq [1280, 800]
     logi: !!seq [1920, 1080]
----
+...

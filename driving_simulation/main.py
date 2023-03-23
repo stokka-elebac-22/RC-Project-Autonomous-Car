@@ -1,15 +1,13 @@
 '''
 The main file for the driving simulation
 '''
-import os
-import sys
 import yaml
 from driving import Driving
 from driving_setup import DrivingSetup
 from computer_vision.camera_handler.camera_handler import CameraHandler
 from computer_vision.camera_handler.camera import Camera
 
-CONFIG_FILE = './config'
+CONFIG_FILE = 'driving_simulation/config'
 
 if __name__ == '__main__':
     # ----- CONFIG ----- #
@@ -19,7 +17,6 @@ if __name__ == '__main__':
         except yaml.YAMLError as exc:
             print(exc)
 
-    print(conf)
     # ----- CAMERAS ----- #
     camera_handler = CameraHandler()
     cameras = camera_handler.refresh_camera_list()
@@ -33,8 +30,7 @@ if __name__ == '__main__':
     if RESOLUTION is None:
         cam = Camera(cameras[0]['id'])
     else:
-        cam = Camera(cameras[0]['id'], conf['camera_resolution'][''])
-    print(cameras)
+        cam = Camera(cameras[0]['id'], RESOLUTION)
     driving = Driving()
     driving_setup = DrivingSetup(conf=conf, driving=driving, camera=cam)
     driving_setup.run()

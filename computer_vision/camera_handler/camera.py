@@ -3,9 +3,8 @@ import cv2 as cv
 
 class Camera:
     '''Camera'''
-    def __init__(self, camera_id=0, delay=1, window_name='window'):
+    def __init__(self, camera_id=0, window_name='window'):
         self.camera_id = camera_id
-        self.delay = delay
         self.window_name = window_name
         self.cap = cv.VideoCapture(self.camera_id)
 

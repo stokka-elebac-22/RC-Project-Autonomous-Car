@@ -3,13 +3,11 @@ import cv2 as cv
 
 class Camera:
     '''Camera'''
-    def __init__(self, qr_code, camera_id=0, delay=1, window_name='window'):
+    def __init__(self, camera_id=0, delay=1, window_name='window'):
         self.camera_id = camera_id
         self.delay = delay
         self.window_name = window_name
-        self.qcd = cv.QRCodeDetector()
         self.cap = cv.VideoCapture(self.camera_id)
-        self.qr_code = qr_code
 
     def run(self, name=None, resize=1, verbose=1):
         '''Run'''
@@ -28,13 +26,6 @@ class Camera:
                 break
         cv.destroyWindow(self.window_name)
 
-    def run_image(self, name, resize, verbose=1):
-        '''Run image'''
-        img = self.read(name, resize)
-        self.detect_qr_code(img, resize, verbose)
-        cv.imshow(name, img)
-        cv.waitKey(0)
-
     def read(self, name=None, resize=1):
         '''Read'''
         if not name:
@@ -42,4 +33,4 @@ class Camera:
             return ret, frame
         frame = cv.imread(name)
         frame = cv.resize(frame, (0, 0), fx = resize, fy = resize)
-        return frame
+        return True, frame

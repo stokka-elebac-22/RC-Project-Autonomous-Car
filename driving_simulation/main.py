@@ -14,7 +14,7 @@ from computer_vision.camera_handler.camera_handler import CameraHandler
 from computer_vision.camera_handler.camera import Camera
 from computer_vision.pathfinding.pathfinding import PathFinding
 from computer_vision.environment.src.a_star import AStar
-from computer_vision.environment.src.environment import Environment
+from computer_vision.environment.src.environment import ViewPointObject, Environment
 from computer_vision.qr_code.qr_code import QRSize, QRCode
 
 CONFIG_FILE = 'driving_simulation/config'
@@ -51,10 +51,15 @@ if __name__ == '__main__':
     a_star = AStar(conf['a_star']['weight'], conf['a_star']['penalty'])
 
     # ----- INIT ENVIRONMENT ----- #
+    view_point_object: ViewPointObject = {
+        'view_point': None, # will be calculated in the environment class
+        'object_id': conf['object_id']['car'],
+    }
     environment: Environment = Environment(
         conf['environment']['size'],
         conf['environment']['real_size'],
         {'object_id': 10},
+        view_point_object=view_point_object,
     )
 
     # ----- INIT PATHFINDING ----- #

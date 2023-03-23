@@ -17,6 +17,7 @@ class Driving:
         self.conf = conf
         self.pathfinding = pathfinding
         self.qr_code = qr_code
+        
 
     def driving(self, frame):
         '''Driving'''
@@ -34,6 +35,7 @@ class Driving:
             }
             objects.append(new_object)
         self.pathfinding.insert_objects(objects)
+        path_data = self.pathfinding.calculate_path()
 
     def waiting(self):
         '''Waiting'''

@@ -4,6 +4,8 @@ The main file for the driving simulation
 import yaml
 from driving import Driving
 from driving_setup import DrivingSetup
+from computer_vision.camera_handler.camera_handler import CameraHandler
+from computer_vision.camera_handler.camera import Camera
 
 CONFIG_FILE = 'config'
 
@@ -15,6 +17,10 @@ if __name__ == '__main__':
         except yaml.YAMLError as exc:
             print(exc)
 
+    camera_handler = CameraHandler()
+    cameras = camera_handler.refresh_camera_list()
+    cam = Camera(cameras[0]['id'])
+    print(cam)
     driving = Driving()
-    driving_setup = DrivingSetup(conf=config_file, driving=driving)
+    driving_setup = DrivingSetup(conf=config_file, driving=driving, camera=cam)
     driving_setup.run()

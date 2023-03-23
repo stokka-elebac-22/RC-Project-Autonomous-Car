@@ -1,11 +1,16 @@
 '''The script for the driving loop'''
+import os
+import sys
 from driving import Driving
 from pynput import keyboard
-from computer_vision.camera_handler.camera_handler import CameraHandler
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+from computer_vision.camera_handler.camera import Camera # pylint: disable=C0413
 
 class DrivingSetup:
     '''The loop for driving'''
-    def __init__(self, conf: dict, driving: Driving, camera: CameraHandler):
+    def __init__(self, conf: dict, driving: Driving, camera: Camera):
         self.conf = conf
         self.driving = driving
         self.camera = camera

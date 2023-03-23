@@ -76,6 +76,7 @@ if __name__ == '__main__':
     # ----- DRIVING ----- #
     print('Start running...')
     driving = Driving(
+        conf=conf,
         pathfinding=path_finding,
         qr_code=qr_code)
     driving_setup = DrivingSetup(

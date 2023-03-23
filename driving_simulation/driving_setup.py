@@ -1,9 +1,12 @@
 '''The script for the driving loop'''
 import os
 import sys
+from typing import List
 import cv2 as cv
+from lib import rotate_image
 from driving import Driving
 from defines import States
+from defines import ActionsDict
 # from pynput import keyboard
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -42,20 +45,28 @@ class DrivingSetup:
     def run(self):
         '''Method for running'''
         while self.running:
-            self.next()
-            self.display()
+            actions = self.next()
+            if actions is None:
+                return
+            self.display(actions[0])
         print('Stopping...')
 
-    def next(self):
+    def next(self) -> List[ActionsDict]:
         '''The next iteration in the loop'''
+        ret, frame = self.camera.read()
+        if not ret:
+            return None
         if self.state == States.DRIVING:
-            self.driving.driving()
+            actions: List[ActionsDict] = self.driving.driving(frame)
+        return actions
 
-    def display(self):
+    def display(self, action: ActionsDict):
         '''Display the arrow or other symbols'''
         if os.path.exists(self.image_paths['arrow']):
             img = cv.imread(self.image_paths['arrow'])
-            cv.imshow('', img)
+            # rotate image
+            roated_image = rotate_image(img, action['angle'])
+            cv.imshow('', roated_image)
             cv.waitKey(0)
         else:
             print(f'Path does not exists {self.image_paths["arrow"]}')

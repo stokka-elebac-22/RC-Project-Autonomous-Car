@@ -10,4 +10,9 @@ object_id:
   end_point: !!int 2
   car: !!int 10
   QR: !!int 20
+camera:
+  active: !!str 'web'
+  camera_resolution:
+    web: !!seq [1280, 800]
+    logi: !!seq [1920, 1080]
 ---

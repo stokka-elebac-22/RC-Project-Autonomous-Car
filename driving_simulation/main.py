@@ -1,26 +1,40 @@
 '''
 The main file for the driving simulation
 '''
+import os
+import sys
 import yaml
 from driving import Driving
 from driving_setup import DrivingSetup
 from computer_vision.camera_handler.camera_handler import CameraHandler
 from computer_vision.camera_handler.camera import Camera
 
-CONFIG_FILE = 'config'
+CONFIG_FILE = './config'
 
 if __name__ == '__main__':
     # ----- CONFIG ----- #
     with open(CONFIG_FILE + '.yml', 'r', encoding='utf8') as f:
         try:
-            config_file = yaml.safe_load(f)
+            conf = yaml.safe_load(f)
         except yaml.YAMLError as exc:
             print(exc)
 
+    print(conf)
+    # ----- CAMERAS ----- #
     camera_handler = CameraHandler()
     cameras = camera_handler.refresh_camera_list()
-    cam = Camera(cameras[0]['id'])
+    # finding the resolution
+    RESOLUTION = None
+    if conf['camera']['active'] == 'web':
+        RESOLUTION = conf['camera']['camera_resolution']['web']
+    elif conf['camera']['active'] == 'logi':
+        RESOLUTION = conf['camera']['camera_resolution']['logi']
+
+    if RESOLUTION is None:
+        cam = Camera(cameras[0]['id'])
+    else:
+        cam = Camera(cameras[0]['id'], conf['camera_resolution'][''])
     print(cameras)
     driving = Driving()
-    driving_setup = DrivingSetup(conf=config_file, driving=driving, camera=cam)
+    driving_setup = DrivingSetup(conf=conf, driving=driving, camera=cam)
     driving_setup.run()

@@ -26,7 +26,7 @@ class DrivingSetup:
 
     def run(self):
         '''Method for running'''
-        while self.end:
+        while self.running:
             self.__next()
         print('Stopping...')
 

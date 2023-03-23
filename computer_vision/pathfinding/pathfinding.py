@@ -109,7 +109,7 @@ class PathFinding:
     # pylint: disable=R0914
     def calculate_path(self, start_object: int, end_object: int) -> list[tuple]:
         '''
-        Calculate the shortest path from a 
+        Calculate the shortest path from a
         specific object to another object using AStar algorithm
         '''
 

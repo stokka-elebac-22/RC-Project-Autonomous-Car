@@ -16,5 +16,5 @@ if __name__ == '__main__':
             print(exc)
 
     driving = Driving()
-    driving_setup = DrivingSetup(driving=driving)
+    driving_setup = DrivingSetup(conf=config_file, driving=driving)
     driving_setup.run()

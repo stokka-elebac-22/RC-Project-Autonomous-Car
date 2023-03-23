@@ -1,11 +1,14 @@
 '''The script for the driving loop'''
 from driving import Driving
 from pynput import keyboard
+from computer_vision.camera_handler.camera_handler import CameraHandler
 
 class DrivingSetup:
     '''The loop for driving'''
-    def __init__(self, driving: Driving):
+    def __init__(self, conf: dict, driving: Driving, camera: CameraHandler):
+        self.conf = conf
         self.driving = driving
+        self.camera = camera
 
         # ----- INTERRUPTS ----- #
         self.running = True
@@ -32,3 +35,4 @@ class DrivingSetup:
 
     def __next(self):
         '''The next iteration in the loop'''
+

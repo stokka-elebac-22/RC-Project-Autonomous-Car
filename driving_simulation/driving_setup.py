@@ -2,7 +2,7 @@
 from driving import Driving
 from pynput import keyboard
 
-class DrivingLoop:
+class DrivingSetup:
     '''The loop for driving'''
     def __init__(self, driving: Driving):
         self.driving = driving
@@ -27,7 +27,8 @@ class DrivingLoop:
     def run(self):
         '''Method for running'''
         while self.end:
-            next()
+            self.__next()
+        print('Stopping...')
 
-    def next(self):
+    def __next(self):
         '''The next iteration in the loop'''

@@ -3,7 +3,7 @@ from sys import platform
 from typing import Tuple
 import cv2 as cv
 
-class Camera: # pylint: disable=R0903
+class Camera:
     '''Camera'''
     def __init__(self, camera_id=0, window_name='window', resolution: Tuple[int, int] = None):
         '''
@@ -28,3 +28,9 @@ class Camera: # pylint: disable=R0903
         '''Read'''
         ret, frame = self.cap.read()
         return ret, frame
+
+    def get_dimensions(self) -> Tuple[float, float]:
+        '''Returns width and height'''
+        width  = self.cap.get(cv.cv.CV_CAP_PROP_FRAME_WIDTH)   # float `width`
+        height = self.cap.get(cv.cv.CV_CAP_PROP_FRAME_HEIGHT)  # float `height`
+        return width, height

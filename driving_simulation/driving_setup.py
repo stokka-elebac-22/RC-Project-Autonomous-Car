@@ -49,7 +49,6 @@ class DrivingSetup:
     def next(self):
         '''The next iteration in the loop'''
 
-
     def display(self):
         '''Display the arrow or other symbols'''
         if os.path.exists(self.image_paths['arrow']):

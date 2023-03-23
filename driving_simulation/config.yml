@@ -3,6 +3,9 @@ qr_code_size:
   px: !!int 191
   mm: !!int 79
   distance: !!int 515
+environment:
+  size: !!seq [11, 10]
+  real_size: !!int 50
 a_star:
   weight: !!int 4
   penalty: !!int 2

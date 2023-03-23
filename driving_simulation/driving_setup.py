@@ -48,6 +48,8 @@ class DrivingSetup:
 
     def next(self):
         '''The next iteration in the loop'''
+        if self.state == States.DRIVING:
+            self.driving.driving()
 
     def display(self):
         '''Display the arrow or other symbols'''

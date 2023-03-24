@@ -18,8 +18,7 @@ class Driving:
         self.pathfinding = pathfinding
         self.qr_code = qr_code
 
-
-    def driving(self, frame):
+    def driving(self, frame, frame_dimensions):
         '''Driving'''
         objects: List[self.pathfinding.Objects] = []
         # ----- QR CODE ----- #
@@ -27,7 +26,8 @@ class Driving:
         if current_qr_data['ret']:
             # assuming only one qr code
             distance_y = current_qr_data['distances'][0]
-            distance_x = self.qr_code.qr_geometries.get_qr_code_distance_x()
+            distance_x = self.qr_code.qr_geometries[0].get_qr_code_distance_x(
+                (frame_dimensions[0]/2, frame_dimensions[1]/2))
             new_object: PathFinding.Objects = {
                  'values': [(distance_x, distance_y)],
                  'distance': True,

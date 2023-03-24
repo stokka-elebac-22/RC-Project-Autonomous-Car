@@ -3,7 +3,6 @@ import os
 import sys
 from typing import List
 import cv2 as cv
-from lib import rotate_image
 from driving import Driving
 from defines import States
 from defines import ActionsDict
@@ -11,6 +10,7 @@ from defines import ActionsDict
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
+from driving_simulation.lib import rotate_image # pylint: disable=C0413
 from computer_vision.camera_handler.camera import Camera # pylint: disable=C0413
 
 class DrivingSetup:
@@ -26,7 +26,7 @@ class DrivingSetup:
 
         # ----- INTERRUPTS ----- #
         self.running = True
-        self.__interrupts()
+        # self.__interrupts()
 
     def __interrupts(self):
         pass
@@ -46,8 +46,6 @@ class DrivingSetup:
         '''Method for running'''
         while self.running:
             actions = self.next()
-            if actions is None:
-                continue
             self.display(actions)
         print('Stopping...')
 
@@ -57,7 +55,7 @@ class DrivingSetup:
         if not ret:
             return None
         if self.state == States.DRIVING:
-            actions: List[ActionsDict] = self.driving.driving(frame)
+            actions: List[ActionsDict] = self.driving.driving(frame, self.camera.get_dimensions())
         return actions
 
     def display(self, action: ActionsDict):
@@ -65,8 +63,9 @@ class DrivingSetup:
         if os.path.exists(self.image_paths['arrow']):
             img = cv.imread(self.image_paths['arrow'])
             # rotate image
-            roated_image = rotate_image(img, action['angles'][0])
-            cv.imshow('', roated_image)
-            cv.waitKey(0)
+            if action is not None:
+                img = rotate_image(img, action['angles'][0])
+            cv.imshow('', img)
+            cv.waitKey()
         else:
             print(f'Path does not exists {self.image_paths["arrow"]}')

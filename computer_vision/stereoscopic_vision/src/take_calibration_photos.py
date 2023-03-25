@@ -4,7 +4,7 @@ import cv2 as cv
 from camera import Camera
 
 if __name__ == '__main__':
-    DIRECTORY = 'computer_vision/stereoscopic_vision/images/test_images'
+    DIRECTORY = 'computer_vision/stereoscopic_vision/images/test_imagestest'
     CAMERA_ID_LEFT = 1
     CAMERA_ID_RIGHT = 2
     BOARD_DIMENSIONS = (13, 9)
@@ -56,7 +56,6 @@ if __name__ == '__main__':
             for frame, _ in frames:
                 gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
                 ret, _ = cv.findChessboardCorners(gray, BOARD_DIMENSIONS, None)
-                ret = True
                 if not ret:
                     RETS = False
                     break

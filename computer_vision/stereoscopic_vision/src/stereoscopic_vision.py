@@ -89,7 +89,7 @@ class StereoscopicVision:
             0)
 
         disparity = self.stereo.compute(rect_left, rect_right)
-        disparity = self.stereo.compute(gray_left, gray_right)
+        # disparity = self.stereo.compute(gray_left, gray_right)
         # NOTE: Code returns a 16bit signed single channel image (CV_16S),
         # containing a disparity map scaled by 16.
         # Hence it is essential to convert it to CV_32F and scale it down 16 times.
@@ -116,7 +116,7 @@ class StereoscopicVision:
     def obstacle_detection(self, disparity, min_dist, max_dist):
         '''Detecting depth to obstacles in cm'''
         depth_map = self.parameters.measurement/disparity # for depth in cm
-        param = 0.1
+        param = 0.01
 
         mask = cv.inRange(depth_map, min_dist, max_dist)
         # depth_map = cv.bitwise_and(disparity, disparity, mask=mask)
@@ -130,19 +130,33 @@ class StereoscopicVision:
             # print(cv.contourArea(cnts[0]), cv.contourArea(cnts[-1]))
             # print(self.parameters.contour_area*mask.shape[0]*mask.shape[1])
 
-            # for cnt in cnts: # go through every contours
+            x_pos, y_pos, w_rect, h_rect = None, None, None, None
+            cur_cnt = None
+            current_average_value = np.average(cnts[0])
+
+            for cnt in cnts: # go through every contours
 		        # Check if detected contour is significantly large (to avoid multiple tiny regions)
-            cnt = cnts[0]
-            # if cv.contourArea(cnt) > self.parameters.contour_area*mask.shape[0]*mask.shape[1]:
-            if cv.contourArea(cnt) > param*mask.shape[0]*mask.shape[1]:
-                x_pos, y_pos, w_rect, h_rect = cv.boundingRect(cnts[0])
-			    # finding average depth of region represented by the largest contour
-                mask2 = np.zeros_like(mask)
-                cv.drawContours(mask2, cnt, 0, (255), -1)
-			    # Calculating the average depth of the object closer than the safe distance
-                depth_mean, _ = cv.meanStdDev(depth_map, mask=mask2)
-                if depth_mean:
-                    return True, depth_mean, (x_pos, y_pos), (w_rect, h_rect)
+                # cnt = cnts[0]
+                # if cv.contourArea(cnt) > self.parameters.contour_area*mask.shape[0]*mask.shape[1]:
+                if cv.contourArea(cnt) > param*mask.shape[0]*mask.shape[1]:
+                    if np.average(cnt) > current_average_value:
+                        continue
+                    x_pos, y_pos, w_rect, h_rect = cv.boundingRect(cnts[0])
+                    cur_cnt = cnt
+			        # # finding average depth of region represented by the largest contour
+                    # mask2 = np.zeros_like(mask)
+                    # cv.drawContours(mask2, cnt, 0, (255), -1)
+			        # # Calculating the average depth of the object closer than the safe distance
+                    # depth_mean, _ = cv.meanStdDev(depth_map, mask=mask2)
+            if cur_cnt is None:
+                return False, None, None, None
+			# finding average depth of region represented by the largest contour
+            mask2 = np.zeros_like(mask)
+            cv.drawContours(mask2, cur_cnt, 0, (255), -1)
+			# Calculating the average depth of the object closer than the safe distance
+            depth_mean, _ = cv.meanStdDev(depth_map, mask=mask2)
+            if depth_mean:
+                return True, depth_mean, (x_pos, y_pos), (w_rect, h_rect)
         return False, None, None, None
 
     def get_data(self, disparity, min_dist, max_dist):
@@ -160,16 +174,15 @@ if __name__ == '__main__':
     # PARAMETER_PATH = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
     PARAMETER_PATH = ''
     MAPS_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps_web_light.xml'
-    MAX_DIST = 1000 # max distance to recognize objects (mm)
-    MIN_DIST = 100 # min distance to recognize objects (mm)
+    MAX_DIST = 200 # max distance to recognize objects (mm)
+    MIN_DIST = 50 # min distance to recognize objects (mm)
     THRESH_DIST = 255
     M = 1 # base value, the real one is from the xml file (and is calculated in a previous test)
     Z = MAX_DIST # The depth, for used for calculating M
 
     # NOTE: if you also have a webcam (that you do not want to use),
-    # use id 0 and 2 (not always the case....)
-    cam_left = Camera(camera_id=1, window_name='Left camera')
-    cam_right = Camera(camera_id=2, window_name='Right camera')
+    cam_left = Camera(camera_id=2, window_name='Left camera')
+    cam_right = Camera(camera_id=1, window_name='Right camera')
     stereo_vision = StereoscopicVision(MAPS_PATH, PARAMETER_PATH)
 
     cv.namedWindow('disp', cv.WINDOW_NORMAL)

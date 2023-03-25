@@ -1,45 +1,30 @@
 '''Camera'''
+from sys import platform
+from typing import Tuple
 import cv2 as cv
 
-class Camera:
+class Camera: # pylint: disable=R0903
     '''Camera'''
-    def __init__(self, qr_code, camera_id=0, delay=1, window_name='window'):
+    def __init__(self, camera_id=0, window_name='window', resolution: Tuple[int, int] = None):
+        '''
+        Init the camera
+        resolution is optional ([width, height])
+        '''
         self.camera_id = camera_id
-        self.delay = delay
         self.window_name = window_name
-        self.qcd = cv.QRCodeDetector()
-        self.cap = cv.VideoCapture(self.camera_id)
-        self.qr_code = qr_code
+        if platform in ['linux', 'linux2', 'darwin']:
+            # linux or OSX
+            self.cap = cv.VideoCapture(self.camera_id)
+            self.cap.set(cv.CAP_PROP_AUTOFOCUS, 0) # turn autofocus off
+        elif platform == 'win32':
+            # windows
+            self.cap = cv.VideoCapture(self.camera_id, cv.CAP_DSHOW)
+            self.cap.set(cv.CAP_PROP_AUTOFOCUS, 0) # turn autofocus off
+            if resolution is not None:
+                self.cap.set(cv.CAP_PROP_FRAME_WIDTH, resolution[0])
+                self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, resolution[1])
 
-    def run(self, name=None, resize=1, verbose=1):
-        '''Run'''
-        if not name:
-            self.run_video(verbose)
-        else:
-            self.run_image(name, resize, verbose)
-
-    def run_video(self, verbose=1):
-        '''Run video'''
-        while True:
-            frame = self.read()
-            self.detect_qr_code(frame, verbose=verbose)
-            cv.imshow(self.window_name, frame)
-            if cv.waitKey(self.delay) & 0xFF == ord('q'):
-                break
-        cv.destroyWindow(self.window_name)
-
-    def run_image(self, name, resize, verbose=1):
-        '''Run image'''
-        img = self.read(name, resize)
-        self.detect_qr_code(img, resize, verbose)
-        cv.imshow(name, img)
-        cv.waitKey(0)
-
-    def read(self, name=None, resize=1):
+    def read(self):
         '''Read'''
-        if not name:
-            ret, frame = self.cap.read()
-            return ret, frame
-        frame = cv.imread(name)
-        frame = cv.resize(frame, (0, 0), fx = resize, fy = resize)
-        return frame
+        ret, frame = self.cap.read()
+        return ret, frame

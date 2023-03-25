@@ -52,7 +52,6 @@ if __name__ == '__main__':
         if TRIGGER:
             if not RETS:
                 continue
-
             for frame, _ in frames:
                 gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
                 ret, _ = cv.findChessboardCorners(gray, BOARD_DIMENSIONS, None)
@@ -64,7 +63,7 @@ if __name__ == '__main__':
 
             print('Done\n')
             for frame, title in frames:
-                cv.imwrite(f'{DIRECTORY}/{title}/{title}_{COUNT}.jpg', frame)
+                cv.imwrite(f'{DIRECTORY}/{title}_{COUNT}.jpg', frame)
             COUNT += 1
             TRIGGER = False
 

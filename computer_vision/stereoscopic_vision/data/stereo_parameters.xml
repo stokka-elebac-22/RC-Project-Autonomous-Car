@@ -1,16 +1,6 @@
 <?xml version="1.0"?>
 <opencv_storage>
 <num_disparities>160</num_disparities>
-<block_size>45</block_size>
-<pre_filter_type>0</pre_filter_type>
-<pre_filter_size>5</pre_filter_size>
-<pre_filter_cap>1</pre_filter_cap>
-<texture_threshold>0</texture_threshold>
-<uniqueness_ratio>0</uniqueness_ratio>
-<speckle_range>0</speckle_range>
-<speckle_window_size>0</speckle_window_size>
-<disparity_max_diff>0</disparity_max_diff>
-<min_disparity>0</min_disparity>
-<obstacle_area>0.</obstacle_area>
-<contour_area>0.</contour_area>
+<block_size>25</block_size>
+<M>956.7798457000323</M>
 </opencv_storage>

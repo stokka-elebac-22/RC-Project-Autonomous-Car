@@ -1,8 +1,17 @@
 '''QR code module.'''
 import dataclasses
 from typing import TypedDict, Tuple, List
+import os
+import sys
 import numpy as np
 import cv2 as cv
+try:
+    current = os.path.dirname(os.path.realpath(__file__))
+    parent = os.path.dirname(current)
+    sys.path.append(parent)
+    from stereoscopic_vision.src.camera import Camera
+except ImportError:
+    from computer_vision.stereoscopic_vision.src.camera import Camera
 
 QRSize = TypedDict('QRSize', {
     'px': int,
@@ -134,6 +143,16 @@ class QRCode:
         get_measurements(self, frame, resize=1) -> bool, float, float
         '''
         qcd = cv.QRCodeDetector()
+        if frame is None:
+            return {
+            'ret': False,
+            'distances': None,
+            'angles': None,
+            'info': None,
+            'points': None,
+            'rest': None
+            }
+
         ret_qr, decoded_info , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
 
         # add more QRGeometry if needed or delete if too many
@@ -252,31 +271,32 @@ class DisplayQRCode:
         cv.putText(frame, f'distance = {int(distance)}', (10, 50), \
                 self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
-def local_read_camera(name: str=None, resize: int=1):
-    '''Local read camera '''
-    if not name:
-        ret, frame = cap.read()
-        if not ret:
-            raise SystemError
-    else:
-        frame = cv.imread(name)
-    frame = cv.resize(frame, (0, 0), fx = resize, fy = resize)
-    return frame
+# def local_read_camera(name: str=None, resize: int=1):
+#     '''Local read camera '''
+#     if not name:
+#         ret, frame = cap.read()
+#         if not ret:
+#             raise SystemError
+#     else:
+#         frame = cv.imread(name)
+#     frame = cv.resize(frame, (0, 0), fx = resize, fy = resize)
+#     return frame
 
 
 if __name__ == '__main__':
     # ----- ORIGINAL MEASUREMENTS -----
     # QR Code measured, 55mm lense
     SIZE = {
-        'px': 76,
+        'px': 126,
         'mm': 52,
         'distance': 500
     }
     qr_code = QRCode(SIZE)
-    CAMERA_ID = 0
+    CAMERA_ID = 1
     DELAY = 1
     WINDOW_NAME = 'window'
-    cap = cv.VideoCapture(CAMERA_ID)
+    # cap = cv.VideoCapture(CAMERA_ID)
+    cam = Camera(CAMERA_ID)
     VERBOSE = 1
 
     ##### VALUES #####
@@ -302,8 +322,7 @@ if __name__ == '__main__':
     distances_lists = [[0 for _ in range(VALUES_LENGTH)]]
 
     while True:
-        # img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
-        img = local_read_camera()
+        img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
         qr_data = qr_code.get_data(img)
 
         if qr_data['ret']:

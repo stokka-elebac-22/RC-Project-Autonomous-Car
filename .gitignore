@@ -55,4 +55,4 @@ dmypy.json
 .pyre/
 
 # data
-Stereoscopic Vision/data/stereo_rectify_maps.xml
+computer_vision/stereoscopic_vision/images/

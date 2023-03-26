@@ -1,47 +1,34 @@
 '''DOC'''
+import time
 import cv2 as cv
-from pynput import keyboard
+from camera import Camera
 
 if __name__ == '__main__':
-    DIRECTORY = 'computer_vision/stereoscopic_vision/images'
+    DIRECTORY = 'computer_vision/stereoscopic_vision/images/test_imagestest'
     CAMERA_ID_LEFT = 1
-    CAMERA_ID_RIGHT = 0
-    BOARD_DIMENSIONS = (8, 6)
-    print('Setting up cameras...')
-    cam1 = cv.VideoCapture(CAMERA_ID_LEFT)
-    cam2 = cv.VideoCapture(CAMERA_ID_RIGHT)
-    print('Done\n')
-    cameras = [(cam1, 'left'), (cam2, 'right')]
-    cameras = []
+    CAMERA_ID_RIGHT = 2
+    BOARD_DIMENSIONS = (13, 9)
+    cam_left = Camera(CAMERA_ID_LEFT)
+    cam_right = Camera(CAMERA_ID_RIGHT)
+    cameras = [(cam_left, 'left'), (cam_right, 'right')]
+
+    # check if all cameras work
+    for cam in cameras:
+        ret, _ = cam[0].read()
+        if not ret:
+            print(f'{cam[1]} camera could not connect...')
+            raise ConnectionError
 
     qcd = cv.QRCodeDetector()
 
     TRIGGER = False
     COUNT = 0
 
-    RUN = True
+    start_time = time.time()
 
-    def on_press(key):
-        '''Press'''
-        print('Capturing...')
-        global TRIGGER # pylint: disable=W0603
-        if key == keyboard.Key.space:
-            TRIGGER = True
+    TIME_TH = 5 # 2 seconds between each photo
 
-    def on_release(key):
-        '''Release'''
-        global RUN # pylint: disable=W0603
-        if key == keyboard.Key.esc:
-            # Stop listener
-            RUN = False
-
-    print('Setting up listeners...')
-    listener = keyboard.Listener(on_press=on_press, on_release=on_release)
-    listener.start()  # start to listen on a separate thread
-    # listener.join()  # remove if main thread is polling self.keys
-    print('Done\n')
-
-    while RUN:
+    while True:
         frames = []
         RETS = True
         for cam in cameras:
@@ -51,6 +38,16 @@ if __name__ == '__main__':
                 break
             cv.imshow(cam[1], frame)
             frames.append((frame, cam[1]))
+
+        if cv.waitKey(1) & 0xFF == ord('s'): # stop loop by pressing s
+            print('Stopping...')
+            break
+
+        cur_time = time.time()
+        ts = cur_time - start_time
+        if ts >= TIME_TH and TRIGGER is False:
+            print('Capturing...')
+            TRIGGER = True
 
         if TRIGGER:
             if not RETS:
@@ -69,3 +66,5 @@ if __name__ == '__main__':
                 cv.imwrite(f'{DIRECTORY}/{title}_{COUNT}.jpg', frame)
             COUNT += 1
             TRIGGER = False
+
+            start_time = time.time()

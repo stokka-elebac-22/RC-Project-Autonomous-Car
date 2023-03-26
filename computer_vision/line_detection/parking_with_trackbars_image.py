@@ -111,7 +111,7 @@ if __name__ == "__main__":
         if line_dict is not None:
             parking_slot_detector.show_lines(copy, line_dict['slot_lines'])
             parking_slot_detector.show_lines(copy, line_dict['all_lines'])
-        
+
         cv2.imshow('frame', copy)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

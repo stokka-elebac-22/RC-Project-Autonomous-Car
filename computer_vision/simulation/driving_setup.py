@@ -1,5 +1,6 @@
 '''The script for the driving loop'''
 import os
+import sys
 from typing import List
 import cv2 as cv
 from defines import States
@@ -32,7 +33,6 @@ class DrivingSetup:
     def __interrupts(self):
         def on_press(key):
             if key == keyboard.Key.esc:
-                # Stop listener
                 self.running = False
                 return False
             return True
@@ -49,6 +49,7 @@ class DrivingSetup:
             actions = self.next()
             self.display(actions)
         print('Stopping...')
+        sys.exit()
 
     def next(self) -> List[ActionsDict]:
         '''The next iteration in the loop'''
@@ -67,6 +68,7 @@ class DrivingSetup:
             if action is not None:
                 img = rotate_image(img, action['angles'][0])
             cv.imshow('', img)
-            cv.waitKey()
+            cv.waitKey(1)
         else:
-            print(f'Path does not exists {self.image_paths["arrow"]}')
+            print(f'Path does not exists: {self.image_paths["arrow"]}')
+            raise FileNotFoundError

@@ -63,6 +63,7 @@ class Simulation:
         return cam
 
     def __pathfinding_setup(self):
+        print('Setting up pathfinding...')
         # ----- INIT PARKFINDING ALGORITHM ----- #
         a_star = AStar(self.conf['a_star']['weight'], self.conf['a_star']['penalty'])
 
@@ -87,6 +88,7 @@ class Simulation:
         return pathfinding
 
     def __qr_code_setup(self):
+        print('Setting up QR code...')
         # ----- INIT QR CODE ----- #
         qr_size: QRSize = {
             'px': self.conf['qr_code_size']['px'],
@@ -98,11 +100,13 @@ class Simulation:
 
     def run(self):
         '''Run the simulation'''
+        print('Running...')
         self.driving_setup.run()
 
 
 if __name__ == '__main__':
     CONFIG_FILE = 'config'
+    print('Reading configuration file...')
     # ----- CONFIG ----- #
     with open(CONFIG_FILE + '.yml', 'r', encoding='utf8') as f:
         try:

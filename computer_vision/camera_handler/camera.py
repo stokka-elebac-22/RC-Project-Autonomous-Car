@@ -3,7 +3,7 @@ from sys import platform
 from typing import Tuple
 import cv2 as cv
 
-class Camera:
+class Camera: # pylint: disable=R0903
     '''Camera'''
     def __init__(self, camera_id=0, window_name='window', resolution: Tuple[int, int] = None):
         '''

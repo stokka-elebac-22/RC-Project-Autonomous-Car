@@ -10,9 +10,3 @@ class States(Enum):
     PARKING = 1
     DRIVING = 2
     STOPPING = 3
-
-ActionsDict = TypedDict('ActionsDict', {
-    'speed': int,
-    'angle': float,
-    'time': float,
-})

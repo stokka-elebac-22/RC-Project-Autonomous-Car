@@ -46,7 +46,7 @@ class DrivingSetup:
     def run(self):
         '''Method for running'''
         while self.running:
-            actions = self.next()
+            actions = self.next() # pylint: disable=E1102
             self.display(actions)
         print('Stopping...')
         sys.exit()

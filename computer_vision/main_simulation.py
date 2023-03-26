@@ -19,7 +19,7 @@ except ImportError:
     from pathfinding.pathfinding import PathFinding
     from qr_code.qr_code import QRCode, QRSize
 
-class Simulation:
+class Simulation: # pylint: disable=R0903
     '''
     The class for running the simulation
     '''

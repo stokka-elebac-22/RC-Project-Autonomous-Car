@@ -1,0 +1,18 @@
+---
+qr_code_size:
+  px: !!int 191
+  mm: !!int 79
+  distance: !!int 515
+a_star:
+  weight: !!int 4
+  penalty: !!int 2
+object_id:
+  end_point: !!int 2
+  car: !!int 10
+  QR: !!int 20
+camera:
+  active: !!str 'web'
+  camera_resolution:
+    web: !!seq [1280, 800]
+    logi: !!seq [1920, 1080]
+---

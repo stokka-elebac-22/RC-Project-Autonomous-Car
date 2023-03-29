@@ -1,5 +1,6 @@
 ---
   headless: True
+  simulation: True
   network:
     host: !!str '10.0.11.116'
     port: !!int 2004
@@ -21,4 +22,25 @@
       px: !!int 76
       mm: !!int 52
       distance: !!int 500
+  qr_code_size:
+    px: !!int 191
+    mm: !!int 79
+    distance: !!int 515
+  a_star:
+    weight: !!int 4
+    penalty: !!int 2
+  environment:
+    size: !!seq [11, 10]
+    real_size: !!int 50
+  object_id:
+    end_point: !!int 2
+    car: !!int 10
+    QR: !!int 20
+  camera:
+    active: !!str 'web'
+    camera_resolution:
+      web: !!seq [1280, 800]
+      logi: !!seq [1920, 1080]
+  image_paths:
+    arrow: 'computer_vision/simulation/images/arrow.jpg'
 ...

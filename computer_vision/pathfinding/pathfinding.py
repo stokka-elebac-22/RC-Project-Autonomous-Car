@@ -19,6 +19,7 @@ except ImportError:
     from computer_vision.pathfinding.bresenham import bresenham
     from computer_vision.pathfinding.spline import catmull_rom_chain, approx_segment_lengths
     from computer_vision.pathfinding.lib import get_abs_velo, get_angle, get_angle_diff
+
 class PathFinding:
     '''
     Class using 2D environmentironment mapping to calculate shortest
@@ -107,7 +108,7 @@ class PathFinding:
         return self.__environment
 
     # pylint: disable=R0914
-    def calculate_path(self, start_object: int, end_object: int) -> list[tuple]:
+    def calculate_path(self, start_object: int, end_object: int) -> dict:
         '''
         Calculate the shortest path from a
         specific object to another object using AStar algorithm

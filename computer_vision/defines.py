@@ -1,5 +1,5 @@
 '''
-defines.py: Class for enums to ensure consistency in values
+defines.py: Class for enums and typed dict to ensure consistency in values
 across platforms.
 '''
 __copyright__ = 'Copyright 2023, DATBAC'
@@ -8,13 +8,13 @@ __version__ = '0.1.0'
 __status__ = 'Testing'
 
 from enum import Enum
+from typing import TypedDict
 
 
 class Sensor(Enum):
     '''Enum for sensor types'''
     HCSR04 = 1   # Ultrasonic distance sensor
     VL53L = 2    # Laser distance sensor
-
 
 class Position(Enum):
     '''Enum for positions'''
@@ -44,6 +44,12 @@ class MessageId(Enum):
 
     CAN_TEST_MSG_ID = 136         # 0x088
     CAN_DEVICE_SETTINGS_ID = 152  # 0x098
+
+ActionsDict = TypedDict('ActionsDict', {
+    'speed': int,
+    'angle': float,
+    'time': float,
+})
 
 
 if __name__ == '__main__':

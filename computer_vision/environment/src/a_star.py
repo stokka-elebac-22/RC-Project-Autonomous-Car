@@ -12,10 +12,11 @@ except ImportError:
 
 class AStar:
     '''A* Algorithm'''
-    def __init__(self, weight: int = 0, penalty: int = 1):
+    def __init__(self, weight: int = 0, penalty: int = 1, hindrance_ids: List[int] = tuple([1])):
         self.valid = ['None'] # a list of object names that are valid
         self.weight = weight
         self.penalty = penalty
+        self.hindrance_ids = hindrance_ids
 
     # pylint warning needs to be fixed.
     # pylint: disable=R0914 R0912 R0915
@@ -181,7 +182,7 @@ class AStar:
             for col in range(size[1]):
                 # checks if it is a hindrance and then
                 # applies a weight to the tiles around
-                if mat[row][col] == 1:
+                if mat[row][col] in self.hindrance_ids:
                     # checks all surronding positions
                     for pos in positions:
                         idx_x = col + pos[0]

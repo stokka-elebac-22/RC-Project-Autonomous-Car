@@ -24,7 +24,7 @@ except ImportError:
 
 if __name__ == '__main__':
 
-    IMG_PATH = 'tests/images/parking_slot_detection_4/title_1.jpg'
+    IMG_PATH = 'tests/images/parking_slot_detection_4/title_4.jpg'
 
     img = cv2.imread(IMG_PATH)
 
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     env = Environment(BOARD_SIZE, ENV_SIZE, view_point_object)
 
     # pathfinding algorithm
-    a_star = AStar()
+    a_star = AStar(weight=2, penalty=2, hindrance_ids=[1, 30])
 
     # display
     display = DisplayEnvironment(WINDOW_SIZE, BOARD_SIZE)

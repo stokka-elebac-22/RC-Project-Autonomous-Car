@@ -6,15 +6,17 @@ from display import DisplayEnvironment
 from a_star import AStar
 
 if __name__ == '__main__': # pylint: disable=R0801
-    SIZE = (10, 11)
-    W_SIZE = 600
+    SIZE = (30, 60)
+    W_SIZE = 720
     WINDOW_SIZE = (W_SIZE* (SIZE[1]/SIZE[0]), W_SIZE)
 
     # create the environment and adding the 'car'
-    env= Environment(SIZE, 1, {'view_point': None, 'object_id': 10})
+    env= Environment(SIZE, 3, {'view_point': None, 'object_id': 10})
     display = DisplayEnvironment(WINDOW_SIZE, SIZE)
 
     env.insert((2, SIZE[1]-2), 20)
+
+    a_star = AStar(weight=2, penalty=1)
 
     RUN = True
     while RUN:
@@ -33,7 +35,7 @@ if __name__ == '__main__': # pylint: disable=R0801
         cur_mat = env.get_data()
         display.update(cur_mat)
         cur_mat = env.get_data()
-        ret, path = AStar().get_data(cur_mat, start_pos_path, end_pos_path)
+        ret, path = a_star.get_data(cur_mat, start_pos_path, end_pos_path)
 
         if ret:
             for pos in path[1:-1]:

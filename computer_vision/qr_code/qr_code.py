@@ -77,6 +77,8 @@ class QRGeometry:
     def get_distance(self) -> float:
         '''Return the distance'''
         height_px = self.get_height()
+        if height_px == 0:
+            return 0.0
         distance = (self.size.get('mm') * self.focal_length) / height_px
         return distance
 
@@ -227,12 +229,11 @@ class DisplayQRCode:
                 distance = qrgs[i].get_distance()
             else:
                 distance = data['distances'][i]
-
-            if data['info'][i] is None:
+            if data['info'] is None or data['info'][i] is None:
                 color = self.color_frame_green
             else:
                 color = self.color_frame_red
-            frame = cv.polylines(frame, [qrgs[i].points.astype(int)], True, color, 4)
+            frame = cv.polylines(frame, [np.array(qrgs[i].points).astype(int)], True, color, 4)
             if verbose > 0:
                 display_data = {'distance': distance, 'angle': angle}
                 self.display_values(frame, qrg, display_data, verbose)
@@ -266,10 +267,16 @@ class DisplayQRCode:
 
         angle = data['angle']
         distance = data['distance']
-        cv.putText(frame, f'angle    = {int(angle)}', (10, 20), self.font, \
-                            self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
-        cv.putText(frame, f'distance = {int(distance)}', (10, 50), \
-                self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
+        angle_txt = 'angle    = NaN'
+        distance_txt = 'distance = NaN'
+        if angle is not None:
+            angle_txt = f'angle    = {int(angle)}'
+        if distance is not None:
+            distance_txt = f'distance = {int(distance)}'
+        cv.putText(frame, angle_txt, (10, 20), self.font, \
+                   self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
+        cv.putText(frame, distance_txt, (10, 50), self.font, \
+                   self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
 # def local_read_camera(name: str=None, resize: int=1):
 #     '''Local read camera '''

@@ -24,7 +24,7 @@ except ImportError:
 
 if __name__ == '__main__':
 
-    IMG_PATH = 'tests/images/parking_slot_detection_4/title_1.jpg'
+    IMG_PATH = 'tests/images/parking_slot_detection_4/title_6.jpg'
 
     img = cv2.imread(IMG_PATH)
 

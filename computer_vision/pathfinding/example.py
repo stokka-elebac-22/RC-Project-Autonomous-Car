@@ -24,14 +24,14 @@ except ImportError:
 
 if __name__ == '__main__':
 
-    # TODO: remove later
-    img = cv2.imread(
-        'tests/images/parking_slot_detection_2/title_21.jpg')
+    IMG_PATH = 'tests/images/parking_slot_detection_4/title_1.jpg'
+
+    img = cv2.imread(IMG_PATH)
 
     # ----- QR CODE ----- #
     QR_SIZE: QRSize = {
-        'px': 76,
-        'mm': 52,
+        'px': 191,
+        'mm': 79,
         'distance': 500,
     }
 
@@ -135,10 +135,7 @@ if __name__ == '__main__':
 
         path_finding.insert_objects(objects)
 
-        # Should change this to camera frame later
-        frame = cv2.imread(
-             'tests/images/parking_slot_detection_2/title_21.jpg')
-        # ret, frame = cam.read()
+        frame = cv2.imread(IMG_PATH)
 
         obstacles = []
 

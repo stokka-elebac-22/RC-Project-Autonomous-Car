@@ -24,7 +24,7 @@ except ImportError:
 
 if __name__ == '__main__':
 
-    IMG_PATH = 'tests/images/parking_slot_detection_4/title_6.jpg'
+    IMG_PATH = 'tests/images/parking_slot_detection_4/title_1.jpg'
 
     img = cv2.imread(IMG_PATH)
 
@@ -52,10 +52,10 @@ if __name__ == '__main__':
     # ----- PARKING SLOT DETECTOR ----- #
     P_CANNY = [50, 100]
     P_HOUGH = [80, 200, 5]
-    P_ITERATIONS = [1, 1]
+    P_ITERATIONS = [5, 2]
     P_BLUR = 5
     P_FILTER_ATOL = [20, 20]
-    P_CLUSTER_ATOL = 5
+    P_CLUSTER_ATOL = 0
 
     # ----- LANE DETECTOR ----- #
     L_CANNY = [50, 100]

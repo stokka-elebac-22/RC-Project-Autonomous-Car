@@ -24,10 +24,11 @@ class DrivingSetup:
 
         # ----- TEXT ----- #
         self.image_attributes = {
-            'image_path': image_paths,
-            'org': (50, 50),
+            'image_paths': image_paths,
+            'org': (25, 50),
+            'font': cv.FONT_HERSHEY_SIMPLEX,
             'font_scale': 1,
-            'color': (255, 70, 70),
+            'color': (70, 70, 255),
             'thickness': 1
         }
 
@@ -35,7 +36,7 @@ class DrivingSetup:
         self.state = States.DRIVING
 
         # ----- ACTION ----- #
-        self.actions: ActionsDict = []
+        self.actions: ActionsDict = None
 
         # ----- INTERRUPTS ----- #
         self.running = True
@@ -60,11 +61,13 @@ class DrivingSetup:
             actions = self.next() # pylint: disable=E1102
             if actions is not None:
                 self.actions = actions
-            angle = self.actions['angle'].pop()
-            time = self.actions['time'].pop()
-            speed = self.actions['speed'].pop()
-            distance = time * speed
-            self.display(angle, distance)
+            if self.actions is None:
+                continue
+            angle = self.actions['angles'].pop()
+            # time = self.actions['times'].pop()
+            # speed = self.actions['speed'].pop()
+            # distance = time * speed
+            self.display(angle, 0)
         print('Stopping...')
         sys.exit()
 
@@ -79,15 +82,15 @@ class DrivingSetup:
 
     def display(self, angle, distance) -> bool:
         '''Display the arrow or other symbols'''
-        if angle or distance is None:
+        if angle is None or distance is None:
             return False
         arrow_image_path = self.image_attributes['image_paths']['arrow']
         if os.path.exists(arrow_image_path):
             img = cv.imread(arrow_image_path)
-            img = rotate_image(img, angle) # rotate image
+            img = rotate_image(img, angle*100) # rotate image
             img = cv.putText(
                 img,
-                str(distance),
+                f'Distance: {distance}',
                 self.image_attributes['org'],
                 self.image_attributes['font'],
                 self.image_attributes['font_scale'],

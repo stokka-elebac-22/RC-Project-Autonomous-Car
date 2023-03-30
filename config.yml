@@ -30,7 +30,7 @@
     weight: !!int 4
     penalty: !!int 2
   environment:
-    size: !!seq [11, 10]
+    size: !!seq [50, 50]
     real_size: !!int 50
   object_id:
     end_point: !!int 2

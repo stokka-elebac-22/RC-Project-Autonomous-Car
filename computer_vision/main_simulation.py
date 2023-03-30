@@ -3,6 +3,7 @@ The main file for the driving simulation
 '''
 import os
 import yaml
+import cv2 as cv
 from simulation.driving import Driving
 from simulation.driving_setup import DrivingSetup
 try:
@@ -81,7 +82,11 @@ class Simulation: # pylint: disable=R0903
         )
 
         # ----- INIT PATHFINDING ----- #
-        frame_width, frame_height = self.cam.get_dimensions()
+        if self.conf['simulation']['live']:
+            frame_width, frame_height = self.cam.get_dimensions()
+        else:
+            img = cv.imread(self.conf['simulation']['image_paths']['camera_view'])
+            frame_width, frame_height, _ = img.shape
         pathfinding: PathFinding = PathFinding(
             pixel_size=(frame_width, frame_height),
             environment=environment,

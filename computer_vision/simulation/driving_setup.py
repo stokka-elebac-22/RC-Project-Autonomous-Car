@@ -51,7 +51,7 @@ class DrivingSetup:
         listener.start()
 
     def __init_actions(self):
-        frame = self.conf['simulation']['image_paths']['camera_view']
+        frame = cv.imread(self.conf['simulation']['image_paths']['camera_view'])
         height, width, _ = frame.shape
         self.actions = self.driving.driving(frame, (width, height))
 

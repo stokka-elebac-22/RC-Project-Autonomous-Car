@@ -21,10 +21,21 @@ class DrivingSetup:
         self.conf = conf
         self.driving = driving
         self.camera = camera
-        self.image_paths = image_paths
 
-        # STATES:
+        # ----- TEXT ----- #
+        self.image_attributes = {
+            'image_path': image_paths,
+            'org': (50, 50),
+            'font_scale': 1,
+            'color': (255, 70, 70),
+            'thickness': 1
+        }
+
+        # ----- STATES ----- #
         self.state = States.DRIVING
+
+        # ----- ACTION ----- #
+        self.actions: ActionsDict = []
 
         # ----- INTERRUPTS ----- #
         self.running = True
@@ -47,7 +58,13 @@ class DrivingSetup:
         '''Method for running'''
         while self.running:
             actions = self.next() # pylint: disable=E1102
-            self.display(actions)
+            if actions is not None:
+                self.actions = actions
+            angle = self.actions['angle'].pop()
+            time = self.actions['time'].pop()
+            speed = self.actions['speed'].pop()
+            distance = time * speed
+            self.display(angle, distance)
         print('Stopping...')
         sys.exit()
 
@@ -60,15 +77,26 @@ class DrivingSetup:
             actions: List[ActionsDict] = self.driving.driving(frame, self.camera.get_dimensions())
         return actions
 
-    def display(self, action: ActionsDict):
+    def display(self, angle, distance) -> bool:
         '''Display the arrow or other symbols'''
-        if os.path.exists(self.image_paths['arrow']):
-            img = cv.imread(self.image_paths['arrow'])
-            # rotate image
-            if action is not None:
-                img = rotate_image(img, action['angles'][0])
+        if angle or distance is None:
+            return False
+        arrow_image_path = self.image_attributes['image_paths']['arrow']
+        if os.path.exists(arrow_image_path):
+            img = cv.imread(arrow_image_path)
+            img = rotate_image(img, angle) # rotate image
+            img = cv.putText(
+                img,
+                str(distance),
+                self.image_attributes['org'],
+                self.image_attributes['font'],
+                self.image_attributes['font_scale'],
+                self.image_attributes['color'],
+                self.image_attributes['thickness'],
+                cv.LINE_AA)
             cv.imshow('', img)
-            cv.waitKey(1)
+            cv.waitKey(0)
         else:
             print(f'Path does not exists: {self.image_paths["arrow"]}')
             raise FileNotFoundError
+        return True

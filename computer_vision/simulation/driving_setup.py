@@ -26,6 +26,13 @@ class DrivingSetup:
         # STATES:
         self.state = States.DRIVING
 
+        # ----- ACTIONS ----- #
+        self.actions = None
+
+        # ----- INIT ACTIONS ----- #
+        if self.conf['simulation']['live'] is False:
+            self.__init_actions()
+
         # ----- INTERRUPTS ----- #
         self.running = True
         self.__interrupts()
@@ -43,12 +50,19 @@ class DrivingSetup:
         )
         listener.start()
 
+    def __init_actions(self):
+        frame = self.conf['simulation']['image_paths']['camera_view']
+        height, width, _ = frame.shape
+        self.actions = self.driving.driving(frame, (width, height))
+
     def run(self):
         '''Method for running'''
         while self.running:
-            if self.camera is not None:
+            if self.conf['simulation']['live']:
                 actions = self.next() # pylint: disable=E1102
-            self.display(actions)
+                if actions is not None:
+                    self.actions = actions
+            self.display(self.actions)
         print('Stopping...')
         sys.exit()
 

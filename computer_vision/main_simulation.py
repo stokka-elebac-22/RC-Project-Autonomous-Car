@@ -26,6 +26,7 @@ class Simulation: # pylint: disable=R0903
     '''
     def __init__(self, conf: dict) -> None:
         self.conf = conf
+        self.cam = None
         if self.conf['simulation']['live']:
             self.cam = self.__camera_setup()
         pathfinding = self.__pathfinding_setup()

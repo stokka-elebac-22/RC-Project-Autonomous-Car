@@ -17,11 +17,11 @@ except ImportError:
 
 class DrivingSetup:
     '''The loop for driving'''
-    def __init__(self, conf: dict, driving: Driving, camera: Camera, image_paths: dict):
+    def __init__(self, conf: dict, driving: Driving, camera: Camera=None):
         self.conf = conf
         self.driving = driving
         self.camera = camera
-        self.image_paths = image_paths
+        self.image_paths = self.conf['simulation']['image_paths']
 
         # STATES:
         self.state = States.DRIVING
@@ -46,7 +46,8 @@ class DrivingSetup:
     def run(self):
         '''Method for running'''
         while self.running:
-            actions = self.next() # pylint: disable=E1102
+            if self.camera is not None:
+                actions = self.next() # pylint: disable=E1102
             self.display(actions)
         print('Stopping...')
         sys.exit()

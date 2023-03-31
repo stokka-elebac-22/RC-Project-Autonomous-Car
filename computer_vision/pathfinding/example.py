@@ -151,7 +151,7 @@ if __name__ == '__main__':
             qr_distance_x = distances[0]
             qr_distance_y = qr_data['distances'][0]
             obstacles.append({'values': [
-                (qr_distance_x-50, qr_distance_y-100)],
+                (qr_distance_x, qr_distance_y)],
                 'distance': True, 'object_id': 20})
 
             # Use ParkingSlot Module

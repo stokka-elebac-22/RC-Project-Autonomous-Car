@@ -12,6 +12,7 @@ try:
     from environment.src.environment import Environment, ViewPointObject
     from environment.src.a_star import AStar
     from qr_code.qr_code import QRCode, QRSize
+    from camera_handler.camera import Camera
 except ImportError:
     from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
     from computer_vision.line_detection.lane_detection import LaneDetector
@@ -21,6 +22,7 @@ except ImportError:
     from computer_vision.environment.src.environment import Environment, ViewPointObject
     from computer_vision.environment.src.a_star import AStar
     from computer_vision.qr_code.qr_code import QRCode
+    from computer_vision.camera_handler.camera import Camera
 
 if __name__ == '__main__':
 
@@ -29,7 +31,7 @@ if __name__ == '__main__':
     IMG_PATH = 'tests/images/parking_slot_detection_4/title_4.jpg'
 
     if LIVE:
-        cam = cv2.VideoCapture(0)
+        cam = Camera(camera_id=1)
         ret, frame = cam.read()
         if not ret:
             raise ValueError("NO CAM FRAME")
@@ -50,7 +52,7 @@ if __name__ == '__main__':
 
     # ----- ENVIRONMENT ----- #
     BOARD_SIZE = (60, 115)
-    ENV_SIZE = 25
+    ENV_SIZE = 30
     W_SIZE = 720
 
     # ----- DISPLAY ----- #
@@ -88,8 +90,6 @@ if __name__ == '__main__':
     # ----- PATHFINDING ----- #
     TENSION = 0
     VELOCITY = 10
-
-    cam = cv2.VideoCapture(0)
 
     # environment
     view_point_object: ViewPointObject = {
@@ -222,6 +222,9 @@ if __name__ == '__main__':
             QR_CODE_ID = 20
             CAR_ID = 10
             path_data = path_finding.calculate_path(CAR_ID, QR_CODE_ID)
+            if path_data is None:
+                print('There is not path data...')
+                continue
             update_display(display, path_finding.get_environment(), path_data['path'])
             display.display()
 

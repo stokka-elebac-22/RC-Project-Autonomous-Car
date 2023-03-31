@@ -71,7 +71,7 @@ class DrivingSetup:
         '''Method for running'''
         while self.running:
             if self.conf['simulation']['live']:
-                actions = self.next()
+                actions = self.next() # pylint: disable=E1102
                 if actions is not None:
                     self.__update_actions(actions)
             if self.actions is None or not self.actions:

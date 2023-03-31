@@ -24,25 +24,33 @@ except ImportError:
 
 if __name__ == '__main__':
 
-    # TODO: remove later
-    img = cv2.imread(
-        'tests/images/parking_slot_detection_2/title_21.jpg')
+    LIVE = True
+
+    IMG_PATH = 'tests/images/parking_slot_detection_4/title_4.jpg'
+
+    if LIVE:
+        cam = cv2.VideoCapture(0)
+        ret, frame = cam.read()
+        if not ret:
+            raise ValueError("NO CAM FRAME")
+    else:
+        frame = cv2.imread(IMG_PATH)
 
     # ----- QR CODE ----- #
     QR_SIZE: QRSize = {
-        'px': 76,
-        'mm': 52,
+        'px': 191,
+        'mm': 79,
         'distance': 500,
     }
 
     # ----- CAMERA ----- #
-    PIXEL_WIDTH = img.shape[1]
-    PIXEL_HEIGHT = img.shape[0]
+    PIXEL_WIDTH = frame.shape[1]
+    PIXEL_HEIGHT = frame.shape[0]
     MM_WIDTH = 200
 
     # ----- ENVIRONMENT ----- #
     BOARD_SIZE = (60, 115)
-    ENV_SIZE = 20
+    ENV_SIZE = 25
     W_SIZE = 720
 
     # ----- DISPLAY ----- #
@@ -50,12 +58,20 @@ if __name__ == '__main__':
     TILE_SIZE = WINDOW_SIZE[1]/BOARD_SIZE[0]
 
     # ----- PARKING SLOT DETECTOR ----- #
+    # OLD BOOMER
     P_CANNY = [50, 100]
     P_HOUGH = [80, 200, 5]
-    P_ITERATIONS = [1, 1]
-    P_BLUR = 5
+    P_ITERATIONS = [5, 2]
+    P_BLUR = 7
     P_FILTER_ATOL = [20, 20]
-    P_CLUSTER_ATOL = 5
+    P_CLUSTER_ATOL = 0
+
+    # P_CANNY = [50, 100]
+    # P_HOUGH = [65, 70, 20]
+    # P_ITERATIONS = [1, 1]
+    # P_BLUR = 12
+    # P_FILTER_ATOL = [20, 20]
+    # P_CLUSTER_ATOL = 0
 
     # ----- LANE DETECTOR ----- #
     L_CANNY = [50, 100]
@@ -83,7 +99,7 @@ if __name__ == '__main__':
     env = Environment(BOARD_SIZE, ENV_SIZE, view_point_object)
 
     # pathfinding algorithm
-    a_star = AStar()
+    a_star = AStar(weight=2, penalty=2, hindrance_ids=[1, 30])
 
     # display
     display = DisplayEnvironment(WINDOW_SIZE, BOARD_SIZE)
@@ -135,10 +151,12 @@ if __name__ == '__main__':
 
         path_finding.insert_objects(objects)
 
-        # Should change this to camera frame later
-        frame = cv2.imread(
-             'tests/images/parking_slot_detection_2/title_21.jpg')
-        # ret, frame = cam.read()
+        if LIVE:
+            ret, frame = cam.read()
+            if not ret:
+                raise ValueError("NO CAM FRAME")
+        else:
+            frame = cv2.imread(IMG_PATH)
 
         obstacles = []
 
@@ -160,7 +178,7 @@ if __name__ == '__main__':
                 'points': qr_data['points']
             }
 
-            line_dict = parking_slot_detector.get_parking_slot(img, qr_code_data)
+            line_dict = parking_slot_detector.get_parking_slot(frame, qr_code_data)
             if line_dict is not None:
                 for lines in line_dict['all_lines']:
                     obstacles.append({'values': [

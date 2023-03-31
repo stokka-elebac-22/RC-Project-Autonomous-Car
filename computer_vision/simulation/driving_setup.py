@@ -64,10 +64,10 @@ class DrivingSetup:
             if self.actions is None:
                 continue
             angle = self.actions['angles'].pop()
-            # time = self.actions['times'].pop()
-            # speed = self.actions['speed'].pop()
-            # distance = time * speed
-            self.display(angle, 0)
+            time = self.actions['times'].pop()
+            speed = self.actions['speed'].pop()
+            distance = time * speed
+            self.display(angle, distance)
         print('Stopping...')
         sys.exit()
 

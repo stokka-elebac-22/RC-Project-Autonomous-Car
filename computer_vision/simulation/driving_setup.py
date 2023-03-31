@@ -63,7 +63,7 @@ class DrivingSetup:
             actions = self.next() # pylint: disable=E1102
             if actions is not None:
                 self.__update_actions(actions)
-            if self.actions is None:
+            if self.actions is None or not self.actions:
                 continue
 
             cur_action = self.actions.popleft()

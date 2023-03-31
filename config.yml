@@ -45,5 +45,5 @@
     arrow: 'computer_vision/simulation/images/arrow.jpg'
   spline:
     tension: !!int 0
-    velocity: !!float 20.0
+    velocity: !!float 100.0
 ...

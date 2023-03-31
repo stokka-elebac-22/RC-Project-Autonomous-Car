@@ -87,7 +87,7 @@ class DrivingSetup:
         self.actions: List[ActionsDict] = deque()
         for angle, time in zip(angles, times):
             self.actions.append({
-                'speed': self.conf['spline']['velocity'],
+                'speed': self.driving.pathfinding.velocity,
                 'angle': angle,
                 'time': time,
             })

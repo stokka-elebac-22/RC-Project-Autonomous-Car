@@ -121,6 +121,7 @@ class DrivingSetup:
                 cv.LINE_AA)
             cv.imshow('', img)
             cv.waitKey(0)
+            print(f'Moved the car by {distance}mm at an angle of {angle} degrees.')
         else:
             print(f'Path does not exists: {self.image_paths["arrow"]}')
             raise FileNotFoundError

@@ -77,6 +77,8 @@ class QRGeometry:
     def get_distance(self) -> float:
         '''Return the distance'''
         height_px = self.get_height()
+        if height_px == 0:
+            return 0.0
         distance = (self.size.get('mm') * self.focal_length) / height_px
         return distance
 
@@ -145,15 +147,26 @@ class QRCode:
         qcd = cv.QRCodeDetector()
         if frame is None:
             return {
-            'ret': False,
-            'distances': None,
-            'angles': None,
-            'info': None,
-            'points': None,
-            'rest': None
+                'ret': False,
+                'distances': None,
+                'angles': None,
+                'info': None,
+                'points': None,
+                'rest': None
             }
 
-        ret_qr, decoded_info , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
+        try:
+            ret_qr, decoded_info , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
+        except cv.error:
+            return {
+                'ret': False,
+                'distances': None,
+                'angles': None,
+                'info': None,
+                'points': None,
+                'rest': None
+            }
+
 
         # add more QRGeometry if needed or delete if too many
         if not ret_qr:
@@ -210,7 +223,7 @@ class DisplayQRCode:
 
         self.font = cv.FONT_HERSHEY_SIMPLEX
         self.font_scale = 0.5
-        self.text_color = (255, 0, 255)
+        self.text_color = (255, 70, 70)
         self.text_thickness = 1
 
     def display(self, frame: np.ndarray, qrgs: QRGeometry, data: DisplayData, verbose: int=1):
@@ -227,12 +240,11 @@ class DisplayQRCode:
                 distance = qrgs[i].get_distance()
             else:
                 distance = data['distances'][i]
-
-            if data['info'][i] is None:
+            if data['info'] is None or data['info'][i] is None:
                 color = self.color_frame_green
             else:
                 color = self.color_frame_red
-            frame = cv.polylines(frame, [qrgs[i].points.astype(int)], True, color, 4)
+            frame = cv.polylines(frame, [np.array(qrgs[i].points).astype(int)], True, color, 4)
             if verbose > 0:
                 display_data = {'distance': distance, 'angle': angle}
                 self.display_values(frame, qrg, display_data, verbose)
@@ -245,15 +257,16 @@ class DisplayQRCode:
 
     def display_values(self, frame, qrg: QRGeometry, data: DisplayData, verbose: int=1):
         '''Display values'''
+        text_offset = 10
         if verbose > 1:
-            text_location_a = (int(min(qrg.points[0][0], qrg.points[1][0]) + \
-                                    qrg.side_a/2), int(qrg.points[0][1]))
-            text_location_b = (int(qrg.points[1][0]), int(min(qrg.points[1][1], \
-                                    qrg.points[2][1]) + qrg.side_b/2))
-            text_location_c = (int(min(qrg.points[2][0], qrg.points[3][0]) + \
-                                    qrg.side_c/2), int(qrg.points[2][1]))
-            text_location_d = (int(qrg.points[3][0]), int(min(qrg.points[2][1], \
-                                    qrg.points[0][1]) + qrg.side_d/2))
+            text_location_a = (int(min(qrg.points[0][0], qrg.points[1][0]) + qrg.side_a/2), \
+                               int(qrg.points[0][1]) - text_offset)
+            text_location_b = (int(qrg.points[1][0]) + text_offset, \
+                               int(min(qrg.points[1][1], qrg.points[2][1]) + qrg.side_b/2))
+            text_location_c = (int(min(qrg.points[2][0], qrg.points[3][0]) + qrg.side_c/2), \
+                               int(qrg.points[2][1]) + 2*text_offset)
+            text_location_d = (int(qrg.points[3][0]) - 4*text_offset, \
+                               int(min(qrg.points[2][1], qrg.points[0][1]) + qrg.side_d/2))
 
             cv.putText(frame, str(int(qrg.side_a)), text_location_a, self.font, \
                         self.font_scale, self.text_color, self.text_thickness, cv.LINE_AA)
@@ -266,10 +279,16 @@ class DisplayQRCode:
 
         angle = data['angle']
         distance = data['distance']
-        cv.putText(frame, f'angle    = {int(angle)}', (10, 20), self.font, \
-                            self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
-        cv.putText(frame, f'distance = {int(distance)}', (10, 50), \
-                self.font, self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
+        angle_txt = 'angle    = NaN'
+        distance_txt = 'distance = NaN'
+        if angle is not None:
+            angle_txt = f'angle    = {int(angle)}'
+        if distance is not None:
+            distance_txt = f'distance = {int(distance)}'
+        cv.putText(frame, angle_txt, (10, 20), self.font, \
+                   self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
+        cv.putText(frame, distance_txt, (10, 50), self.font, \
+                   self.font_scale * 1.5, self.text_color, self.text_thickness, cv.LINE_AA)
 
 # def local_read_camera(name: str=None, resize: int=1):
 #     '''Local read camera '''
@@ -284,11 +303,12 @@ class DisplayQRCode:
 
 
 if __name__ == '__main__':
+    IMG_PATH = 'tests/images/parking_slot_detection_4/title_4.jpg'
     # ----- ORIGINAL MEASUREMENTS -----
     # QR Code measured, 55mm lense
     SIZE = {
-        'px': 126,
-        'mm': 52,
+        'px': 191,
+        'mm': 79,
         'distance': 500
     }
     qr_code = QRCode(SIZE)
@@ -322,7 +342,7 @@ if __name__ == '__main__':
     distances_lists = [[0 for _ in range(VALUES_LENGTH)]]
 
     while True:
-        img = cv.imread('tests/images/qr_code/logi_1080p/distance/distance_30.jpg')
+        img = cv.imread(IMG_PATH)
         qr_data = qr_code.get_data(img)
 
         if qr_data['ret']:

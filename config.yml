@@ -35,7 +35,7 @@
     weight: !!int 4
     penalty: !!int 2
   environment:
-    size: !!seq [11, 10]
+    size: !!seq [50, 50]
     real_size: !!int 50
   object_id:
     end_point: !!int 2
@@ -46,4 +46,7 @@
     camera_resolution:
       web: !!seq [1280, 800]
       logi: !!seq [1920, 1080]
+  spline:
+    tension: !!int 0
+    velocity: !!float 100.0
 ...

@@ -258,10 +258,11 @@ if __name__ == '__main__':
     # ORIGINAL: hough=[200,5]
     parking_slot_detector = ParkingSlotDetector(
         hough=[80, 200, 5], iterations=[5, 2], cluster_atol=0)
-    img = cv2.imread('computer_vision/line_detection/assets/parking/10.png')
+    IMG_PATH = 'tests/images/parking_slot_detection_4/title_6.jpg'
+    img = cv2.imread(IMG_PATH)
     qr_size = {
-        'px': 76,
-        'mm': 52,
+        'px': 191,
+        'mm': 79,
         'distance': 500
     }
     qr_code = QRCode(size=qr_size)

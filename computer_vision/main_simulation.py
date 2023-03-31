@@ -91,6 +91,7 @@ class Simulation: # pylint: disable=R0903
             pixel_size=(frame_width, frame_height),
             environment=environment,
             pathfinding_algorithm=a_star,
+            velocity=self.conf['spline']['velocity']
         )
         return pathfinding
 

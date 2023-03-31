@@ -41,8 +41,8 @@ if __name__ == '__main__':
     MM_WIDTH = 200
 
     # ----- ENVIRONMENT ----- #
-    BOARD_SIZE = (30, 65)
-    ENV_SIZE = 30
+    BOARD_SIZE = (60, 115)
+    ENV_SIZE = 20
     W_SIZE = 720
 
     # ----- DISPLAY ----- #
@@ -222,8 +222,7 @@ if __name__ == '__main__':
                     pg.draw.line(display.display_window, line_color,
                                 (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE),
                                 (c[COUNT+1][0]*TILE_SIZE, c[COUNT+1][1]*TILE_SIZE))
-                    # pg.draw.circle(display.display_window, pg.Color('green'), (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE), 5, 5)
-                    COUNT += 1
+                    COUNT += 2
 
                 # 2D TO 3D, need to put in function?
                 # for i, value in enumerate(c):

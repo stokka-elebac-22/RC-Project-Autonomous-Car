@@ -41,8 +41,8 @@ if __name__ == '__main__':
     MM_WIDTH = 200
 
     # ----- ENVIRONMENT ----- #
-    BOARD_SIZE = (60, 115)
-    ENV_SIZE = 20
+    BOARD_SIZE = (30, 65)
+    ENV_SIZE = 30
     W_SIZE = 720
 
     # ----- DISPLAY ----- #
@@ -151,7 +151,7 @@ if __name__ == '__main__':
             qr_distance_x = distances[0]
             qr_distance_y = qr_data['distances'][0]
             obstacles.append({'values': [
-                (qr_distance_x, qr_distance_y)],
+                (qr_distance_x-50, qr_distance_y-100)],
                 'distance': True, 'object_id': 20})
 
             # Use ParkingSlot Module
@@ -222,7 +222,8 @@ if __name__ == '__main__':
                     pg.draw.line(display.display_window, line_color,
                                 (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE),
                                 (c[COUNT+1][0]*TILE_SIZE, c[COUNT+1][1]*TILE_SIZE))
-                    COUNT += 2
+                    # pg.draw.circle(display.display_window, pg.Color('green'), (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE), 5, 5)
+                    COUNT += 1
 
                 # 2D TO 3D, need to put in function?
                 # for i, value in enumerate(c):

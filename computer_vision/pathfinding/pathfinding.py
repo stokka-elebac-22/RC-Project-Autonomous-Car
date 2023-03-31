@@ -12,7 +12,7 @@ try:
     from environment.src.a_star import AStar
     from bresenham import bresenham
     from spline import catmull_rom_chain, approx_segment_lengths
-    from lib import get_abs_velo, get_angle, get_angle_diff
+    from lib import get_angle, get_angle_diff
 except ImportError:
     from computer_vision.environment.src.environment import Environment
     from computer_vision.environment.src.a_star import AStar
@@ -30,10 +30,12 @@ class PathFinding:
                 environment: Environment,
                 pathfinding_algorithm: AStar,
                 tension:float=0.,
-                velocity:float = 10): # pylint: disable=R0913
+                velocity:float = 10,
+                num_points:int=3): # pylint: disable=R0913
         self.pixel_size = pixel_size
         self.tension = tension
         self.velocity = velocity
+        self.num_points = num_points
         self.__environment = environment
         self.__pathfinding_algorithm = pathfinding_algorithm
 
@@ -122,24 +124,20 @@ class PathFinding:
 
         if path:
             new_path = [(value[1], value[0])
-                        for i, value in enumerate(path) if i % 3 == 0]
+                        for i, value in enumerate(path)]
             temp_path = [(path[0][1], path[0][0])]
             temp_path = temp_path + new_path
-            for _ in range(2):
+            for _ in range(1):
                 temp_path.append((path[len(path) - 1][1], path[len(path) - 1][0]))
-
             temp_path.reverse()
-            curve, velo = catmull_rom_chain(temp_path, self.tension)
+            curve, _ = catmull_rom_chain(temp_path, self.tension, self.num_points)
             lengths = approx_segment_lengths(curve)
-            times = [x / self.velocity for x in lengths]
+            times = [x * self.__environment.real_size / self.velocity for x in lengths]
 
-            # TODO: muligens trenge ikke abs velo
-            # ENDRE VELOCITYCONSTANT Eller numpoints i catmull spline
-            abs_velos = []
             angles = []
-            for value in velo:
-                abs_velos.append(get_abs_velo(value))
-                angles.append(get_angle(value))
+            for i, value in enumerate(curve):
+                if i!=0:
+                    angles.append(get_angle(curve[i-1], value))
 
             angle_diff = get_angle_diff(angles)
 

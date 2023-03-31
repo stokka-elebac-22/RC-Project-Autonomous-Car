@@ -10,8 +10,8 @@ class TestParametrized:
     '''
 
     @pytest.mark.parametrize('point, expected', [
-        ((20, 300), (-98.71690549205113, 920.3376614349003)),
-        ((10, 50), (-103.18577414502009, 893.8827273349013))])
+        ((20, 300), (-66.17662952711039, 639.4140036278998)),
+        ((10, 50), (-737.7092676379443, 2500))])
     def test_point_to_distance(self, point, expected):
         '''Testing point to distance'''
         board_size = (60, 115)

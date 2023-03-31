@@ -41,14 +41,13 @@ class PathFinding:
         offset_x = point[0] - self.pixel_size[0]/2
         offset_y = self.pixel_size[1] - point[1]
         # Added 150 offset
-        y_distance = -0.000000443*pow(np.int64(offset_y), np.int64(4)) \
-                    +0.0002751831*pow(np.int64(offset_y), np.int64(3)) \
-                    -0.0382433809*pow(np.int64(offset_y), np.int64(2)) \
-                    +3.0818720986*offset_y+341.0336777149 
-        
-        ratio_x = 0.000843682600000000 * y_distance -0.0171120596000000
-        if y_distance > 1500:
-            y_distance=1500
+        y_distance = 0.0000005405*pow(np.int64(offset_y), np.int64(4)) \
+                    -0.0002915424*pow(np.int64(offset_y), np.int64(3)) \
+                    +0.0579638581*pow(np.int64(offset_y), np.int64(2)) \
+                    -2.4604486471*offset_y+430.4886090479
+        ratio_x= 0.0008111433472 * y_distance - 0.0096054187869
+        if y_distance > 2500:
+            y_distance=2500
         x_distance = offset_x*ratio_x
         return (x_distance, y_distance)
 

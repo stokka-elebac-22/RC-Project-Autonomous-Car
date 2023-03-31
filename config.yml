@@ -30,7 +30,7 @@
     weight: !!int 4
     penalty: !!int 2
   environment:
-    size: !!seq [11, 10]
+    size: !!seq [50, 50]
     real_size: !!int 50
   object_id:
     end_point: !!int 2
@@ -43,4 +43,7 @@
       logi: !!seq [1920, 1080]
   image_paths:
     arrow: 'computer_vision/simulation/images/arrow.jpg'
+  spline:
+    tension: !!int 0
+    velocity: !!float 100.0
 ...

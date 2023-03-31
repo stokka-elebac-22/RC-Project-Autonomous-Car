@@ -147,15 +147,26 @@ class QRCode:
         qcd = cv.QRCodeDetector()
         if frame is None:
             return {
-            'ret': False,
-            'distances': None,
-            'angles': None,
-            'info': None,
-            'points': None,
-            'rest': None
+                'ret': False,
+                'distances': None,
+                'angles': None,
+                'info': None,
+                'points': None,
+                'rest': None
             }
 
-        ret_qr, decoded_info , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
+        try:
+            ret_qr, decoded_info , points_qr, rest_qr = qcd.detectAndDecodeMulti(frame)
+        except cv.error:
+            return {
+                'ret': False,
+                'distances': None,
+                'angles': None,
+                'info': None,
+                'points': None,
+                'rest': None
+            }
+
 
         # add more QRGeometry if needed or delete if too many
         if not ret_qr:

@@ -43,4 +43,7 @@
       logi: !!seq [1920, 1080]
   image_paths:
     arrow: 'computer_vision/simulation/images/arrow.jpg'
+  spline:
+    tension: !!int 0
+    velocity: !!float 20.0
 ...

@@ -1,6 +1,7 @@
 '''The script for the driving loop'''
 import os
 import sys
+from collections import deque
 from typing import List
 import cv2 as cv
 from defines import States
@@ -36,13 +37,14 @@ class DrivingSetup:
         self.state = States.DRIVING
 
         # ----- ACTION ----- #
-        self.actions: ActionsDict = None
+        self.actions: List[ActionsDict] = deque()
 
         # ----- INTERRUPTS ----- #
         self.running = True
         self.__interrupts()
 
     def __interrupts(self):
+        '''Interrupts'''
         def on_press(key):
             if key == keyboard.Key.esc:
                 self.running = False
@@ -60,16 +62,36 @@ class DrivingSetup:
         while self.running:
             actions = self.next() # pylint: disable=E1102
             if actions is not None:
-                self.actions = actions
+                self.__update_actions(actions)
             if self.actions is None:
                 continue
-            angle = self.actions['angles'].pop()
-            time = self.actions['times'].pop()
-            speed = self.actions['speed'].pop()
-            distance = time * speed
+
+            cur_action = self.actions.popleft()
+            if cur_action is None:
+                continue
+            angle = cur_action['angle']
+            speed = cur_action['speed']
+            time = cur_action['time']
+            distance= speed * time
+
             self.display(angle, distance)
         print('Stopping...')
         sys.exit()
+
+    def __update_actions(self, actions) -> bool:
+        '''Update actions'''
+        if actions is None:
+            return False
+        angles = actions['angles']
+        times = actions['times']
+        self.actions: List[ActionsDict] = deque()
+        for angle, time in zip(angles, times):
+            self.actions.append({
+                'speed': self.conf['spline']['velocity'],
+                'angle': angle,
+                'time': time,
+            })
+        return True
 
     def next(self) -> List[ActionsDict]:
         '''The next iteration in the loop'''

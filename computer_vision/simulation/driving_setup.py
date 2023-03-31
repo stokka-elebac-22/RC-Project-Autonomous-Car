@@ -106,6 +106,7 @@ class DrivingSetup:
         '''Display the arrow or other symbols'''
         if angle is None or distance is None:
             return False
+        distance = int(distance)
         arrow_image_path = self.image_attributes['image_paths']['arrow']
         if os.path.exists(arrow_image_path):
             img = cv.imread(arrow_image_path)

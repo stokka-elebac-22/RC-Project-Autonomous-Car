@@ -31,13 +31,15 @@ class PathFinding:
                 pathfinding_algorithm: AStar,
                 tension:float=0.,
                 velocity:float = 10,
-                num_points:int=3): # pylint: disable=R0913
+                num_points:int=3,
+                rotate_time:float=0.1): # pylint: disable=R0913
         self.pixel_size = pixel_size
         self.tension = tension
         self.velocity = velocity
         self.num_points = num_points
         self.__environment = environment
         self.__pathfinding_algorithm = pathfinding_algorithm
+        self.rotate_time = rotate_time
 
     def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
@@ -108,6 +110,34 @@ class PathFinding:
     def get_environment(self):
         '''Retrieve environment'''
         return self.__environment
+    
+
+    def merge_similar_angles(self, times: list[int], angles: list[float], tol: int = 1) -> dict:
+        '''Merge similar angles to reduce the list of angles and times'''
+        if not angles or not times:
+            return None
+        new_angles = []
+        new_times = []
+        previous_angle = angles[0]
+        previous_time = times[0]
+        for i in range(len(angles)-1):
+            if  previous_angle - tol <= angles[i+1] <= previous_angle + tol \
+                or \
+                previous_angle - tol >= angles[i+1] >= previous_angle + tol:
+                previous_angle = (previous_angle + angles[i+1]) / 2
+                previous_time += times[i+1]
+            else:
+                new_times.append(previous_time)
+                new_angles.append(previous_angle)
+                previous_angle = angles[i+1]
+                previous_time = times[i+1]
+        new_times.append(previous_time)
+        new_angles.append(previous_angle)
+        return {
+            'times': new_times, 
+            'angles': new_angles
+        }
+
 
     # pylint: disable=R0914
     def calculate_path(self, start_object: int, end_object: int) -> dict:
@@ -139,12 +169,16 @@ class PathFinding:
                 if i!=0:
                     angles.append(get_angle(curve[i-1], value))
 
-            angle_diff = get_angle_diff(angles)
-
+            data = self.merge_similar_angles(times[:-1], angles[:-1], 1)
+            data['angles'].append(angles[-1])
+            angle_diff = get_angle_diff(data['angles'])
+            if not angle_diff:
+                return None
+            data['times'] = [self.rotate_time*angle_diff[0]] + data['times']
             return {
                 'path': path,
                 'curve': curve,
                 'angles': angle_diff,
-                'times': times,
+                'times': data['times'],
             }
         return None

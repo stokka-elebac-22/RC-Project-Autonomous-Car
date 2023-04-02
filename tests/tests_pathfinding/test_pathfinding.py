@@ -73,3 +73,37 @@ class TestParametrized:
         result = path_finding.distance_to_point(distance)
         assert result[0] == pytest.approx(expected[0], 0.001)
         assert result[1] == pytest.approx(expected[1], 0.001)
+
+    @pytest.mark.parametrize('times, angles, expected', [
+        ([1, 2, 4, 5], [0, 0, 1, -5], [[7, 5], [0.5, -5]]),
+        ([0.5, 0.7, 1, 2], [-1, -2, 1, 2], [[1.2, 3], [-1.5, 1.5]]),
+    ])
+    def test_merge_similar_angles(self, times, angles, expected):
+        '''Testing distance to point'''
+        board_size = (60, 115)
+        env_size = 20
+        pixel_width = 300
+        pixel_height = 500
+
+        tension = 0
+        velocity = 10
+
+        view_point_object: ViewPointObject = {
+            'view_point': None,
+            'object_id': 10,
+        }
+        env = Environment(board_size, env_size, view_point_object)
+        a_star = AStar()
+
+        path_finding = PathFinding(
+            [pixel_width, pixel_height],
+            env,
+            a_star,
+            tension,
+            velocity
+        )
+
+        data = path_finding.merge_similar_angles(times, angles, 1)
+
+        assert data['times'] == expected[0]
+        assert data['angles'] == expected[1]

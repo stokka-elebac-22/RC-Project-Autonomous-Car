@@ -12,15 +12,20 @@ class TestParametrized:
         '''Testing get_abs_velo method'''
         assert get_abs_velo(vec) == pytest.approx(expected, 0.001)
 
-    @pytest.mark.parametrize('vec, expected', [
-        ([3, 4], 36.87),
-        ([-3, 4], -36.87),
-        ([-3, -4], -143.13),
-        ([3, -4], 143.13),
+    @pytest.mark.parametrize('point_one, point_two, expected', [
+        ((32, 29), (31.5, 28.5625), -48.81),
+        ((32, 29), (31.5, 29.4375), -131.19),
+        ((32, 29), (32.5, 28.5625), 48.81),
+        ((32, 29), (32.5, 29.4375), 131.19),
+        ((31, 28), (31, 28), 0),
+        ((31, 28), (31, 29), 0),
+        ((31, 28), (31, 27), 0),
+        ((31, 28), (30, 28), -90),
+        ((31, 28), (32, 28), 90),
         ])
-    def test_get_angle(self, vec, expected):
+    def test_get_angle(self, point_one, point_two, expected):
         '''Testing get_angle method'''
-        assert get_angle(vec) == pytest.approx(expected, 0.001)
+        assert get_angle(point_one, point_two) == pytest.approx(expected, 0.001)
 
     @pytest.mark.parametrize('angles, expected', [
         ([40, 45], [40, 5]),

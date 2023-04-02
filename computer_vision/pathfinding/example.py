@@ -239,12 +239,11 @@ if __name__ == '__main__':
                 pg.display.flip()
                 COUNT = 0
                 LEN_C = len(c)
-                while COUNT < LEN_C:
+                while COUNT < LEN_C - 1:
                     pg.draw.line(display.display_window, line_color,
                                 (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE),
                                 (c[COUNT+1][0]*TILE_SIZE, c[COUNT+1][1]*TILE_SIZE))
                     COUNT += 2
-
                 # 2D TO 3D, need to put in function?
                 # for i, value in enumerate(c):
                 #     if i % 30 == 0:

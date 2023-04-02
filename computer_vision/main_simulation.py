@@ -1,7 +1,9 @@
 '''
 The main file for the driving simulation
 '''
+import os
 import yaml
+import cv2 as cv
 from simulation.driving import Driving
 from simulation.driving_setup import DrivingSetup
 try:
@@ -25,7 +27,9 @@ class Simulation: # pylint: disable=R0903
     '''
     def __init__(self, conf: dict) -> None:
         self.conf = conf
-        self.cam = self.__camera_setup()
+        self.cam = None
+        if self.conf['simulation']['live']:
+            self.cam = self.__camera_setup()
         pathfinding = self.__pathfinding_setup()
         qr_code = self.__qr_code_setup()
 
@@ -37,8 +41,7 @@ class Simulation: # pylint: disable=R0903
         self.driving_setup = DrivingSetup(
             conf=conf,
             driving=driving,
-            camera=self.cam,
-            image_paths=conf['image_paths'])
+            camera=self.cam)
         self.run()
 
     def __camera_setup(self):
@@ -79,7 +82,11 @@ class Simulation: # pylint: disable=R0903
         )
 
         # ----- INIT PATHFINDING ----- #
-        frame_width, frame_height = self.cam.get_dimensions()
+        if self.conf['simulation']['live']:
+            frame_width, frame_height = self.cam.get_dimensions()
+        else:
+            img = cv.imread(self.conf['simulation']['image_paths']['camera_view'])
+            frame_width, frame_height, _ = img.shape
         pathfinding: PathFinding = PathFinding(
             pixel_size=(frame_width, frame_height),
             environment=environment,
@@ -114,6 +121,13 @@ if __name__ == '__main__':
             c = yaml.safe_load(f)
         except yaml.YAMLError as exc:
             print(exc)
+
+    # ----- TEST IF PATHS ARE CORRECT ----- #
+    if c['simulation']['active']:
+        image_paths = c['simulation']['image_paths']
+        for image_path in [image_paths['camera_view'], image_paths['arrow']]:
+            if not os.path.exists(image_path):
+                raise FileNotFoundError
 
     simulation = Simulation(c)
     simulation.run()

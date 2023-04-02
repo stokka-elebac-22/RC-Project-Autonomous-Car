@@ -18,14 +18,14 @@ except ImportError:
 
 class DrivingSetup:
     '''The loop for driving'''
-    def __init__(self, conf: dict, driving: Driving, camera: Camera, image_paths: dict):
+    def __init__(self, conf: dict, driving: Driving, camera: Camera=None):
         self.conf = conf
         self.driving = driving
         self.camera = camera
 
         # ----- TEXT ----- #
         self.image_attributes = {
-            'image_paths': image_paths,
+            'image_paths': self.conf['simulation']['image_paths'],
             'org': (25, 50),
             'font': cv.FONT_HERSHEY_SIMPLEX,
             'font_scale': 1,
@@ -38,6 +38,10 @@ class DrivingSetup:
 
         # ----- ACTION ----- #
         self.actions: List[ActionsDict] = deque()
+
+        # ----- INIT ACTIONS ----- #
+        if self.conf['simulation']['live'] is False:
+            self.__init_actions()
 
         # ----- INTERRUPTS ----- #
         self.running = True
@@ -57,15 +61,21 @@ class DrivingSetup:
         )
         listener.start()
 
+    def __init_actions(self):
+        frame = cv.imread(self.conf['simulation']['image_paths']['camera_view'])
+        height, width, _ = frame.shape
+        actions = self.driving.driving(frame, (width, height))
+        self.__update_actions(actions)
+
     def run(self):
         '''Method for running'''
         while self.running:
-            actions = self.next() # pylint: disable=E1102
-            if actions is not None:
-                self.__update_actions(actions)
+            if self.conf['simulation']['live']:
+                actions = self.next() # pylint: disable=E1102
+                if actions is not None:
+                    self.__update_actions(actions)
             if self.actions is None or not self.actions:
                 continue
-
             cur_action = self.actions.popleft()
             if cur_action is None:
                 continue
@@ -110,7 +120,7 @@ class DrivingSetup:
         arrow_image_path = self.image_attributes['image_paths']['arrow']
         if os.path.exists(arrow_image_path):
             img = cv.imread(arrow_image_path)
-            img = rotate_image(img, angle*100) # rotate image
+            img = rotate_image(img, angle) # rotate image
             img = cv.putText(
                 img,
                 f'Distance: {distance}',
@@ -121,8 +131,8 @@ class DrivingSetup:
                 self.image_attributes['thickness'],
                 cv.LINE_AA)
             cv.imshow('', img)
+            print(f'Move the car by {distance}mm at an angle of {angle} degrees.')
             cv.waitKey(0)
-            print(f'Moved the car by {distance}mm at an angle of {angle} degrees.')
         else:
             print(f'Path does not exists: {self.image_paths["arrow"]}')
             raise FileNotFoundError

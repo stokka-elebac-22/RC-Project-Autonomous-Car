@@ -1,6 +1,11 @@
 ---
   headless: True
-  simulation: True
+  simulation:
+    active: True
+    live: False
+    image_paths:
+      camera_view: 'computer_vision/simulation/images/photo_1.jpg'
+      arrow: 'computer_vision/simulation/images/arrow.jpg'
   network:
     host: !!str '10.0.11.116'
     port: !!int 2004
@@ -41,8 +46,6 @@
     camera_resolution:
       web: !!seq [1280, 800]
       logi: !!seq [1920, 1080]
-  image_paths:
-    arrow: 'computer_vision/simulation/images/arrow.jpg'
   spline:
     tension: !!int 0
     velocity: !!float 100.0

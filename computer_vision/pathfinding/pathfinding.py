@@ -45,8 +45,8 @@ class PathFinding:
         y_distance = -0.000000443*pow(np.int64(offset_y), np.int64(4)) \
                     +0.0002751831*pow(np.int64(offset_y), np.int64(3)) \
                     -0.0382433809*pow(np.int64(offset_y), np.int64(2)) \
-                    +3.0818720986*offset_y+341.0336777149 
-        
+                    +3.0818720986*offset_y+341.0336777149
+
         ratio_x = 0.000843682600000000 * y_distance -0.0171120596000000
         if y_distance > 1500:
             y_distance=1500

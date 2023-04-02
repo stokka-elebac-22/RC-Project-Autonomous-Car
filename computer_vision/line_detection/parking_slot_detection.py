@@ -8,12 +8,15 @@ import numpy as np
 try:
     from line_detector import LineDetector
     from lib import MergeLines
+    from camera_handler.camera import Camera
 except ImportError:
     try:
         from computer_vision.line_detection.line_detector import LineDetector
         from computer_vision.qr_code.qr_code import QRCode
         from computer_vision.line_detection.lib import MergeLines
+        from computer_vision.camera_handler.camera import Camera
     except ImportError:
+        from camera_handler.camera import Camera
         from line_detection.line_detector import LineDetector
         from line_detection.lib import MergeLines
 
@@ -256,33 +259,53 @@ class ParkingSlotDetector(LineDetector):
 
 if __name__ == '__main__':
     # ORIGINAL: hough=[200,5]
+    LIVE = True
     parking_slot_detector = ParkingSlotDetector(
         hough=[80, 200, 5], iterations=[5, 2], cluster_atol=0)
-    IMG_PATH = 'tests/images/parking_slot_detection_4/title_6.jpg'
-    img = cv2.imread(IMG_PATH)
+
+    if LIVE:
+        cam = Camera(camera_id=1)
+        ret, img = cam.read()
+        if not ret:
+            print('Could not get information from the camera...')
+            sys.exit()
+    else:
+        IMG_PATH = 'tests/images/parking_slot_detection_4/title_6.jpg'
+        img = cv2.imread(IMG_PATH)
+
     qr_size = {
         'px': 191,
         'mm': 79,
-        'distance': 500
+        'distance': 515
     }
     qr_code = QRCode(size=qr_size)
-    data = qr_code.get_data(img)
-    qr_code_data = {
-        'ret': data['ret'],
-        'points': data['points']
-    }
-    qr_code_measurements = {
-        'distances': data['distances'],
-        'angles': data['angles'],
-        'info': data['info']}
-    qr_code.display(img, qr_code_measurements, verbose=2)
+    while True:
+        data = qr_code.get_data(img)
+        qr_code_data = {
+            'ret': data['ret'],
+            'points': data['points']
+        }
+        qr_code_measurements = {
+            'distances': data['distances'],
+            'angles': data['angles'],
+            'info': data['info']}
+        qr_code.display(img, qr_code_measurements, verbose=2)
 
-    line_dict = parking_slot_detector.get_parking_slot(img, qr_code_data)
 
-    if line_dict is not None:
-        parking_slot_detector.show_lines(img, line_dict['slot_lines'])
-        parking_slot_detector.show_lines(img, line_dict['all_lines'])
+        line_dict = parking_slot_detector.get_parking_slot(img, qr_code_data)
 
-    cv2.imshow('img', img)
-    cv2.waitKey(0)
+        if line_dict is not None:
+            parking_slot_detector.show_lines(img, line_dict['slot_lines'])
+            parking_slot_detector.show_lines(img, line_dict['all_lines'])
+
+        cv2.imshow('img', img)
+        if LIVE is False:
+            cv2.waitKey(0)
+            break
+        ret, img = cam.read()
+        if not ret:
+            print('Could not get information from camera...')
+            break
+        cv2.waitKey(1)
+
     cv2.destroyAllWindows()

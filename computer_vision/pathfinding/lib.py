@@ -1,6 +1,5 @@
 '''Importing libraries'''
 import math
-from typing import Tuple
 import numpy as np
 try:
     from computer_vision.environment.src.display import DisplayEnvironment

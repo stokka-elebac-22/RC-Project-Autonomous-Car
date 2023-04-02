@@ -223,7 +223,6 @@ if __name__ == '__main__':
                                 (c[COUNT][0]*TILE_SIZE, c[COUNT][1]*TILE_SIZE),
                                 (c[COUNT+1][0]*TILE_SIZE, c[COUNT+1][1]*TILE_SIZE))
                     COUNT += 2
-
                 # 2D TO 3D, need to put in function?
                 # for i, value in enumerate(c):
                 #     if i % 30 == 0:

@@ -18,7 +18,7 @@ except ImportError:
     from computer_vision.environment.src.a_star import AStar
     from computer_vision.pathfinding.bresenham import bresenham
     from computer_vision.pathfinding.spline import catmull_rom_chain, approx_segment_lengths
-    from computer_vision.pathfinding.lib import get_abs_velo, get_angle, get_angle_diff
+    from computer_vision.pathfinding.lib import get_angle, get_angle_diff
 
 class PathFinding:
     '''
@@ -110,7 +110,6 @@ class PathFinding:
     def get_environment(self):
         '''Retrieve environment'''
         return self.__environment
-    
 
     def merge_similar_angles(self, times: list[int], angles: list[float], tol: int = 1) -> dict:
         '''Merge similar angles to reduce the list of angles and times'''
@@ -154,7 +153,7 @@ class PathFinding:
 
         if path:
             new_path = [(value[1], value[0])
-                        for i, value in enumerate(path)]
+                        for _, value in enumerate(path)]
             temp_path = [(path[0][1], path[0][0])]
             temp_path = temp_path + new_path
             for _ in range(1):

@@ -4,7 +4,6 @@ watch the color flips between black and white.
 Slightly increase "THRESHOLD" value if it doesn't flip.
 https://www.dlology.com/blog/how-to-measure-the-latency-of-a-webcam-with-opencv/
 """
-
 import cv2
 import numpy as np
 

@@ -1,5 +1,5 @@
 '''main_headless.py: DATBAC23 Car system main.'''
-from defines import States
+from defines import States, MessageId
 from socket_handling.abstract_server import NetworkSettings
 from socket_handling.multi_socket_server import MultiSocketServer
 from camera_handler.camera_headless import CameraHandler
@@ -8,6 +8,7 @@ from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
 from car_communication.abstract_communication import AbstractCommunication
 from car_communication.can_bus_communication import CanBusCommunication
 from car_communication.car_serial_communication import CarSerialCommunication
+from car_communication.car_stepper_communication import CarStepperCommunication
 
 from qr_code.qr_code import QRCode
 
@@ -22,6 +23,8 @@ class Headless():  # pylint: disable=R0903
             self.car_comm = CarSerialCommunication(conf["serial"])
         elif conf["car_comm_interface"] == "can":
             self.car_comm = CanBusCommunication(conf["can"])
+        elif conf["car_comm_interface"] == "stepper":
+            self.car_comm = CarStepperCommunication(conf["stepper"])
 
         # Network config for main connection + camera(s)
         self.net_main = NetworkSettings(conf["network"]["host"], conf["network"]["port"])
@@ -53,6 +56,13 @@ class Headless():  # pylint: disable=R0903
         self.stop_sign_detector = TrafficSignDetector('stop_sign_model.xml')
 
         while True:
+            # Check and handle incoming data
+            for data in self.socket_server:
+                if MessageId(data[0]) is MessageId.CMD_SET_STATE:
+                    self.state = data[1]
+                    print("State changed to: ")
+                    print(States(data[1]).name)
+
             # Take new picture, handle socket transfers
             ret, frame0 = self.cam0_handler.get_cv_frame()
             if ret is True:

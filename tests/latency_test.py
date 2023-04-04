@@ -1,6 +1,5 @@
 """
-Run this script then
-point the camera to look at the window,
+Run this script then point the camera to look at the window,
 watch the color flips between black and white.
 Slightly increase "THRESHOLD" value if it doesn't flip.
 https://www.dlology.com/blog/how-to-measure-the-latency-of-a-webcam-with-opencv/
@@ -21,7 +20,7 @@ IM_HEIGHT = 720
 
 ### USB webcam ###
 camera = cv2.VideoCapture(CAM_INDEX)
-if ((camera == None) or (not camera.isOpened())):
+if ((camera is None) or (not camera.isOpened())):
     print('\n\n')
     print('Error - could not open video device.')
     print('\n\n')
@@ -37,10 +36,8 @@ prev_tick = cv2.getTickCount()
 frame_number, prev_change_frame = 0, 0
 is_dark = True
 
-
 while True:
     frame_number += 1
-
     _, frame = camera.read()
     img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -55,12 +52,9 @@ while True:
             frame_number - prev_change_frame
         ))
         prev_tick = new
-
         prev_change_frame = frame_number
-
         fill_color = 255 if is_dark else 0
         show = np.full(img.shape, fill_color, dtype=img.dtype)
-
         cv2.imshow('frame', show)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):

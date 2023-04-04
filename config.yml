@@ -23,10 +23,10 @@
     channel: !!str "can0"
   step:
     active: !!bool false
-    step0: !!int
-    dir0: !!int
-    step1: !!int
-    dir1: !!int
+    step0: !!int 18
+    dir0: !!int 12
+    step1: !!int 19
+    dir1: !!int 13
   camera0:
     id: !!int 0
     size:
@@ -51,7 +51,8 @@
     active: !!str 'web'
     camera_resolution:
       web: !!seq [1280, 800]
-      logi: !!seq [1920, 1080]
+      logitech: !!seq [1920, 1080]
+      pi_cam: !!seq [1920, 1080]
   spline:
     tension: !!int 0
     velocity: !!float 100.0

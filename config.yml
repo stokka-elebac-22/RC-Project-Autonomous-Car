@@ -13,7 +13,7 @@
     stream_en_cam0: !!bool True
     port_cam1: !!int 2006
     stream_en_cam1: !!bool False
-  car_comm_interface: !!str "serial"   # "serial", "can", "pwm"
+  car_comm_interface: !!str "serial"   # "serial", "can", "stepper"
   serial:
     active: !!bool false
     port: !!int 0
@@ -21,6 +21,12 @@
     active: !!bool false
     interface: !!str "socketcan"
     channel: !!str "can0"
+  step:
+    active: !!bool false
+    step0: !!int
+    dir0: !!int
+    step1: !!int
+    dir1: !!int
   camera0:
     id: !!int 0
     size:

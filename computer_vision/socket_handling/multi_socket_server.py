@@ -18,6 +18,9 @@ class MultiSocketServer(BasicServer):
         self.clients = []
         self.incoming_data  = queue.Queue()
 
+    def __iter__(self):
+        return self
+
     def start(self):
         '''Start server interface'''
         try:
@@ -63,7 +66,6 @@ class MultiSocketServer(BasicServer):
             connection.sendall(str.encode(response))
         connection.close()
 
-
     def send_to_all(self, message):
         '''Send message to all connected clients'''
         if message is None:
@@ -73,7 +75,7 @@ class MultiSocketServer(BasicServer):
                 connection.sendall(message)
             except socket.error:
                 continue
-        print("Send:")
+        print("Sending:")
         print(message)
 
     def get_next_message(self):
@@ -81,6 +83,12 @@ class MultiSocketServer(BasicServer):
         if not self.incoming_data.empty():
             return self.incoming_data.get()
         return None
+
+    def __next__(self):
+        '''Get next incoming message'''
+        if not self.incoming_data.empty():
+            return self.incoming_data.get()
+        raise StopIteration
 
 if __name__ == "__main__":
     # Receive message from socket, send message to all connected clients, and sleep.

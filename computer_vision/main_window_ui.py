@@ -94,9 +94,9 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
             if 'Cam' in self.camera_cbo[index].currentText():
                 self.cam_thread[index] = VideoThread(current_index)  # pylint: disable=W0201
                 # connect its signal to the update_image slot
-                if index is 0:
+                if index == 0:
                     self.cam_thread[index].change_pixmap_signal.connect(self.update_image)
-                elif index is 1:
+                elif index == 1:
                     self.cam_thread[index].change_pixmap_signal.connect(self.update_image2)
                 # start the thread
                 self.cam_thread[index].start()

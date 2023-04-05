@@ -11,7 +11,7 @@ __status__ = 'Testing'
 import sys
 from socket_handling.socket_client import SocketClient # pylint: disable=W0611
 from camera_handler.camera_handler import CameraHandler, VideoThread
-from traffic_sign_detection.main import TrafficSignDetector
+from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
 from qr_code.qr_code import QRCode
 from PyQt6 import QtWidgets, uic, QtCore
 from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
@@ -51,6 +51,15 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
             self.findChild(QtWidgets.QLabel, 'input_img_1'),
             self.findChild(QtWidgets.QLabel, 'input_img_2')
         ]
+        self.chk_enable = [
+            self.findChild(QtWidgets.QCheckBox, 'input_chk_enable_1'),
+            self.findChild(QtWidgets.QCheckBox, 'input_chk_enable_2')
+        ]
+        self.cam_thread = ["", ""]
+        self.chk_enable[0].stateChanged.connect(
+            lambda: self.check_and_start_camera(self.chk_enable[0], 0))
+        self.chk_enable[1].stateChanged.connect(
+            lambda: self.check_and_start_camera(self.chk_enable[1], 1))
 
         # Get size from config
         size = {
@@ -77,6 +86,27 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
             self.showFullScreen()
         self.show()
         self.app.exec()
+
+    def check_and_start_camera(self, chk_box: QtWidgets.QCheckBox, index):
+        '''Trigger start of camera if checked '''
+        if chk_box.isChecked() is True:
+            current_index = self.camera_cbo[index].currentIndex()
+            if 'Cam' in self.camera_cbo[index].currentText():
+                self.cam_thread[index] = VideoThread(current_index)  # pylint: disable=W0201
+                # connect its signal to the update_image slot
+                if index is 0:
+                    self.cam_thread[index].change_pixmap_signal.connect(self.update_image)
+                elif index is 1:
+                    self.cam_thread[index].change_pixmap_signal.connect(self.update_image2)
+                # start the thread
+                self.cam_thread[index].start()
+        else:
+            try:
+                self.cam_thread[index].stop()
+            except AttributeError:
+                pass
+            except Exception as e:
+                print(e)
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
@@ -108,6 +138,13 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         self.img_output.setPixmap(output_img)
         self.output_text.setText(output_data)
 
+    def update_image2(self, cv_img):
+        '''Updates image2 with a new opencv image'''
+        qt_img = self.camera_handler.convert_cv_qt(
+            cv_img, self.img_input[0].width(), self.img_input[0].height())
+        # print('Setting new image')
+        self.img_input[1].setPixmap(qt_img)
+
     def refresh_webcam_list(self):
         '''Run a Qthread to check possible webcams and create a list'''
         self.thread = QThread()
@@ -128,10 +165,10 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
             for camera in self.camera_handler.get_camera_list():
                 cbo.addItem(
                     self.camera_handler.get_camera_string(camera['id']))
+            cbo.addItem("Network stream cam 0")
+            cbo.addItem("Network stream cam 1")
                 # create the video capture thread
-        self.thread2 = VideoThread(1)  # pylint: disable=W0201
-        # connect its signal to the update_image slot
-        self.thread2.change_pixmap_signal.connect(self.update_image)
-        # start the thread
-        self.thread2.start()
+        self.check_and_start_camera(self.chk_enable[0], 0)
+        self.check_and_start_camera(self.chk_enable[1], 1)
+
     # def update_plot_data(self):

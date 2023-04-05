@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 """car_stepper_communication.py: Communication module to handle Raspberry pi HW PWM with Pi-HAT."""
 from car_communication.abstract_communication import AbstractCommunication
-from rpi_hardware_pwm import HardwarePWM # only dependency on Raspberry Pi
+
+try:
+    from rpi_hardware_pwm import HardwarePWM # only dependency on Raspberry Pi
+    PWM_POSSIBLE = True
+except Exception as e: # pylint: disable=W0702
+    print(e)
+    print("Not possible to run pi hw-PWM")
+    PWM_POSSIBLE = False
 
 # https://pypi.org/project/rpi-hardware-pwm/
 # On the Raspberry Pi, add dtoverlay=pwm-2chan to /boot/config.txt. This defaults to GPIO_18 as the pin for PWM0 and GPIO_19 as the pin for PWM1.

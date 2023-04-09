@@ -13,6 +13,7 @@ from socket_handling.socket_client import SocketClient # pylint: disable=W0611
 from camera_handler.camera_handler import CameraHandler, VideoThread
 from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
 from qr_code.qr_code import QRCode
+from defines import States
 from PyQt6 import QtWidgets, uic, QtCore
 from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
 import numpy as np
@@ -61,6 +62,9 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         self.chk_enable[1].stateChanged.connect(
             lambda: self.check_and_start_camera(self.chk_enable[1], 1))
 
+        self.cbo_car_state = self.findChild(QtWidgets.QComboBox, 'cbo_carstate')
+        for state in States:
+            self.cbo_car_state.addItem('{}: {}'.format(state.value, state.name))
         # Get size from config
         size = {
             'px': conf["camera0"]["size"]["px"],
@@ -90,6 +94,7 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     def check_and_start_camera(self, chk_box: QtWidgets.QCheckBox, index):
         '''Trigger start of camera if checked '''
         if chk_box.isChecked() is True:
+            self.camera_cbo[index].setEnabled(False)
             current_index = self.camera_cbo[index].currentIndex()
             if 'Cam' in self.camera_cbo[index].currentText():
                 self.cam_thread[index] = VideoThread(current_index)  # pylint: disable=W0201
@@ -102,6 +107,7 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
                 self.cam_thread[index].start()
         else:
             try:
+                self.camera_cbo[index].setEnabled(True)
                 self.cam_thread[index].stop()
             except AttributeError:
                 pass

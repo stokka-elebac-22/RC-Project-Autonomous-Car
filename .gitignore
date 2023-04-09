@@ -56,3 +56,4 @@ dmypy.json
 
 # data
 computer_vision/stereoscopic_vision/images/
+config.yml

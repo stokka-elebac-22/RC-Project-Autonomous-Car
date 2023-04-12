@@ -145,8 +145,9 @@ if __name__ == '__main__':
     cam_right = Camera(camera_id=1, window_name='Right camera')
     stereo_vision = StereoscopicVision(MAPS_PATH, PARAMETER_PATH)
 
-    cv.namedWindow('disp', cv.WINDOW_NORMAL)
-    cv.namedWindow('disparity', cv.WINDOW_NORMAL)
+    if DISPLAY:
+        cv.namedWindow('disp', cv.WINDOW_NORMAL)
+        cv.namedWindow('disparity', cv.WINDOW_NORMAL)
 
     def nothing(_):
         '''Empty function'''

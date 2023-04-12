@@ -3,6 +3,7 @@ import dataclasses
 import os.path
 import cv2 as cv
 import numpy as np
+from camera import Camera
 
 @dataclasses.dataclass
 class DisparityParameters:
@@ -129,7 +130,6 @@ class StereoscopicVision:
 
 
 if __name__ == '__main__':
-    from camera import Camera
     # PARAMETER_PATH = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
     PARAMETER_PATH = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
     MAPS_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps_web_light.xml'
@@ -142,7 +142,13 @@ if __name__ == '__main__':
 
     # NOTE: if you also have a webcam (that you do not want to use),
     cam_left = Camera(camera_id=0, window_name='Left camera')
+    ret, _ = cam_left.read()
+    if ret is False:
+        print(f'Cannot read from camera {cam_left.camera_id}.')
     cam_right = Camera(camera_id=1, window_name='Right camera')
+    ret, _ = cam_right.read()
+    if ret is False:
+        print(f'Cannot read from camera {cam_right.camera_id}.')
     stereo_vision = StereoscopicVision(MAPS_PATH, PARAMETER_PATH)
 
     if DISPLAY:

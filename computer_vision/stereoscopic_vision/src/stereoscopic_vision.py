@@ -149,13 +149,13 @@ if __name__ == '__main__':
         cv.namedWindow('disp', cv.WINDOW_NORMAL)
         cv.namedWindow('disparity', cv.WINDOW_NORMAL)
 
-    def nothing(_):
-        '''Empty function'''
+        def nothing(_):
+            '''Empty function'''
 
-    print('Creating trackbars...')
-    # creating trackbars for testing
-    cv.createTrackbar('num_disparities','disp',1,17, nothing)
-    cv.createTrackbar('block_size','disp',3,20,nothing)
+        print('Creating trackbars...')
+        # creating trackbars for testing
+        cv.createTrackbar('num_disparities','disp',1,17, nothing)
+        cv.createTrackbar('block_size','disp',3,20,nothing)
 
     print('Setting trackbar positions...')
     # Getting parameter information from previous tests, if there is one

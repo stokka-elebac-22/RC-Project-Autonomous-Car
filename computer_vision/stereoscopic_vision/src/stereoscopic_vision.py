@@ -141,7 +141,7 @@ if __name__ == '__main__':
     DISPLAY = False
 
     # NOTE: if you also have a webcam (that you do not want to use),
-    cam_left = Camera(camera_id=2, window_name='Left camera')
+    cam_left = Camera(camera_id=0, window_name='Left camera')
     cam_right = Camera(camera_id=1, window_name='Right camera')
     stereo_vision = StereoscopicVision(MAPS_PATH, PARAMETER_PATH)
 

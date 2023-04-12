@@ -141,11 +141,11 @@ if __name__ == '__main__':
     DISPLAY = False
 
     # NOTE: if you also have a webcam (that you do not want to use),
-    cam_left = Camera(camera_id=0, window_name='Left camera')
+    cam_left = Camera(camera_id=2, window_name='Left camera')
     ret, _ = cam_left.read()
     if ret is False:
         print(f'Cannot read from camera {cam_left.camera_id}.')
-    cam_right = Camera(camera_id=1, window_name='Right camera')
+    cam_right = Camera(camera_id=3, window_name='Right camera')
     ret, _ = cam_right.read()
     if ret is False:
         print(f'Cannot read from camera {cam_right.camera_id}.')

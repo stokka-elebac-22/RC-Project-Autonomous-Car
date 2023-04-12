@@ -138,6 +138,7 @@ if __name__ == '__main__':
     BLUR = 12
     M = 1 # base value, the real one is from the xml file (and is calculated in a previous test)
     Z = MAX_DIST # The depth, for used for calculating M
+    DISPLAY = False
 
     # NOTE: if you also have a webcam (that you do not want to use),
     cam_left = Camera(camera_id=2, window_name='Left camera')
@@ -231,16 +232,20 @@ if __name__ == '__main__':
             if ret_val and depth_val[0][0] is not None:
                 average.pop()
                 average.append(depth_val[0][0])
-                cv.putText(frame_left, f'{int(np.sum(average)/len(average))} cm',
-                    [pos_val[0] + 5, pos_val[1] + 40], 1, 2, (40, 200, 40), 2, 2)
-                cv.rectangle(current_disparity,
-                    pos_val,
-                    (pos_val[0] + size_val[0], pos_val[1] + size_val[1]),
-                    color=(255, 200, 40))
+                if DISPLAY:
+                    cv.putText(frame_left, f'{int(np.sum(average)/len(average))} cm',
+                        [pos_val[0] + 5, pos_val[1] + 40], 1, 2, (40, 200, 40), 2, 2)
+                    cv.rectangle(current_disparity,
+                        pos_val,
+                        (pos_val[0] + size_val[0], pos_val[1] + size_val[1]),
+                        color=(255, 200, 40))
+                else:
+                    print(int(np.sum(average)/len(average)))
 
-            cv.imshow('frame left', frame_left)
-            cv.imshow('frame right', frame_right)
-            cv.imshow('disparity', current_disparity)
+            if DISPLAY:
+                cv.imshow('frame left', frame_left)
+                cv.imshow('frame right', frame_right)
+                cv.imshow('disparity', current_disparity)
 
             if CURRENT_DEPTH < MIN_DIST:
                 break

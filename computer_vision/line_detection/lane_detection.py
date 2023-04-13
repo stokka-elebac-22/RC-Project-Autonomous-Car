@@ -49,7 +49,6 @@ class LaneDetector(LineDetector):
         if line_parameters is not None:
             slope = line_parameters[0]
             intercept = line_parameters[1]
-            # since line will always start from bottom of image
             y_1 = image.shape[0]
             y_2 = int(y_1 * (2.3 / 5))
             x_1 = int((y_1 - intercept) / slope)
@@ -60,8 +59,8 @@ class LaneDetector(LineDetector):
     def get_average_lines(self, lines: np.ndarray) -> np.ndarray:
         '''Sort the lines into left and right and get the average for each side'''
         if lines is not None:
-            left_fit = []  # will hold intercept and slope parameters for the left side lines
-            right_fit = []  # will hold intercept and slope parameters for the right side lines
+            left_cluster = []
+            right_cluster = []
 
             for line in lines:
                 x_1, y_1, x_2, y_2 = line.reshape(4)
@@ -69,24 +68,21 @@ class LaneDetector(LineDetector):
                     warnings.filterwarnings('error')
                     try:
                         parameters = np.polyfit((x_1, x_2), (y_1, y_2), 1)
-                        slope = parameters[0]
-                        intercept = parameters[1]
+                        slope, intercept = parameters
                         if slope < 0:
-                            left_fit.append((slope, intercept))
+                            left_cluster.append((slope, intercept))
                         else:
-                            right_fit.append((slope, intercept))
+                            right_cluster.append((slope, intercept))
                     except np.RankWarning:
                         pass
 
-            # now we have got m,c parameters for left and right line,
-            # we need to know x1,y1 x2,y2 parameters
-            left_fit_average = None
-            right_fit_average = None
-            if len(left_fit) > 0:
-                left_fit_average = np.average(left_fit, axis=0)
-            if len(right_fit) > 0:
-                right_fit_average = np.average(right_fit, axis=0)
-            return np.array([left_fit_average, right_fit_average], dtype=object)
+            left_avg = None
+            right_avg = None
+            if len(left_cluster) > 0:
+                left_avg = np.average(left_cluster, axis=0)
+            if len(right_cluster) > 0:
+                right_avg = np.average(right_cluster, axis=0)
+            return np.array([left_avg, right_avg], dtype=object)
         return np.array([None, None])
 
     def get_diff_from_center_info(self, image: np.ndarray, lines: np.ndarray) -> float:
@@ -119,10 +115,8 @@ class LaneDetector(LineDetector):
             return None
 
         coordinates_x = [lines[0][0], lines[1][0]]
-        # coordinates_y = [points_coordinates[0][3], points_coordinates[1][3]]
         width = max(coordinates_x) - min(coordinates_x)
 
-        # TODO: need to change size here, measure in real life # pylint: disable=W0511
         height = image.shape[0]
 
         pt_input = np.float32([[0, 0],

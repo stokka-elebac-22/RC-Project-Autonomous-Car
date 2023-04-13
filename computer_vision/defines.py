@@ -28,6 +28,8 @@ class States(Enum):
     WAITING = 0
     PARKING = 1
     DRIVING = 2
+    STOPPING = 3
+    MANUAL = 4
 
 class MessageId(Enum):
     '''Enum for message ID's'''

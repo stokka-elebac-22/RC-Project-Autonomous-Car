@@ -62,9 +62,15 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         self.chk_enable[1].stateChanged.connect(
             lambda: self.check_and_start_camera(self.chk_enable[1], 1))
 
-        self.cbo_car_state = self.findChild(QtWidgets.QComboBox, 'cbo_carstate')
+        self.cbo_car_state = self.findChild(QtWidgets.QComboBox, 'cbo_car_state')
         for state in States:
             self.cbo_car_state.addItem('{}: {}'.format(state.value, state.name))
+
+        self.cbo_socket_conn = self.findChild(QtWidgets.QComboBox, 'cbo_socket_connection')
+        for conn in self.connection_details['host_list']:
+            print(conn['name'])
+            self.cbo_socket_conn.addItem('{}: {}'.format(conn['name'], conn['host']))
+
         # Get size from config
         size = {
             'px': conf["camera0"]["size"]["px"],
@@ -76,7 +82,7 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         self.stop_sign_detector = TrafficSignDetector('stop_sign_model.xml')
 
         self.img_output = self.findChild(QtWidgets.QLabel, 'output_img')
-        self.output_text = self.findChild(QtWidgets.QLabel, 'output_lbl')
+        self.output_text = self.findChild(QtWidgets.QLabel, 'lbl_data_output')
         self.refresh_webcam_list()
 
         self.timer = QtCore.QTimer()

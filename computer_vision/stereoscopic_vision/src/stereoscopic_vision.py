@@ -3,7 +3,6 @@ import dataclasses
 import os.path
 import cv2 as cv
 import numpy as np
-from camera import Camera
 
 @dataclasses.dataclass
 class DisparityParameters:
@@ -130,6 +129,7 @@ class StereoscopicVision:
 
 
 if __name__ == '__main__':
+    from camera import Camera
     # PARAMETER_PATH = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
     PARAMETER_PATH = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
     MAPS_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps_web_light.xml'

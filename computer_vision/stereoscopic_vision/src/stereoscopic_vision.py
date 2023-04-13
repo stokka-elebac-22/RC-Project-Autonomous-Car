@@ -138,14 +138,14 @@ if __name__ == '__main__':
     BLUR = 12
     M = 1 # base value, the real one is from the xml file (and is calculated in a previous test)
     Z = MAX_DIST # The depth, for used for calculating M
-    DISPLAY = False
+    DISPLAY = True
 
     # NOTE: if you also have a webcam (that you do not want to use),
-    # cam_left = Camera(camera_id=0, window_name='Left camera')
-    # ret, _ = cam_left.read()
-    # if ret is False:
-    #     print(f'Cannot read from camera {cam_left.camera_id}.')
-    cam_right = Camera(camera_id=1, window_name='Right camera')
+    cam_left = Camera(camera_id=2, window_name='Left camera')
+    ret, _ = cam_left.read()
+    if ret is False:
+        print(f'Cannot read from camera {cam_left.camera_id}.')
+    cam_right = Camera(camera_id=0, window_name='Right camera')
     ret, _ = cam_right.read()
     if ret is False:
         print(f'Cannot read from camera {cam_right.camera_id}.')
@@ -250,8 +250,7 @@ if __name__ == '__main__':
                         pos_val,
                         (pos_val[0] + size_val[0], pos_val[1] + size_val[1]),
                         color=(255, 200, 40))
-                else:
-                    print(int(np.sum(average)/len(average)))
+                print(int(np.sum(average)/len(average)))
 
             if DISPLAY:
                 cv.imshow('frame left', frame_left)

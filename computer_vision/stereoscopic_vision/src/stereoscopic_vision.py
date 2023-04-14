@@ -138,33 +138,42 @@ if __name__ == '__main__':
     BLUR = 12
     M = 1 # base value, the real one is from the xml file (and is calculated in a previous test)
     Z = MAX_DIST # The depth, for used for calculating M
+    DISPLAY = True
 
     # NOTE: if you also have a webcam (that you do not want to use),
     cam_left = Camera(camera_id=2, window_name='Left camera')
-    cam_right = Camera(camera_id=1, window_name='Right camera')
+    ret, _ = cam_left.read()
+    if ret is False:
+        print(f'Cannot read from camera {cam_left.camera_id}.')
+    cam_right = Camera(camera_id=0, window_name='Right camera')
+    ret, _ = cam_right.read()
+    if ret is False:
+        print(f'Cannot read from camera {cam_right.camera_id}.')
     stereo_vision = StereoscopicVision(MAPS_PATH, PARAMETER_PATH)
 
-    cv.namedWindow('disp', cv.WINDOW_NORMAL)
-    cv.namedWindow('disparity', cv.WINDOW_NORMAL)
+    if DISPLAY:
+        cv.namedWindow('disp', cv.WINDOW_NORMAL)
+        cv.namedWindow('disparity', cv.WINDOW_NORMAL)
 
-    def nothing(_):
-        '''Empty function'''
+        def nothing(_):
+            '''Empty function'''
 
-    print('Creating trackbars...')
-    # creating trackbars for testing
-    cv.createTrackbar('num_disparities','disp',1,17, nothing)
-    cv.createTrackbar('block_size','disp',3,20,nothing)
+        print('Creating trackbars...')
+        # creating trackbars for testing
+        cv.createTrackbar('num_disparities','disp',1,17, nothing)
+        cv.createTrackbar('block_size','disp',3,20,nothing)
 
-    print('Setting trackbar positions...')
-    # Getting parameter information from previous tests, if there is one
-    if os.path.exists(PARAMETER_PATH):
-        file_read = cv.FileStorage(PARAMETER_PATH, cv.FILE_STORAGE_READ)
-        cv.setTrackbarPos('num_disparities','disp',
-            int(stereo_vision.parameters.num_disparities/16))
-        cv.setTrackbarPos('block_size','disp',
-            int((stereo_vision.parameters.block_size-5)/2))
-        M = file_read.getNode('M').real()
-        file_read.release()
+    if DISPLAY:
+        print('Setting trackbar positions...')
+        # Getting parameter information from previous tests, if there is one
+        if os.path.exists(PARAMETER_PATH):
+            file_read = cv.FileStorage(PARAMETER_PATH, cv.FILE_STORAGE_READ)
+            cv.setTrackbarPos('num_disparities','disp',
+                int(stereo_vision.parameters.num_disparities/16))
+            cv.setTrackbarPos('block_size','disp',
+                int((stereo_vision.parameters.block_size-5)/2))
+            M = file_read.getNode('M').real()
+            file_read.release()
 
     CURRENT_DEPTH = 500
     STEP_SIZE = 200 # Reduce the current depth by step size for every mouse press
@@ -174,31 +183,33 @@ if __name__ == '__main__':
 
     # Defining callback functions for mouse events
     # pylint: disable=W0613
-    def mouse_click(event, x_pos, y_pos, flags, param):
-        '''Recognize when the mouse is pressed'''
-        # pylint: disable=W0603
-        global CURRENT_DEPTH
-        if event == cv.EVENT_LBUTTONDBLCLK:
-            print('Pressing...')
-            if current_disparity[y_pos,x_pos] > 0:
-                value_pairs.append([CURRENT_DEPTH, current_disparity[y_pos, x_pos]])
-                print(f'Distance: {CURRENT_DEPTH} cm  | \
-                    Disparity: {current_disparity[y_pos, x_pos]}')
-                CURRENT_DEPTH += STEP_SIZE
+    if DISPLAY:
+        def mouse_click(event, x_pos, y_pos, flags, param):
+            '''Recognize when the mouse is pressed'''
+            # pylint: disable=W0603
+            global CURRENT_DEPTH
+            if event == cv.EVENT_LBUTTONDBLCLK:
+                print('Pressing...')
+                if current_disparity[y_pos,x_pos] > 0:
+                    value_pairs.append([CURRENT_DEPTH, current_disparity[y_pos, x_pos]])
+                    print(f'Distance: {CURRENT_DEPTH} cm  | \
+                        Disparity: {current_disparity[y_pos, x_pos]}')
+                    CURRENT_DEPTH += STEP_SIZE
 
-    cv.setMouseCallback('disparity', mouse_click)
 
-    DIRECTORY_LEFT_IMAGE = \
-        'computer_vision/stereoscopic_vision/images/test_images/frame left.png'
-    DIRECTORY_RIGHT_IMAGE = \
-        'computer_vision/stereoscopic_vision/images/test_images/frame right.png'
+        cv.setMouseCallback('disparity', mouse_click)
 
-    if not os.path.exists(DIRECTORY_LEFT_IMAGE):
-        print(f'{DIRECTORY_LEFT_IMAGE} does not exists')
-        raise FileExistsError
-    if not os.path.exists(DIRECTORY_RIGHT_IMAGE):
-        print(f'{DIRECTORY_RIGHT_IMAGE} does not exists')
-        raise FileExistsError
+    # DIRECTORY_LEFT_IMAGE = \
+    #     'computer_vision/stereoscopic_vision/images/test_images/frame left.png'
+    # DIRECTORY_RIGHT_IMAGE = \
+    #     'computer_vision/stereoscopic_vision/images/test_images/frame right.png'
+
+    # if not os.path.exists(DIRECTORY_LEFT_IMAGE):
+    #     print(f'{DIRECTORY_LEFT_IMAGE} does not exists')
+    #     raise FileExistsError
+    # if not os.path.exists(DIRECTORY_RIGHT_IMAGE):
+    #     print(f'{DIRECTORY_RIGHT_IMAGE} does not exists')
+    #     raise FileExistsError
 
     print('Running...')
     while True:
@@ -214,15 +225,16 @@ if __name__ == '__main__':
             # NOTE: it might help to blur the image to reduce noise
             # Displaying the disparity
             # Updating the parameters based on the trackbar positions
-            gtp_num_disparities = cv.getTrackbarPos('num_disparities', 'disp')
-            gtp_block_size = cv.getTrackbarPos('block_size','disp')
+            if DISPLAY:
+                gtp_num_disparities = cv.getTrackbarPos('num_disparities', 'disp')
+                gtp_block_size = cv.getTrackbarPos('block_size','disp')
 
-            stereo_vision.parameters.num_disparities = max(gtp_num_disparities*16, 16)
-            stereo_vision.parameters.block_size = gtp_block_size*2 + 5
+                stereo_vision.parameters.num_disparities = max(gtp_num_disparities*16, 16)
+                stereo_vision.parameters.block_size = gtp_block_size*2 + 5
 
-            # # Setting the updated parameters before computing disparity map
-            stereo_vision.stereo.setNumDisparities(stereo_vision.parameters.num_disparities)
-            stereo_vision.stereo.setBlockSize(stereo_vision.parameters.block_size)
+                # # Setting the updated parameters before computing disparity map
+                stereo_vision.stereo.setNumDisparities(stereo_vision.parameters.num_disparities)
+                stereo_vision.stereo.setBlockSize(stereo_vision.parameters.block_size)
 
             current_disparity = stereo_vision.get_disparity(frame_left, frame_right)
             ret_val, depth_val, pos_val, size_val = stereo_vision.get_data(
@@ -231,16 +243,19 @@ if __name__ == '__main__':
             if ret_val and depth_val[0][0] is not None:
                 average.pop()
                 average.append(depth_val[0][0])
-                cv.putText(frame_left, f'{int(np.sum(average)/len(average))} cm',
-                    [pos_val[0] + 5, pos_val[1] + 40], 1, 2, (40, 200, 40), 2, 2)
-                cv.rectangle(current_disparity,
-                    pos_val,
-                    (pos_val[0] + size_val[0], pos_val[1] + size_val[1]),
-                    color=(255, 200, 40))
+                if DISPLAY:
+                    cv.putText(frame_left, f'{int(np.sum(average)/len(average))} cm',
+                        [pos_val[0] + 5, pos_val[1] + 40], 1, 2, (40, 200, 40), 2, 2)
+                    cv.rectangle(current_disparity,
+                        pos_val,
+                        (pos_val[0] + size_val[0], pos_val[1] + size_val[1]),
+                        color=(255, 200, 40))
+                print(int(np.sum(average)/len(average)))
 
-            cv.imshow('frame left', frame_left)
-            cv.imshow('frame right', frame_right)
-            cv.imshow('disparity', current_disparity)
+            if DISPLAY:
+                cv.imshow('frame left', frame_left)
+                cv.imshow('frame right', frame_right)
+                cv.imshow('disparity', current_disparity)
 
             if CURRENT_DEPTH < MIN_DIST:
                 break
@@ -249,23 +264,24 @@ if __name__ == '__main__':
                 print('Quitting...')
                 break
 
-    cv.destroyWindow('disp')
-    cv.destroyWindow('disparity')
+    if DISPLAY:
+        cv.destroyWindow('disp')
+        cv.destroyWindow('disparity')
 
-    # Calculating the disparity list / inverse, solving M and C
-    # Value paris should be 2 dimensional
-    if len(value_pairs) > 0:
-        value_pairs = np.array(value_pairs)
-        z = value_pairs[:, 0]
-        disp = value_pairs[:,1]
-        disp_inv = 1/disp
+        # Calculating the disparity list / inverse, solving M and C
+        # Value paris should be 2 dimensional
+        if len(value_pairs) > 0:
+            value_pairs = np.array(value_pairs)
+            z = value_pairs[:, 0]
+            disp = value_pairs[:,1]
+            disp_inv = 1/disp
 
-        # Solving for M using least square fitting with QR decomposition method
-        coeff = np.vstack([disp_inv, np.ones(len(disp_inv))]).T
-        ret, dst = cv.solve(coeff, z, flags=cv.DECOMP_QR)
-        M = dst[0, 0]
-        C = dst[1, 0]
-        print('Value of M: ', M)
+            # Solving for M using least square fitting with QR decomposition method
+            coeff = np.vstack([disp_inv, np.ones(len(disp_inv))]).T
+            ret, dst = cv.solve(coeff, z, flags=cv.DECOMP_QR)
+            M = dst[0, 0]
+            C = dst[1, 0]
+            print('Value of M: ', M)
 
     # print('Saving parameters...')
     # cv_file_write = cv.FileStorage(PARAMETER_PATH, cv.FILE_STORAGE_WRITE)

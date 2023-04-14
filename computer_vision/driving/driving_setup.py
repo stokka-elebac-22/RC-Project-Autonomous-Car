@@ -111,6 +111,7 @@ class DrivingSetup:
                     self.car_comm.drive_direction(speed, angle)
                     self.previous['speed'] = speed
                     self.previous['angle'] = angle
+                    self.previous['time'] = time.time()
         print('Stopping...')
         sys.exit()
 

@@ -144,7 +144,7 @@ class CarSerialCommunication(AbstractCommunication):
 
     def set_motor_speed(self, m0_dir: int, m0_speed: int, m1_dir: int, m1_speed):
         '''Set the motor speeds directly'''
-        txt = "rc_controller motor-set-speed {m0_d:d} {m0_v:d} {m1_d:d} {m1_v:d}"
+        txt = "m {m0_d:d} {m0_v:d} {m1_d:d} {m1_v:d}"
         self.send_command(txt.format(
             m0_d = m0_dir, m0_v = m0_speed,
             m1_d = m1_dir, m1_v = m1_speed))

@@ -17,7 +17,8 @@ import yaml
 try:
     from main_window_ui import Ui
     GUI_POSSIBLE = True
-except: # pylint: disable=W0702
+except Exception as error: # pylint: disable=W0703
+    print(error)
     print("Unable to run in GUI mode")
     GUI_POSSIBLE = False
 from main_headless import Headless
@@ -45,10 +46,6 @@ if __name__ == '__main__':
 
 
     args = parser.parse_args()
-    if not os.path.isfile(args.theme + '.ui'):
-        print('Unable to locate the theme file, \
-            please check if it exists in the script folder')
-        sys.exit(0)
 
     if not os.path.isfile(args.config_file + '.yml'):
         print('Unable to locate the config file, \
@@ -58,14 +55,17 @@ if __name__ == '__main__':
     with open(args.config_file + '.yml', encoding="utf8") as f:
         config = yaml.load(f, Loader=yaml.SafeLoader)
 
-    FULL_SCREEN = args.full_screen.lower() in ['true', 1]
-    os.environ['QT_DEVICE_PIXEL_RATIO'] = '0'
-    os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
-    os.environ['QT_SCREEN_SCALE_FACTORS'] = '1'
-    os.environ['QT_SCALE_FACTOR'] = '1'
-
     if config["headless"] is True or GUI_POSSIBLE is False:
         main_thread = Headless(config)
     else:
+        FULL_SCREEN = args.full_screen.lower() in ['true', 1]
+        os.environ['QT_DEVICE_PIXEL_RATIO'] = '0'
+        os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
+        os.environ['QT_SCREEN_SCALE_FACTORS'] = '1'
+        os.environ['QT_SCALE_FACTOR'] = '1'
+        if not os.path.isfile(args.theme + '.ui'):
+            print('Unable to locate the theme file, \
+                please check if it exists in the script folder')
+            sys.exit(0)
         window = Ui(args.theme + '.ui', config, FULL_SCREEN)
     sys.exit(0)

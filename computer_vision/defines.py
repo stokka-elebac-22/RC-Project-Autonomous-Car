@@ -28,9 +28,17 @@ class States(Enum):
     WAITING = 0
     PARKING = 1
     DRIVING = 2
+    STOPPING = 3
+    MANUAL = 4
 
 class MessageId(Enum):
-    '''Enum for CAN message Ids'''
+    '''Enum for message ID's'''
+    NONE = 0
+
+    '''Generic/System messages:'''
+    CMD_SET_STATE = 1
+
+    '''CAN message Ids'''
     CAN_MOTOR_DATA_ID = 16        # 0x010 //  00010 000
     CAN_STEERING_DATA_ID = 24     # 0x018 //  00011 000
 

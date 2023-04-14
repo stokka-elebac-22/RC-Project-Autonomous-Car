@@ -23,11 +23,11 @@ def format_degrees_minutes(coordinates, digits):
 
     return degrees + "." + minutes
 
-def get_position_data(gps):
+def get_position_data(gps_conn):
     ''' This method reads the data from the serial port, the GPS dongle is attached to,
         and then parses the NMEA messages it transmits.
         gps is the serial port, that's used to communicate with the GPS adapter'''
-    data = gps.readline()
+    data = gps_conn.readline()
     message = data[0:6]
     if message == b'$GPRMC':
         # GPRMC = Recommended minimum specific GPS/Transit data

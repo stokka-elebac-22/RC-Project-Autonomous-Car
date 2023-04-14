@@ -47,6 +47,8 @@
     end_point: !!int 2
     car: !!int 10
     QR: !!int 20
+    parking_line: !!int 30
+    lane_line: !!int 31
   camera:
     active: !!str 'web'
     camera_resolution:

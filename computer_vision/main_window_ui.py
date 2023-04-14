@@ -117,8 +117,8 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
                 self.cam_thread[index].stop()
             except AttributeError:
                 pass
-            except Exception as e:
-                print(e)
+            except Exception as error: # pylint: disable=W0703
+                print(error)
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):

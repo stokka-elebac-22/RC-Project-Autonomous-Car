@@ -17,8 +17,8 @@ import yaml
 try:
     from main_window_ui import Ui
     GUI_POSSIBLE = True
-except Exception as e: # pylint: disable=W0702
-    print(e)
+except Exception as error: # pylint: disable=W0703
+    print(error)
     print("Unable to run in GUI mode")
     GUI_POSSIBLE = False
 from main_headless import Headless

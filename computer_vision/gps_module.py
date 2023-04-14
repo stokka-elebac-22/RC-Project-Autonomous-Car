@@ -50,11 +50,11 @@ def get_position_data(gps):
 if __name__ == '__main__':
     print ("Application started!")
     gps = serial.Serial(SERIAL_PORT, baudrate = 9600, timeout = 0.5)
-    running = True
-    while running:
+    RUNNING = True
+    while RUNNING:
         try:
             get_position_data(gps)
         except KeyboardInterrupt:
-            running = False
+            RUNNING = False
             gps.close()
             print ("Application closed!")

@@ -1,7 +1,6 @@
+''' GPS Module example '''
 import serial
-'''
-    GPS Module example
-'''
+
 SERIAL_PORT = "/dev/serial0"
 
 def format_degrees_minutes(coordinates, digits):

@@ -13,6 +13,9 @@ try:
     from computer_vision.environment.src.environment import Environment, ViewPointObject
     from computer_vision.pathfinding.pathfinding import PathFinding
     from computer_vision.qr_code.qr_code import QRCode, QRSize
+    from computer_vision.line_detection.lane_detection import LaneDetector
+    from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
+    from computer_vision.traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
 except ImportError:
     from camera_handler.camera_handler import CameraHandler
     from camera_handler.camera import Camera
@@ -20,6 +23,9 @@ except ImportError:
     from environment.src.environment import Environment, ViewPointObject
     from pathfinding.pathfinding import PathFinding
     from qr_code.qr_code import QRCode, QRSize
+    from line_detection.lane_detection import LaneDetector
+    from line_detection.parking_slot_detection import ParkingSlotDetector
+    from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
 
 class Simulation: # pylint: disable=R0903
     '''
@@ -32,12 +38,18 @@ class Simulation: # pylint: disable=R0903
             self.cam = self.__camera_setup()
         pathfinding = self.__pathfinding_setup()
         qr_code = self.__qr_code_setup()
+        parking_slot_detector = self.__parking_slot_detector_setup()
+        lane_detector = self.__lane_detector_setup()
+        traffic_sign_detector = self.__traffic_sign_detector_setup()
 
         # ----- DRIVING ----- #
         driving = Driving(
             conf=conf,
             pathfinding=pathfinding,
-            qr_code=qr_code)
+            qr_code=qr_code,
+            parking_slot_detector=parking_slot_detector,
+            lane_detector=lane_detector,
+            stop_sign_detector=traffic_sign_detector)
         self.driving_setup = DrivingSetup(
             conf=conf,
             driving=driving,
@@ -105,6 +117,38 @@ class Simulation: # pylint: disable=R0903
         }
         qr_code = QRCode(qr_size)
         return qr_code
+    
+    def __parking_slot_detector_setup(self):
+        parking_slot_detector = ParkingSlotDetector(
+            canny=self.conf['parking_slot_detector']['canny'],
+            hough=self.conf['parking_slot_detector']['hough'],
+            blur=self.conf['parking_slot_detector']['blur'],
+            iterations=self.conf['parking_slot_detector']['iterations'],
+            filter_atol=self.conf['parking_slot_detector']['canny'],
+        )
+        return parking_slot_detector
+
+    def __lane_detector_setup(self):
+        lane_detector = LaneDetector(
+            canny=self.conf['lane_detector']['canny'],
+            blur=self.conf['lane_detector']['blur'],
+            hough=self.conf['lane_detector']['hough'],
+            width=self.conf['lane_detector']['width']
+        )
+        return lane_detector
+
+    def __traffic_sign_detector_setup(self):
+        traffic_size: QRSize = {
+            'px': self.conf['sign_size']['px'],
+            'mm': self.conf['sign_size']['mm'],
+            'distance': self.conf['sign_size']['distance'],
+        }
+        min_size_traffic = self.conf['traffic_sign']['min_size']
+        stop_sign_detector = TrafficSignDetector('cascade.xml',
+                                                      traffic_size,
+                                                      min_size_traffic)
+        return stop_sign_detector
+
 
     def run(self):
         '''Run the simulation'''

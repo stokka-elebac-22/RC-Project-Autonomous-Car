@@ -108,8 +108,17 @@ class DrivingSetup:
         ret, frame = self.camera.read()
         if not ret:
             return None
-        if self.state == States.DRIVING:
-            actions: List[ActionsDict] = self.driving.driving(frame, self.camera.get_dimensions())
+        match self.state:
+            case States.WAITING:
+                actions: List[ActionsDict] = self.driving.waiting(frame)
+            case States.DRIVING:
+                actions: List[ActionsDict] = \
+                    self.driving.driving(frame, self.camera.get_dimensions())
+            case States.STOPPING:
+                actions: List[ActionsDict] = self.driving.stopping(frame)
+            case States.PARKING:
+                actions: List[ActionsDict] = \
+                    self.driving.parking(frame, self.camera.get_dimensions())
         return actions
 
     def display(self, angle, distance) -> bool:

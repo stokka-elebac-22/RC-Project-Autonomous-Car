@@ -37,6 +37,8 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     def __init__(self, ui_file, conf: dict, fullscreen: bool):
         self.connection_details = conf["network"]
         self.camera_handler = CameraHandler()
+        self.fps_count = 0
+        self.output_data = ''
         # Create an instance of QtWidgets.QApplication
         self.app = QtWidgets.QApplication(sys.argv)
 
@@ -86,11 +88,11 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         self.refresh_webcam_list()
 
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(50)
-        # self.timer.timeout.connect(self.update_plot_data)
+        self.timer.setInterval(500)
+        self.timer.timeout.connect(self.update_plots_and_label_data)
         self.timer.start()
 
-        # self.update_plot_data()
+        self.update_plots_and_label_data()
 
         if fullscreen:
             self.showFullScreen()
@@ -123,21 +125,21 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
         '''Updates the image_label with a new opencv image'''
+        self.fps_count += 1
+        qr_output = ''
         output_frame = cv_img
         qt_img = self.camera_handler.convert_cv_qt(
             cv_img, self.img_input[0].width(), self.img_input[0].height())
         current_qr_data = self.qr_code.get_data(cv_img)
-        output_data = 'Data: \n'
         # print(current_qr_data)
         if current_qr_data['ret']:
             self.qr_code.display(output_frame, current_qr_data, verbose=0)
             for i in range(len(current_qr_data['distances'])):
-                output_data += \
-                    f"QR-Code {str(i)} \n \
-                        Distance: {round(current_qr_data['distances'][i])} \n \
-                        Angle: {current_qr_data['angles'][i]} \n"
-
-                output_data += 'Data: ' + current_qr_data['info'][i] + '\n'
+                qr_output += \
+                    f"-QR-Code {str(i)} \n \
+                        Distance: {round(current_qr_data['distances'][i], 5)} \
+                        Angle: {round(current_qr_data['angles'][i], 5)} \n  \
+                        Data: {current_qr_data['info'][i]}"
 
         current_stop_sign = self.stop_sign_detector.detect_signs(cv_img)
         self.stop_sign_detector.show_signs(output_frame, current_stop_sign)
@@ -148,7 +150,7 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         # print('Setting new image')
         self.img_input[0].setPixmap(qt_img)
         self.img_output.setPixmap(output_img)
-        self.output_text.setText(output_data)
+        self.output_data = 'Data:\n ' + qr_output
 
     def update_image2(self, cv_img):
         '''Updates image2 with a new opencv image'''
@@ -183,4 +185,9 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         self.check_and_start_camera(self.chk_enable[0], 0)
         self.check_and_start_camera(self.chk_enable[1], 1)
 
-    # def update_plot_data(self):
+    def update_plots_and_label_data(self):
+        '''Update plots and label data'''
+        if self.fps_count > 0:
+            self.output_data += f'\nFPS: {self.fps_count * 2}'
+            self.fps_count = 0
+            self.output_text.setText(self.output_data) # pylint: disable=E0001

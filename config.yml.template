@@ -13,6 +13,9 @@
     stream_en_cam0: !!bool True
     port_cam1: !!int 2006
     stream_en_cam1: !!bool False
+    host_list: [
+      { name: "localhost", host: "127.0.0.1", port: 2004 }
+    ]
   car_comm_interface: !!str "serial"   # "serial", "can", "stepper"
   serial:
     active: !!bool false

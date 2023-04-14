@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_main_view">
        <attribute name="title">
@@ -96,7 +96,7 @@
            </layout>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0,10">
+           <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0,0,10">
             <item>
              <layout class="QFormLayout" name="formLayout">
               <item row="1" column="0">
@@ -153,6 +153,13 @@
              <widget class="QCheckBox" name="chk_qrdetect">
               <property name="text">
                <string>QR-Code</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="chk_stop_sign">
+              <property name="text">
+               <string>Stop sign detection</string>
               </property>
              </widget>
             </item>

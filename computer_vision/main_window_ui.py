@@ -58,6 +58,14 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
             self.findChild(QtWidgets.QCheckBox, 'input_chk_enable_1'),
             self.findChild(QtWidgets.QCheckBox, 'input_chk_enable_2')
         ]
+        self.chk_computer_vision = [
+            self.findChild(QtWidgets.QCheckBox, 'chk_linedetect'),
+            self.findChild(QtWidgets.QCheckBox, 'chk_objectdetect'),
+            self.findChild(QtWidgets.QCheckBox, 'chk_disparity'),
+            self.findChild(QtWidgets.QCheckBox, 'chk_qrdetect'),
+            self.findChild(QtWidgets.QCheckBox, 'chk_stop_sign')
+        ]
+
         self.cam_thread = ["", ""]
         self.chk_enable[0].stateChanged.connect(
             lambda: self.check_and_start_camera(self.chk_enable[0], 0))
@@ -124,39 +132,47 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
-        '''Updates the image_label with a new opencv image'''
+        '''Updates the image_label with a new OpenCV image'''
         self.fps_count += 1
         qr_output = ''
         output_frame = cv_img
         qt_img = self.camera_handler.convert_cv_qt(
             cv_img, self.img_input[0].width(), self.img_input[0].height())
-        current_qr_data = self.qr_code.get_data(cv_img)
-        # print(current_qr_data)
-        if current_qr_data['ret']:
-            self.qr_code.display(output_frame, current_qr_data, verbose=0)
-            for i in range(len(current_qr_data['distances'])):
-                qr_output += \
-                    f"-QR-Code {str(i)} \n \
-                        Distance: {round(current_qr_data['distances'][i], 5)} \
-                        Angle: {round(current_qr_data['angles'][i], 5)} \n  \
-                        Data: {current_qr_data['info'][i]}"
 
-        current_stop_sign = self.stop_sign_detector.detect_signs(cv_img)
-        self.stop_sign_detector.show_signs(output_frame, current_stop_sign)
+        ## QR Code
+        if self.chk_computer_vision[3].isChecked():
+            current_qr_data = self.qr_code.get_data(cv_img)
+            # print(current_qr_data)
+            if current_qr_data['ret']:
+                self.qr_code.display(output_frame, current_qr_data, verbose=0)
+                for i in range(len(current_qr_data['distances'])):
+                    qr_output += \
+                        f"-QR-Code {str(i)} \n \
+                            Distance: {round(current_qr_data['distances'][i], 5)} \
+                            Angle: {round(current_qr_data['angles'][i], 5)} \n  \
+                            Data: {current_qr_data['info'][i]}"
 
+        ## Stop sign detection
+        if self.chk_computer_vision[4].isChecked():
+            current_stop_sign = self.stop_sign_detector.detect_signs(cv_img)
+            self.stop_sign_detector.show_signs(output_frame, current_stop_sign)
+
+        ## Adjust output image to fit frame
         output_img = self.camera_handler.convert_cv_qt(
             cv_img, self.img_output.width(), self.img_output.height())
 
-        # print('Setting new image')
+        # Set new frame
         self.img_input[0].setPixmap(qt_img)
         self.img_output.setPixmap(output_img)
+
+        # Ready current data
         self.output_data = 'Data:\n ' + qr_output
 
     def update_image2(self, cv_img):
         '''Updates image2 with a new opencv image'''
         qt_img = self.camera_handler.convert_cv_qt(
             cv_img, self.img_input[0].width(), self.img_input[0].height())
-        # print('Setting new image')
+        # Update frame 2
         self.img_input[1].setPixmap(qt_img)
 
     def refresh_webcam_list(self):

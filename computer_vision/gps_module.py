@@ -1,8 +1,9 @@
 import serial
-SERIAL_PORT = "/dev/serial0"
 '''
     GPS Module example
 '''
+SERIAL_PORT = "/dev/serial0"
+
 def format_degrees_minutes(coordinates, digits):
     ''' In the NMEA message, the position gets transmitted as:
         DDMM.MMMMM, where DD denotes the degrees and MM.MMMMM denotes
@@ -47,14 +48,14 @@ def get_position_data(gps):
         # Handle other NMEA messages and unsupported strings
         pass
 
-print ("Application started!")
-gps = serial.Serial(SERIAL_PORT, baudrate = 9600, timeout = 0.5)
-
-running = True
-while running:
-    try:
-        get_position_data(gps)
-    except KeyboardInterrupt:
-        running = False
-        gps.close()
-        print ("Application closed!")
+if __name__ == '__main__':
+    print ("Application started!")
+    gps = serial.Serial(SERIAL_PORT, baudrate = 9600, timeout = 0.5)
+    running = True
+    while running:
+        try:
+            get_position_data(gps)
+        except KeyboardInterrupt:
+            running = False
+            gps.close()
+            print ("Application closed!")

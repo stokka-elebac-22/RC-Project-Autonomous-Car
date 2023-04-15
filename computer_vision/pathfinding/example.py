@@ -96,7 +96,8 @@ if __name__ == '__main__':
         'view_point': None,
         'object_id': 10,
     }
-    env = Environment(BOARD_SIZE, ENV_SIZE, view_point_object)
+
+    env = Environment(BOARD_SIZE, (PIXEL_WIDTH, PIXEL_HEIGHT), ENV_SIZE, view_point_object)
 
     # pathfinding algorithm
     a_star = AStar(weight=2, penalty=2, hindrance_ids=[1, 30])
@@ -105,7 +106,6 @@ if __name__ == '__main__':
     display = DisplayEnvironment(WINDOW_SIZE, BOARD_SIZE)
 
     path_finding = PathFinding(
-        [PIXEL_WIDTH, PIXEL_HEIGHT],
         env,
         a_star,
         TENSION,

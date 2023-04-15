@@ -1,7 +1,7 @@
 '''Test the environment'''
 import pytest
 import numpy as np
-from computer_vision.environment.src.environment import Environment
+from computer_vision.environment.src.environment import Environment, ViewPointObject
 
 class TestEnvironment:
     '''Testing the environment'''
@@ -14,8 +14,28 @@ class TestEnvironment:
     @pytest.mark.skip(reason="no way of testing this without a video device")
     def test_init(self, size, exp):
         '''Testing the init method'''
-        env = Environment(size, 1)
+        pixel_width = 300
+        pixel_height = 500
+        env = Environment(size,[pixel_width, pixel_height], 1)
         assert env.size == (exp, exp) and len(env.map) == exp and len(env.map[0]) == exp
+
+    @pytest.mark.parametrize('point, expected', [
+        ((20, 300), (-98.71690549205113, 920.3376614349003)),
+        ((10, 50), (-103.18577414502009, 893.8827273349013))])
+    def test_point_to_distance(self, point, expected):
+        '''Testing point to distance'''
+        board_size = (60, 115)
+        env_size = 20
+        pixel_width = 300
+        pixel_height = 500
+        view_point_object: ViewPointObject = {
+            'view_point': None,
+            'object_id': 10,
+        }
+        env = Environment(board_size, [pixel_width, pixel_height], env_size, view_point_object)
+        result = env.point_to_distance(point)
+        assert result[0] == pytest.approx(expected[0], 0.001)
+        assert result[1] == pytest.approx(expected[1], 0.001)
 
     @pytest.mark.parametrize(
         ['param', 'exp'],
@@ -39,7 +59,9 @@ class TestEnvironment:
 
     def test_insert(self, param, exp):
         '''Testing inserting object into the environment'''
-        env = Environment(param[0], param[2], param[1])
+        pixel_width = 300
+        pixel_height = 500
+        env = Environment(param[0], [pixel_width, pixel_height], param[2], param[1])
         ret = env.insert(param[3], param[4])
         data = env.get_data()
         assert ret[0] == exp[0] and are_same(data, exp[1])
@@ -53,7 +75,9 @@ class TestEnvironment:
 
     def test_reset(self, param, exp):
         '''Testing the reset method'''
-        env = Environment(param[0], param[1])
+        pixel_width = 300
+        pixel_height = 500
+        env = Environment(param[0], [pixel_width, pixel_height], param[1])
         env.map = param[2]
         env.reset()
         env.map = exp
@@ -73,7 +97,9 @@ class TestEnvironment:
 
     def test_remove(self, param, exp):
         '''Testing removing object(s)'''
-        env = Environment(param[0], param[2], param[1])
+        pixel_width = 300
+        pixel_height = 500
+        env = Environment(param[0], [pixel_width, pixel_height], param[2], param[1])
         for pos, obj_id in zip(param[3], param[4]):
             env.insert(pos, obj_id)
         env.remove(param[5], param[6])
@@ -100,7 +126,9 @@ class TestEnvironment:
 
     def test_insert_by_index(self, param, exp):
         '''Testing inserting object by index into the environment'''
-        env = Environment(param[0], param[2], param[1])
+        pixel_width = 300
+        pixel_height = 500
+        env = Environment(param[0], [pixel_width, pixel_height], param[2], param[1])
         ret = env.insert_by_index(param[3], param[4])
         data = env.get_data()
         assert ret == exp[0] and are_same(data, exp[1])
@@ -115,7 +143,9 @@ class TestEnvironment:
 
     def test_get_pos(self, param, exp):
         '''Test find position of object'''
-        env = Environment((5, 5), 1)
+        pixel_width = 300
+        pixel_height = 500
+        env = Environment((5, 5), [pixel_width, pixel_height], 1)
         env.insert(param[0], param[1])
         pos = env.get_pos(param[1])
         assert pos == exp

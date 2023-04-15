@@ -9,11 +9,12 @@ ViewPointObject = TypedDict('ViewPointObject', {
 })
 class Environment:
     '''Creating a 2 dimensional map of the 3 dimensional world'''
-    def __init__(self, size: Tuple[int, int], real_size: float,
+    def __init__(self, size: Tuple[int, int], pixel_size: Tuple[int, int], real_size: float,
             view_point_object: ViewPointObject = None):
         '''View point is the position in a 2d matrix where everyting should be relativ too'''
         self.size = size
         self.real_size = real_size # the real unit size per square
+        self.pixel_size = pixel_size
         self.map = np.zeros(self.size)
 
         self.view_point = (self.size[0]-1, self.size[1]//2)
@@ -53,6 +54,22 @@ class Environment:
                 if col == object_id:
                     return (i, j)
         return None
+    
+    def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
+        '''Converts point to distance'''
+        offset_x = point[0] - self.pixel_size[0]/2
+        offset_y = self.pixel_size[1] - point[1]
+        # Height 123mm
+        y_distance = -0.000000443*pow(np.int64(offset_y), np.int64(4)) \
+                    + 0.0002751831*pow(np.int64(offset_y), np.int64(3)) \
+                    - 0.0382433809*pow(np.int64(offset_y), np.int64(2)) \
+                    + 3.0818720986*offset_y \
+                    + 341.0336777149
+        ratio_x= 0.0008436826 * y_distance -0.0171120596
+        if y_distance > 1700:
+            y_distance= 1700
+        x_distance = offset_x*ratio_x
+        return (x_distance, y_distance)
 
     def insert(self, distance: Tuple[float, float], object_id: int) -> bool:
         '''

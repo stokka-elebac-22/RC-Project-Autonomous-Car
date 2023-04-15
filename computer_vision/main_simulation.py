@@ -89,7 +89,7 @@ class Simulation: # pylint: disable=R0903
         )
 
         # ----- INIT PATHFINDING ----- #
-            
+
         pathfinding: PathFinding = PathFinding(
             environment=environment,
             pathfinding_algorithm=a_star,

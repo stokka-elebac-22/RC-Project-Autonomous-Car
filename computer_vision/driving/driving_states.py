@@ -27,7 +27,7 @@ class DrivingStates:
                  stop_sign_detector: TrafficSignDetector,
                  parking_slot_detector: ParkingSlotDetector,
                  lane_detector: LaneDetector
-                 ):
+                 ): # pylint: disable=R0913
         '''Init'''
         self.conf = conf
         self.pathfinding = pathfinding
@@ -175,7 +175,7 @@ class DrivingStates:
                             'time': action_time,
                         })
                     return actions
-            return None
+        return None
 
     def stopping(self, frame):
         '''Stopping'''

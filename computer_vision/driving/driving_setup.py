@@ -1,5 +1,4 @@
 '''The script for the driving loop'''
-import sys
 import time
 from collections import deque
 from typing import List

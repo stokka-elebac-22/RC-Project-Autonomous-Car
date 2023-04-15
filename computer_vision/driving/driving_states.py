@@ -77,7 +77,6 @@ class DrivingStates:
             if current_qr_data['distances'] is not None and \
                     len(current_qr_data['distances']) > 0:
                 print(output_data)
-        return None
 
     def driving(self, frame):
         '''Driving'''
@@ -88,7 +87,7 @@ class DrivingStates:
                 if line is not None:
                     objects.append({'values': [
                                     (line[0], line[1]), (line[2], line[3])],
-                                    'distance': False, 
+                                    'distance': False,
                                     'object_id': self.conf['object_id']['lane_line']})
             check_point = self.lane_detector.get_next_point(frame, avg_lines)
             if check_point is not None:
@@ -120,14 +119,14 @@ class DrivingStates:
                     return actions
         return None
 
-    def parking(self, frame, frame_dimensions):
+    def parking(self, frame, frame_dimensions): # pylint: disable=R0914
         '''Parking'''
         objects: List[self.pathfinding.Objects] = []
 
-        ## QR Code ###
+        ### QR Code ###
         qr_data = self.qr_code.get_data(frame)
         if not qr_data['ret']:
-            return
+            return None
 
         current_qr_data = self.qr_code.get_data(frame)
         if current_qr_data['ret']:

@@ -17,7 +17,7 @@ except ImportError:
     from car_communication.abstract_communication import AbstractCommunication
     from ..lib import display_arrow
 
-class DrivingSetup:
+class DrivingSetup: # pylint: disable=R0902
     '''The loop for driving'''
     def __init__(self, conf: dict,
                  driving: DrivingStates,
@@ -82,8 +82,6 @@ class DrivingSetup:
                     self.previous['speed'] = speed
                     self.previous['angle'] = angle
                     self.previous['time'] = time.time()
-        print('Stopping...')
-        sys.exit()
 
     def __update_actions(self, actions) -> bool:
         '''Update actions'''

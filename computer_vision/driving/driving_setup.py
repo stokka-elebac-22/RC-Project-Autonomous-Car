@@ -124,15 +124,12 @@ class DrivingSetup:
         ret, frame = self.camera.read()
         if not ret:
             return None
-        match self.state:
-            case States.WAITING:
-                actions: List[ActionsDict] = self.driving.waiting(frame)
-            case States.DRIVING:
-                actions: List[ActionsDict] = \
-                    self.driving.driving(frame, self.camera.get_dimensions())
-            case States.STOPPING:
-                actions: List[ActionsDict] = self.driving.stopping(frame)
-            case States.PARKING:
-                actions: List[ActionsDict] = \
-                    self.driving.parking(frame, self.camera.get_dimensions())
+        if self.state == States.WAITING:
+            actions: List[ActionsDict] = self.driving.waiting(frame)
+        elif self.state == States.DRIVING:
+            actions: List[ActionsDict] = self.driving.driving(frame, self.camera.get_dimensions())
+        elif self.state == States.STOPPING:
+            actions: List[ActionsDict] = self.driving.stopping(frame)
+        elif self.state == States.PARKING:
+            actions: List[ActionsDict] = self.driving.parking(frame, self.camera.get_dimensions())
         return actions

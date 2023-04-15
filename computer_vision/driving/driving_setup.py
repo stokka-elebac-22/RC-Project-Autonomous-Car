@@ -7,12 +7,12 @@ import cv2 as cv
 from defines import States
 from defines import ActionsDict
 try:
-    from computer_vision.driving.driving_states import Driving
+    from computer_vision.driving.driving_states import DrivingStates
     from computer_vision.camera_handler.camera import Camera
     from computer_vision.car_communication.abstract_communication import AbstractCommunication
     from computer_vision.lib import display_arrow
 except ImportError:
-    from driving import Driving
+    from driving_states import DrivingStates
     from camera_handler.camera import Camera
     from car_communication.abstract_communication import AbstractCommunication
     from ..lib import display_arrow
@@ -20,7 +20,7 @@ except ImportError:
 class DrivingSetup:
     '''The loop for driving'''
     def __init__(self, conf: dict,
-                 driving: Driving,
+                 driving: DrivingStates,
                  camera: Camera=None,
                  car_comm: AbstractCommunication= None):
         self.conf = conf

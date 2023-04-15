@@ -55,6 +55,7 @@ class Environment:
                     return (i, j)
         return None
 
+    # pylint: disable=E1136
     def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
         offset_x = point[0] - self.pixel_size[0]/2

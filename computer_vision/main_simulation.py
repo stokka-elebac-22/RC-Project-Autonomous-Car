@@ -2,7 +2,9 @@
 The main file for the driving simulation
 '''
 import os
+import sys
 import yaml
+from pynput import keyboard
 from driving.driving import Driving
 
 if __name__ == '__main__':
@@ -21,6 +23,19 @@ if __name__ == '__main__':
         for image_path in [image_paths['camera_view'], image_paths['arrow']]:
             if not os.path.exists(image_path):
                 raise FileNotFoundError
+
+    # ----- INTERRUPTS ----- #
+    def on_press(key):
+        '''on_press'''
+        if key == keyboard.Key.esc:
+            sys.exit()
+
+    # Collect events until released
+    listener = keyboard.Listener(
+        on_press=on_press
+    )
+    listener.start()
+
 
     simulation = Driving(c)
     simulation.run()

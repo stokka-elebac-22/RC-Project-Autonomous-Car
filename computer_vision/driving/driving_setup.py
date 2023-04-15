@@ -6,7 +6,6 @@ from typing import List
 import cv2 as cv
 from defines import States
 from defines import ActionsDict
-from pynput import keyboard
 try:
     from computer_vision.driving.driving_states import Driving
     from computer_vision.camera_handler.camera import Camera
@@ -45,24 +44,6 @@ class DrivingSetup:
         if self.conf['simulation']['live'] is False:
             self.__init_actions()
 
-        # ----- INTERRUPTS ----- #
-        self.running = True
-        self.__interrupts()
-
-    def __interrupts(self):
-        '''Interrupts'''
-        def on_press(key):
-            if key == keyboard.Key.esc:
-                self.running = False
-                return False
-            return True
-
-        # Collect events until released
-        listener = keyboard.Listener(
-            on_press=on_press
-        )
-        listener.start()
-
     def __init_actions(self):
         frame = cv.imread(self.conf['simulation']['image_paths']['camera_view'])
         height, width, _ = frame.shape
@@ -71,7 +52,7 @@ class DrivingSetup:
 
     def run(self):
         '''Method for running'''
-        while self.running:
+        while True:
             actions = self.next() # pylint: disable=E1102
             if actions is not None:
                 self.actions = actions

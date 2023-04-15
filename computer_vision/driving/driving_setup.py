@@ -1,5 +1,4 @@
 '''The script for the driving loop'''
-import os
 import sys
 import time
 from collections import deque
@@ -11,13 +10,13 @@ from pynput import keyboard
 try:
     from computer_vision.driving.driving_states import Driving
     from computer_vision.camera_handler.camera import Camera
-    from computer_vision.camera_handler.lib import rotate_image
     from computer_vision.car_communication.abstract_communication import AbstractCommunication
+    from computer_vision.lib import display_arrow
 except ImportError:
     from driving import Driving
     from camera_handler.camera import Camera
-    from camera_handler.lib import rotate_image
     from car_communication.abstract_communication import AbstractCommunication
+    from ..lib import display_arrow
 
 class DrivingSetup:
     '''The loop for driving'''
@@ -34,16 +33,6 @@ class DrivingSetup:
             'angle': None,
             'speed': None,
             'time': time.time(),
-        }
-
-        # ----- TEXT ----- #
-        self.image_attributes = {
-            'image_paths': self.conf['simulation']['image_paths'],
-            'org': (25, 50),
-            'font': cv.FONT_HERSHEY_SIMPLEX,
-            'font_scale': 1,
-            'color': (70, 70, 255),
-            'thickness': 1
         }
 
         # ----- STATES ----- #
@@ -103,9 +92,9 @@ class DrivingSetup:
                 angle = self.cur_action['angle']
                 speed = self.cur_action['speed']
                 duration = self.cur_action['time']
-            distance= speed * duration
+            distance = speed * duration
             if self.conf['simulation']['live']:
-                self.display(angle, distance)
+                display_arrow(self.conf, angle, distance)
             else:
                 if self.previous['speed'] != speed and self.previous['angle'] != angle:
                     self.car_comm.drive_direction(speed, angle)
@@ -147,29 +136,3 @@ class DrivingSetup:
                 actions: List[ActionsDict] = \
                     self.driving.parking(frame, self.camera.get_dimensions())
         return actions
-
-    def display(self, angle, distance) -> bool:
-        '''Display the arrow or other symbols'''
-        if angle is None or distance is None:
-            return False
-        distance = int(distance)
-        arrow_image_path = self.image_attributes['image_paths']['arrow']
-        if os.path.exists(arrow_image_path):
-            img = cv.imread(arrow_image_path)
-            img = rotate_image(img, angle) # rotate image
-            img = cv.putText(
-                img,
-                f'Distance: {distance}',
-                self.image_attributes['org'],
-                self.image_attributes['font'],
-                self.image_attributes['font_scale'],
-                self.image_attributes['color'],
-                self.image_attributes['thickness'],
-                cv.LINE_AA)
-            cv.imshow('', img)
-            print(f'Move the car by {distance}mm at an angle of {angle} degrees.')
-            cv.waitKey(0)
-        else:
-            print(f'Path does not exists: {self.image_paths["arrow"]}')
-            raise FileNotFoundError
-        return True

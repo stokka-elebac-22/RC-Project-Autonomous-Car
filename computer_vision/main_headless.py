@@ -22,7 +22,7 @@ from qr_code.qr_code import QRCode, QRSize
 class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
     # pylint: disable=R0902
-    def __init__(self, conf: dict): # pylint: disable=R0912
+    def __init__(self, conf: dict): # pylint: disable=R0912, R0914, R0915
         self.state = States.WAITING  # Start in "idle" state
         self.car_comm: AbstractCommunication
         # pylint: disable=R0903

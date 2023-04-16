@@ -36,27 +36,27 @@ class DrivingStates:
         self.parking_slot_detector = parking_slot_detector
         self.lane_detector = lane_detector
 
-    # def driving(self, frame, frame_dimensions):
-    #     '''Driving'''
-    #     objects: List[self.pathfinding.Objects] = []
-    #     # ----- QR CODE ----- #
-    #     current_qr_data = self.qr_code.get_data(frame)
-    #     if current_qr_data['ret']:
-    #         # assuming only one qr code
-    #         distance_y = current_qr_data['distances'][0]
-    #         distance_x = self.qr_code.qr_geometries[0].get_qr_code_distance_x(
-    #             (frame_dimensions[0]/2, frame_dimensions[1]/2))
-    #         new_object: PathFinding.Objects = {
-    #             'values': [(distance_x, distance_y)],
-    #             'distance': True,
-    #             'object_id': self.conf['object_id']['QR']
-    #         }
-    #         objects.append(new_object)
-    #     self.pathfinding.insert_objects(objects)
-    #     start_id = self.conf['object_id']['car']
-    #     end_id = self.conf['object_id']['QR']
-    #     path_data = self.pathfinding.calculate_path(start_id, end_id)
-    #     return path_data
+    def simulation(self, frame, frame_dimensions):
+        '''Simulation'''
+        objects: List[self.pathfinding.Objects] = []
+        # ----- QR CODE ----- #
+        current_qr_data = self.qr_code.get_data(frame)
+        if current_qr_data['ret']:
+            # assuming only one qr code
+            distance_y = current_qr_data['distances'][0]
+            distance_x = self.qr_code.qr_geometries[0].get_qr_code_distance_x(
+                (frame_dimensions[0]/2, frame_dimensions[1]/2))
+            new_object: PathFinding.Objects = {
+                'values': [(distance_x, distance_y)],
+                'distance': True,
+                'object_id': self.conf['object_id']['QR']
+            }
+            objects.append(new_object)
+        self.pathfinding.insert_objects(objects)
+        start_id = self.conf['object_id']['car']
+        end_id = self.conf['object_id']['QR']
+        path_data = self.pathfinding.calculate_path(start_id, end_id)
+        return path_data
 
     def waiting(self, frame):
         '''Waiting'''

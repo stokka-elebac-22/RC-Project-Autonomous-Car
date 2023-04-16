@@ -46,7 +46,7 @@ class DrivingSetup: # pylint: disable=R0902
     def __init_actions(self):
         frame = cv.imread(self.conf['simulation']['image_paths']['camera_view'])
         height, width, _ = frame.shape
-        actions = self.driving.driving(frame, (width, height))
+        actions = self.driving.simulation(frame, (width, height))
         self.__update_actions(actions)
 
     def run(self):
@@ -73,9 +73,9 @@ class DrivingSetup: # pylint: disable=R0902
                 speed = self.cur_action['speed']
                 duration = self.cur_action['time']
             distance = speed * duration
-            if self.conf['simulation']['live']:
+            if not self.conf['headless']:
                 display_arrow(self.conf, angle, distance)
-            else:
+            if self.conf['headless']:
                 if self.previous['speed'] != speed and self.previous['angle'] != angle:
                     self.car_comm.drive_direction(speed, angle)
                     self.previous['speed'] = speed
@@ -99,6 +99,8 @@ class DrivingSetup: # pylint: disable=R0902
 
     def next(self) -> List[ActionsDict]:
         '''The next iteration in the loop'''
+        if self.camera is None:
+            return
         ret, frame = self.camera.read()
         if not ret:
             return None

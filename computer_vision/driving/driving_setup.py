@@ -52,16 +52,22 @@ class DrivingSetup: # pylint: disable=R0902
     def run(self):
         '''Method for running'''
         while True:
-            actions = self.next() # pylint: disable=E1102
-            if actions is not None:
-                self.actions = actions
+            actions = None
+            if self.conf['simulation']['live'] or self.conf['headless']:
+                actions = self.next() # pylint: disable=E1102
+                if actions is not None:
+                    self.actions = actions
             if self.actions is None or not self.actions:
                 continue
             time_now = self.previous['time'] - time.time()
             # pylint: disable=E1136
-            if actions is not None or \
-                (self.cur_action is not None and time_now >= self.cur_action['time']):
+            if self.conf['simulation']['active']:
                 self.cur_action = self.actions.popleft() if self.actions else None
+            else:
+                if actions is not None or \
+                    (self.cur_action is not None and time_now >= self.cur_action['time']) or \
+                    self.cur_action is None:
+                    self.cur_action = self.actions.popleft() if self.actions else None
 
             if self.cur_action is None or \
                 (self.cur_action is not None and time_now >= self.cur_action['time']):

@@ -75,20 +75,22 @@ class Simulation: # pylint: disable=R0903
             'view_point': None, # will be calculated in the environment class
             'object_id': self.conf['object_id']['car'],
         }
-        environment: Environment = Environment(
-            self.conf['environment']['size'],
-            self.conf['environment']['real_size'],
-            view_point_object,
-        )
-
-        # ----- INIT PATHFINDING ----- #
         if self.conf['simulation']['live']:
             frame_width, frame_height = self.cam.get_dimensions()
         else:
             img = cv.imread(self.conf['simulation']['image_paths']['camera_view'])
             frame_width, frame_height, _ = img.shape
+
+        environment: Environment = Environment(
+            self.conf['environment']['size'],
+            (frame_width, frame_height),
+            self.conf['environment']['real_size'],
+            view_point_object,
+        )
+
+        # ----- INIT PATHFINDING ----- #
+
         pathfinding: PathFinding = PathFinding(
-            pixel_size=(frame_width, frame_height),
             environment=environment,
             pathfinding_algorithm=a_star,
             velocity=self.conf['spline']['velocity']

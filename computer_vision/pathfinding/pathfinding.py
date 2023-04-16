@@ -1,9 +1,8 @@
 '''Main'''
 import os
 import sys
-import math
-from typing import TypedDict, Tuple
-import numpy as np
+from typing import TypedDict
+
 try:
     current = os.path.dirname(os.path.realpath(__file__))
     parent = os.path.dirname(current)
@@ -26,54 +25,18 @@ class PathFinding:
     path with objects that can be hindrances
     '''
     def __init__(self,
-                pixel_size: Tuple[int, int],
                 environment: Environment,
                 pathfinding_algorithm: AStar,
                 tension:float=0.,
                 velocity:float = 10,
                 num_points:int=3,
                 rotate_time:float=0.1): # pylint: disable=R0913
-        self.pixel_size = pixel_size
         self.tension = tension
         self.velocity = velocity
         self.num_points = num_points
         self.__environment = environment
         self.__pathfinding_algorithm = pathfinding_algorithm
         self.rotate_time = rotate_time
-
-    def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
-        '''Converts point to distance'''
-        offset_x = point[0] - self.pixel_size[0]/2
-        offset_y = self.pixel_size[1] - point[1]
-        # Added 150 offset
-        y_distance = -0.000000443*pow(np.int64(offset_y), np.int64(4)) \
-                    +0.0002751831*pow(np.int64(offset_y), np.int64(3)) \
-                    -0.0382433809*pow(np.int64(offset_y), np.int64(2)) \
-                    +3.0818720986*offset_y+341.0336777149
-
-        ratio_x = 0.000843682600000000 * y_distance -0.0171120596000000
-        if y_distance > 1500:
-            y_distance=1500
-        x_distance = offset_x*ratio_x
-        return (x_distance, y_distance)
-
-    # TODO: Maybe fix later
-    def distance_to_point(self, distance:tuple[float, float]) -> tuple[int, int]:
-        '''Converts distance to point'''
-        # x_0 = 5.405*10**(-7)*pow(np.int64(self.pixel_height), np.int64(4)) \
-        # - 0.0002915424*pow(np.int64(self.pixel_height), \
-        # np.int64(3))+0.0579638581*pow(np.int64(self.pixel_height),\
-        # np.int64(2))-2.4604486471*self.pixel_height+430.4886090479-150
-        # x_1 = -0.00002162*pow(np.int64(self.pixel_height),\
-        # np.int64(3))+0.0008746272*pow(np.int64(self.pixel_height),\
-        # np.int64(2))-0.1159277162*self.pixel_height+2.4604486471
-        # x_2 = 0.000003243*pow(np.int64(self.pixel_height), \
-        # np.int64(2))-0.0008746272*self.pixel_width+0.0579638581
-        # x_3 = -0.000002162*self.pixel_width+0.0002915424
-        # x_4 = 5.405*10**(-7)
-        p_x = math.floor((distance[0]/1) + self.pixel_size[0]/1)
-        p_y = math.floor(self.pixel_size[1] - (distance[1]/1))
-        return (p_x, p_y)
 
     Objects = TypedDict('Objects', {
         'values': list[tuple],
@@ -94,7 +57,7 @@ class PathFinding:
                     if groups['distance']:
                         _, coord = self.__environment.insert(group, groups['object_id'])
                     else:
-                        distance = self.point_to_distance(group)
+                        distance = self.__environment.point_to_distance(group)
                         _, coord = self.__environment.insert(
                             distance, groups['object_id'])
                     if coord is not None:

@@ -297,7 +297,7 @@ class Headless():  # pylint: disable=R0903
                 (self.cur_action is not None and time_now > self.cur_action['time'])\
                     or actions_resetted:
                 new_action = self.actions.popleft()
-                if new_action is None: # list is empty, no actions left
+                if new_action is not None: 
                     if self.previous['speed'] != new_action['speed'] and \
                         self.previous['angle'] != new_action('angle'):
                         self.car_comm.drive_direction(new_action['speed'], new_action('angle'))

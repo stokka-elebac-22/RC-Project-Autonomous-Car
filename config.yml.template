@@ -4,8 +4,8 @@
     active: True
     live: False
     image_paths:
-      camera_view: 'computer_vision/driving/images/photo_1.jpg'
-      arrow: 'computer_vision/driving/images/arrow.jpg'
+      camera_view: 'computer_vision/simulation/images/photo_1.jpg'
+      arrow: 'computer_vision/simulation/images/arrow.jpg'
   network:
     host: !!str '10.0.11.116'
     port: !!int 2004

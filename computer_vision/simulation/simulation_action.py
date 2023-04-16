@@ -11,27 +11,21 @@ try:
     from computer_vision.car_communication.abstract_communication import AbstractCommunication
     from computer_vision.lib import display_arrow
 except ImportError:
-    from driving_states import DrivingStates
+    from ..driving.driving_states import DrivingStates
     from camera_handler.camera import Camera
     from car_communication.abstract_communication import AbstractCommunication
     from ..lib import display_arrow
 
-class DrivingSetup: # pylint: disable=R0902
+class SimulationAction: # pylint: disable=R0902
     '''The loop for driving'''
     def __init__(self, conf: dict,
                  driving: DrivingStates,
-                 camera: Camera=None,
-                 car_comm: AbstractCommunication= None):
+                 camera: Camera=None
+                 ):
         self.conf = conf
         self.driving = driving
         self.camera = camera
-        self.car_comm = car_comm
         self.cur_action = None
-        self.previous = {
-            'angle': None,
-            'speed': None,
-            'time': time.time(),
-        }
 
         # ----- STATES ----- #
         self.state = States.DRIVING
@@ -53,40 +47,20 @@ class DrivingSetup: # pylint: disable=R0902
         '''Method for running'''
         while True:
             actions = None
-            if self.conf['simulation']['live'] or self.conf['headless']:
+            if self.conf['simulation']['live']:
                 actions = self.next() # pylint: disable=E1102
                 if actions is not None:
                     self.actions = actions
             if self.actions is None or not self.actions:
                 continue
-            time_now = self.previous['time'] - time.time()
             # pylint: disable=E1136
             if self.conf['simulation']['active']:
                 self.cur_action = self.actions.popleft() if self.actions else None
-            else:
-                if actions is not None or \
-                    (self.cur_action is not None and time_now >= self.cur_action['time']) or \
-                    self.cur_action is None:
-                    self.cur_action = self.actions.popleft() if self.actions else None
-
-            if self.cur_action is None or \
-                (self.cur_action is not None and time_now >= self.cur_action['time']):
-                angle = 0
-                speed = 0
-                duration = 0
-            else:
-                angle = self.cur_action['angle']
-                speed = self.cur_action['speed']
-                duration = self.cur_action['time']
+            angle = self.cur_action['angle']
+            speed = self.cur_action['speed']
+            duration = self.cur_action['time']
             distance = speed * duration
-            if not self.conf['headless']:
-                display_arrow(self.conf, angle, distance)
-            if self.conf['headless']:
-                if self.previous['speed'] != speed and self.previous['angle'] != angle:
-                    self.car_comm.drive_direction(speed, angle)
-                    self.previous['speed'] = speed
-                    self.previous['angle'] = angle
-                    self.previous['time'] = time.time()
+            display_arrow(self.conf, angle, distance)
 
     def __update_actions(self, actions) -> bool:
         '''Update actions'''

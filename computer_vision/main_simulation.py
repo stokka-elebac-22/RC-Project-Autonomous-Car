@@ -4,45 +4,41 @@ The main file for the driving simulation
 import os
 import sys
 import yaml
-<<<<<<< HEAD
 from pynput import keyboard
-from driving.driving import Driving
-=======
-import cv2 as cv
-from simulation.driving import Driving
-from simulation.driving_setup import DrivingSetup
-try:
-    from computer_vision.camera_handler.camera_handler import CameraHandler
-    from computer_vision.camera_handler.camera import Camera
-    from computer_vision.environment.src.a_star import AStar
-    from computer_vision.environment.src.environment import Environment, ViewPointObject
-    from computer_vision.pathfinding.pathfinding import PathFinding
-    from computer_vision.qr_code.qr_code import QRCode, QRSize
-except ImportError:
-    from camera_handler.camera_handler import CameraHandler
-    from camera_handler.camera import Camera
-    from environment.src.a_star import AStar
-    from environment.src.environment import Environment, ViewPointObject
-    from pathfinding.pathfinding import PathFinding
-    from qr_code.qr_code import QRCode, QRSize
+from driving.driving_states import DrivingStates
+from driving.driving_setup import DrivingSetup
+from camera_handler.camera_handler import CameraHandler
+from camera_handler.camera import Camera
+from module_setup import ModuleSetup
 
 class Simulation: # pylint: disable=R0903
     '''
-    The class for running the simulation
+    The class for starting init
     '''
-    def __init__(self, conf: dict) -> None:
+    def __init__(self, conf: dict, module_setup: ModuleSetup) -> None:
         self.conf = conf
         self.cam = None
+        self.cam0_stream = None
+        self.cam1_stream = None
         if self.conf['simulation']['live']:
             self.cam = self.__camera_setup()
-        pathfinding = self.__pathfinding_setup()
-        qr_code = self.__qr_code_setup()
+        
+        print('Initializing the modules')
+        pathfinding = module_setup.pathfinding_setup()
+        qr_code = module_setup.qr_code_setup()
+        parking_slot_detector = module_setup.parking_slot_detector_setup()
+        lane_detector = module_setup.lane_detector_setup()
+        traffic_sign_detector = module_setup.traffic_sign_detector_setup()
 
         # ----- DRIVING ----- #
-        driving = Driving(
+        driving = DrivingStates(
             conf=conf,
             pathfinding=pathfinding,
-            qr_code=qr_code)
+            qr_code=qr_code,
+            parking_slot_detector=parking_slot_detector,
+            lane_detector=lane_detector,
+            stop_sign_detector=traffic_sign_detector)
+        
         self.driving_setup = DrivingSetup(
             conf=conf,
             driving=driving,
@@ -70,55 +66,11 @@ class Simulation: # pylint: disable=R0903
             raise ConnectionError
         return cam
 
-    def __pathfinding_setup(self):
-        print('Setting up pathfinding...')
-        # ----- INIT PARKFINDING ALGORITHM ----- #
-        a_star = AStar(self.conf['a_star']['weight'], self.conf['a_star']['penalty'])
-
-        # ----- INIT ENVIRONMENT ----- #
-        view_point_object: ViewPointObject = {
-            'view_point': None, # will be calculated in the environment class
-            'object_id': self.conf['object_id']['car'],
-        }
-        if self.conf['simulation']['live']:
-            frame_width, frame_height = self.cam.get_dimensions()
-        else:
-            img = cv.imread(self.conf['simulation']['image_paths']['camera_view'])
-            frame_width, frame_height, _ = img.shape
-
-        environment: Environment = Environment(
-            self.conf['environment']['size'],
-            (frame_width, frame_height),
-            self.conf['environment']['real_size'],
-            view_point_object,
-        )
-
-        # ----- INIT PATHFINDING ----- #
-
-        pathfinding: PathFinding = PathFinding(
-            environment=environment,
-            pathfinding_algorithm=a_star,
-            velocity=self.conf['spline']['velocity']
-        )
-        return pathfinding
-
-    def __qr_code_setup(self):
-        print('Setting up QR code...')
-        # ----- INIT QR CODE ----- #
-        qr_size: QRSize = {
-            'px': self.conf['qr_code_size']['px'],
-            'mm': self.conf['qr_code_size']['mm'],
-            'distance': self.conf['qr_code_size']['distance'],
-        }
-        qr_code = QRCode(qr_size)
-        return qr_code
-
     def run(self):
         '''Run the simulation'''
         print('Running...')
         self.driving_setup.run()
 
->>>>>>> 74c1c7426b705f5b5b7fcb59330a8506d9164cdc
 
 if __name__ == '__main__':
     CONFIG_FILE = 'config'
@@ -150,5 +102,5 @@ if __name__ == '__main__':
     listener.start()
 
 
-    simulation = Driving(c)
+    simulation = Simulation(c)
     simulation.run()

@@ -38,90 +38,15 @@ except ImportError:
     from socket_handling.abstract_server import NetworkSettings
     from socket_handling.multi_socket_server import MultiSocketServer
 
-class Driving: # pylint: disable=R0903
+class ModuleSetup: # pylint: disable=R0903
     '''
-    The class for starting init
+    The class for setting up modules
     '''
     def __init__(self, conf: dict) -> None:
         self.conf = conf
-        self.cam = None
-        self.cam0_stream = None
-        self.cam1_stream = None
-        self.car_comm: AbstractCommunication
-        if self.conf['simulation']['live'] or self.conf['headless']:
-            self.cam = self.__camera_setup()
-        if self.conf['headless']:
-            self.__socket_setup()
-        pathfinding = self.__pathfinding_setup()
-        qr_code = self.__qr_code_setup()
-        parking_slot_detector = self.__parking_slot_detector_setup()
-        lane_detector = self.__lane_detector_setup()
-        traffic_sign_detector = self.__traffic_sign_detector_setup()
 
-        # ----- DRIVING ----- #
-        driving = DrivingStates(
-            conf=conf,
-            pathfinding=pathfinding,
-            qr_code=qr_code,
-            parking_slot_detector=parking_slot_detector,
-            lane_detector=lane_detector,
-            stop_sign_detector=traffic_sign_detector)
-        self.driving_setup = DrivingSetup(
-            conf=conf,
-            driving=driving,
-            camera=self.cam)
-        self.run()
-
-    def __socket_setup(self):
-        '''Socket setup'''
-        print('Setting up socket for streaming...')
-        # pylint: disable=R0903
-        if self.conf["car_comm_interface"] == "serial":
-            self.car_comm = CarSerialCommunication(self.conf["serial"])
-        elif self.conf["car_comm_interface"] == "can":
-            self.car_comm = CanBusCommunication(self.conf["can"])
-        self.car_comm.start()
-
-        # Network config for main connection + camera(s)
-        net_main = NetworkSettings(self.conf["network"]["host"], self.conf["network"]["port"])
-        net_cam0 = NetworkSettings(self.conf["network"]["host"], self.conf["network"]["port_cam0"])
-        net_cam1 = NetworkSettings(self.conf["network"]["host"], self.conf["network"]["port_cam1"])
-
-        # Start main socket server for connections
-        socket_server = MultiSocketServer(net_main)
-        socket_server.start()
-
-        self.cam0_stream = CamSocketStream(net_cam0)
-        if self.conf["network"]["stream_en_cam0"] is True:
-            self.cam0_stream.start()
-
-        self.cam1_stream = CamSocketStream(net_cam1)
-        if self.conf["network"]["stream_en_cam1"] is True:
-            self.cam1_stream.start()
-
-    def __camera_setup(self):
-        # ----- CAMERAS ----- #
-        print('Setting up cameras...')
-        camera_handler = CameraHandler()
-        cameras = camera_handler.refresh_camera_list()
-        # finding the resolution
-        resolution = None
-        if self.conf['camera']['active'] == 'web':
-            resolution = self.conf['camera']['camera_resolution']['web']
-        elif self.conf['camera']['active'] == 'logi':
-            resolution = self.conf['camera']['camera_resolution']['logi']
-
-        if resolution is None:
-            cam = Camera(cameras[0]['id'])
-        else:
-            cam = Camera(cameras[0]['id'], resolution)
-        ret, _ = cam.read()
-        if not ret:
-            raise ConnectionError
-        return cam
-
-    def __pathfinding_setup(self):
-        print('Setting up pathfinding...')
+    def pathfinding_setup(self):
+        '''Init Pathfinding'''
         # ----- INIT PARKFINDING ALGORITHM ----- #
         a_star = AStar(self.conf['a_star']['weight'], self.conf['a_star']['penalty'])
 
@@ -151,7 +76,9 @@ class Driving: # pylint: disable=R0903
         )
         return pathfinding
 
-    def __qr_code_setup(self):
+    def qr_code_setup(self):
+        '''Init QR'''
+
         print('Setting up QR code...')
         # ----- INIT QR CODE ----- #
         qr_size: QRSize = {
@@ -162,7 +89,8 @@ class Driving: # pylint: disable=R0903
         qr_code = QRCode(qr_size)
         return qr_code
 
-    def __parking_slot_detector_setup(self):
+    def parking_slot_detector_setup(self):
+        '''Init Parking Slot Detector'''
         parking_slot_detector = ParkingSlotDetector(
             canny=self.conf['parking_slot_detector']['canny'],
             hough=self.conf['parking_slot_detector']['hough'],
@@ -172,7 +100,8 @@ class Driving: # pylint: disable=R0903
         )
         return parking_slot_detector
 
-    def __lane_detector_setup(self):
+    def lane_detector_setup(self):
+        '''Init Lane Detector'''
         lane_detector = LaneDetector(
             canny=self.conf['lane_detector']['canny'],
             blur=self.conf['lane_detector']['blur'],
@@ -181,7 +110,8 @@ class Driving: # pylint: disable=R0903
         )
         return lane_detector
 
-    def __traffic_sign_detector_setup(self):
+    def traffic_sign_detector_setup(self):
+        '''Init Traffic Sign Detector'''
         traffic_size: QRSize = {
             'px': self.conf['sign_size']['px'],
             'mm': self.conf['sign_size']['mm'],
@@ -192,9 +122,3 @@ class Driving: # pylint: disable=R0903
                                                       traffic_size,
                                                       (min_size_traffic[0], min_size_traffic[1]))
         return stop_sign_detector
-
-
-    def run(self):
-        '''Run the simulation'''
-        print('Running...')
-        self.driving_setup.run()

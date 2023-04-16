@@ -34,7 +34,7 @@ if __name__ == '__main__':
         cam = Camera(camera_id=1)
         ret, frame = cam.read()
         if not ret:
-            raise ValueError("NO CAM FRAME")
+            raise ValueError('NO CAM FRAME')
     else:
         frame = cv2.imread(IMG_PATH)
 

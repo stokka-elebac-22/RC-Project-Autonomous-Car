@@ -13,7 +13,7 @@ class TrafficSignDetector:
     DOC:
     '''
     def __init__(self,
-            model: str='computer_vision/traffic_sign_detection/cascade.xml',
+            model: str='computer_vision/traffic_sign_detection/stop_sign_model.xml',
             size: SignSize=None,
             min_size: Tuple[int, int]=None):
 

@@ -7,15 +7,12 @@ from socket_handling.abstract_server import NetworkSettings
 from socket_handling.multi_socket_server import MultiSocketServer
 from camera_handler.camera_headless import CameraHandler
 from camera_handler.camera_sock_server import CamSocketStream
-from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
 from car_communication.abstract_communication import AbstractCommunication
 from car_communication.can_bus_communication import CanBusCommunication
 from car_communication.car_serial_communication import CarSerialCommunication
 from car_communication.car_stepper_communication import CarStepperCommunication
 from module_setup import ModuleSetup
 from driving.driving_states import DrivingStates
-
-from qr_code.qr_code import QRCode
 
 class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
@@ -50,7 +47,7 @@ class Headless():  # pylint: disable=R0903
 
         self.cam0_handler = CameraHandler(conf["camera0"]["id"])
         cameras = self.cam0_handler.refresh_camera_list()
-    
+
         self.module_setup = ModuleSetup(conf)
         self.traffic_sign_detector = ModuleSetup.traffic_sign_detector_setup()
         self.lane_detector = ModuleSetup.lane_detector_setup()
@@ -93,17 +90,19 @@ class Headless():  # pylint: disable=R0903
             if self.state == States.WAITING:
                 actions: List[ActionsDict] = self.driving_states.waiting(frame0)
             elif self.state == States.DRIVING:
-                actions: List[ActionsDict] = self.driving_states.driving(frame0, cameras[conf["camera0"]["id"]].get_dimensions())
+                actions: List[ActionsDict] = self.driving_states.driving(
+                    frame0, cameras[conf["camera0"]["id"]].get_dimensions())
             elif self.state == States.STOPPING:
                 actions: List[ActionsDict] = self.driving_states.stopping(frame0)
             elif self.state == States.PARKING:
-                actions: List[ActionsDict] = self.driving_states.parking(frame0, cameras[conf["camera0"]["id"]].get_dimensions())
+                actions: List[ActionsDict] = self.driving_states.parking(
+                    frame0, cameras[conf["camera0"]["id"]].get_dimensions())
             elif self.state is States.MANUAL:
                 pass
-        
+
             if actions is not None:
                 self.actions = actions
-            
+
             time_now = self.prev_action['time'] - time.time()
             # pylint: disable=E1136
             if actions is not None or \
@@ -124,3 +123,4 @@ class Headless():  # pylint: disable=R0903
                 self.prev_action['speed'] = speed
                 self.prev_action['angle'] = angle
                 self.prev_action['time'] = time.time()
+                

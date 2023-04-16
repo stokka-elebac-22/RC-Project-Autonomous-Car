@@ -1,19 +1,17 @@
 '''The script for the driving loop'''
-import time
 from collections import deque
 from typing import List
 import cv2 as cv
 from defines import States
 from defines import ActionsDict
+#pylint:disable=E0402
 try:
     from computer_vision.driving.driving_states import DrivingStates
     from computer_vision.camera_handler.camera import Camera
-    from computer_vision.car_communication.abstract_communication import AbstractCommunication
     from computer_vision.lib import display_arrow
 except ImportError:
     from ..driving.driving_states import DrivingStates
     from camera_handler.camera import Camera
-    from car_communication.abstract_communication import AbstractCommunication
     from ..lib import display_arrow
 
 class SimulationAction: # pylint: disable=R0902

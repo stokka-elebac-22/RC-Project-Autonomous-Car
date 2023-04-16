@@ -22,7 +22,7 @@ class Simulation: # pylint: disable=R0903
         self.cam1_stream = None
         if self.conf['simulation']['live']:
             self.cam = self.__camera_setup()
-        
+
         print('Initializing the modules')
         pathfinding = module_setup.pathfinding_setup()
         qr_code = module_setup.qr_code_setup()
@@ -38,7 +38,7 @@ class Simulation: # pylint: disable=R0903
             parking_slot_detector=parking_slot_detector,
             lane_detector=lane_detector,
             stop_sign_detector=traffic_sign_detector)
-        
+
         self.driving_setup = SimulationAction(
             conf=conf,
             driving=driving,

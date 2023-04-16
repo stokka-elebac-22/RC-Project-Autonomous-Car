@@ -2,7 +2,7 @@
 import time
 from typing import List
 from collections import deque
-from defines import States
+from defines import States, MessageId
 from socket_handling.abstract_server import NetworkSettings
 from socket_handling.multi_socket_server import MultiSocketServer
 from camera_handler.camera_headless import CameraHandler
@@ -137,11 +137,18 @@ class Headless():  # pylint: disable=R0903
         # base = 100
         self.previous_time = time.time()
         while True: # pylint: disable=R1702
-            # Take new picture, handle socket transferss
-            ret, frame = self.cam0_handler.get_cv_frame()
+            # Check and handle incoming data
+            for data in self.socket_server:
+                if MessageId(data[0]) is MessageId.CMD_SET_STATE:
+                    self.state = data[1]
+                    print("State changed to: ")
+                    print(States(data[1]).name)
+
+            # Take new picture, handle socket transfers
+            ret, frame0 = self.cam0_handler.get_cv_frame()
             if ret is True:
-                self.cam0_stream.send_to_all(frame)
-                self.cam1_stream.send_to_all(frame)
+                self.cam0_stream.send_to_all(frame0)
+                self.cam1_stream.send_to_all(frame0)
 
             if self.state is States.WAITING:  # Prints detected data (testing)
 
@@ -168,10 +175,10 @@ class Headless():  # pylint: disable=R0903
                 # ---------- Parking Slot ---------- #
                 objects: List[path_finding.Objects] = []
 
-                # ---------- GET CAMERA INFORMATION---------- #
-                frame = self.cam0_handler.get_cv_frame()
-                if frame is None:
-                    continue
+                # # ---------- GET CAMERA INFORMATION---------- #
+                # frame = self.cam0_handler.get_cv_frame()
+                # if frame is None:
+                #     continue
 
                 ## QR Code ###
                 qr_data = self.qr_code.get_data(frame)

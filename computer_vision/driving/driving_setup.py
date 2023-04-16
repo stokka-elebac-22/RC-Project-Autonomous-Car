@@ -106,7 +106,7 @@ class DrivingSetup: # pylint: disable=R0902
     def next(self) -> List[ActionsDict]:
         '''The next iteration in the loop'''
         if self.camera is None:
-            return
+            return None
         ret, frame = self.camera.read()
         if not ret:
             return None

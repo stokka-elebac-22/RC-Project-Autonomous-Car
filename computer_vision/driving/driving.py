@@ -186,10 +186,10 @@ class Driving: # pylint: disable=R0903
             'mm': self.conf['sign_size']['mm'],
             'distance': self.conf['sign_size']['distance'],
         }
-        min_size_traffic = self.conf['traffic_sign']['min_size']
+        min_size_traffic = self.conf['traffic_sign_detector']['min_size']
         stop_sign_detector = TrafficSignDetector('cascade.xml',
                                                       traffic_size,
-                                                      min_size_traffic)
+                                                      (min_size_traffic[0], min_size_traffic[1]))
         return stop_sign_detector
 
 

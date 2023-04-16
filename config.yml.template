@@ -4,7 +4,7 @@
     active: True
     live: False
     image_paths:
-      camera_view: 'computer_vision/simulation/images/photo_1.jpg'
+      camera_view: 'computer_vision/driving/images/photo_1.jpg'
       arrow: 'computer_vision/driving/images/arrow.jpg'
   network:
     host: !!str '10.0.11.116'
@@ -58,4 +58,23 @@
   spline:
     tension: !!int 0
     velocity: !!float 100.0
+  sign_size:
+    px: !!int 153
+    mm: !!int 61
+    distance: !!int 538
+  lane_detector:
+    canny: !!seq [25, 0]
+    blur: !!int 10
+    hough: !!seq [33, 296, 500]
+    width: !!int 200
+  parking_slot_detector:
+    canny: !!seq [50, 150]
+    hough: !!seq [80, 200, 5]
+    iterations: !!seq [1, 1]
+    blur: !!int 5
+    filter_atol: !!seq [20, 20]
+  traffic_sign_detector:
+    distance: !!int 1000
+    min_size: !!seq [100, 100]
+  base_speed: !!int 70
 ...

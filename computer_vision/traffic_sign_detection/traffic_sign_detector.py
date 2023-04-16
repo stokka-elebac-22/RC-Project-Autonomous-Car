@@ -1,5 +1,5 @@
 '''Importing necessary libraries'''
-from typing import TypedDict
+from typing import TypedDict, Tuple
 import cv2
 
 SignSize = TypedDict('SignSize', {
@@ -13,8 +13,9 @@ class TrafficSignDetector:
     DOC:
     '''
     def __init__(self,
-            model: str='computer_vision/traffic_sign_detection/stop_sign_model.xml',
-            size: SignSize=None):
+            model: str='computer_vision/traffic_sign_detection/cascade.xml',
+            size: SignSize=None,
+            min_size: Tuple[int, int]=None):
 
         self.cascade = cv2.CascadeClassifier(model)
 
@@ -30,9 +31,11 @@ class TrafficSignDetector:
         if self.size.get('distance') is None:
             self.size['distance'] = 1
 
+        self.min_size=min_size
+
     def detect_signs(self, image):
         '''Detect the signs based on the model used'''
-        signs = self.cascade.detectMultiScale(image)
+        signs = self.cascade.detectMultiScale(image, minSize=self.min_size)
         return signs
 
     def get_distance(self, sign):

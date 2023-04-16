@@ -49,11 +49,11 @@ class Headless():  # pylint: disable=R0903
         cameras = self.cam0_handler.refresh_camera_list()
 
         self.module_setup = ModuleSetup(conf)
-        self.traffic_sign_detector = ModuleSetup.traffic_sign_detector_setup()
-        self.lane_detector = ModuleSetup.lane_detector_setup()
-        self.qr_code = ModuleSetup.qr_code_setup()
-        self.parking_slot_detector = ModuleSetup.parking_slot_detector_setup()
-        self.pathfinding = ModuleSetup.pathfinding_setup()
+        self.traffic_sign_detector = self.module_setup.traffic_sign_detector_setup()
+        self.lane_detector = self.module_setup.lane_detector_setup()
+        self.qr_code = self.module_setup.qr_code_setup()
+        self.parking_slot_detector = self.module_setup.parking_slot_detector_setup()
+        self.pathfinding = self.module_setup.pathfinding_setup()
 
         self.driving_states = DrivingStates(
             conf=conf,
@@ -123,4 +123,3 @@ class Headless():  # pylint: disable=R0903
                 self.prev_action['speed'] = speed
                 self.prev_action['angle'] = angle
                 self.prev_action['time'] = time.time()
-                

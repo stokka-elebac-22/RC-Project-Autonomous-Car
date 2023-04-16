@@ -102,3 +102,4 @@ class ModuleSetup: # pylint: disable=R0903
                                                       traffic_size,
                                                       (min_size_traffic[0], min_size_traffic[1]))
         return stop_sign_detector
+    

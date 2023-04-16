@@ -6,7 +6,7 @@ import sys
 import yaml
 from pynput import keyboard
 from driving.driving_states import DrivingStates
-from driving.driving_setup import DrivingSetup
+from simulation.simulation_action import SimulationAction
 from camera_handler.camera_handler import CameraHandler
 from camera_handler.camera import Camera
 from module_setup import ModuleSetup
@@ -39,7 +39,7 @@ class Simulation: # pylint: disable=R0903
             lane_detector=lane_detector,
             stop_sign_detector=traffic_sign_detector)
         
-        self.driving_setup = DrivingSetup(
+        self.driving_setup = SimulationAction(
             conf=conf,
             driving=driving,
             camera=self.cam)
@@ -102,5 +102,5 @@ if __name__ == '__main__':
     listener.start()
 
 
-    simulation = Simulation(c)
+    simulation = Simulation(c, ModuleSetup(c))
     simulation.run()

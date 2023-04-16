@@ -1,11 +1,7 @@
 '''Driving class'''
 
 import cv2 as cv
-from driving.driving_states import DrivingStates
-from driving.driving_setup import DrivingSetup
 try:
-    from computer_vision.camera_handler.camera_handler import CameraHandler
-    from computer_vision.camera_handler.camera import Camera
     from computer_vision.environment.src.a_star import AStar
     from computer_vision.environment.src.environment import Environment, ViewPointObject
     from computer_vision.pathfinding.pathfinding import PathFinding
@@ -13,18 +9,7 @@ try:
     from computer_vision.line_detection.lane_detection import LaneDetector
     from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
     from computer_vision.traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
-    from computer_vision.car_communication.abstract_communication import AbstractCommunication
-    from computer_vision.car_communication.can_bus_communication import CanBusCommunication
-    from computer_vision.car_communication.car_serial_communication import CarSerialCommunication
-    from computer_vision.socket_handling.abstract_server import NetworkSettings
-    from computer_vision.socket_handling.multi_socket_server import MultiSocketServer
-    from computer_vision.camera_handler.camera_headless import CameraHandler
-    from computer_vision.camera_handler.camera_sock_server import CamSocketStream
 except ImportError:
-    from camera_handler.camera_handler import CameraHandler
-    from camera_handler.camera import Camera
-    from camera_handler.camera_headless import CameraHandler
-    from camera_handler.camera_sock_server import CamSocketStream
     from environment.src.a_star import AStar
     from environment.src.environment import Environment, ViewPointObject
     from pathfinding.pathfinding import PathFinding
@@ -32,11 +17,6 @@ except ImportError:
     from line_detection.lane_detection import LaneDetector
     from line_detection.parking_slot_detection import ParkingSlotDetector
     from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
-    from car_communication.abstract_communication import AbstractCommunication
-    from car_communication.can_bus_communication import CanBusCommunication
-    from car_communication.car_serial_communication import CarSerialCommunication
-    from socket_handling.abstract_server import NetworkSettings
-    from socket_handling.multi_socket_server import MultiSocketServer
 
 class ModuleSetup: # pylint: disable=R0903
     '''

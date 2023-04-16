@@ -26,7 +26,7 @@ except ImportError:
 
 if __name__ == '__main__':
 
-    LIVE = True
+    LIVE = False
 
     IMG_PATH = 'tests/images/parking_slot_detection_4/title_4.jpg'
 
@@ -162,7 +162,7 @@ if __name__ == '__main__':
 
         qr_data = qr_code.get_data(frame)
         if qr_data['ret']:
-            distances = path_finding.point_to_distance(
+            distances = env.point_to_distance(
                 (qr_data['points'][0][0][0]+
                  (qr_data['points'][0][1][0]-qr_data['points'][0][0][0])/2,
                  qr_data['points'][0][0][0]))

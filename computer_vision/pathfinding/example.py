@@ -26,7 +26,7 @@ except ImportError:
 
 if __name__ == '__main__':
 
-    LIVE = True
+    LIVE = False
 
     IMG_PATH = 'tests/images/parking_slot_detection_4/title_4.jpg'
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
         cam = Camera(camera_id=1)
         ret, frame = cam.read()
         if not ret:
-            raise ValueError("NO CAM FRAME")
+            raise ValueError('NO CAM FRAME')
     else:
         frame = cv2.imread(IMG_PATH)
 
@@ -96,7 +96,8 @@ if __name__ == '__main__':
         'view_point': None,
         'object_id': 10,
     }
-    env = Environment(BOARD_SIZE, ENV_SIZE, view_point_object)
+
+    env = Environment(BOARD_SIZE, (PIXEL_WIDTH, PIXEL_HEIGHT), ENV_SIZE, view_point_object)
 
     # pathfinding algorithm
     a_star = AStar(weight=2, penalty=2, hindrance_ids=[1, 30])
@@ -105,7 +106,6 @@ if __name__ == '__main__':
     display = DisplayEnvironment(WINDOW_SIZE, BOARD_SIZE)
 
     path_finding = PathFinding(
-        [PIXEL_WIDTH, PIXEL_HEIGHT],
         env,
         a_star,
         TENSION,
@@ -162,7 +162,7 @@ if __name__ == '__main__':
 
         qr_data = qr_code.get_data(frame)
         if qr_data['ret']:
-            distances = path_finding.point_to_distance(
+            distances = env.point_to_distance(
                 (qr_data['points'][0][0][0]+
                  (qr_data['points'][0][1][0]-qr_data['points'][0][0][0])/2,
                  qr_data['points'][0][0][0]))

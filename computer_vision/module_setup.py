@@ -23,7 +23,7 @@ class ModuleSetup: # pylint: disable=R0903
     '''
     The class for setting up modules
     '''
-    def __init__(self, conf: dict, cam: list) -> None:
+    def __init__(self, conf: dict, cam: dict = None) -> None:
         self.conf = conf
         self.cam = cam
 

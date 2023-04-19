@@ -38,7 +38,7 @@ class ModuleSetup: # pylint: disable=R0903
             'object_id': self.conf['object_id']['car'],
         }
 
-        if self.conf['simulation']['live']:
+        if self.conf['simulation']['live'] or self.conf['headless']:
             frame_width, frame_height = self.cam.get_dimensions()
         else:
             img = cv.imread(self.conf['simulation']['image_paths']['camera_view'])

@@ -16,14 +16,16 @@ except ImportError:
     from qr_code.qr_code import QRCode, QRSize
     from line_detection.lane_detection import LaneDetector
     from line_detection.parking_slot_detection import ParkingSlotDetector
+
     from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
 
 class ModuleSetup: # pylint: disable=R0903
     '''
     The class for setting up modules
     '''
-    def __init__(self, conf: dict) -> None:
+    def __init__(self, conf: dict, cam: list) -> None:
         self.conf = conf
+        self.cam = cam
 
     def pathfinding_setup(self):
         '''Init Pathfinding'''

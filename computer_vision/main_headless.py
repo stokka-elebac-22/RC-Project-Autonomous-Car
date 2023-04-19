@@ -49,7 +49,7 @@ class Headless():  # pylint: disable=R0903
         self.cam0_handler = CameraHandler(conf["camera0"]["id"])
         cameras = self.cam0_handler.refresh_camera_list()
 
-        self.module_setup = ModuleSetup(conf)
+        self.module_setup = ModuleSetup(conf, cameras[conf["camera0"]["id"]])
         self.traffic_sign_detector = self.module_setup.traffic_sign_detector_setup()
         self.lane_detector = self.module_setup.lane_detector_setup()
         self.qr_code = self.module_setup.qr_code_setup()

@@ -1,5 +1,5 @@
 '''Environment'''
-from typing import TypedDict, Tuple
+from typing import TypedDict, Tuple, List
 import copy
 import numpy as np
 from computer_vision.pathfinding.bresenham import bresenham
@@ -10,7 +10,7 @@ ViewPointObject = TypedDict('ViewPointObject', {
 })
 
 Objects = TypedDict('Objects', {
-    'values': list[tuple],
+    'values': List[Tuple],
     'distance': bool,
     'object_id': int
 })

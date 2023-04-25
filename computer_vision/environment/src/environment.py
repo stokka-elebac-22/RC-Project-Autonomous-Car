@@ -1,19 +1,29 @@
 '''Environment'''
-from typing import TypedDict, Tuple
+from typing import TypedDict, Tuple, List
 import copy
 import numpy as np
+from computer_vision.pathfinding.bresenham import bresenham
 
 ViewPointObject = TypedDict('ViewPointObject', {
     'view_point': Tuple[int, int],
     'object_id': int,
 })
+
+Objects = TypedDict('Objects', {
+    'values': List[Tuple],
+    'distance': bool,
+    'object_id': int
+})
+
+
 class Environment:
     '''Creating a 2 dimensional map of the 3 dimensional world'''
+
     def __init__(self, size: Tuple[int, int], pixel_size: Tuple[int, int], real_size: float,
-            view_point_object: ViewPointObject = None):
+                 view_point_object: ViewPointObject = None):
         '''View point is the position in a 2d matrix where everyting should be relativ too'''
         self.size = size
-        self.real_size = real_size # the real unit size per square
+        self.real_size = real_size  # the real unit size per square
         self.pixel_size = pixel_size
         self.map = np.zeros(self.size)
 
@@ -56,19 +66,19 @@ class Environment:
         return None
 
     # pylint: disable=E1136
-    def point_to_distance(self, point:tuple[int, int]) -> tuple[float, float]:
+    def point_to_distance(self, point: tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
         offset_x = point[0] - self.pixel_size[0]/2
         offset_y = self.pixel_size[1] - point[1]
         # Height 123mm
         y_distance = -0.000000443*pow(np.int64(offset_y), np.int64(4)) \
-                    + 0.0002751831*pow(np.int64(offset_y), np.int64(3)) \
-                    - 0.0382433809*pow(np.int64(offset_y), np.int64(2)) \
-                    + 3.0818720986*offset_y \
-                    + 341.0336777149
-        ratio_x= 0.0008436826 * y_distance -0.0171120596
+            + 0.0002751831*pow(np.int64(offset_y), np.int64(3)) \
+            - 0.0382433809*pow(np.int64(offset_y), np.int64(2)) \
+            + 3.0818720986*offset_y \
+            + 341.0336777149
+        ratio_x = 0.0008436826 * y_distance - 0.0171120596
         if y_distance > 1700:
-            y_distance= 1700
+            y_distance = 1700
         x_distance = offset_x*ratio_x
         return (x_distance, y_distance)
 
@@ -81,7 +91,8 @@ class Environment:
             # distance in y direction needs to be positive
             return False, None
         if distance[1] == 0:
-            row = self.view_point[0]-1 # so it does not collide with view point
+            # so it does not collide with view point
+            row = self.view_point[0]-1
         else:
             # Move it up the matrix (down in index), because assuming the viewpoint is upward
             row = self.view_point[0] - distance[1]//self.real_size
@@ -94,7 +105,7 @@ class Environment:
         self.map[int(row)][int(col)] = object_id
         return True, (int(row), int(col))
 
-    def remove(self, object_id: int, remove_all: bool=False):
+    def remove(self, object_id: int, remove_all: bool = False):
         '''Remove an object'''
         for i, row in enumerate(self.map):
             for j, col in enumerate(row):
@@ -110,3 +121,26 @@ class Environment:
             return False
         self.map[pos[0]][pos[1]] = object_id
         return True
+
+    def insert_objects(self, objects: list[Objects]) -> None:
+        '''Insert objects into environment'''
+        for groups in objects:
+            coords = []
+            if groups['values'] is not None:
+                for group in groups['values']:
+                    if groups['distance']:
+                        _, coord = self.insert(group, groups['object_id'])
+                    else:
+                        distance = self.point_to_distance(group)
+                        _, coord = self.insert(
+                            distance, groups['object_id'])
+                    if coord is not None:
+                        coords.append(coord[0])
+                        coords.append(coord[1])
+
+                if len(coords) == 4:
+                    result = bresenham(
+                        (coords[0], coords[1]), (coords[2], coords[3]))
+                    if result is not None:
+                        for point in result:
+                            self.insert_by_index(point, groups['object_id'])

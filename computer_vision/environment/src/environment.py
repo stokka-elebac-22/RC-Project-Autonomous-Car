@@ -69,14 +69,18 @@ class Environment:
     def point_to_distance(self, point: tuple[int, int]) -> tuple[float, float]:
         '''Converts point to distance'''
         offset_x = point[0] - self.pixel_size[0]/2
+        # code to calibrate middle of cam
+        # offset_x = point[0] - 533
         offset_y = self.pixel_size[1] - point[1]
-        # Height 123mm
-        y_distance = -0.000000443*pow(np.int64(offset_y), np.int64(4)) \
-            + 0.0002751831*pow(np.int64(offset_y), np.int64(3)) \
-            - 0.0382433809*pow(np.int64(offset_y), np.int64(2)) \
-            + 3.0818720986*offset_y \
-            + 341.0336777149
-        ratio_x = 0.0008436826 * y_distance - 0.0171120596
+        y_distance = 7.06075681116041 * pow(10, -14) * pow(np.int64(offset_y), np.int64(7)) \
+            -7.07543466719694*pow(10, -11)*pow(np.int64(offset_y), np.int64(6)) \
+                +2.84232325514655*pow(10, -8)*pow(np.int64(offset_y), np.int64(5)) \
+                    -0.00000570571739397854*pow(np.int64(offset_y), np.int64(4)) \
+                        +0.000613607865916111*pow(np.int64(offset_y), np.int64(3)) \
+                            -0.0303482866336146*pow(np.int64(offset_y), np.int64(2)) \
+                                +1.55996291629615*offset_y+334.781663853853
+
+        ratio_x= 0.0008436826 * y_distance -0.0171120596
         if y_distance > 1700:
             y_distance = 1700
         x_distance = offset_x*ratio_x

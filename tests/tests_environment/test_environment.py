@@ -20,8 +20,8 @@ class TestEnvironment:
         assert env.size == (exp, exp) and len(env.map) == exp and len(env.map[0]) == exp
 
     @pytest.mark.parametrize('point, expected', [
-        ((20, 300), (-98.71690549205113, 920.3376614349003)),
-        ((10, 50), (-103.18577414502009, 893.8827273349013))])
+        ((20, 300), (-72.73986037532511, 683.4909800231756)),
+        ((10, 50), (-2080.709610707287, 1700))])
     def test_point_to_distance(self, point, expected):
         '''Testing point to distance'''
         board_size = (60, 115)

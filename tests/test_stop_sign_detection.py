@@ -1,8 +1,8 @@
 '''Importing needed libraries'''
 import pytest
 import cv2
-from computer_vision.traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
-PATH = 'tests/images/traffic_sign'
+from computer_vision.stop_sign_detection.stop_sign_detector import StopSignDetector
+PATH = 'tests/images/stop_sign'
 
 cases_ok = [
     ('1.jpg', 1),
@@ -17,14 +17,14 @@ cases_not_ok = [('1.jpg', 0),
 
 class TestParametrized:
     '''
-    DOC: Testing TrafficSignDetection class from module traffic_sign_detection
+    DOC: Testing StopSignDetection class from module stop_sign_detection
     '''
 
     def detect_signs(self, source):
         '''Initialization the class to test and use it'''
-        traffic_sign_detection = TrafficSignDetector()
+        stop_sign_detection = StopSignDetector()
         image = cv2.imread(f'{PATH}/{source}')
-        signs = traffic_sign_detection.detect_signs(image)
+        signs = stop_sign_detection.detect_signs(image)
         return signs
 
     @pytest.mark.parametrize('source, expected',cases_ok)

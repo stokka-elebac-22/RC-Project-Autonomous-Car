@@ -8,7 +8,7 @@ PATH = 'computer_vision/line_detection/assets/'
 
 class TestParametrized:
     '''
-    DOC: Testing TrafficSignDetection class from module traffic_sign_detection
+    DOC: Testing StopSignDetection class from module stop_sign_detection
     '''
 
     def get_image(self, source):

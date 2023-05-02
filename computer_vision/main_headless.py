@@ -4,7 +4,7 @@ from socket_handling.abstract_server import NetworkSettings
 from socket_handling.multi_socket_server import MultiSocketServer
 from camera_handler.camera_headless import CameraHandler
 from camera_handler.camera_sock_server import CamSocketStream
-from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
+from stop_sign_detection.stop_sign_detector import StopSignDetector
 from car_communication.abstract_communication import AbstractCommunication
 from car_communication.can_bus_communication import CanBusCommunication
 from car_communication.car_serial_communication import CarSerialCommunication
@@ -53,7 +53,7 @@ class Headless():  # pylint: disable=R0903
         self.cam0_handler = CameraHandler(conf["camera0"]["id"])
 
         self.qr_code = QRCode(size)
-        self.stop_sign_detector = TrafficSignDetector('stop_sign_model.xml')
+        self.stop_sign_detector = StopSignDetector('stop_sign_model.xml')
 
         while True:
             # Check and handle incoming data

@@ -1,7 +1,7 @@
 '''Importing libraries'''
 from typing import TypedDict
 import cv2
-from main import TrafficSignDetector
+from stop_sign_detector import StopSignDetector
 
 if __name__ == '__main__':
 
@@ -23,9 +23,9 @@ if __name__ == '__main__':
             'mm': 61,
             'distance': 200
         }
-        traffic_sign_detection = TrafficSignDetector(size = sign_size)
-        output_signs = traffic_sign_detection.detect_signs(frame)
-        traffic_sign_detection.show_signs(frame, output_signs)
+        stop_sign_detection = StopSignDetector(size = sign_size)
+        output_signs = stop_sign_detection.detect_signs(frame)
+        stop_sign_detection.show_signs(frame, output_signs)
         cv2.imshow('frame', frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

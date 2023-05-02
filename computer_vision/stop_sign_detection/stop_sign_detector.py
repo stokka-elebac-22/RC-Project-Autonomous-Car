@@ -8,12 +8,12 @@ SignSize = TypedDict('SignSize', {
     'distance': int,
 })
 
-class TrafficSignDetector:
+class StopSignDetector:
     '''
     DOC:
     '''
     def __init__(self,
-            model: str='computer_vision/traffic_sign_detection/stop_sign_model.xml',
+            model: str='computer_vision/stop_sign_detection/stop_sign_model.xml',
             size: SignSize=None):
 
         self.cascade = cv2.CascadeClassifier(model)
@@ -50,7 +50,7 @@ class TrafficSignDetector:
 
 if __name__ == '__main__':
 
-    img = cv2.imread('computer_vision/traffic_sign_detection/images/test/1.jpg')
+    img = cv2.imread('computer_vision/stop_sign_detection/images/test/1.jpg')
 
     SCALE_PERCENT = 30  # percent of original size
     img_width = int(img.shape[1] * SCALE_PERCENT / 100)
@@ -63,9 +63,9 @@ if __name__ == '__main__':
         'mm': 61,
         'distance': 200
     }
-    traffic_sign_detection = TrafficSignDetector(size=sign_size)
-    output_signs = traffic_sign_detection.detect_signs(img)
-    traffic_sign_detection.show_signs(img, output_signs)
+    stop_sign_detection = StopSignDetector(size=sign_size)
+    output_signs = stop_sign_detection.detect_signs(img)
+    stop_sign_detection.show_signs(img, output_signs)
 
     cv2.imshow('frame', img)
     cv2.waitKey(0)

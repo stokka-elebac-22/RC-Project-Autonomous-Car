@@ -11,7 +11,7 @@ __status__ = 'Testing'
 import sys
 from socket_handling.socket_client import SocketClient # pylint: disable=W0611
 from camera_handler.camera_handler import CameraHandler, VideoThread
-from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
+from stop_sign_detection.stop_sign_detector import StopSignDetector
 from qr_code.qr_code import QRCode
 from defines import States
 from PyQt6 import QtWidgets, uic, QtCore
@@ -81,7 +81,7 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         }
 
         self.qr_code = QRCode(size)
-        self.stop_sign_detector = TrafficSignDetector('stop_sign_model.xml')
+        self.stop_sign_detector = StopSignDetector('stop_sign_model.xml')
 
         self.img_output = self.findChild(QtWidgets.QLabel, 'output_img')
         self.output_text = self.findChild(QtWidgets.QLabel, 'lbl_data_output')

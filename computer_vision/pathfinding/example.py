@@ -7,7 +7,7 @@ from lib import update_display
 try:
     from line_detection.parking_slot_detection import ParkingSlotDetector
     from line_detection.lane_detection import LaneDetector
-    from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector, SignSize
+    from stop_sign_detection.stop_sign_detector import StopSignDetector, SignSize
     from environment.src.display import DisplayEnvironment
     from environment.src.environment import Environment, ViewPointObject
     from environment.src.a_star import AStar
@@ -16,8 +16,7 @@ try:
 except ImportError:
     from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
     from computer_vision.line_detection.lane_detection import LaneDetector
-    from computer_vision.traffic_sign_detection.traffic_sign_detector \
-        import TrafficSignDetector, SignSize
+    from computer_vision.stop_sign_detection.stop_sign_detector import StopSignDetector, SignSize
     from computer_vision.environment.src.display import DisplayEnvironment
     from computer_vision.environment.src.environment import Environment, ViewPointObject
     from computer_vision.environment.src.a_star import AStar
@@ -80,7 +79,7 @@ if __name__ == '__main__':
     L_HOUGH = [80, 200, 5]
     L_BLUR = 5
 
-    # ----- TRAFFIC SIGN DETECTOR ----- #
+    # ----- STOP SIGN DETECTOR ----- #
     SIGN_SIZE: SignSize = {
         'px': 61,
         'mm': 10,
@@ -128,7 +127,7 @@ if __name__ == '__main__':
         width=MM_WIDTH
     )
 
-    traffic_sign_detector = TrafficSignDetector(size=SIGN_SIZE)
+    stop_sign_detector = StopSignDetector(size=SIGN_SIZE)
 
     qr_code = QRCode(QR_SIZE)
 
@@ -201,14 +200,14 @@ if __name__ == '__main__':
             #     center_diff = lane_detector.get_diff_from_center_info(
             #         frame, avg_lines)
 
-            # Use Traffic Sign module
-            # signs = traffic_sign_detection.detect_signs(frame)
+            # Use Stop Sign module
+            # signs = stop_sign_detection.detect_signs(frame)
             # if signs is not None:
             #     for sign in signs:
             #         distances = path_finding.point_to_distance(
             #             (sign[0]+sign[2]/2, sign[1]))
             #         distance_x = distances[0]
-            #         distance_y = traffic_sign_detection.get_distance(sign)
+            #         distance_y = stop_sign_detection.get_distance(sign)
             #         obstacles.append({'values': [
             #         (distance_x, distance_y)], 'distance': True, 'object_id': 40})
 

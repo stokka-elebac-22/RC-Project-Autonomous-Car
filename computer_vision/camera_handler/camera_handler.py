@@ -61,7 +61,7 @@ class CameraHandler:
 
     # pylint: disable=R0801
     def convert_cv_qt(self, cv_img, scale_w: int, scale_h: int) -> QPixmap: # pylint: disable=R0201
-        '''Convert from an opencv image to QPixmap'''
+        '''Convert from an OpenCV image to QPixmap'''
         rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
         # pylint: disable=C0103
         h, w, ch = rgb_image.shape

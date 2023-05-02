@@ -192,8 +192,8 @@ class TestParametrized:
                       [-0.92732365, - 0.38411003]],
                      )]),
     ])
-    def test_catmull_rom_spline(self, param, expected):
-        '''Testing catmull_rom_spline method'''
+    def test_catmull_rom_segment(self, param, expected):
+        '''Testing catmull_rom_segment method'''
         board_size = (60, 115)
         env_size = 20
 
@@ -213,7 +213,7 @@ class TestParametrized:
             tension,
             velocity
         )
-        curve, velocity = path_finding.catmull_rom_spline(
+        curve, velocity = path_finding.catmull_rom_segment(
             param[0], param[1], param[2], param[3], param[4], 5)
         for i, value in enumerate(curve):
             assert value[0] == pytest.approx(expected[0][i][0], 0.001)
@@ -289,7 +289,7 @@ class TestParametrized:
                       [-1.31352914, -0.36382651]],
                      )]),
     ])
-    def test_catmull_rom_chain(self, param, expected):
+    def test_catmull_rom_spline(self, param, expected):
         '''Testing catmull_rom_spline method'''
         board_size = (60, 115)
         env_size = 20
@@ -310,7 +310,7 @@ class TestParametrized:
             tension,
             velocity
         )
-        curve, velocity = path_finding.catmull_rom_chain(
+        curve, velocity = path_finding.catmull_rom_spline(
             param[0], param[1], 5)
         for i, value in enumerate(curve):
             assert value[0] == pytest.approx(expected[0][i][0], 0.001)

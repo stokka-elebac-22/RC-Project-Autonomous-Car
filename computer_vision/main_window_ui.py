@@ -11,13 +11,14 @@ __status__ = 'Testing'
 import sys
 from socket_handling.socket_client import SocketClient # pylint: disable=W0611
 from camera_handler.camera_handler import CameraHandler, VideoThread
+from joystick_module import JoystickHandler
 from stop_sign_detection.stop_sign_detector import StopSignDetector
 from qr_code.qr_code import QRCode
 from defines import States
-from PyQt6 import QtWidgets, uic, QtCore
+from PyQt6 import QtWidgets, QtGui, uic, QtCore
 from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
 import numpy as np
-
+from pygame.locals import * # JOYAXISMOTION, JOYBALLMOTION, JOYHATMOTION, JOYBUTTONUP, JOYBUTTONDOWN
 
 class Worker(QObject, ):  # pylint: disable=R0903
     '''Worker thread'''
@@ -37,10 +38,12 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     def __init__(self, ui_file, conf: dict, fullscreen: bool):
         self.connection_details = conf["network"]
         self.camera_handler = CameraHandler()
+        self.joystick_handler = JoystickHandler()
         self.fps_count = 0
         self.output_data = ''
         # Create an instance of QtWidgets.QApplication
         self.app = QtWidgets.QApplication(sys.argv)
+        self.app.setWindowIcon(QtGui.QIcon('car_ico.ico'))
 
         super().__init__()
         # Ui, self).__init__() # Call the inherited classes __init__ method
@@ -95,6 +98,10 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         self.output_text = self.findChild(QtWidgets.QLabel, 'lbl_data_output')
         self.refresh_webcam_list()
 
+        print(self.joystick_handler.available_joystick_list)
+        self.joystick_handler.set_joystick(0)
+        self.joystick_handler.start()
+        self.joystick_handler.change_pixmap_signal.connect(self.joystick_callback)
         self.timer = QtCore.QTimer()
         self.timer.setInterval(500)
         self.timer.timeout.connect(self.update_plots_and_label_data)
@@ -174,6 +181,29 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
             cv_img, self.img_input[0].width(), self.img_input[0].height())
         # Update frame 2
         self.img_input[1].setPixmap(qt_img)
+
+    def joystick_callback(self, event_type):
+        '''Callback for joystick signals'''
+        if event_type == JOYAXISMOTION:
+            print("Joy axis motion:")
+            print(self.joystick_handler.event_num)
+            print(self.joystick_handler.axis[self.joystick_handler.event_num])
+        elif event_type == JOYBALLMOTION:
+            print(event_type)
+            print(self.joystick_handler.event_num)
+            print(self.joystick_handler.ball[self.joystick_handler.event_num])
+        elif event_type == JOYHATMOTION:
+            print(event_type)
+            print(self.joystick_handler.event_num)
+            print(self.joystick_handler.joy[self.joystick_handler.event_num])
+        elif event_type == JOYBUTTONUP:
+            print(event_type)
+            print(self.joystick_handler.event_num)
+            print(self.joystick_handler.button[self.joystick_handler.event_num])
+        elif event_type == JOYBUTTONDOWN:
+            print(event_type)
+            print(self.joystick_handler.event_num)
+            print(self.joystick_handler.button[self.joystick_handler.event_num])
 
     def refresh_webcam_list(self):
         '''Run a Qthread to check possible webcams and create a list'''

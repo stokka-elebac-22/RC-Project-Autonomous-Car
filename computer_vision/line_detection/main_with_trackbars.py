@@ -22,7 +22,7 @@ if __name__ == "__main__":
     while True:
         canny_low_thr = cv2.getTrackbarPos('Canny low threshold','Trackbars')
         canny_high_thr = cv2.getTrackbarPos('Canny high threshold','Trackbars')
-        hough_min_length = cv2.getTrackbarPos('Hough threshold','Trackbars')
+        hough_threshold = cv2.getTrackbarPos('Hough threshold','Trackbars')
         hough_min_length = cv2.getTrackbarPos('Hough minimum line length','Trackbars')
         hough_max_gap = cv2.getTrackbarPos('Hough maximum line gap','Trackbars')
         gaussian_kernel = cv2.getTrackbarPos('Gaussian blur kernel size','Trackbars')

@@ -33,6 +33,7 @@
       px: !!int 76
       mm: !!int 52
       distance: !!int 500
+    calibration_path: 'camera_calibration.xml'
   qr_code_size:
     px: !!int 191
     mm: !!int 79

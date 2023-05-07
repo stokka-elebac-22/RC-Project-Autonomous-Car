@@ -9,6 +9,7 @@ from car_communication.abstract_communication import AbstractCommunication
 from car_communication.can_bus_communication import CanBusCommunication
 from car_communication.car_serial_communication import CarSerialCommunication
 from car_communication.car_stepper_communication import CarStepperCommunication
+from lib import calibrate_camera
 
 from qr_code.qr_code import QRCode
 
@@ -65,6 +66,7 @@ class Headless():  # pylint: disable=R0903
 
             # Take new picture, handle socket transfers
             ret, frame0 = self.cam0_handler.get_cv_frame()
+
             if ret is True:
                 self.cam0_stream.send_to_all(frame0)
                 self.cam1_stream.send_to_all(frame0)

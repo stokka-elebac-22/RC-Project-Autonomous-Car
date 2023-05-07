@@ -18,10 +18,10 @@ class CameraHandler:
 
         self.calibration_ret = False
         if conf:
-            ret, K, D, _, _= self.calibrate(conf['camera0']['calibration_path'])
+            ret, intr, dist, _, _= self.calibrate(conf['camera0']['calibration_path'])
             self.clibration_ret = ret
-            self.K = K
-            self.D = D
+            self.intr = intr
+            self.dist = dist
 
 
     def get_camera_string(self, camera_id: int) -> str:
@@ -62,7 +62,7 @@ class CameraHandler:
             ret, img = self.cv_camera.read()
             if ret:
                 if self.calibration_ret:
-                    img = cv2.undistort(img, self.K, self.D)
+                    img = cv2.undistort(img, self.intr, self.dist)
                     return img
         return None
 
@@ -77,9 +77,9 @@ class CameraHandler:
             objpoints = cv_file.getNode('objpoints').mat()
             imgpoints = cv_file.getNode('imgpoints').mat()
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            ret, K, D, rvecs, tvecs = \
+            ret, intr, dist, rvecs, tvecs = \
                 cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
-            return ret, K, D, rvecs, tvecs
+            return ret, intr, dist, rvecs, tvecs
         print('Could not calibrate camera')
         return None, None, None, None, None
 

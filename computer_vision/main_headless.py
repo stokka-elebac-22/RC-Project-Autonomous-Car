@@ -9,7 +9,6 @@ from car_communication.abstract_communication import AbstractCommunication
 from car_communication.can_bus_communication import CanBusCommunication
 from car_communication.car_serial_communication import CarSerialCommunication
 from car_communication.car_stepper_communication import CarStepperCommunication
-from lib import calibrate_camera
 
 from qr_code.qr_code import QRCode
 

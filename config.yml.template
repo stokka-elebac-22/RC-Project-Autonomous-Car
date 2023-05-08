@@ -34,6 +34,13 @@
       mm: !!int 52
       distance: !!int 500
     calibration_path: 'camera_calibration.xml'
+  camera1:
+    id: !!int 1
+    size:
+      px: !!int 76
+      mm: !!int 52
+      distance: !!int 500
+    calibration_path: 'camera_calibration.xml'
   qr_code_size:
     px: !!int 191
     mm: !!int 79
@@ -57,4 +64,10 @@
   spline:
     tension: !!int 0
     velocity: !!float 100.0
+  stereo:
+    parameter_path: !!str 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
+    maps_path: !!str 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps_web_light.xml'
+    max_dist: !!int 2000
+    min_dist = 50
+    blur = 12
 ...

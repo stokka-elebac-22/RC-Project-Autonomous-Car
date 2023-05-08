@@ -30,6 +30,7 @@ class States(Enum):
     DRIVING = 2
     STOPPING = 3
     MANUAL = 4
+    STEREO = 5
 
 class MessageId(Enum):
     '''Enum for message ID's'''

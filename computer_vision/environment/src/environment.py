@@ -2,7 +2,7 @@
 from typing import TypedDict, Tuple, List
 import copy
 import numpy as np
-from computer_vision.pathfinding.bresenham import bresenham
+from bresenham import bresenham
 
 ViewPointObject = TypedDict('ViewPointObject', {
     'view_point': Tuple[int, int],

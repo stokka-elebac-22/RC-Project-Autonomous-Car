@@ -65,6 +65,7 @@ class Headless():  # pylint: disable=R0903
 
             # Take new picture, handle socket transfers
             ret, frame0 = self.cam0_handler.get_cv_frame()
+
             if ret is True:
                 self.cam0_stream.send_to_all(frame0)
                 self.cam1_stream.send_to_all(frame0)

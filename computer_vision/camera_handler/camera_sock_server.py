@@ -33,7 +33,7 @@ class CamSocketStream(BasicServer): # pylint: disable=R0902
     def run_socket(self):
         '''Run image socket server'''
         self.server_socket.bind(self.socket_address)
-        print('Listening at:',self.socket_address)
+        print('Camera socket listening at:',self.socket_address)
         while True:
             _, client_addr = self.server_socket.recvfrom(self.BUFF_SIZE)
             print('GOT connection from ',client_addr)

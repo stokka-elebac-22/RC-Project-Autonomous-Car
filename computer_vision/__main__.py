@@ -59,6 +59,7 @@ if __name__ == '__main__':
         config = yaml.load(f, Loader=yaml.SafeLoader)
 
     if config["headless"] is True or GUI_POSSIBLE is False:
+        print("Starting headless")
         main_thread = Headless(config)
     else:
         FULL_SCREEN = args.full_screen.lower() in ['true', 1]

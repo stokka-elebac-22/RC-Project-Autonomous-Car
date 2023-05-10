@@ -11,8 +11,8 @@ class MultiSocketServer(BasicServer):
     '''Socket Server for multiple clients'''
     def __init__(self, net_sett: NetworkSettings):
         self.server_side_socket = socket.socket()
-        self.host = net_sett.host # '10.0.10.95'
-        self.port = net_sett.port # 2004
+        self.host = net_sett.host
+        self.port = net_sett.port
         self.thread_count = 0
         self.running = False
         self.clients = []
@@ -27,7 +27,7 @@ class MultiSocketServer(BasicServer):
             self.server_side_socket.bind((self.host, self.port))
         except socket.error as error:
             print(str(error))
-        print('Socket is listening..')
+        print('Socket is listening for connections...')
         self.server_side_socket.listen(5)
         self.running = True
         start_new_thread(self.run_socket, () )
@@ -44,7 +44,7 @@ class MultiSocketServer(BasicServer):
             start_new_thread(self.multi_threaded_client, (client, ))
             self.clients.append(client)
             self.thread_count += 1
-            print('Thread Number: ' + str(self.ThreadCount))
+            print('Thread Number: ' + str(self.thread_count))
         self.server_side_socket.close()
 
     def multi_threaded_client(self, connection):

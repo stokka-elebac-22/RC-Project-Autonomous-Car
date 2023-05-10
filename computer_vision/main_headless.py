@@ -37,6 +37,7 @@ class Headless():  # pylint: disable=R0903
 
         self.cam0_stream = CamSocketStream(self.net_cam0)
         if conf["network"]["stream_en_cam0"] is True:
+            print("Starting camera stream")
             self.cam0_stream.start()
 
         self.cam1_stream = CamSocketStream(self.net_cam1)
@@ -58,10 +59,13 @@ class Headless():  # pylint: disable=R0903
         while True:
             # Check and handle incoming data
             for data in self.socket_server:
+                print (data)
                 if MessageId(data[0]) is MessageId.CMD_SET_STATE:
                     self.state = data[1]
                     print("State changed to: ")
                     print(States(data[1]).name)
+                if MessageId(data[0]) is MessageId.CMD_JOYSTICK_DIRECTIONS:
+                    # Handle joystick directions
 
             # Take new picture, handle socket transfers
             ret, frame0 = self.cam0_handler.get_cv_frame()

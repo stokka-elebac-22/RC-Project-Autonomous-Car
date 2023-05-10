@@ -74,6 +74,13 @@ class Headless():  # pylint: disable=R0903
             if ret is True:
                 self.cam0_stream.send_to_all(frame0)
                 self.cam1_stream.send_to_all(frame0)
+            else:
+                self.camera_missing_frame += 1
+                print(f"Could not get frame from camera: {self.cam0_handler.camera_id}!")
+                if self.camera_missing_frame > 10:
+                    print("Exceeded number of missing frames in a row. Stopping headless.")
+                    print(self.cam0_handler.refresh_camera_list())
+                    break
 
             if self.state is States.WAITING:  # Prints detected data (testing)
                 current_qr_data = self.qr_code.get_data(frame0)

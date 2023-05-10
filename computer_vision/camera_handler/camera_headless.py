@@ -63,8 +63,8 @@ class CameraHandler:
             if ret:
                 if self.calibration_ret:
                     img = cv2.undistort(img, self.intr, self.dist)
-                    return img
-        return None
+                return True, img
+        return False, None
 
     def calibrate(self, path):
         '''

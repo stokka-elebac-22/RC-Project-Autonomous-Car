@@ -1,9 +1,34 @@
 ''' Joystick module '''
 from typing import List
+import dataclasses
 import pygame
 from pygame.locals import *
 from PyQt6.QtCore import pyqtSignal, Qt, QThread
 import numpy as np
+
+@dataclasses.dataclass
+class CurrentHeading:
+    '''Object to keep track of current heading'''
+    def __init__(self):
+        self.x_velocity = 0
+        self.y_velocity = 0
+        self.button = [0, 0]
+
+    def update_direction(self, direction: int, value: float):
+        '''update direction'''
+        if direction == 0:
+            self.x_velocity = value
+        elif direction == 1:
+            self.y_velocity = value
+
+    def update_button(self, btn_number: int, value: int):
+        '''update button'''
+        if btn_number >= 0 and btn_number < 2:
+            self.button = value
+
+    def get_byte_for_heading(self, prefix_number: int) -> bytes:
+        '''Get bytes to send (socket)'''
+        pass
 
 class JoystickHandler(QThread):
     '''Joystick handler object'''

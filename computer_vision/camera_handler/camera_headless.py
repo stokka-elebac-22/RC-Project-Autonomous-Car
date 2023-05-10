@@ -14,6 +14,7 @@ class CameraHandler:
         self.available_camera_list = []
         if camera_id != 999:
             self.cv_camera = cv2.VideoCapture(camera_id)
+        self.camera_id = camera_id
         # calibrating the camera
 
         self.calibration_ret = False

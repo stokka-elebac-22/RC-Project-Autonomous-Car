@@ -1,5 +1,6 @@
 '''main_headless.py: DATBAC23 Car system main.'''
 from defines import States, MessageId
+from joystick_handler.joystick_position import CurrentHeading
 from socket_handling.abstract_server import NetworkSettings
 from socket_handling.multi_socket_server import MultiSocketServer
 from camera_handler.camera_headless import CameraHandler
@@ -36,6 +37,7 @@ class Headless():  # pylint: disable=R0903
         self.socket_server.start()
 
         self.camera_missing_frame = 0
+        self.joystick_position = CurrentHeading()
 
         self.cam0_stream = CamSocketStream(self.net_cam0)
         if conf["network"]["stream_en_cam0"] is True:
@@ -67,7 +69,7 @@ class Headless():  # pylint: disable=R0903
                     print("State changed to: ")
                     print(States(data[1]).name)
                 if MessageId(data[0]) is MessageId.CMD_JOYSTICK_DIRECTIONS:
-                    pass
+                    self.joystick_position.set_heading_from_bytes(data)
                     # Handle joystick directions
 
             # Take new picture, handle socket transfers
@@ -107,6 +109,9 @@ class Headless():  # pylint: disable=R0903
 
             elif self.state is States.PARKING:
                 pass
+            elif self.state is States.MANUAL:
+                print(f"After ... Side: {self.joystick_position.x_velocity}, F/B: {self.joystick_position.y_velocity} Buttons: {self.joystick_position.button}")
+
             elif self.state is States.DRIVING:
                 # example:
                 self.car_comm.set_motor_speed(1, 100, 1, 100)

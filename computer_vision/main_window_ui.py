@@ -12,11 +12,7 @@ import sys
 from socket_handling.socket_client import SocketClient # pylint: disable=W0611
 from camera_handler.camera_handler import CameraHandler, VideoThread
 from joystick_module import JoystickHandler
-<<<<<<< HEAD
 from stop_sign_detection.stop_sign_detector import StopSignDetector
-=======
-from traffic_sign_detection.traffic_sign_detector import TrafficSignDetector
->>>>>>> fix_gui_and_socket
 from qr_code.qr_code import QRCode
 from defines import States
 from PyQt6 import QtWidgets, QtGui, uic, QtCore

@@ -35,6 +35,8 @@ class Headless():  # pylint: disable=R0903
         self.socket_server = MultiSocketServer(self.net_main)
         self.socket_server.start()
 
+        self.camera_missing_frame = 0
+
         self.cam0_stream = CamSocketStream(self.net_cam0)
         if conf["network"]["stream_en_cam0"] is True:
             print("Starting camera stream")
@@ -72,6 +74,7 @@ class Headless():  # pylint: disable=R0903
             ret, frame0 = self.cam0_handler.get_cv_frame()
 
             if ret is True:
+                self.camera_missing_frame = 0
                 self.cam0_stream.send_to_all(frame0)
                 self.cam1_stream.send_to_all(frame0)
             else:

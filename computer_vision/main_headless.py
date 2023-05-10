@@ -65,6 +65,7 @@ class Headless():  # pylint: disable=R0903
                     print("State changed to: ")
                     print(States(data[1]).name)
                 if MessageId(data[0]) is MessageId.CMD_JOYSTICK_DIRECTIONS:
+                    pass
                     # Handle joystick directions
 
             # Take new picture, handle socket transfers

@@ -37,6 +37,7 @@ class MessageId(Enum):
 
     '''Generic/System messages:'''
     CMD_SET_STATE = 1
+    CMD_JOYSTICK_DIRECTIONS = 2
 
     '''CAN message Ids'''
     CAN_MOTOR_DATA_ID = 16        # 0x010 //  00010 000

@@ -22,11 +22,12 @@ class SocketClient():
         '''Start Socket client'''
         self.running = True
         self.connection = connection
-        start_new_thread(self.run_server, )
+        print (f"Connecting to: {connection.host}:{connection.port}")
+        start_new_thread(self.run_server, ())
 
     def run_server(self) -> None:
         '''Run socket client'''
-        self.client_socket.connect(self.conn_details)
+        self.client_socket.connect((self.connection.host, self.connection.port))
         try:
             while self.running:
                 data = self.client_socket.recv(1024)
@@ -42,8 +43,8 @@ class SocketClient():
                         else:
                             for x in range(len(data)):  # pylint: disable=C0200
                                 print(data[x])
-                    except:  # pylint: disable=W0702
-                        print("error")
+                    except Exception as err:  # pylint: disable=W0702
+                        print(f"error: {err}")
 
                     #print(hex(data[1]))
                     #print(''.join('{:02x}'.format(x) for x in data))

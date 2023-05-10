@@ -9,7 +9,12 @@ __email__ = 'asbjorn@maxit-as.com'
 __status__ = 'Testing'
 
 import sys
+import struct
+from defines import States
+from socket_handling.abstract_server import NetworkSettings
+from socket_handling.db_handler import DbHandler
 from socket_handling.socket_client import SocketClient # pylint: disable=W0611
+from camera_handler.socket_video_thread import SocketVideoThread
 from camera_handler.camera_handler import CameraHandler, VideoThread
 from joystick_module import JoystickHandler
 from stop_sign_detection.stop_sign_detector import StopSignDetector
@@ -36,7 +41,10 @@ class Worker(QObject, ):  # pylint: disable=R0903
 class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     '''Class handling Qt GUI control'''
     def __init__(self, ui_file, conf: dict, fullscreen: bool):
+        self.conf = conf
         self.connection_details = conf["network"]
+        self.storage = DbHandler('data.db')
+        self.socket_client = SocketClient(self.storage)
         self.camera_handler = CameraHandler()
         self.joystick_handler = JoystickHandler()
         self.fps_count = 0
@@ -77,12 +85,20 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
 
         self.cbo_car_state = self.findChild(QtWidgets.QComboBox, 'cbo_car_state')
         for state in States:
-            self.cbo_car_state.addItem('{}: {}'.format(state.value, state.name))
+            self.cbo_car_state.addItem(f'{state.value}: {state.name}')
 
         self.cbo_socket_conn = self.findChild(QtWidgets.QComboBox, 'cbo_socket_connection')
         for conn in self.connection_details['host_list']:
             print(conn['name'])
-            self.cbo_socket_conn.addItem('{}: {}'.format(conn['name'], conn['host']))
+            self.cbo_socket_conn.addItem(f"{conn['name']}: {conn['host']}")
+        self.btn_connect = self.findChild(QtWidgets.QPushButton, 'btn_connect')
+        self.btn_connect.clicked.connect(
+            lambda: self.socket_connect(self.cbo_socket_conn.currentIndex()))
+
+        self.cbo_state = self.findChild(QtWidgets.QComboBox, 'cbo_car_state')
+        self.btn_send_state = self.findChild(QtWidgets.QPushButton, 'btn_setstate')
+        self.btn_send_state.clicked.connect(
+            lambda: self.socket_send_state(self.cbo_state.currentIndex()))
 
         # Get size from config
         size = {
@@ -128,6 +144,12 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
                     self.cam_thread[index].change_pixmap_signal.connect(self.update_image2)
                 # start the thread
                 self.cam_thread[index].start()
+            else: # TODO: Fix settings for camera stream + add support for 2 cameras
+                self.cam_thread[index] = SocketVideoThread(NetworkSettings("192.168.121.57", 2005))
+                if index == 0:
+                    self.cam_thread[index].change_pixmap_signal.connect(self.update_image)
+                self.cam_thread[index].start()
+
         else:
             try:
                 self.camera_cbo[index].setEnabled(True)
@@ -237,3 +259,31 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
             self.output_data += f'\nFPS: {self.fps_count * 2}'
             self.fps_count = 0
             self.output_text.setText(self.output_data) # pylint: disable=E0001
+
+    def socket_connect(self, id: int):
+        '''Start socket client connection'''
+        if not self.socket_client.running:
+            host = self.connection_details['host_list'][id]['host']
+            port = self.connection_details['host_list'][id]['port']
+            conn = NetworkSettings(host, port)
+            self.socket_client.start(conn)
+        else:
+            print("Already connected!")
+
+    def socket_send_state(self, state: int):
+        '''Send state request on socket connection '''
+        if self.socket_client.running:
+            data = struct.pack("I", 1 + state*256) # States.CMD_SET_STATE.value
+            print(f"Sending state: {state} as {data}")
+            self.socket_client.send_to_all(data)
+        else:
+            print("Not connected!")
+
+    def socket_send_joystick_direction(self):
+        '''Send joystick direction update on socket connection '''
+        if self.socket_client.running:
+            data = struct.pack("I", 2 + 1*256) # States.CMD_JOYSTICK_DIRECTIONS.value = 2
+            print(f"Sending joystick data: {data}")
+            self.socket_client.send_to_all(data)
+        else:
+            print("Not connected!")

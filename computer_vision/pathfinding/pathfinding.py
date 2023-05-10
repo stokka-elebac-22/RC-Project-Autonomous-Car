@@ -15,18 +15,20 @@ except ImportError:
     from computer_vision.environment.src.environment import Environment
     from computer_vision.environment.src.a_star import AStar
 
+
 class PathFinding:
     '''
     Class using 2D environmentironment mapping to calculate shortest
     path with objects that can be hindrances
     '''
+
     def __init__(self,
-                environment: Environment,
-                pathfinding_algorithm: AStar,
-                tension:float=0.,
-                velocity:float = 10,
-                num_points:int=3,
-                rotate_time:float=0.1): # pylint: disable=R0913
+                 environment: Environment,
+                 pathfinding_algorithm: AStar,
+                 tension: float = 0.,
+                 velocity: float = 10,
+                 num_points: int = 3,
+                 rotate_time: float = 0.1):  # pylint: disable=R0913
         self.tension = tension
         self.velocity = velocity
         self.num_points = num_points
@@ -61,9 +63,9 @@ class PathFinding:
         previous_angle = angles[0]
         previous_time = times[0]
         for i in range(len(angles)-1):
-            if  previous_angle - tol <= angles[i+1] <= previous_angle + tol \
-                or \
-                previous_angle - tol >= angles[i+1] >= previous_angle + tol:
+            if previous_angle - tol <= angles[i+1] <= previous_angle + tol \
+                    or \
+                    previous_angle - tol >= angles[i+1] >= previous_angle + tol:
                 previous_angle = (previous_angle + angles[i+1]) / 2
                 previous_time += times[i+1]
             else:
@@ -74,7 +76,7 @@ class PathFinding:
         new_times.append(previous_time)
         new_angles.append(previous_angle)
         return {
-            'times': new_times, 
+            'times': new_times,
             'angles': new_angles
         }
 
@@ -84,7 +86,7 @@ class PathFinding:
         x_j, y_j = p_j
         return (((x_j-x_i)**2+(y_j-y_i)**2)**0.5)**alpha + t_i
 
-    def catmull_rom_segment(self, p_0, p_1, p_2, p_3, alpha, num_points=100): # pylint: disable=R0913 R0914
+    def catmull_rom_segment(self, p_0, p_1, p_2, p_3, alpha, num_points=100):  # pylint: disable=R0913 R0914
         '''
         p_0, p_1, p_2, and p_3: (x, y) pairs
         num_points: number of points in the segment
@@ -112,12 +114,14 @@ class PathFinding:
         a2_d = (p_2-p_1)/(t_2-t_1)
         a3_d = (p_3-p_2)/(t_3-t_2)
 
-        b1_d = (a_2-a_1)/(t_2-t_0)+(t_2-t_p)/(t_2-t_0)*a1_d+(t_p-t_0)/(t_2-t_0)*a2_d
-        b2_d = (a_3-a_2)/(t_3-t_1)+(t_3-t_p)/(t_3-t_1)*a2_d+(t_p-t_1)/(t_3-t_1)*a3_d
+        b1_d = (a_2-a_1)/(t_2-t_0)+(t_2-t_p) / \
+            (t_2-t_0)*a1_d+(t_p-t_0)/(t_2-t_0)*a2_d
+        b2_d = (a_3-a_2)/(t_3-t_1)+(t_3-t_p) / \
+            (t_3-t_1)*a2_d+(t_p-t_1)/(t_3-t_1)*a3_d
 
-        c_d = (b_2-b_1)/(t_2-t_1)+(t_2-t_p)/(t_2-t_1)*b1_d+(t_p-t_1)/(t_2-t_1)*b2_d
+        c_d = (b_2-b_1)/(t_2-t_1)+(t_2-t_p) / \
+            (t_2-t_1)*b1_d+(t_p-t_1)/(t_2-t_1)*b2_d
         return c_o, c_d
-
 
     def catmull_rom_spline(self, points, alpha, num_points=100):
         '''
@@ -130,7 +134,8 @@ class PathFinding:
         derivative = []
         for i in range(len(points)-3):
             c_value, d_value = self.catmull_rom_segment(
-                points[i], points[i+1], points[i+2], points[i+3], alpha, num_points
+                points[i], points[i+1], points[i +
+                                               2], points[i+3], alpha, num_points
             )
             curve.extend(c_value)
             derivative.extend(d_value)
@@ -186,8 +191,8 @@ class PathFinding:
             degrees = -90 + degrees
         return degrees
 
-
     # pylint: disable=R0914
+
     def calculate_path(self, start_object: int, end_object: int) -> dict:
         '''
         Calculate the shortest path from a
@@ -198,7 +203,8 @@ class PathFinding:
         end_pos_path = self.__environment.get_pos(end_object)
 
         cur_mat = self.__environment.get_data()
-        _, path = self.__pathfinding_algorithm.get_data(cur_mat, start_pos_path, end_pos_path)
+        _, path = self.__pathfinding_algorithm.get_data(
+            cur_mat, start_pos_path, end_pos_path)
 
         if path:
             new_path = [(value[1], value[0])
@@ -206,15 +212,18 @@ class PathFinding:
             temp_path = [(path[0][1], path[0][0])]
             temp_path = temp_path + new_path
             for _ in range(1):
-                temp_path.append((path[len(path) - 1][1], path[len(path) - 1][0]))
+                temp_path.append(
+                    (path[len(path) - 1][1], path[len(path) - 1][0]))
             temp_path.reverse()
-            curve, _ = self.catmull_rom_spline(temp_path, self.tension, self.num_points)
+            curve, _ = self.catmull_rom_spline(
+                temp_path, self.tension, self.num_points)
             lengths = self.approx_segment_lengths(curve)
-            times = [x * self.__environment.real_size / self.velocity for x in lengths]
+            times = [x * self.__environment.real_size /
+                     self.velocity for x in lengths]
 
             angles = []
             for i, value in enumerate(curve):
-                if i!=0:
+                if i != 0:
                     angles.append(self.get_angle(curve[i-1], value))
 
             data = self.merge_similar_angles(times[:-1], angles[:-1], 1)

@@ -2,7 +2,7 @@
 from typing import TypedDict, Tuple, List
 import copy
 import numpy as np
-from computer_vision.pathfinding.bresenham import bresenham
+from bresenham import bresenham
 
 ViewPointObject = TypedDict('ViewPointObject', {
     'view_point': Tuple[int, int],
@@ -144,7 +144,7 @@ class Environment:
 
                 if len(coords) == 4:
                     result = bresenham(
-                        (coords[0], coords[1]), (coords[2], coords[3]))
+                        coords[0], coords[1], coords[2], coords[3])
                     if result is not None:
                         for point in result:
                             self.insert_by_index(point, groups['object_id'])

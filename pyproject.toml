@@ -17,6 +17,7 @@ can = "^0.0.0"
 python-can = "^4.1.0"
 imutils = "^0.5.4"
 pynput = "^1.7.6"
+bresenham = "^0.2.1"
 
 [tool.poetry.group.gui]
 optional = true

@@ -61,6 +61,7 @@ class MultiSocketServer(BasicServer):
                 self.clients.remove(connection)
                 break
             except UnicodeDecodeError as error:
+                response = "err"
                 print(f"Decode error: {error}")
             if not data:
                 break

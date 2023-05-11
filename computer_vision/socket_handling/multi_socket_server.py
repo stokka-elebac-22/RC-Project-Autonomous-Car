@@ -56,10 +56,12 @@ class MultiSocketServer(BasicServer):
                 response = 'Server message: ' + data.decode('utf-8')
             except socket.error as error:
                 self.thread_count -= 1
-                print('Thread Number: ' + str(self.thread_count))
+                print(f'Thread Number: {self.thread_count}')
                 print(str(error))
                 self.clients.remove(connection)
                 break
+            except UnicodeDecodeError as error:
+                print(f"Decode error: {error}")
             if not data:
                 break
             self.incoming_data.put(data)

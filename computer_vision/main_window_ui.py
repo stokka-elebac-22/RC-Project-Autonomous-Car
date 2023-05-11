@@ -301,6 +301,7 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         '''Send joystick direction update on socket connection '''
         if self.socket_client.running:
             data = self.joystick_position.get_byte_for_heading(2) # States.CMD_JOYSTICK_DIRECTIONS.value = 2
+            print("Sending data")
             self.socket_client.send_to_all(data)
         else:
             print("Not connected!")

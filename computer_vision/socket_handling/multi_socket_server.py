@@ -53,7 +53,8 @@ class MultiSocketServer(BasicServer):
         while True:
             try:
                 data = connection.recv(2048)
-                response = 'Server message: ' + data.decode('utf-8')
+                if data[0] not in (1, 2, 16, 24, 32, 40, 64, 72, 128, 136, 152):
+                    response = 'Server message: ' + data.decode('utf-8')
             except socket.error as error:
                 self.thread_count -= 1
                 print(f'Thread Number: {self.thread_count}')

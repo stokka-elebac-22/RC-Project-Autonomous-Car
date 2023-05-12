@@ -6,9 +6,11 @@ from typing import List
 try:
     from pathfinding.pathfinding import PathFinding
     from qr_code.qr_code import QRCode
+    from line_detection.parking_slot_detection import ParkingSlotDetector
 except ImportError:
     from computer_vision.pathfinding.pathfinding import PathFinding
     from computer_vision.qr_code.qr_code import QRCode
+    from computer_vision.line_detection.parking_slot_detection import ParkingSlotDetector
 
 class Driving:
     '''Driving class'''
@@ -17,6 +19,23 @@ class Driving:
         self.conf = conf
         self.pathfinding = pathfinding
         self.qr_code = qr_code
+
+        # ----- PARKING SLOT DETECTOR ----- #
+        P_CANNY = [50, 100]
+        P_HOUGH = [80, 200, 5]
+        P_ITERATIONS = [5, 2]
+        P_BLUR = 7
+        P_FILTER_ATOL = [20, 20]
+        P_CLUSTER_ATOL = 0
+
+        self.parking_slot_detector = ParkingSlotDetector(
+            canny=P_CANNY,
+            hough=P_HOUGH,
+            blur=P_BLUR,
+            iterations=P_ITERATIONS,
+            filter_atol=P_FILTER_ATOL,
+            cluster_atol=P_CLUSTER_ATOL
+        )
 
     def driving(self, frame, frame_dimensions):
         '''Driving'''
@@ -34,6 +53,19 @@ class Driving:
                  'object_id': self.conf['object_id']['QR']
             }
             objects.append(new_object)
+            line_dict = self.parking_slot_detector.get_parking_slot(frame, current_qr_data)
+            if line_dict is not None:
+                for lines in line_dict['all_lines']:
+                    objects.append({
+                        'values':[(lines[0], lines[1]), (lines[2], lines[3])],
+                        'distance': False,
+                        'object_id': 30})
+                for lines in line_dict['slot_lines']:
+                    objects.append({
+                        'values': [(lines[0], lines[1]), (lines[2], lines[3])],
+                        'distance': False,
+                        'object_id': 30})
+
         self.pathfinding.insert_objects(objects)
         start_id = self.conf['object_id']['car']
         end_id = self.conf['object_id']['QR']

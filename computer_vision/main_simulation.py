@@ -118,7 +118,7 @@ if __name__ == '__main__':
     CONFIG_FILE = 'config'
     print('Reading configuration file...')
     # ----- CONFIG ----- #
-    with open(CONFIG_FILE + '.yml', 'r', encoding='utf8') as f:
+    with open(CONFIG_FILE + '.yml.template', 'r', encoding='utf8') as f:
         try:
             c = yaml.safe_load(f)
         except yaml.YAMLError as exc:

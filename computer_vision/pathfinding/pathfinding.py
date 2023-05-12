@@ -225,7 +225,7 @@ class PathFinding:
             for i, value in enumerate(curve):
                 if i != 0:
                     angles.append(self.get_angle(curve[i-1], value))
-
+            print(angles)
             data = self.merge_similar_angles(times[:-1], angles[:-1], 1)
             data['angles'].append(angles[-1])
             angle_diff = self.get_angle_diff(data['angles'])

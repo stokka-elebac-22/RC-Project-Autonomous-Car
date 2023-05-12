@@ -4,7 +4,7 @@
     active: True
     live: False
     image_paths:
-      camera_view: 'tests\images\mappingqr\title_5.jpg'
+      camera_view: 'tests/images/simulation/title_3.jpg'
       arrow: 'computer_vision/simulation/images/arrow.jpg'
   network:
     host: !!str '10.0.11.116'
@@ -44,11 +44,11 @@
     mm: !!int 79
     distance: !!int 515
   a_star:
-    weight: !!int 4
+    weight: !!int 2
     penalty: !!int 2
   environment:
-    size: !!seq [50, 50]
-    real_size: !!int 50
+    size: !!seq [60, 115]
+    real_size: !!int 30
   object_id:
     end_point: !!int 2
     car: !!int 10
@@ -60,6 +60,6 @@
       logitech: !!seq [1920, 1080]
       pi_cam: !!seq [1920, 1080]
   spline:
-    tension: !!int 0
-    velocity: !!float 100.0
+    tension: !!float 0.5
+    velocity: !!float 10.0
 ...

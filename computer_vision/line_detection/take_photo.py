@@ -2,7 +2,7 @@
 import cv2
 
 if __name__ == '__main__':
-    DIRECTORY = 'tests/images/mapping4/'
+    DIRECTORY = 'tests/images/simulation/'
     cam = cv2.VideoCapture(0)
     # cam.set(cv2.CAP_PROP_FPS, 30.0)
     # codec = 0x47504A4D  # MJPG
@@ -10,7 +10,7 @@ if __name__ == '__main__':
     # cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     # cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
-    COUNT = 2
+    COUNT = 3
     while True:
         #frames = []
         RETS = True

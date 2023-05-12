@@ -27,10 +27,11 @@ if __name__ == '__main__':
 
     LIVE = False
 
-    IMG_PATH = 'tests/images/parking_slot_detection_4/title_4.jpg'
+    IMG_PATH = 'tests/images/simulation/title_3.jpg'
+    #IMG_PATH = 'tests/images/mappingqr/title_2.jpg'
 
     if LIVE:
-        cam = Camera(camera_id=1)
+        cam = Camera(camera_id=0)
         ret, frame = cam.read()
         if not ret:
             raise ValueError('NO CAM FRAME')
@@ -41,7 +42,7 @@ if __name__ == '__main__':
     QR_SIZE: QRSize = {
         'px': 191,
         'mm': 79,
-        'distance': 500,
+        'distance': 515,
     }
 
     # ----- CAMERA ----- #
@@ -61,9 +62,9 @@ if __name__ == '__main__':
     # ----- PARKING SLOT DETECTOR ----- #
     # OLD BOOMER
     P_CANNY = [50, 100]
-    P_HOUGH = [80, 200, 5]
-    P_ITERATIONS = [5, 2]
-    P_BLUR = 7
+    P_HOUGH = [65, 70, 20]
+    P_ITERATIONS = [1, 1]
+    P_BLUR = 12
     P_FILTER_ATOL = [20, 20]
     P_CLUSTER_ATOL = 0
 
@@ -116,8 +117,6 @@ if __name__ == '__main__':
         hough=P_HOUGH,
         blur=P_BLUR,
         iterations=P_ITERATIONS,
-        filter_atol=P_FILTER_ATOL,
-        cluster_atol=P_CLUSTER_ATOL
     )
 
     lane_detector = LaneDetector(
@@ -163,7 +162,7 @@ if __name__ == '__main__':
                 (qr_data['points'][0][0][0]+
                  (qr_data['points'][0][1][0]-qr_data['points'][0][0][0])/2,
                  qr_data['points'][0][0][0]))
-            qr_distance_x = distances[0]
+            qr_distance_x = qr_code.qr_geometries[0].get_qr_code_distance_x((PIXEL_WIDTH/2, PIXEL_HEIGHT/2))
             qr_distance_y = qr_data['distances'][0]
             obstacles.append({'values': [
                 (qr_distance_x, qr_distance_y)],

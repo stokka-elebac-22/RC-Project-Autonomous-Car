@@ -68,7 +68,7 @@ class Simulation: # pylint: disable=R0903
     def __pathfinding_setup(self):
         print('Setting up pathfinding...')
         # ----- INIT PARKFINDING ALGORITHM ----- #
-        a_star = AStar(self.conf['a_star']['weight'], self.conf['a_star']['penalty'])
+        a_star = AStar(self.conf['a_star']['weight'], self.conf['a_star']['penalty'], hindrance_ids=[1, 30])
 
         # ----- INIT ENVIRONMENT ----- #
         view_point_object: ViewPointObject = {
@@ -93,6 +93,7 @@ class Simulation: # pylint: disable=R0903
         pathfinding: PathFinding = PathFinding(
             environment=environment,
             pathfinding_algorithm=a_star,
+            tension=0,
             velocity=self.conf['spline']['velocity']
         )
         return pathfinding

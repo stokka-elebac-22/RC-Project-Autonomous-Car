@@ -3,16 +3,13 @@ __copyright__ = 'Copyright 2023, DATBAC23'
 __license__ = 'Apache-2.0'
 __version__ = '0.1.0'
 __status__ = 'Testing'
-import sys
-import cv2, imutils, socket
-import numpy as np
-import time
+import socket
 import base64
-from socket_handling.abstract_server import NetworkSettings
-from PyQt6.QtGui import QPixmap, QImage
-from PyQt6.QtCore import pyqtSignal, Qt, QThread
+import time
 import cv2
 import numpy as np
+from socket_handling.abstract_server import NetworkSettings
+from PyQt6.QtCore import pyqtSignal, QThread
 
 class SocketVideoThread(QThread):
     '''Video Thread'''
@@ -24,12 +21,13 @@ class SocketVideoThread(QThread):
         self._run_flag = True
         self.network_settings = network_settings
 
+    # pylint: disable=R0914 R0912 R0915
     def run(self): # pylint: disable=R0801
         '''Run'''
         BUFF_SIZE = 65536
         client_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         client_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFF_SIZE)
-        fps,st,frames_to_count,cnt = (0,0,20,0)
+        fps,time_step,frames_to_count,cnt = (0,0,20,0) # pylint: disable=W0612
         host_ip = self.network_settings.host
         port = self.network_settings.port
         # client_socket.connect((self.network_settings.host, self.network_settings.port))
@@ -50,10 +48,10 @@ class SocketVideoThread(QThread):
                 break
             if cnt == frames_to_count:
                 try:
-                    fps = round(frames_to_count/(time.time()-st))
-                    st=time.time()
+                    fps = round(frames_to_count/(time.time()-time_step))
+                    time_step=time.time()
                     cnt=0
-                except:
+                except: # pylint: disable=W0702
                     pass
             cnt+=1
 

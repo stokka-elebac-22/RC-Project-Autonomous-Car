@@ -20,11 +20,10 @@ from joystick_handler.joystick_module import JoystickHandler
 from joystick_handler.joystick_position import CurrentHeading
 from stop_sign_detection.stop_sign_detector import StopSignDetector
 from qr_code.qr_code import QRCode
-from defines import States
 from PyQt6 import QtWidgets, QtGui, uic, QtCore
 from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
 import numpy as np
-from pygame.locals import * # JOYAXISMOTION, JOYBALLMOTION, JOYHATMOTION, JOYBUTTONUP, JOYBUTTONDOWN
+from pygame.locals import * # pylint: disable=W0401
 
 class Worker(QObject, ):  # pylint: disable=R0903
     '''Worker thread'''
@@ -209,9 +208,6 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     def joystick_callback(self, event_type):
         '''Callback for joystick signals'''
         if event_type == JOYAXISMOTION:
-            # print("Joy axis motion:")
-            # print(f"Event num: {self.joystick_handler.event_num}")
-            # print(f"Motion: {self.joystick_handler.axis[self.joystick_handler.event_num]}")
             self.joystick_position.update_direction(
                 self.joystick_handler.event_num,
                 self.joystick_handler.axis[self.joystick_handler.event_num])
@@ -224,24 +220,11 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
             print(self.joystick_handler.event_num)
             print(self.joystick_handler.joy[self.joystick_handler.event_num])
         elif event_type == JOYBUTTONUP:
-            # print(event_type)
-            # print(self.joystick_handler.event_num)
-            # print(self.joystick_handler.button[self.joystick_handler.event_num])
-            self.joystick_position.update_button( # self.joystick_handler.event_num,
+            self.joystick_position.update_button(
                 self.joystick_handler.event_num, 0)
         elif event_type == JOYBUTTONDOWN:
-            # print(event_type)
-            # print(self.joystick_handler.event_num)
-            # print(self.joystick_handler.button[self.joystick_handler.event_num])
-            self.joystick_position.update_button( # self.joystick_handler.event_num,
+            self.joystick_position.update_button(
                 self.joystick_handler.event_num, 1)
-
-        # byte_data = self.joystick_position.get_byte_for_heading(2)
-        # print(f"Type: {byte_data[0]} Side: {byte_data[1]}, F/B: {byte_data[2]} Buttons: {byte_data[3]}")
-        # print(f"Before ... Side: {self.joystick_position.x_velocity}, F/B: {self.joystick_position.y_velocity} Buttons: {self.joystick_position.button}")
-        # self.joystick_position.set_heading_from_bytes(byte_data)
-        # print(f"After ... Side: {self.joystick_position.x_velocity}, F/B: {self.joystick_position.y_velocity} Buttons: {self.joystick_position.button}")
-        # print(self.joystick_position.get_byte_for_heading(2))
 
     def refresh_webcam_list(self):
         '''Run a Qthread to check possible webcams and create a list'''
@@ -299,8 +282,8 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
 
     def socket_send_joystick_direction(self):
         '''Send joystick direction update on socket connection '''
-        if self.socket_client.running:
-            data = self.joystick_position.get_byte_for_heading(2) # States.CMD_JOYSTICK_DIRECTIONS.value = 2
+        if self.socket_client.running:  # States.CMD_JOYSTICK_DIRECTIONS.value = 2
+            data = self.joystick_position.get_byte_for_heading(2)
             print("Sending data")
             self.socket_client.send_to_all(data)
         else:

@@ -16,7 +16,7 @@ from qr_code.qr_code import QRCode
 class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
     # pylint: disable=R0902
-    def __init__(self, conf: dict): # pylint: disable=R0912
+    def __init__(self, conf: dict): # pylint: disable=R0912 disable=R0915
         self.state = States.WAITING  # Start in "idle" state
         self.car_comm: AbstractCommunication
         # pylint: disable=R0903
@@ -110,7 +110,9 @@ class Headless():  # pylint: disable=R0903
             elif self.state is States.PARKING:
                 pass
             elif self.state is States.MANUAL:
-                print(f"After ... Side: {self.joystick_position.x_velocity}, F/B: {self.joystick_position.y_velocity} Buttons: {self.joystick_position.button}")
+                print(f"After ... Side: {self.joystick_position.x_velocity}, " +
+                        f"F/B: {self.joystick_position.y_velocity}" +
+                        f"Buttons: {self.joystick_position.button}")
 
             elif self.state is States.DRIVING:
                 # example:

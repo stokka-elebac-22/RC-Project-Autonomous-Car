@@ -53,17 +53,20 @@ class MultiSocketServer(BasicServer):
         while True:
             try:
                 data = connection.recv(2048)
-                response = 'Server message: ' + data.decode('utf-8')
+                if data[0] not in (1, 2, 16, 24, 32, 40, 64, 72, 128, 136, 152):
+                    response = 'Server message: ' + data.decode('utf-8')
+                    connection.sendall(str.encode(response))
             except socket.error as error:
                 self.thread_count -= 1
-                print('Thread Number: ' + str(self.thread_count))
+                print(f'Thread Number: {self.thread_count}')
                 print(str(error))
                 self.clients.remove(connection)
                 break
+            except UnicodeDecodeError as error:
+                print(f"Decode error: {error}")
             if not data:
                 break
             self.incoming_data.put(data)
-            connection.sendall(str.encode(response))
         connection.close()
 
     def send_to_all(self, message):

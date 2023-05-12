@@ -207,22 +207,22 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
 
     def joystick_callback(self, event_type):
         '''Callback for joystick signals'''
-        if event_type == JOYAXISMOTION:
+        if event_type == JOYAXISMOTION: # pylint disable=E0602
             self.joystick_position.update_direction(
                 self.joystick_handler.event_num,
                 self.joystick_handler.axis[self.joystick_handler.event_num])
-        elif event_type == JOYBALLMOTION:
+        elif event_type == JOYBALLMOTION: # pylint disable=E0602
             print(event_type)
             print(self.joystick_handler.event_num)
             print(self.joystick_handler.ball[self.joystick_handler.event_num])
-        elif event_type == JOYHATMOTION:
+        elif event_type == JOYHATMOTION: # pylint disable=E0602
             print(event_type)
             print(self.joystick_handler.event_num)
             print(self.joystick_handler.joy[self.joystick_handler.event_num])
-        elif event_type == JOYBUTTONUP:
+        elif event_type == JOYBUTTONUP: # pylint disable=E0602
             self.joystick_position.update_button(
                 self.joystick_handler.event_num, 0)
-        elif event_type == JOYBUTTONDOWN:
+        elif event_type == JOYBUTTONDOWN: # pylint disable=E0602
             self.joystick_position.update_button(
                 self.joystick_handler.event_num, 1)
 
@@ -261,11 +261,11 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         if self.joystick_handler.joystick_active and self.socket_client.running:
             self.socket_send_joystick_direction()
 
-    def socket_connect(self, id: int):
+    def socket_connect(self, connection_id: int):
         '''Start socket client connection'''
         if not self.socket_client.running:
-            host = self.connection_details['host_list'][id]['host']
-            port = self.connection_details['host_list'][id]['port']
+            host = self.connection_details['host_list'][connection_id]['host']
+            port = self.connection_details['host_list'][connection_id]['port']
             conn = NetworkSettings(host, port)
             self.socket_client.start(conn)
         else:

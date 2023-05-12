@@ -2,8 +2,7 @@
 from typing import List
 import pygame
 from pygame.locals import *
-from PyQt6.QtCore import pyqtSignal, Qt, QThread
-import numpy as np
+from PyQt6.QtCore import pyqtSignal, QThread
 
 class JoystickHandler(QThread):
     '''Joystick handler object'''

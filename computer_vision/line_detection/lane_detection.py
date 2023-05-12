@@ -50,7 +50,7 @@ class LaneDetector(LineDetector):
             slope = line_parameters[0]
             intercept = line_parameters[1]
             y_1 = image.shape[0]
-            y_2 = int(y_1 * (2.3 / 5))
+            y_2 = int(y_1 * (2.8 / 5))
             x_1 = int((y_1 - intercept) / slope)
             x_2 = int((y_2 - intercept) / slope)
             return np.array([x_1, y_1, x_2, y_2])

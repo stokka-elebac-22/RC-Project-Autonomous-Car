@@ -1,5 +1,6 @@
 '''main_headless.py: DATBAC23 Car system main.'''
 from defines import States, MessageId
+from joystick_handler.joystick_position import CurrentHeading
 from socket_handling.abstract_server import NetworkSettings
 from socket_handling.multi_socket_server import MultiSocketServer
 from camera_handler.camera_headless import CameraHandler
@@ -15,7 +16,7 @@ from qr_code.qr_code import QRCode
 class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
     # pylint: disable=R0902
-    def __init__(self, conf: dict): # pylint: disable=R0912
+    def __init__(self, conf: dict): # pylint: disable=R0912 disable=R0915
         self.state = States.WAITING  # Start in "idle" state
         self.car_comm: AbstractCommunication
         # pylint: disable=R0903
@@ -35,8 +36,12 @@ class Headless():  # pylint: disable=R0903
         self.socket_server = MultiSocketServer(self.net_main)
         self.socket_server.start()
 
+        self.camera_missing_frame = 0
+        self.joystick_position = CurrentHeading()
+
         self.cam0_stream = CamSocketStream(self.net_cam0)
         if conf["network"]["stream_en_cam0"] is True:
+            print("Starting camera stream")
             self.cam0_stream.start()
 
         self.cam1_stream = CamSocketStream(self.net_cam1)
@@ -58,17 +63,29 @@ class Headless():  # pylint: disable=R0903
         while True:
             # Check and handle incoming data
             for data in self.socket_server:
+                print (data)
                 if MessageId(data[0]) is MessageId.CMD_SET_STATE:
                     self.state = data[1]
                     print("State changed to: ")
                     print(States(data[1]).name)
+                if MessageId(data[0]) is MessageId.CMD_JOYSTICK_DIRECTIONS:
+                    self.joystick_position.set_heading_from_bytes(data)
+                    # Handle joystick directions
 
             # Take new picture, handle socket transfers
             ret, frame0 = self.cam0_handler.get_cv_frame()
 
             if ret is True:
+                self.camera_missing_frame = 0
                 self.cam0_stream.send_to_all(frame0)
                 self.cam1_stream.send_to_all(frame0)
+            else:
+                self.camera_missing_frame += 1
+                print(f"Could not get frame from camera: {self.cam0_handler.camera_id}!")
+                if self.camera_missing_frame > 10:
+                    print("Exceeded number of missing frames in a row. Stopping headless.")
+                    print(self.cam0_handler.refresh_camera_list())
+                    break
 
             if self.state is States.WAITING:  # Prints detected data (testing)
                 current_qr_data = self.qr_code.get_data(frame0)
@@ -92,6 +109,11 @@ class Headless():  # pylint: disable=R0903
 
             elif self.state is States.PARKING:
                 pass
+            elif self.state is States.MANUAL:
+                print(f"After ... Side: {self.joystick_position.x_velocity}, " +
+                        f"F/B: {self.joystick_position.y_velocity}" +
+                        f"Buttons: {self.joystick_position.button}")
+
             elif self.state is States.DRIVING:
                 # example:
                 self.car_comm.set_motor_speed(1, 100, 1, 100)

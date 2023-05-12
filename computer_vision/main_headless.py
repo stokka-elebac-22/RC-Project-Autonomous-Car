@@ -16,7 +16,7 @@ from qr_code.qr_code import QRCode
 class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
     # pylint: disable=R0902
-    def __init__(self, conf: dict): # pylint: disable=R0912 disable=R0915
+    def __init__(self, conf: dict): # pylint: disable=R0912
         self.state = States.WAITING  # Start in "idle" state
         self.car_comm: AbstractCommunication
         # pylint: disable=R0903
@@ -25,8 +25,9 @@ class Headless():  # pylint: disable=R0903
         elif conf["car_comm_interface"] == "can":
             self.car_comm = CanBusCommunication(conf["can"])
         elif conf["car_comm_interface"] == "stepper":
-            self.car_comm = CarStepperCommunication(conf["stepper"])
-
+            print("Selected stepper")
+            self.car_comm = CarStepperCommunication(conf["step"])
+        self.car_comm.start()
         # Network config for main connection + camera(s)
         self.net_main = NetworkSettings(conf["network"]["host"], conf["network"]["port"])
         self.net_cam0 = NetworkSettings(conf["network"]["host"], conf["network"]["port_cam0"])
@@ -66,7 +67,7 @@ class Headless():  # pylint: disable=R0903
                 print (data)
                 if MessageId(data[0]) is MessageId.CMD_SET_STATE:
                     self.state = data[1]
-                    print("State changed to: ")
+                    print(f"State changed to: {self.state} - ")
                     print(States(data[1]).name)
                 if MessageId(data[0]) is MessageId.CMD_JOYSTICK_DIRECTIONS:
                     self.joystick_position.set_heading_from_bytes(data)
@@ -109,10 +110,33 @@ class Headless():  # pylint: disable=R0903
 
             elif self.state is States.PARKING:
                 pass
-            elif self.state is States.MANUAL:
-                print(f"After ... Side: {self.joystick_position.x_velocity}, " +
-                        f"F/B: {self.joystick_position.y_velocity}" +
-                        f"Buttons: {self.joystick_position.button}")
+            elif self.state is 4:
+                y_velocity = self.joystick_position.y_velocity
+                x_velocity = self.joystick_position.x_velocity
+                if y_velocity > 0:
+                    dir_0 = 1
+                    dir_1 = 1
+                    speed_0 = 10
+                    speed_1 = 10
+                elif y_velocity < 0:
+                    dir_0 = 0
+                    dir_1 = 0
+                    speed_0 = 10
+                    speed_1 = 10
+                else:
+                    dir_0 = 0
+                    dir_1 = 0
+                    speed_0 = 0
+                    speed_1 = 0
+                if x_velocity < 0:
+                    speed_0 += 10
+                elif x_velocity > 0:
+                    speed_1 += 10
+                self.car_comm.set_motor_speed(dir_0, speed_0, dir_1, speed_1)
+                print(f"Speeds Speed0: {int(speed_0)}, Speed1: {speed_1} dir0/1: {dir_0} {dir_1}")
+
+
+                # print(f"After ... Side: {int(self.joystick_position.x_velocity)}, F/B: {int(self.joystick_position.y_velocity)} Buttons: {self.joystick_position.button}")
 
             elif self.state is States.DRIVING:
                 # example:

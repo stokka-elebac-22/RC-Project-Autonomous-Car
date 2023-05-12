@@ -207,22 +207,22 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
 
     def joystick_callback(self, event_type):
         '''Callback for joystick signals'''
-        if event_type == JOYAXISMOTION: # pylint disable=E0602
+        if event_type == JOYAXISMOTION: # pylint: disable=E0602
             self.joystick_position.update_direction(
                 self.joystick_handler.event_num,
                 self.joystick_handler.axis[self.joystick_handler.event_num])
-        elif event_type == JOYBALLMOTION: # pylint disable=E0602
+        elif event_type == JOYBALLMOTION: # pylint: disable=E0602
             print(event_type)
             print(self.joystick_handler.event_num)
             print(self.joystick_handler.ball[self.joystick_handler.event_num])
-        elif event_type == JOYHATMOTION: # pylint disable=E0602
+        elif event_type == JOYHATMOTION: # pylint: disable=E0602
             print(event_type)
             print(self.joystick_handler.event_num)
             print(self.joystick_handler.joy[self.joystick_handler.event_num])
-        elif event_type == JOYBUTTONUP: # pylint disable=E0602
+        elif event_type == JOYBUTTONUP: # pylint: disable=E0602
             self.joystick_position.update_button(
                 self.joystick_handler.event_num, 0)
-        elif event_type == JOYBUTTONDOWN: # pylint disable=E0602
+        elif event_type == JOYBUTTONDOWN: # pylint: disable=E0602
             self.joystick_position.update_button(
                 self.joystick_handler.event_num, 1)
 

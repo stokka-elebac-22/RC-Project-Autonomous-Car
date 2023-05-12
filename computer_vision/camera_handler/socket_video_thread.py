@@ -11,10 +11,12 @@ import numpy as np
 from socket_handling.abstract_server import NetworkSettings
 from PyQt6.QtCore import pyqtSignal, QThread
 
+BUFFER_SIZE = 65536
 class SocketVideoThread(QThread):
     '''Video Thread'''
     change_pixmap_signal = pyqtSignal(np.ndarray)
     camera_id = 0
+
 
     def __init__(self, network_settings: NetworkSettings):
         super().__init__()
@@ -24,9 +26,8 @@ class SocketVideoThread(QThread):
     # pylint: disable=R0914 R0912 R0915
     def run(self): # pylint: disable=R0801
         '''Run'''
-        BUFFERSIZE = 65536
         client_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-        client_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFFERSIZE)
+        client_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,BUFFER_SIZE)
         fps,time_step,frames_to_count,cnt = (0,0,20,0) # pylint: disable=W0612
         host_ip = self.network_settings.host
         port = self.network_settings.port
@@ -35,7 +36,7 @@ class SocketVideoThread(QThread):
         client_socket.sendto(message,(host_ip,port))
         print(f"Camera connecting to: {host_ip}:{port}")
         while self._run_flag:
-            packet,_ = client_socket.recvfrom(BUFFERSIZE)
+            packet,_ = client_socket.recvfrom(BUFFER_SIZE)
             data = base64.b64decode(packet,' /')
             npdata = np.fromstring(data,dtype=np.uint8)
             frame = cv2.imdecode(npdata,1)

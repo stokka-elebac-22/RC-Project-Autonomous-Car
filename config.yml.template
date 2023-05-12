@@ -16,7 +16,7 @@
     host_list: [
       { name: "localhost", host: "127.0.0.1", port: 2004 }
     ]
-  car_comm_interface: !!str "serial"   # "serial", "can", "stepper"
+  car_comm_interface: !!str "stepper"   # "serial", "can", "stepper"
   serial:
     active: !!bool false
     port: !!int 0
@@ -26,10 +26,12 @@
     channel: !!str "can0"
   step:
     active: !!bool false
+    en0: !!int 24
     step0: !!int 18
-    dir0: !!int 12
+    dir0: !!int 23
+    en1: !!int 6
     step1: !!int 19
-    dir1: !!int 13
+    dir1: !!int 5
   camera0:
     id: !!int 0
     size:

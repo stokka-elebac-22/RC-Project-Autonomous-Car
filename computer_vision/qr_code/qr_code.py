@@ -303,7 +303,7 @@ class DisplayQRCode:
 
 
 if __name__ == '__main__':
-    IMG_PATH = 'tests/images/parking_slot_detection_4/title_4.jpg'
+    IMG_PATH = 'tests/images/qr_code/title_5.jpg'
     # ----- ORIGINAL MEASUREMENTS -----
     # QR Code measured, 55mm lense
     SIZE = {

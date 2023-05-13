@@ -1,4 +1,5 @@
 '''main_headless.py: DATBAC23 Car system main.'''
+import cv2
 from defines import States, MessageId
 from joystick_handler.joystick_position import CurrentHeading
 from socket_handling.abstract_server import NetworkSettings
@@ -10,6 +11,7 @@ from car_communication.abstract_communication import AbstractCommunication
 from car_communication.can_bus_communication import CanBusCommunication
 from car_communication.car_serial_communication import CarSerialCommunication
 from car_communication.car_stepper_communication import CarStepperCommunication
+from stereoscopic_vision.src.stereoscopic_vision import StereoscopicVision
 
 from qr_code.qr_code import QRCode
 
@@ -57,9 +59,15 @@ class Headless():  # pylint: disable=R0903
         }
 
         self.cam0_handler = CameraHandler(conf["camera0"]["id"])
+        self.cam1_handler = CameraHandler(conf['camera1']['id'])
 
         self.qr_code = QRCode(size)
         self.stop_sign_detector = StopSignDetector('stop_sign_model.xml')
+
+        # Stereo vision
+        self.stereo_vison = StereoscopicVision(
+            conf['stereo']['maps_path'],
+            conf['stereo']['parameter_path'])
 
         while True:
             # Check and handle incoming data
@@ -75,6 +83,7 @@ class Headless():  # pylint: disable=R0903
 
             # Take new picture, handle socket transfers
             ret, frame0 = self.cam0_handler.get_cv_frame()
+            # ret1, frame1 = self.cam1_handler.get_cv_frame()
 
             if ret is True:
                 self.camera_missing_frame = 0
@@ -110,7 +119,7 @@ class Headless():  # pylint: disable=R0903
 
             elif self.state is States.PARKING:
                 pass
-            elif self.state is 4:
+            elif self.state is States.MANUAL:
                 y_velocity = self.joystick_position.y_velocity
                 x_velocity = self.joystick_position.x_velocity
                 if y_velocity > 0:
@@ -141,3 +150,13 @@ class Headless():  # pylint: disable=R0903
             elif self.state is States.DRIVING:
                 # example:
                 self.car_comm.set_motor_speed(1, 100, 1, 100)
+            elif self.state is States.STEREO:
+                frame0 = cv2.blur(frame0, (conf['stereo']['blur']))
+                frame1 = cv2.blur(frame1, (conf['stereo']['blur']))
+                current_disparity = self.stereo_vison.get_disparity(frame0, frame1)
+                ret_val, depth_val, pos_val, size_val = self.stereo_vison.get_data(
+                    current_disparity,
+                    conf['stereo']['min_dist'],
+                    conf['stereo']['max_dist']
+                )
+                print(ret_val, depth_val, pos_val, size_val)

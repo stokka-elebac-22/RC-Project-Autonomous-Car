@@ -89,12 +89,17 @@ class Headless():  # pylint: disable=R0903
 
         if conf["camera0"]["enabled"] is True:
             self.cam0_handler = CameraHandler(conf["camera0"]["id"])
+        else:
+            self.cam0_handler = None
+
         if conf["camera1"]["enabled"] is True:
             self.cam1_handler = CameraHandler(conf['camera1']['id'])
+        else:
+            self.cam1_handler = None
 
             # ----- CAMERA ----- #
-        PIXEL_WIDTH = conf['frame'][0]
-        PIXEL_HEIGHT = conf['frame'][1]
+        PIXEL_WIDTH, PIXEL_HEIGHT = conf["camera"]["camera_resolution"]["web"]
+        # PIXEL_HEIGHT = conf['frame'][1]
 
         # ----- ENVIRONMENT ----- #
         BOARD_SIZE = (60, 115)
@@ -146,15 +151,14 @@ class Headless():  # pylint: disable=R0903
             if ret1 is True:
                 self.cam1_stream.send_to_all(frame0)
             if self.state is States.WAITING:  # Prints detected data (testing)
-                status, speeds = self.waiting_state.run_calculation(frame0)
-                if status == 0:
-                    pass
+                _, speeds = self.waiting_state.run_calculation(frame0)
+
             elif self.state is States.PARKING:
-                path_data = self.driving_state.run_calculation(frame0)
+                _, path_data = self.driving_state.run_calculation(frame0)
                 self.check_actions(path_data)
 
             elif self.state is States.DRIVING:
-                path_data = self.driving_state.run_calculation(frame0)
+                _, path_data = self.driving_state.run_calculation(frame0)
                 self.check_actions(path_data)
 
             elif self.state is States.STOPPING:
@@ -169,12 +173,11 @@ class Headless():  # pylint: disable=R0903
                 self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
                                               speeds["dir_1"], speeds["speed_1"])
             elif self.state is States.MANUAL:
-                status, speeds = ManualDriving.run_calculation(
+                _, speeds = ManualDriving.run_calculation(
                     self.joystick_position)
                 self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
                                               speeds["dir_1"], speeds["speed_1"])
-                if status == 0:
-                    pass
+
             elif self.state is States.STEREO:
                 if frame0 is not None and frame1 is not None:
                     depth_val = self.stereo_vision.run_calculation([frame0, frame1])

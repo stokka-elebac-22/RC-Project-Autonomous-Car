@@ -13,7 +13,7 @@ class LaningAction():
             env,
             a_star,
             0.5,
-            conf['velocity']
+            conf['spline']['velocity']
         )
         self.lane_detector = LaneDetector(
             conf['lane']['canny'],
@@ -44,9 +44,9 @@ class LaningAction():
             self.conf['object_id']['car'], self.conf['object_id']['QR'])
         if path_data is None:
             print('There is not path data...')
+            return 0, None
 
-
-        return obstacles
+        return len(path_data), path_data
 
 
 

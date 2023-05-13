@@ -48,7 +48,7 @@ class ParkingAction():
                 'points': qr_data['points']
             }
 
-            line_dict = parking_slot_detector.get_parking_slot(input_data, qr_code_data)
+            line_dict = self.parking_slot_detector.get_parking_slot(input_data, qr_code_data)
             if line_dict is not None:
                 for lines in line_dict['all_lines']:
                     obstacles.append({'values': [

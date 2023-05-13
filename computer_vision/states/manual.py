@@ -28,7 +28,7 @@ class ManualDriving():
         elif x_velocity > 0:
             speed_1 += 10
         print(f"Speeds Speed0: {int(speed_0)}, Speed1: {speed_1} dir0/1: {dir_0} {dir_1}")
-        return {
+        return 0, {
             "dir_0" : dir_0,
             "dir_1" : dir_1,
             "speed_0" : speed_0,

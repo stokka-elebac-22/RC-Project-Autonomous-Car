@@ -13,7 +13,7 @@ from car_communication.car_stepper_communication import CarStepperCommunication
 
 from states.manual import ManualDriving
 from states.waiting import WaitingState
-
+from states.stopping import StopSignAction
 class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
     # pylint: disable=R0902
@@ -60,7 +60,8 @@ class Headless():  # pylint: disable=R0903
         self.cam0_handler = CameraHandler(conf["camera0"]["id"])
 
         self.waiting_state = WaitingState(size)
-        self.stop_sign_detector = StopSignDetector('stop_sign_model.xml')
+        self.stopping_state = StopSignAction('stop_sign_model.xml')
+        # self.stop_sign_detector = StopSignDetector('stop_sign_model.xml')
 
         while True:
             # Check and handle incoming data
@@ -90,15 +91,31 @@ class Headless():  # pylint: disable=R0903
                     break
 
             if self.state is States.WAITING:  # Prints detected data (testing)
-                speeds = self.waiting_state.run_calculation(frame0)
+                status, speeds = self.waiting_state.run_calculation(frame0)
 
             elif self.state is States.PARKING:
                 pass
-            elif self.state == 4: #manual
-                speeds = ManualDriving.run_calculation(self.joystick_position)
-                self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
-                                              speeds["dir_1"], speeds["speed_1"])
 
             elif self.state is States.DRIVING:
                 # example:
                 self.car_comm.set_motor_speed(1, 100, 1, 100)
+            elif self.state == 3: #stopping
+                count, speeds = self.stopping_state.run_calculation(frame0)
+                if count == 0:
+                    speeds = {
+                        "dir_0" : 0,
+                        "dir_1" : 0,
+                        "speed_0" : 10,
+                        "speed_1" : 10
+                    }
+                self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
+                                              speeds["dir_1"], speeds["speed_1"])
+
+            elif self.state == 4: #manual
+                status, speeds = ManualDriving.run_calculation(self.joystick_position)
+                self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
+                                              speeds["dir_1"], speeds["speed_1"])
+
+            elif self.state == 5: #shutdown
+                self.car_comm.stop()
+                break

@@ -28,7 +28,7 @@ class WaitingState():
             print(output_data)
         if len(current_stop_sign) > 0:
             print(current_stop_sign)
-        return {
+        return 0, {
             "dir_0" : 0,
             "dir_1" : 0,
             "speed_0" : 0,

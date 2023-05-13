@@ -5,7 +5,6 @@ from socket_handling.abstract_server import NetworkSettings
 from socket_handling.multi_socket_server import MultiSocketServer
 from camera_handler.camera_headless import CameraHandler
 from camera_handler.camera_sock_server import CamSocketStream
-from stop_sign_detection.stop_sign_detector import StopSignDetector
 from car_communication.abstract_communication import AbstractCommunication
 from car_communication.can_bus_communication import CanBusCommunication
 from car_communication.car_serial_communication import CarSerialCommunication
@@ -17,6 +16,7 @@ from states.stopping import StopSignAction
 class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
     # pylint: disable=R0902
+    # pylint: disable=R0915
     def __init__(self, conf: dict): # pylint: disable=R0912
         self.state = States.WAITING  # Start in "idle" state
         self.car_comm: AbstractCommunication
@@ -92,6 +92,8 @@ class Headless():  # pylint: disable=R0903
 
             if self.state is States.WAITING:  # Prints detected data (testing)
                 status, speeds = self.waiting_state.run_calculation(frame0)
+                if status == 0:
+                    pass
 
             elif self.state is States.PARKING:
                 pass
@@ -115,6 +117,8 @@ class Headless():  # pylint: disable=R0903
                 status, speeds = ManualDriving.run_calculation(self.joystick_position)
                 self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
                                               speeds["dir_1"], speeds["speed_1"])
+                if status == 0:
+                    pass
 
             elif self.state == 5: #shutdown
                 self.car_comm.stop()

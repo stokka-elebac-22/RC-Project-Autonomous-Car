@@ -1,13 +1,24 @@
+'''Driving state'''
+from environment.src.a_star import AStar
+from pathfinding.pathfinding import PathFinding
 from line_detection.lane_detection import LaneDetector
 
 class LaningAction():
-    '''Class for waiting state'''
+    '''Class for Lane driving state'''
 
-    def __init__(self, conf) -> None:
+    def __init__(self, conf, env) -> None:
+        self.conf = conf
+        a_star = AStar(weight=2, penalty=2, hindrance_ids=[1, 30])
+        self.path_finding = PathFinding(
+            env,
+            a_star,
+            0.5,
+            conf['velocity']
+        )
         self.lane_detector = LaneDetector(
-            conf['canny'],
-            conf['blur'],
-            conf['hough'],
+            conf['lane']['canny'],
+            conf['lane']['blur'],
+            conf['lane']['hough'],
         )
 
     def run_calculation(self, input_data):
@@ -21,13 +32,20 @@ class LaningAction():
                     obstacles.append({'values': [
                                      (line[0], line[1]), (line[2], line[3])],
                         'distance': False, 'object_id': 31})
-                    
+
             check_point = self.lane_detector.get_next_point(input_data, avg_lines)
             if check_point is not None:
                 obstacles.append({'values': [
                     check_point],
                     'distance': False, 'object_id': 20})
-            
+        self.path_finding.reset()
+        self.path_finding.insert_objects(obstacles)
+        path_data = self.path_finding.calculate_path(
+            self.conf['object_id']['car'], self.conf['object_id']['QR'])
+        if path_data is None:
+            print('There is not path data...')
+
+
         return obstacles
 
 

@@ -213,8 +213,8 @@ class PathFinding:
             curve, _ = self.catmull_rom_spline(
                 temp_path, self.tension, self.num_points)
             lengths = self.approx_segment_lengths(curve)
-            times = [x * self.__environment.real_size /
-                     self.velocity for x in lengths]
+            distances = [x * self.__environment.real_size for x in lengths]
+            times = [ x / self.velocity for x in distances]
 
             angles = []
             for i, value in enumerate(curve):
@@ -232,5 +232,6 @@ class PathFinding:
                 'curve': curve,
                 'angles': angle_diff,
                 'times': data['times'],
+                'distances': distances
             }
         return None

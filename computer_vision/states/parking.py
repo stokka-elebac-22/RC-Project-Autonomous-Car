@@ -1,21 +1,33 @@
+'''Parking class'''
+from environment.src.a_star import AStar
+from pathfinding.pathfinding import PathFinding
 from line_detection.parking_slot_detection import parking_slot_detector
 from qr_code.qr_code import QRCode
 
 class ParkingAction():
-    '''Class for waiting state'''
+    '''Class for autonomous parking state'''
 
-    def __init__(self, conf_parking, conf_qr, env) -> None:
-        self.parking_slot_detector = parking_slot_detector(
-            conf_parking['canny'],
-            conf_parking['blur'],
-            conf_parking['hough'],
+    def __init__(self, conf, env) -> None:
+        self.conf = conf
+        a_star = AStar(weight=2, penalty=2, hindrance_ids=[1, 30])
+        self.path_finding = PathFinding(
+            env,
+            a_star,
+            0.5,
+            conf['velocity']
         )
-        self.r_code = QRCode(conf_qr)
+        self.parking_slot_detector = parking_slot_detector(
+            conf['parking']['canny'],
+            conf['parking']['blur'],
+            conf['parking']['hough'],
+        )
+        self.qr_code = QRCode(conf['qr_code_size'])
         self.env = env
 
     def run_calculation(self, input_data):
         '''Take frame input and output relevant data'''
         # Use lane Module
+        self.path_finding.reset()
         obstacles = []
 
         qr_data = self.qr_code.get_data(input_data)
@@ -46,8 +58,14 @@ class ParkingAction():
                     obstacles.append({'values': [
                         (lines[0], lines[1]), (lines[2], lines[3])],
                         'distance': False, 'object_id': 30})
-            
-        return obstacles
+        self.path_finding.insert_objects(obstacles)
+        path_data = self.path_finding.calculate_path(
+            self.conf['object_id']['car'], self.conf['object_id']['QR'])
+        if path_data is None:
+            print('There is not path data...')
+            return 0, None
+
+        return len(path_data), path_data
 
 
 

@@ -11,7 +11,8 @@ from car_communication.can_bus_communication import CanBusCommunication
 from car_communication.car_serial_communication import CarSerialCommunication
 from car_communication.car_stepper_communication import CarStepperCommunication
 
-from qr_code.qr_code import QRCode
+from states.manual import ManualDriving
+from states.waiting import WaitingState
 
 class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
@@ -58,7 +59,7 @@ class Headless():  # pylint: disable=R0903
 
         self.cam0_handler = CameraHandler(conf["camera0"]["id"])
 
-        self.qr_code = QRCode(size)
+        self.waiting_state = WaitingState(size)
         self.stop_sign_detector = StopSignDetector('stop_sign_model.xml')
 
         while True:
@@ -89,54 +90,14 @@ class Headless():  # pylint: disable=R0903
                     break
 
             if self.state is States.WAITING:  # Prints detected data (testing)
-                current_qr_data = self.qr_code.get_data(frame0)
-                output_data = 'Data: \n'
-                # print(current_qr_data)
-                if current_qr_data['ret']:
-                    for i in range(len(current_qr_data['distances'])):
-                        output_data += \
-                            f"QR-Code {str(i)} \n \
-                                Distance: {round(current_qr_data['distances'][i])} \n \
-                                Angle: {current_qr_data['angles'][i]} \n"
-
-                        output_data += 'Data: ' + current_qr_data['info'][i] + '\n'
-
-                current_stop_sign = self.stop_sign_detector.detect_signs(frame0)
-                if current_qr_data['distances'] is not None and \
-                        len(current_qr_data['distances']) > 0:
-                    print(output_data)
-                if len(current_stop_sign) > 0:
-                    print(current_stop_sign)
+                speeds = self.waiting_state.run_calculation(frame0)
 
             elif self.state is States.PARKING:
                 pass
-            elif self.state is 4:
-                y_velocity = self.joystick_position.y_velocity
-                x_velocity = self.joystick_position.x_velocity
-                if y_velocity > 0:
-                    dir_0 = 1
-                    dir_1 = 1
-                    speed_0 = 10
-                    speed_1 = 10
-                elif y_velocity < 0:
-                    dir_0 = 0
-                    dir_1 = 0
-                    speed_0 = 10
-                    speed_1 = 10
-                else:
-                    dir_0 = 0
-                    dir_1 = 0
-                    speed_0 = 0
-                    speed_1 = 0
-                if x_velocity < 0:
-                    speed_0 += 10
-                elif x_velocity > 0:
-                    speed_1 += 10
-                self.car_comm.set_motor_speed(dir_0, speed_0, dir_1, speed_1)
-                print(f"Speeds Speed0: {int(speed_0)}, Speed1: {speed_1} dir0/1: {dir_0} {dir_1}")
-
-
-                # print(f"After ... Side: {int(self.joystick_position.x_velocity)}, F/B: {int(self.joystick_position.y_velocity)} Buttons: {self.joystick_position.button}")
+            elif self.state == 4: #manual
+                speeds = ManualDriving.run_calculation(self.joystick_position)
+                self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
+                                              speeds["dir_1"], speeds["speed_1"])
 
             elif self.state is States.DRIVING:
                 # example:

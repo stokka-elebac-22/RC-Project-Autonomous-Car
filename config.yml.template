@@ -77,4 +77,14 @@
     max_dist: !!int 2000
     min_dist: !!int 50
     blur: !!int 12
+  lane:
+    blur: !!int 12
+    canny: !!seq [75, 89]
+    morph: !!seq [2, 2]
+    hough: !!seq [61, 59, 49]
+  parking:
+    blur: !!int 12
+    canny: !!seq [50, 100]
+    morph: !!seq [1, 1]
+    hough: !!seq [65, 70, 20]
 ...

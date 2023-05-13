@@ -1,6 +1,9 @@
 '''main_headless.py: DATBAC23 Car system main.'''
 import cv2
+import time
 from defines import States, MessageId
+from typing import List, TypedDict
+from collections import deque
 from joystick_handler.joystick_position import CurrentHeading
 from socket_handling.abstract_server import NetworkSettings
 from socket_handling.multi_socket_server import MultiSocketServer
@@ -11,16 +14,40 @@ from car_communication.can_bus_communication import CanBusCommunication
 from car_communication.car_serial_communication import CarSerialCommunication
 from car_communication.car_stepper_communication import CarStepperCommunication
 from stereoscopic_vision.src.stereoscopic_vision import StereoscopicVision
+from pathfinding.pathfinding import PathFinding
+from environment.src.environment import Environment, ViewPointObject
+from environment.src.a_star import AStar
 
 from states.manual import ManualDriving
 from states.waiting import WaitingState
 from states.stopping import StopSignAction
+from states.driving import LaningAction
+from states.parking import ParkingAction
+
+ActionsDict = TypedDict('ActionsDict', {
+    'speed': int,
+    'angle': float,
+    'time': float,
+})
+
+
 class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
     # pylint: disable=R0902
     # pylint: disable=R0915
-    def __init__(self, conf: dict): # pylint: disable=R0912
+
+    def __init__(self, conf: dict):  # pylint: disable=R0912
         self.state = States.WAITING  # Start in "idle" state
+
+        self.actions: List[ActionsDict] = deque()
+        self.cur_action = None
+        self.prev_action = {
+            'angle': None,
+            'speed': None,
+            'time': time.time(),
+        }
+        path_data = None
+
         self.car_comm: AbstractCommunication
         # pylint: disable=R0903
         if conf["car_comm_interface"] == "serial":
@@ -32,9 +59,12 @@ class Headless():  # pylint: disable=R0903
             self.car_comm = CarStepperCommunication(conf["step"])
         self.car_comm.start()
         # Network config for main connection + camera(s)
-        self.net_main = NetworkSettings(conf["network"]["host"], conf["network"]["port"])
-        self.net_cam0 = NetworkSettings(conf["network"]["host"], conf["network"]["port_cam0"])
-        self.net_cam1 = NetworkSettings(conf["network"]["host"], conf["network"]["port_cam1"])
+        self.net_main = NetworkSettings(
+            conf["network"]["host"], conf["network"]["port"])
+        self.net_cam0 = NetworkSettings(
+            conf["network"]["host"], conf["network"]["port_cam0"])
+        self.net_cam1 = NetworkSettings(
+            conf["network"]["host"], conf["network"]["port_cam1"])
 
         # Start main socket server for connections
         self.socket_server = MultiSocketServer(self.net_main)
@@ -64,9 +94,36 @@ class Headless():  # pylint: disable=R0903
         if conf["camera1"]["enabled"] is True:
             self.cam1_handler = CameraHandler(conf['camera1']['id'])
 
+            # ----- CAMERA ----- #
+        PIXEL_WIDTH = conf['frame'][0]
+        PIXEL_HEIGHT = conf['frame'][1]
+
+        # ----- ENVIRONMENT ----- #
+        BOARD_SIZE = (60, 115)
+        ENV_SIZE = 30
+
+        a_star = AStar(weight=2, penalty=2, hindrance_ids=[1, 30])
+
+        view_point_object: ViewPointObject = {
+            'view_point': None,
+            'object_id': 10,
+        }
+
+        env = Environment(BOARD_SIZE, (PIXEL_WIDTH, PIXEL_HEIGHT),
+                          ENV_SIZE, view_point_object)
+
+        self.path_finding = PathFinding(
+            env,
+            a_star,
+            0.5,
+            conf['velocity']
+        )
+
         self.waiting_state = WaitingState(size)
         self.stopping_state = StopSignAction('stop_sign_model.xml')
-        # self.stop_sign_detector = StopSignDetector('stop_sign_model.xml')
+        self.driving_state = LaningAction(conf['lane'])
+        self.parking_state = ParkingAction(
+            conf['parking'], conf['qr_code_size'], env)
 
         # Stereo vision
         self.stereo_vison = StereoscopicVision(
@@ -76,7 +133,7 @@ class Headless():  # pylint: disable=R0903
         while True:
             # Check and handle incoming data
             for data in self.socket_server:
-                print (data)
+                print(data)
                 if MessageId(data[0]) is MessageId.CMD_SET_STATE:
                     self.state = States(data[1])
                     print(f"State changed to: {self.state} - ")
@@ -94,9 +151,11 @@ class Headless():  # pylint: disable=R0903
                 self.cam1_stream.send_to_all(frame0)
             else:
                 self.camera_missing_frame += 1
-                print(f"Could not get frame from camera: {self.cam0_handler.camera_id}!")
+                print(
+                    f"Could not get frame from camera: {self.cam0_handler.camera_id}!")
                 if self.camera_missing_frame > 10:
-                    print("Exceeded number of missing frames in a row. Stopping headless.")
+                    print(
+                        "Exceeded number of missing frames in a row. Stopping headless.")
                     print(self.cam0_handler.refresh_camera_list())
                     break
             if self.state is States.WAITING:  # Prints detected data (testing)
@@ -104,23 +163,36 @@ class Headless():  # pylint: disable=R0903
                 if status == 0:
                     pass
             elif self.state is States.PARKING:
-                pass
-            elif self.state is States.DRIVING:
-                # example:
+                obstacles = self.driving_state.run_calculation(frame0)
+                self.path_finding.insert_objects(obstacles)
+                path_data = self.path_finding.calculate_path(
+                    conf['object_id']['car'], conf['object_id']['QR'])
+                if path_data is None:
+                    print('There is not path data...')
                 self.car_comm.set_motor_speed(1, 100, 1, 100)
+                self.path_finding.reset()
+            elif self.state is States.DRIVING:
+                obstacles = self.driving_state.run_calculation(frame0)
+                self.path_finding.insert_objects(obstacles)
+                path_data = self.path_finding.calculate_path(
+                    conf['object_id']['car'], conf['object_id']['QR'])
+                if path_data is None:
+                    print('There is not path data...')
+                self.path_finding.reset()
             elif self.state is States.STOPPING:
                 count, speeds = self.stopping_state.run_calculation(frame0)
                 if count == 0:
                     speeds = {
-                        "dir_0" : 0,
-                        "dir_1" : 0,
-                        "speed_0" : 10,
-                        "speed_1" : 10
+                        "dir_0": 0,
+                        "dir_1": 0,
+                        "speed_0": 10,
+                        "speed_1": 10
                     }
                 self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
                                               speeds["dir_1"], speeds["speed_1"])
             elif self.state is States.MANUAL:
-                status, speeds = ManualDriving.run_calculation(self.joystick_position)
+                status, speeds = ManualDriving.run_calculation(
+                    self.joystick_position)
                 self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
                                               speeds["dir_1"], speeds["speed_1"])
                 if status == 0:
@@ -129,7 +201,8 @@ class Headless():  # pylint: disable=R0903
                 if frame0 is not None and frame1 is not None:
                     frame0 = cv2.blur(frame0, (conf['stereo']['blur']))
                     frame1 = cv2.blur(frame1, (conf['stereo']['blur']))
-                    current_disparity = self.stereo_vison.get_disparity(frame0, frame1)
+                    current_disparity = self.stereo_vison.get_disparity(
+                        frame0, frame1)
                     ret_val, depth_val, pos_val, size_val = self.stereo_vison.get_data(
                         current_disparity,
                         conf['stereo']['min_dist'],
@@ -139,3 +212,36 @@ class Headless():  # pylint: disable=R0903
             elif self.state == States.SHUTDOWN:
                 self.car_comm.stop()
                 break
+
+            if path_data is not None:
+                angles = path_data['angles']
+                times = path_data['times']
+                self.actions: deque = deque()
+                for angle, action_time in zip(angles, times):
+                    self.actions.append({
+                        'speed': conf['spline']['velocity'],
+                        'angle': angle,
+                        'time': action_time,
+                    })
+                path_data = None
+
+            time_now = self.prev_action['time'] - time.time()
+            # pylint: disable=E1136
+            if self.actions is not None or \
+                (self.cur_action is not None and time_now >= self.cur_action['time']) or \
+                self.cur_action is None:
+                self.cur_action = self.actions.popleft() if self.actions else None
+
+            if self.cur_action is None or \
+                (self.cur_action is not None and time_now >= self.cur_action['time']):
+                angle = 0
+                speed = 0
+            else:
+                angle = self.cur_action['angle']
+                speed = self.cur_action['speed']
+
+            if self.prev_action['speed'] != speed and self.prev_action['angle'] != angle:
+                self.car_comm.drive_direction(speed, angle)
+                self.prev_action['speed'] = speed
+                self.prev_action['angle'] = angle
+                self.prev_action['time'] = time.time()

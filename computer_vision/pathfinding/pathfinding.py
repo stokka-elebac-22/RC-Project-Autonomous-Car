@@ -207,13 +207,8 @@ class PathFinding:
             cur_mat, start_pos_path, end_pos_path)
 
         if path:
-            new_path = [(value[1], value[0])
+            temp_path = [(value[1], value[0])
                         for _, value in enumerate(path)]
-            temp_path = [(path[0][1], path[0][0])]
-            temp_path = temp_path + new_path
-            for _ in range(1):
-                temp_path.append(
-                    (path[len(path) - 1][1], path[len(path) - 1][0]))
             temp_path.reverse()
             curve, _ = self.catmull_rom_spline(
                 temp_path, self.tension, self.num_points)

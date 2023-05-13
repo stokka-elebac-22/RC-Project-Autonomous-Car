@@ -87,7 +87,7 @@ if __name__ == '__main__':
     }
 
     # ----- PATHFINDING ----- #
-    TENSION = 0
+    TENSION = 0.5
     VELOCITY = 10
 
     # environment

@@ -132,8 +132,9 @@ if __name__ == '__main__':
     qr_code = QRCode(QR_SIZE)
 
     RUN = True
+    objects = []
+
     while RUN:
-        objects = []
         # Add hindrances using mouse
         for event in pg.event.get():
             if event.type == QUIT:
@@ -142,13 +143,10 @@ if __name__ == '__main__':
                 mouse_pos = pg.mouse.get_pos()
                 col = mouse_pos[0] // TILE_SIZE
                 row = mouse_pos[1] // TILE_SIZE
-                objects.append({
-                    'values': (int(row), int(col)),
-                    'distance': False,
-                    'object_id': 1
-                })
+                objects.append(((int(row), int(col))))
 
-        path_finding.insert_objects(objects)
+        for obj in objects:
+            env.insert_by_index(obj, 1)
 
         if LIVE:
             ret, frame = cam.read()

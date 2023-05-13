@@ -1,6 +1,7 @@
 '''main_headless.py: DATBAC23 Car system main.'''
 import cv2
 from defines import States, MessageId
+from joystick_handler.joystick_position import CurrentHeading
 from socket_handling.abstract_server import NetworkSettings
 from socket_handling.multi_socket_server import MultiSocketServer
 from camera_handler.camera_headless import CameraHandler
@@ -26,8 +27,9 @@ class Headless():  # pylint: disable=R0903
         elif conf["car_comm_interface"] == "can":
             self.car_comm = CanBusCommunication(conf["can"])
         elif conf["car_comm_interface"] == "stepper":
-            self.car_comm = CarStepperCommunication(conf["stepper"])
-
+            print("Selected stepper")
+            self.car_comm = CarStepperCommunication(conf["step"])
+        self.car_comm.start()
         # Network config for main connection + camera(s)
         self.net_main = NetworkSettings(conf["network"]["host"], conf["network"]["port"])
         self.net_cam0 = NetworkSettings(conf["network"]["host"], conf["network"]["port_cam0"])
@@ -37,8 +39,12 @@ class Headless():  # pylint: disable=R0903
         self.socket_server = MultiSocketServer(self.net_main)
         self.socket_server.start()
 
+        self.camera_missing_frame = 0
+        self.joystick_position = CurrentHeading()
+
         self.cam0_stream = CamSocketStream(self.net_cam0)
         if conf["network"]["stream_en_cam0"] is True:
+            print("Starting camera stream")
             self.cam0_stream.start()
 
         self.cam1_stream = CamSocketStream(self.net_cam1)
@@ -66,18 +72,30 @@ class Headless():  # pylint: disable=R0903
         while True:
             # Check and handle incoming data
             for data in self.socket_server:
+                print (data)
                 if MessageId(data[0]) is MessageId.CMD_SET_STATE:
                     self.state = data[1]
-                    print("State changed to: ")
+                    print(f"State changed to: {self.state} - ")
                     print(States(data[1]).name)
+                if MessageId(data[0]) is MessageId.CMD_JOYSTICK_DIRECTIONS:
+                    self.joystick_position.set_heading_from_bytes(data)
+                    # Handle joystick directions
 
             # Take new picture, handle socket transfers
-            ret0, frame0 = self.cam0_handler.get_cv_frame()
-            ret1, frame1 = self.cam1_handler.get_cv_frame()
+            ret, frame0 = self.cam0_handler.get_cv_frame()
+            # ret1, frame1 = self.cam1_handler.get_cv_frame()
 
-            if ret0 and ret1:
+            if ret is True:
+                self.camera_missing_frame = 0
                 self.cam0_stream.send_to_all(frame0)
-                self.cam1_stream.send_to_all(frame1)
+                self.cam1_stream.send_to_all(frame0)
+            else:
+                self.camera_missing_frame += 1
+                print(f"Could not get frame from camera: {self.cam0_handler.camera_id}!")
+                if self.camera_missing_frame > 10:
+                    print("Exceeded number of missing frames in a row. Stopping headless.")
+                    print(self.cam0_handler.refresh_camera_list())
+                    break
 
             if self.state is States.WAITING:  # Prints detected data (testing)
                 current_qr_data = self.qr_code.get_data(frame0)
@@ -101,6 +119,34 @@ class Headless():  # pylint: disable=R0903
 
             elif self.state is States.PARKING:
                 pass
+            elif self.state is States.MANUAL:
+                y_velocity = self.joystick_position.y_velocity
+                x_velocity = self.joystick_position.x_velocity
+                if y_velocity > 0:
+                    dir_0 = 1
+                    dir_1 = 1
+                    speed_0 = 10
+                    speed_1 = 10
+                elif y_velocity < 0:
+                    dir_0 = 0
+                    dir_1 = 0
+                    speed_0 = 10
+                    speed_1 = 10
+                else:
+                    dir_0 = 0
+                    dir_1 = 0
+                    speed_0 = 0
+                    speed_1 = 0
+                if x_velocity < 0:
+                    speed_0 += 10
+                elif x_velocity > 0:
+                    speed_1 += 10
+                self.car_comm.set_motor_speed(dir_0, speed_0, dir_1, speed_1)
+                print(f"Speeds Speed0: {int(speed_0)}, Speed1: {speed_1} dir0/1: {dir_0} {dir_1}")
+
+
+                # print(f"After ... Side: {int(self.joystick_position.x_velocity)}, F/B: {int(self.joystick_position.y_velocity)} Buttons: {self.joystick_position.button}")
+
             elif self.state is States.DRIVING:
                 # example:
                 self.car_comm.set_motor_speed(1, 100, 1, 100)

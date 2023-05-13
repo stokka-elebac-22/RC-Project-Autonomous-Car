@@ -40,6 +40,17 @@ tests = ["attrs[tests-no-zope]", "zope.interface"]
 tests-no-zope = ["cloudpickle", "cloudpickle", "hypothesis", "hypothesis", "mypy (>=0.971,<0.990)", "mypy (>=0.971,<0.990)", "pympler", "pympler", "pytest (>=4.3.0)", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-mypy-plugins", "pytest-xdist[psutil]", "pytest-xdist[psutil]"]
 
 [[package]]
+name = "bresenham"
+version = "0.2.1"
+description = "An implementation of Bresenham's line drawing algorithm"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "bresenham-0.2.1-py3-none-any.whl", hash = "sha256:c076b8bf730adb65cc5037d26639a5629dd63f6c1481d80b6856c99d47a1c6bf"},
+]
+
+[[package]]
 name = "can"
 version = "0.0.0"
 description = "A color animator."
@@ -1086,4 +1097,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "4943d971c8dcbff73e84cd2b3fefad485604b30d52290be516d8fb45f6f2dbf2"
+content-hash = "6ffa141d0470db33ae89ce2d5210b0465841624177ce5acadccc8ee40e71296d"

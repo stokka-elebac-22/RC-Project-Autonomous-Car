@@ -30,10 +30,10 @@ class TestParametrized:
 
     @pytest.mark.parametrize('img_source, line, expected', [
         ('bike_park.jpg', [-0.8819273, 822.19240925],
-         [-2469, 3000, -632, 1380]),
-        ('curve.jpg', [-0.123, 423.], [-20951, 3000, -7780, 1380]),
-        ('1.jpg', [1.881, -0.493], [1595, 3000, 733, 1380]),
-        ('2.jpg', [2.34, 423.1924], [1101, 3000, 408, 1380])])
+         [-2469, 3000, -971, 1679]),
+        ('curve.jpg', [-0.123, 423.], [-20951, 3000, -10211, 1679]),
+        ('1.jpg', [1.881, -0.493], [1595, 3000, 892, 1679]),
+        ('2.jpg', [2.34, 423.1924], [1101, 3000, 536, 1679])])
     def test_get_line_coordinates_from_parameters(self, img_source, line, expected):
         '''Test if the output coordinates are equal to the expected coordinates'''
         lane_detector = LaneDetector()

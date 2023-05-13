@@ -9,15 +9,21 @@ __email__ = 'asbjorn@maxit-as.com'
 __status__ = 'Testing'
 
 import sys
+import struct
+from defines import States
+from socket_handling.abstract_server import NetworkSettings
+from socket_handling.db_handler import DbHandler
 from socket_handling.socket_client import SocketClient # pylint: disable=W0611
+from camera_handler.socket_video_thread import SocketVideoThread
 from camera_handler.camera_handler import CameraHandler, VideoThread
+from joystick_handler.joystick_module import JoystickHandler
+from joystick_handler.joystick_position import CurrentHeading
 from stop_sign_detection.stop_sign_detector import StopSignDetector
 from qr_code.qr_code import QRCode
-from defines import States
-from PyQt6 import QtWidgets, uic, QtCore
+from PyQt6 import QtWidgets, QtGui, uic, QtCore
 from PyQt6.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
 import numpy as np
-
+from pygame.locals import * # pylint: disable=W0401
 
 class Worker(QObject, ):  # pylint: disable=R0903
     '''Worker thread'''
@@ -35,12 +41,18 @@ class Worker(QObject, ):  # pylint: disable=R0903
 class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
     '''Class handling Qt GUI control'''
     def __init__(self, ui_file, conf: dict, fullscreen: bool):
+        self.conf = conf
         self.connection_details = conf["network"]
+        self.storage = DbHandler('data.db')
+        self.socket_client = SocketClient(self.storage)
         self.camera_handler = CameraHandler()
+        self.joystick_handler = JoystickHandler()
         self.fps_count = 0
         self.output_data = ''
+        self.joystick_position = CurrentHeading()
         # Create an instance of QtWidgets.QApplication
         self.app = QtWidgets.QApplication(sys.argv)
+        self.app.setWindowIcon(QtGui.QIcon('car_ico.ico'))
 
         super().__init__()
         # Ui, self).__init__() # Call the inherited classes __init__ method
@@ -58,6 +70,14 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
             self.findChild(QtWidgets.QCheckBox, 'input_chk_enable_1'),
             self.findChild(QtWidgets.QCheckBox, 'input_chk_enable_2')
         ]
+        self.chk_computer_vision = [
+            self.findChild(QtWidgets.QCheckBox, 'chk_linedetect'),
+            self.findChild(QtWidgets.QCheckBox, 'chk_objectdetect'),
+            self.findChild(QtWidgets.QCheckBox, 'chk_disparity'),
+            self.findChild(QtWidgets.QCheckBox, 'chk_qrdetect'),
+            self.findChild(QtWidgets.QCheckBox, 'chk_stop_sign')
+        ]
+
         self.cam_thread = ["", ""]
         self.chk_enable[0].stateChanged.connect(
             lambda: self.check_and_start_camera(self.chk_enable[0], 0))
@@ -66,12 +86,20 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
 
         self.cbo_car_state = self.findChild(QtWidgets.QComboBox, 'cbo_car_state')
         for state in States:
-            self.cbo_car_state.addItem('{}: {}'.format(state.value, state.name))
+            self.cbo_car_state.addItem(f'{state.value}: {state.name}')
 
         self.cbo_socket_conn = self.findChild(QtWidgets.QComboBox, 'cbo_socket_connection')
         for conn in self.connection_details['host_list']:
             print(conn['name'])
-            self.cbo_socket_conn.addItem('{}: {}'.format(conn['name'], conn['host']))
+            self.cbo_socket_conn.addItem(f"{conn['name']}: {conn['host']}")
+        self.btn_connect = self.findChild(QtWidgets.QPushButton, 'btn_connect')
+        self.btn_connect.clicked.connect(
+            lambda: self.socket_connect(self.cbo_socket_conn.currentIndex()))
+
+        self.cbo_state = self.findChild(QtWidgets.QComboBox, 'cbo_car_state')
+        self.btn_send_state = self.findChild(QtWidgets.QPushButton, 'btn_setstate')
+        self.btn_send_state.clicked.connect(
+            lambda: self.socket_send_state(self.cbo_state.currentIndex()))
 
         # Get size from config
         size = {
@@ -87,6 +115,10 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
         self.output_text = self.findChild(QtWidgets.QLabel, 'lbl_data_output')
         self.refresh_webcam_list()
 
+        print(self.joystick_handler.available_joystick_list)
+        self.joystick_handler.set_joystick(0)
+        self.joystick_handler.start()
+        self.joystick_handler.change_pixmap_signal.connect(self.joystick_callback)
         self.timer = QtCore.QTimer()
         self.timer.setInterval(500)
         self.timer.timeout.connect(self.update_plots_and_label_data)
@@ -113,6 +145,12 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
                     self.cam_thread[index].change_pixmap_signal.connect(self.update_image2)
                 # start the thread
                 self.cam_thread[index].start()
+            else: # TODO: Fix settings for camera stream + add support for 2 cameras
+                self.cam_thread[index] = SocketVideoThread(NetworkSettings("192.168.121.57", 2005))
+                if index == 0:
+                    self.cam_thread[index].change_pixmap_signal.connect(self.update_image)
+                self.cam_thread[index].start()
+
         else:
             try:
                 self.camera_cbo[index].setEnabled(True)
@@ -124,40 +162,69 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
-        '''Updates the image_label with a new opencv image'''
+        '''Updates the image_label with a new OpenCV image'''
         self.fps_count += 1
         qr_output = ''
         output_frame = cv_img
         qt_img = self.camera_handler.convert_cv_qt(
             cv_img, self.img_input[0].width(), self.img_input[0].height())
-        current_qr_data = self.qr_code.get_data(cv_img)
-        # print(current_qr_data)
-        if current_qr_data['ret']:
-            self.qr_code.display(output_frame, current_qr_data, verbose=0)
-            for i in range(len(current_qr_data['distances'])):
-                qr_output += \
-                    f"-QR-Code {str(i)} \n \
-                        Distance: {round(current_qr_data['distances'][i], 5)} \
-                        Angle: {round(current_qr_data['angles'][i], 5)} \n  \
-                        Data: {current_qr_data['info'][i]}"
 
-        current_stop_sign = self.stop_sign_detector.detect_signs(cv_img)
-        self.stop_sign_detector.show_signs(output_frame, current_stop_sign)
+        ## QR Code
+        if self.chk_computer_vision[3].isChecked():
+            current_qr_data = self.qr_code.get_data(cv_img)
+            # print(current_qr_data)
+            if current_qr_data['ret']:
+                self.qr_code.display(output_frame, current_qr_data, verbose=0)
+                for i in range(len(current_qr_data['distances'])):
+                    qr_output += \
+                        f"-QR-Code {str(i)} \n \
+                            Distance: {round(current_qr_data['distances'][i], 5)} \
+                            Angle: {round(current_qr_data['angles'][i], 5)} \n  \
+                            Data: {current_qr_data['info'][i]}"
 
+        ## Stop sign detection
+        if self.chk_computer_vision[4].isChecked():
+            current_stop_sign = self.stop_sign_detector.detect_signs(cv_img)
+            self.stop_sign_detector.show_signs(output_frame, current_stop_sign)
+
+        ## Adjust output image to fit frame
         output_img = self.camera_handler.convert_cv_qt(
             cv_img, self.img_output.width(), self.img_output.height())
 
-        # print('Setting new image')
+        # Set new frame
         self.img_input[0].setPixmap(qt_img)
         self.img_output.setPixmap(output_img)
+
+        # Ready current data
         self.output_data = 'Data:\n ' + qr_output
 
     def update_image2(self, cv_img):
         '''Updates image2 with a new opencv image'''
         qt_img = self.camera_handler.convert_cv_qt(
             cv_img, self.img_input[0].width(), self.img_input[0].height())
-        # print('Setting new image')
+        # Update frame 2
         self.img_input[1].setPixmap(qt_img)
+
+    def joystick_callback(self, event_type):
+        '''Callback for joystick signals'''
+        if event_type == JOYAXISMOTION: # pylint: disable=E0602
+            self.joystick_position.update_direction(
+                self.joystick_handler.event_num,
+                self.joystick_handler.axis[self.joystick_handler.event_num])
+        elif event_type == JOYBALLMOTION: # pylint: disable=E0602
+            print(event_type)
+            print(self.joystick_handler.event_num)
+            print(self.joystick_handler.ball[self.joystick_handler.event_num])
+        elif event_type == JOYHATMOTION: # pylint: disable=E0602
+            print(event_type)
+            print(self.joystick_handler.event_num)
+            print(self.joystick_handler.joy[self.joystick_handler.event_num])
+        elif event_type == JOYBUTTONUP: # pylint: disable=E0602
+            self.joystick_position.update_button(
+                self.joystick_handler.event_num, 0)
+        elif event_type == JOYBUTTONDOWN: # pylint: disable=E0602
+            self.joystick_position.update_button(
+                self.joystick_handler.event_num, 1)
 
     def refresh_webcam_list(self):
         '''Run a Qthread to check possible webcams and create a list'''
@@ -191,3 +258,33 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
             self.output_data += f'\nFPS: {self.fps_count * 2}'
             self.fps_count = 0
             self.output_text.setText(self.output_data) # pylint: disable=E0001
+        if self.joystick_handler.joystick_active and self.socket_client.running:
+            self.socket_send_joystick_direction()
+
+    def socket_connect(self, connection_id: int):
+        '''Start socket client connection'''
+        if not self.socket_client.running:
+            host = self.connection_details['host_list'][connection_id]['host']
+            port = self.connection_details['host_list'][connection_id]['port']
+            conn = NetworkSettings(host, port)
+            self.socket_client.start(conn)
+        else:
+            print("Already connected!")
+
+    def socket_send_state(self, state: int):
+        '''Send state request on socket connection '''
+        if self.socket_client.running:
+            data = struct.pack("I", 1 + state*256) # States.CMD_SET_STATE.value
+            print(f"Sending state: {state} as {data}")
+            self.socket_client.send_to_all(data)
+        else:
+            print("Not connected!")
+
+    def socket_send_joystick_direction(self):
+        '''Send joystick direction update on socket connection '''
+        if self.socket_client.running:  # States.CMD_JOYSTICK_DIRECTIONS.value = 2
+            data = self.joystick_position.get_byte_for_heading(2)
+            print("Sending data")
+            self.socket_client.send_to_all(data)
+        else:
+            print("Not connected!")

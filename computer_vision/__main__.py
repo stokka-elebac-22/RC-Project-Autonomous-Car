@@ -17,10 +17,14 @@ import yaml
 try:
     from main_window_ui import Ui
     GUI_POSSIBLE = True
-except Exception as error: # pylint: disable=W0703
+except ImportError as error:
     print(error)
     print("Unable to run in GUI mode")
     GUI_POSSIBLE = False
+try:
+    import ctypes
+except ImportError as error:
+    print(error)
 from main_headless import Headless
 
 if __name__ == '__main__':
@@ -44,7 +48,6 @@ if __name__ == '__main__':
                         default='config',
                         help='name of config file (default: config)')
 
-
     args = parser.parse_args()
 
     if not os.path.isfile(args.config_file + '.yml'):
@@ -56,6 +59,7 @@ if __name__ == '__main__':
         config = yaml.load(f, Loader=yaml.SafeLoader)
 
     if config["headless"] is True or GUI_POSSIBLE is False:
+        print("Starting headless")
         main_thread = Headless(config)
     else:
         FULL_SCREEN = args.full_screen.lower() in ['true', 1]
@@ -63,6 +67,11 @@ if __name__ == '__main__':
         os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
         os.environ['QT_SCREEN_SCALE_FACTORS'] = '1'
         os.environ['QT_SCALE_FACTOR'] = '1'
+        MY_APP_ID = 'boomer_corp.autonomy.car.version'
+        try:
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(MY_APP_ID)
+        except Exception as error:  # pylint: disable=W0703
+            print(error)
         if not os.path.isfile(args.theme + '.ui'):
             print('Unable to locate the theme file, \
                 please check if it exists in the script folder')

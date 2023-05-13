@@ -59,8 +59,10 @@ class Headless():  # pylint: disable=R0903
             'distance': conf["camera0"]["size"]["distance"],
         }
 
-        self.cam0_handler = CameraHandler(conf["camera0"]["id"])
-        self.cam1_handler = CameraHandler(conf['camera1']['id'])
+        if conf["camera0"]["enabled"] is True:
+            self.cam0_handler = CameraHandler(conf["camera0"]["id"])
+        if conf["camera1"]["enabled"] is True:
+            self.cam1_handler = CameraHandler(conf['camera1']['id'])
 
         self.waiting_state = WaitingState(size)
         self.stopping_state = StopSignAction('stop_sign_model.xml')
@@ -106,7 +108,7 @@ class Headless():  # pylint: disable=R0903
             elif self.state is States.DRIVING:
                 # example:
                 self.car_comm.set_motor_speed(1, 100, 1, 100)
-            elif self.state is States.STOPPING: # 3: #stopping
+            elif self.state is States.STOPPING:
                 count, speeds = self.stopping_state.run_calculation(frame0)
                 if count == 0:
                     speeds = {
@@ -117,22 +119,23 @@ class Headless():  # pylint: disable=R0903
                     }
                 self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
                                               speeds["dir_1"], speeds["speed_1"])
-            elif self.state is States.MANUAL: #4: #manual
+            elif self.state is States.MANUAL:
                 status, speeds = ManualDriving.run_calculation(self.joystick_position)
                 self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
                                               speeds["dir_1"], speeds["speed_1"])
                 if status == 0:
                     pass
-            elif self.state == States.SHUTDOWN: #shutdown
+            elif self.state is States.STEREO:
+                if frame0 is not None and frame1 is not None:
+                    frame0 = cv2.blur(frame0, (conf['stereo']['blur']))
+                    frame1 = cv2.blur(frame1, (conf['stereo']['blur']))
+                    current_disparity = self.stereo_vison.get_disparity(frame0, frame1)
+                    ret_val, depth_val, pos_val, size_val = self.stereo_vison.get_data(
+                        current_disparity,
+                        conf['stereo']['min_dist'],
+                        conf['stereo']['max_dist']
+                    )
+                    print(ret_val, depth_val, pos_val, size_val)
+            elif self.state == States.SHUTDOWN:
                 self.car_comm.stop()
                 break
-            elif self.state is States.STEREO:
-                frame0 = cv2.blur(frame0, (conf['stereo']['blur']))
-                frame1 = cv2.blur(frame1, (conf['stereo']['blur']))
-                current_disparity = self.stereo_vison.get_disparity(frame0, frame1)
-                ret_val, depth_val, pos_val, size_val = self.stereo_vison.get_data(
-                    current_disparity,
-                    conf['stereo']['min_dist'],
-                    conf['stereo']['max_dist']
-                )
-                print(ret_val, depth_val, pos_val, size_val)

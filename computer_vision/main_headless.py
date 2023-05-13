@@ -6,18 +6,19 @@ from socket_handling.abstract_server import NetworkSettings
 from socket_handling.multi_socket_server import MultiSocketServer
 from camera_handler.camera_headless import CameraHandler
 from camera_handler.camera_sock_server import CamSocketStream
-from stop_sign_detection.stop_sign_detector import StopSignDetector
 from car_communication.abstract_communication import AbstractCommunication
 from car_communication.can_bus_communication import CanBusCommunication
 from car_communication.car_serial_communication import CarSerialCommunication
 from car_communication.car_stepper_communication import CarStepperCommunication
 from stereoscopic_vision.src.stereoscopic_vision import StereoscopicVision
 
-from qr_code.qr_code import QRCode
-
+from states.manual import ManualDriving
+from states.waiting import WaitingState
+from states.stopping import StopSignAction
 class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
     # pylint: disable=R0902
+    # pylint: disable=R0915
     def __init__(self, conf: dict): # pylint: disable=R0912
         self.state = States.WAITING  # Start in "idle" state
         self.car_comm: AbstractCommunication
@@ -58,11 +59,14 @@ class Headless():  # pylint: disable=R0903
             'distance': conf["camera0"]["size"]["distance"],
         }
 
-        self.cam0_handler = CameraHandler(conf["camera0"]["id"])
-        self.cam1_handler = CameraHandler(conf['camera1']['id'])
+        if conf["camera0"]["enabled"] is True:
+            self.cam0_handler = CameraHandler(conf["camera0"]["id"])
+        if conf["camera1"]["enabled"] is True:
+            self.cam1_handler = CameraHandler(conf['camera1']['id'])
 
-        self.qr_code = QRCode(size)
-        self.stop_sign_detector = StopSignDetector('stop_sign_model.xml')
+        self.waiting_state = WaitingState(size)
+        self.stopping_state = StopSignAction('stop_sign_model.xml')
+        # self.stop_sign_detector = StopSignDetector('stop_sign_model.xml')
 
         # Stereo vision
         self.stereo_vison = StereoscopicVision(
@@ -74,7 +78,7 @@ class Headless():  # pylint: disable=R0903
             for data in self.socket_server:
                 print (data)
                 if MessageId(data[0]) is MessageId.CMD_SET_STATE:
-                    self.state = data[1]
+                    self.state = States(data[1])
                     print(f"State changed to: {self.state} - ")
                     print(States(data[1]).name)
                 if MessageId(data[0]) is MessageId.CMD_JOYSTICK_DIRECTIONS:
@@ -84,7 +88,6 @@ class Headless():  # pylint: disable=R0903
             # Take new picture, handle socket transfers
             ret, frame0 = self.cam0_handler.get_cv_frame()
             # ret1, frame1 = self.cam1_handler.get_cv_frame()
-
             if ret is True:
                 self.camera_missing_frame = 0
                 self.cam0_stream.send_to_all(frame0)
@@ -96,67 +99,43 @@ class Headless():  # pylint: disable=R0903
                     print("Exceeded number of missing frames in a row. Stopping headless.")
                     print(self.cam0_handler.refresh_camera_list())
                     break
-
             if self.state is States.WAITING:  # Prints detected data (testing)
-                current_qr_data = self.qr_code.get_data(frame0)
-                output_data = 'Data: \n'
-                # print(current_qr_data)
-                if current_qr_data['ret']:
-                    for i in range(len(current_qr_data['distances'])):
-                        output_data += \
-                            f"QR-Code {str(i)} \n \
-                                Distance: {round(current_qr_data['distances'][i])} \n \
-                                Angle: {current_qr_data['angles'][i]} \n"
-
-                        output_data += 'Data: ' + current_qr_data['info'][i] + '\n'
-
-                current_stop_sign = self.stop_sign_detector.detect_signs(frame0)
-                if current_qr_data['distances'] is not None and \
-                        len(current_qr_data['distances']) > 0:
-                    print(output_data)
-                if len(current_stop_sign) > 0:
-                    print(current_stop_sign)
-
+                status, speeds = self.waiting_state.run_calculation(frame0)
+                if status == 0:
+                    pass
             elif self.state is States.PARKING:
                 pass
-            elif self.state is States.MANUAL:
-                y_velocity = self.joystick_position.y_velocity
-                x_velocity = self.joystick_position.x_velocity
-                if y_velocity > 0:
-                    dir_0 = 1
-                    dir_1 = 1
-                    speed_0 = 10
-                    speed_1 = 10
-                elif y_velocity < 0:
-                    dir_0 = 0
-                    dir_1 = 0
-                    speed_0 = 10
-                    speed_1 = 10
-                else:
-                    dir_0 = 0
-                    dir_1 = 0
-                    speed_0 = 0
-                    speed_1 = 0
-                if x_velocity < 0:
-                    speed_0 += 10
-                elif x_velocity > 0:
-                    speed_1 += 10
-                self.car_comm.set_motor_speed(dir_0, speed_0, dir_1, speed_1)
-                print(f"Speeds Speed0: {int(speed_0)}, Speed1: {speed_1} dir0/1: {dir_0} {dir_1}")
-
-
-                # print(f"After ... Side: {int(self.joystick_position.x_velocity)}, F/B: {int(self.joystick_position.y_velocity)} Buttons: {self.joystick_position.button}")
-
             elif self.state is States.DRIVING:
                 # example:
                 self.car_comm.set_motor_speed(1, 100, 1, 100)
+            elif self.state is States.STOPPING:
+                count, speeds = self.stopping_state.run_calculation(frame0)
+                if count == 0:
+                    speeds = {
+                        "dir_0" : 0,
+                        "dir_1" : 0,
+                        "speed_0" : 10,
+                        "speed_1" : 10
+                    }
+                self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
+                                              speeds["dir_1"], speeds["speed_1"])
+            elif self.state is States.MANUAL:
+                status, speeds = ManualDriving.run_calculation(self.joystick_position)
+                self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
+                                              speeds["dir_1"], speeds["speed_1"])
+                if status == 0:
+                    pass
             elif self.state is States.STEREO:
-                frame0 = cv2.blur(frame0, (conf['stereo']['blur']))
-                frame1 = cv2.blur(frame1, (conf['stereo']['blur']))
-                current_disparity = self.stereo_vison.get_disparity(frame0, frame1)
-                ret_val, depth_val, pos_val, size_val = self.stereo_vison.get_data(
-                    current_disparity,
-                    conf['stereo']['min_dist'],
-                    conf['stereo']['max_dist']
-                )
-                print(ret_val, depth_val, pos_val, size_val)
+                if frame0 is not None and frame1 is not None:
+                    frame0 = cv2.blur(frame0, (conf['stereo']['blur']))
+                    frame1 = cv2.blur(frame1, (conf['stereo']['blur']))
+                    current_disparity = self.stereo_vison.get_disparity(frame0, frame1)
+                    ret_val, depth_val, pos_val, size_val = self.stereo_vison.get_data(
+                        current_disparity,
+                        conf['stereo']['min_dist'],
+                        conf['stereo']['max_dist']
+                    )
+                    print(ret_val, depth_val, pos_val, size_val)
+            elif self.state == States.SHUTDOWN:
+                self.car_comm.stop()
+                break

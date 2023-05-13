@@ -31,6 +31,7 @@ class States(Enum):
     STOPPING = 3
     MANUAL = 4
     STEREO = 5
+    SHUTDOWN = 6
 
 class MessageId(Enum):
     '''Enum for message ID's'''

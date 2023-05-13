@@ -22,9 +22,6 @@ class CarStepperCommunication(AbstractCommunication):
     def __init__(self, conn_info):
         self.running = False
         self.conn_info = conn_info
-
-    def start(self):
-        ''' N/A as this works only locally on Pi'''
         print("Setting up hardware access GPIO/PWM for Pi")
         self.running = True
         self.EN2 = 24
@@ -51,12 +48,14 @@ class CarStepperCommunication(AbstractCommunication):
         GPIO.output(self.DIR2, self.CW1)
         GPIO.output(self.EN, 1)
         GPIO.output(self.EN2, 1)
-
         self.pwm0 = HardwarePWM(pwm_channel=0, hz=10)
+        self.pwm1 = HardwarePWM(pwm_channel=1, hz=10)
+
+    def start(self):
+        ''' N/A as this works only locally on Pi'''
         self.pwm0.start(50) # half duty cycle
         self.pwm0.change_frequency(10)
 
-        self.pwm1 = HardwarePWM(pwm_channel=1, hz=10)
         self.pwm1.start(50) # half duty cycle
         self.pwm1.change_frequency(10)
 
@@ -69,6 +68,8 @@ class CarStepperCommunication(AbstractCommunication):
         GPIO.output(self.DIR2, 0)
         GPIO.output(self.EN, 1)
         GPIO.output(self.EN2, 1)
+        GPIO.cleanup()
+
         self.running = False
 
     def send_command(self, command):

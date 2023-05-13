@@ -34,12 +34,14 @@
     dir1: !!int 5
   camera0:
     id: !!int 0
+    enabled: !!bool True
     size:
       px: !!int 76
       mm: !!int 52
       distance: !!int 500
     calibration_path: 'camera_calibration.xml'
   camera1:
+    enabled: !!bool False
     id: !!int 1
     size:
       px: !!int 76
@@ -73,6 +75,6 @@
     parameter_path: !!str 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
     maps_path: !!str 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps_web_light.xml'
     max_dist: !!int 2000
-    min_dist = 50
-    blur = 12
+    min_dist: !!int 50
+    blur: !!int 12
 ...

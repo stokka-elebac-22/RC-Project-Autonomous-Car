@@ -13,7 +13,6 @@ from car_communication.abstract_communication import AbstractCommunication
 from car_communication.can_bus_communication import CanBusCommunication
 from car_communication.car_serial_communication import CarSerialCommunication
 from car_communication.car_stepper_communication import CarStepperCommunication
-from stereoscopic_vision.src.stereoscopic_vision import StereoscopicVision
 from environment.src.environment import Environment, ViewPointObject
 
 from states.manual import ManualDriving

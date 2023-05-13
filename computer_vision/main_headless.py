@@ -86,7 +86,6 @@ class Headless():  # pylint: disable=R0903
             # Take new picture, handle socket transfers
             ret, frame0 = self.cam0_handler.get_cv_frame()
             # ret1, frame1 = self.cam1_handler.get_cv_frame()
-
             if ret is True:
                 self.camera_missing_frame = 0
                 self.cam0_stream.send_to_all(frame0)
@@ -98,46 +97,15 @@ class Headless():  # pylint: disable=R0903
                     print("Exceeded number of missing frames in a row. Stopping headless.")
                     print(self.cam0_handler.refresh_camera_list())
                     break
-
             if self.state is States.WAITING:  # Prints detected data (testing)
                 status, speeds = self.waiting_state.run_calculation(frame0)
                 if status == 0:
                     pass
-
             elif self.state is States.PARKING:
                 pass
-            elif self.state is States.MANUAL:
-                y_velocity = self.joystick_position.y_velocity
-                x_velocity = self.joystick_position.x_velocity
-                if y_velocity > 0:
-                    dir_0 = 1
-                    dir_1 = 1
-                    speed_0 = 10
-                    speed_1 = 10
-                elif y_velocity < 0:
-                    dir_0 = 0
-                    dir_1 = 0
-                    speed_0 = 10
-                    speed_1 = 10
-                else:
-                    dir_0 = 0
-                    dir_1 = 0
-                    speed_0 = 0
-                    speed_1 = 0
-                if x_velocity < 0:
-                    speed_0 += 10
-                elif x_velocity > 0:
-                    speed_1 += 10
-                self.car_comm.set_motor_speed(dir_0, speed_0, dir_1, speed_1)
-                print(f"Speeds Speed0: {int(speed_0)}, Speed1: {speed_1} dir0/1: {dir_0} {dir_1}")
-
-
-                # print(f"After ... Side: {int(self.joystick_position.x_velocity)}, F/B: {int(self.joystick_position.y_velocity)} Buttons: {self.joystick_position.button}")
-
             elif self.state is States.DRIVING:
                 # example:
                 self.car_comm.set_motor_speed(1, 100, 1, 100)
-
             elif self.state is States.STOPPING: # 3: #stopping
                 count, speeds = self.stopping_state.run_calculation(frame0)
                 if count == 0:
@@ -149,7 +117,6 @@ class Headless():  # pylint: disable=R0903
                     }
                 self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
                                               speeds["dir_1"], speeds["speed_1"])
-
             elif self.state is States.MANUAL: #4: #manual
                 status, speeds = ManualDriving.run_calculation(self.joystick_position)
                 self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],

@@ -1,7 +1,7 @@
 '''Parking class'''
 from environment.src.a_star import AStar
 from pathfinding.pathfinding import PathFinding
-from line_detection.parking_slot_detection import parking_slot_detector
+from line_detection.parking_slot_detection import ParkingSlotDetector
 from qr_code.qr_code import QRCode
 
 class ParkingAction():
@@ -16,7 +16,7 @@ class ParkingAction():
             0.5,
             conf['velocity']
         )
-        self.parking_slot_detector = parking_slot_detector(
+        self.parking_slot_detector = ParkingSlotDetector(
             conf['parking']['canny'],
             conf['parking']['blur'],
             conf['parking']['hough'],

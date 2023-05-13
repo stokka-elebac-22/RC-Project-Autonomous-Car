@@ -68,7 +68,7 @@ class Headless():  # pylint: disable=R0903
             for data in self.socket_server:
                 print (data)
                 if MessageId(data[0]) is MessageId.CMD_SET_STATE:
-                    self.state = data[1]
+                    self.state = States(data[1])
                     print(f"State changed to: {self.state} - ")
                     print(States(data[1]).name)
                 if MessageId(data[0]) is MessageId.CMD_JOYSTICK_DIRECTIONS:
@@ -101,7 +101,8 @@ class Headless():  # pylint: disable=R0903
             elif self.state is States.DRIVING:
                 # example:
                 self.car_comm.set_motor_speed(1, 100, 1, 100)
-            elif self.state == 3: #stopping
+
+            elif self.state is States.STOPPING: # 3: #stopping
                 count, speeds = self.stopping_state.run_calculation(frame0)
                 if count == 0:
                     speeds = {
@@ -113,7 +114,7 @@ class Headless():  # pylint: disable=R0903
                 self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
                                               speeds["dir_1"], speeds["speed_1"])
 
-            elif self.state == 4: #manual
+            elif self.state is States.MANUAL: #4: #manual
                 status, speeds = ManualDriving.run_calculation(self.joystick_position)
                 self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
                                               speeds["dir_1"], speeds["speed_1"])

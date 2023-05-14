@@ -36,7 +36,7 @@ class TestParametrized:
             velocity
         )
 
-        data = path_finding.merge_similar_angles(times, angles, 1)
+        data = path_finding.merge_similar_angles(times, times, angles, 1)
 
         assert data['times'] == expected[0]
         assert data['angles'] == expected[1]

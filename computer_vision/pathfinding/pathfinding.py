@@ -54,30 +54,37 @@ class PathFinding:
         '''Retrieve environment'''
         return self.__environment
 
-    def merge_similar_angles(self, times: list[int], angles: list[float], tol: int = 1) -> dict:
+    def merge_similar_angles(self, distances: list[int], times: list[int], angles: list[float], tol: int = 1) -> dict:
         '''Merge similar angles to reduce the list of angles and times'''
         if not angles or not times:
             return None
         new_angles = []
         new_times = []
+        new_distances = []
         previous_angle = angles[0]
         previous_time = times[0]
+        previous_distance = distances[0]
         for i in range(len(angles)-1):
             if previous_angle - tol <= angles[i+1] <= previous_angle + tol \
                     or \
                     previous_angle - tol >= angles[i+1] >= previous_angle + tol:
                 previous_angle = (previous_angle + angles[i+1]) / 2
                 previous_time += times[i+1]
+                previous_distance += distances[i+1]
             else:
                 new_times.append(previous_time)
                 new_angles.append(previous_angle)
+                new_distances.append(previous_distance)
                 previous_angle = angles[i+1]
                 previous_time = times[i+1]
+                previous_distance = distances[i+1]
         new_times.append(previous_time)
         new_angles.append(previous_angle)
+        new_distances.append(previous_distance)
         return {
             'times': new_times,
-            'angles': new_angles
+            'angles': new_angles,
+            'distances': new_distances
         }
 
     def catmull_t_j(self, t_i, p_i, p_j, alpha):
@@ -221,17 +228,38 @@ class PathFinding:
                 if i != 0:
                     angles.append(self.get_angle(curve[i-1], value))
 
-            data = self.merge_similar_angles(times[:-1], angles[:-1], 1)
-            data['angles'].append(angles[-1])
+            data = self.merge_similar_angles(distances[:-1],times[:-1], angles[:-1], 1)
+            #data['angles'].append(angles[-1])
             angle_diff = self.get_angle_diff(data['angles'])
             if not angle_diff:
                 return None
-            data['times'] = [self.rotate_time*angle_diff[0]] + data['times']
+            #data['times'] = [self.rotate_time*angle_diff[0]] + data['times']
+            new_angles = []
+            new_distances = []
+            new_times = []
+            prev_angle = angle_diff[0]
+            prev_distance = data['distances'][0]
+            prev_time = data['times'][0]
+            for i in range(len(angle_diff)-1):
+                if prev_distance == 0:
+                    prev_angle += angle_diff[i+1]
+                    prev_distance += data['distances'][i+1]
+                    prev_time += data['times'][i+1]
+                else:
+                    new_angles.append(prev_angle)
+                    new_distances.append(prev_distance)
+                    new_times.append(prev_time)
+                    prev_angle = angle_diff[i+1]
+                    prev_distance = data['distances'][i+1]
+                    prev_time = data['times'][i+1]
+            new_angles.append(prev_angle)
+            new_distances.append(prev_distance)
+            new_times.append(prev_time)
             return {
                 'path': path,
                 'curve': curve,
-                'angles': angle_diff,
-                'times': data['times'],
-                'distances': distances
+                'angles': new_angles,
+                'times': new_times,
+                'distances': new_distances
             }
         return None

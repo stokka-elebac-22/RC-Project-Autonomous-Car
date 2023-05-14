@@ -2,7 +2,6 @@
 import time
 from typing import List, TypedDict
 from collections import deque
-import cv2
 from defines import States, MessageId
 from joystick_handler.joystick_position import CurrentHeading
 from socket_handling.abstract_server import NetworkSettings
@@ -33,6 +32,7 @@ class Headless():  # pylint: disable=R0903
     '''Class handling headless running'''
     # pylint: disable=R0902
     # pylint: disable=R0915
+    # pylint: disable=R0914
 
     def __init__(self, conf: dict):  # pylint: disable=R0912
         self.state = States.WAITING  # Start in "idle" state
@@ -97,21 +97,21 @@ class Headless():  # pylint: disable=R0903
         else:
             self.cam1_handler = None
 
-            # ----- CAMERA ----- #
-        PIXEL_WIDTH, PIXEL_HEIGHT = conf["camera"]["camera_resolution"]["web"]
+        # ----- CAMERA ----- #
+        pixel_width, pixel_height = conf["camera"]["camera_resolution"]["web"]
         # PIXEL_HEIGHT = conf['frame'][1]
 
         # ----- ENVIRONMENT ----- #
-        BOARD_SIZE = (60, 115)
-        ENV_SIZE = 30
+        board_size = (60, 115)
+        env_size = 30
 
         view_point_object: ViewPointObject = {
             'view_point': None,
             'object_id': 10,
         }
 
-        env = Environment(BOARD_SIZE, (PIXEL_WIDTH, PIXEL_HEIGHT),
-                          ENV_SIZE, view_point_object)
+        env = Environment(board_size, (pixel_width, pixel_height),
+                          env_size, view_point_object)
 
 
         self.waiting_state = WaitingState(size)

@@ -183,12 +183,12 @@ class Headless():  # pylint: disable=R0903
                     ret, _ = self.stereo_vision.run_calculation([frame0, frame1])
                     # if return value is true, that means it could find an
                     # object between min and max value (set in stereo vision class)
-                    if ret:
+                    if not ret:
                         speeds = {
                         "dir_0": 0,
                         "dir_1": 0,
-                        "speed_0": 0,
-                        "speed_1": 0
+                        "speed_0": 10,
+                        "speed_1": 10
                         }
                         self.car_comm.set_motor_speed(speeds["dir_0"], speeds["speed_0"],
                                                       speeds["dir_1"], speeds["speed_1"])

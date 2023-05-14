@@ -70,7 +70,7 @@ class Environment:
         '''Converts point to distance'''
         offset_x = point[0] - self.pixel_size[0]/2
         # code to calibrate middle of cam
-        offset_x = point[0] - 533
+        # offset_x = point[0] - 533
         offset_y = self.pixel_size[1] - point[1]
         y_distance = 7.06075681116041 * pow(10, -14) * pow(np.int64(offset_y), np.int64(7)) \
             -7.07543466719694*pow(10, -11)*pow(np.int64(offset_y), np.int64(6)) \

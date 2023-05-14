@@ -180,8 +180,10 @@ class Headless():  # pylint: disable=R0903
 
             elif self.state is States.STEREO:
                 if frame0 is not None and frame1 is not None:
-                    depth_val = self.stereo_vision.run_calculation([frame0, frame1])
-                    if depth_val < 500:
+                    ret, _ = self.stereo_vision.run_calculation([frame0, frame1])
+                    # if return value is false, that means it could not find an object between min and max value
+                    # (set in stereo vision class)
+                    if not ret:
                         speeds = {
                         "dir_0": 0,
                         "dir_1": 0,

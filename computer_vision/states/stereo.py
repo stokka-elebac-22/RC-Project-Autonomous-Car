@@ -1,4 +1,3 @@
-
 import cv2
 from stereoscopic_vision.src.stereoscopic_vision import StereoscopicVision
 
@@ -21,4 +20,4 @@ class StereoAction():
             self.conf['stereo']['min_dist'],
             self.conf['stereo']['max_dist']
         )
-        return depth_val
+        return ret_val, depth_val

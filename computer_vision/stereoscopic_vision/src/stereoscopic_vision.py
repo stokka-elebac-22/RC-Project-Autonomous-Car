@@ -133,8 +133,8 @@ if __name__ == '__main__':
     # PARAMETER_PATH = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
     PARAMETER_PATH = 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
     MAPS_PATH = 'computer_vision/stereoscopic_vision/data/stereo_rectify_maps_web_light.xml'
-    MAX_DIST = 2000 # max distance to recognize objects (mm)
-    MIN_DIST = 50 # min distance to recognize objects (mm)
+    MAX_DIST = 1000 # max distance to recognize objects (mm)
+    MIN_DIST = 0 # min distance to recognize objects (mm)
     BLUR = 12
     M = 1 # base value, the real one is from the xml file (and is calculated in a previous test)
     Z = MAX_DIST # The depth, for used for calculating M

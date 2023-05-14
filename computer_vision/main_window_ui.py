@@ -145,7 +145,7 @@ class Ui(QtWidgets.QMainWindow):  # pylint: disable=R0902
                     self.cam_thread[index].change_pixmap_signal.connect(self.update_image2)
                 # start the thread
                 self.cam_thread[index].start()
-            else: # TODO: Fix settings for camera stream + add support for 2 cameras
+            else: # Fix settings for camera stream + add support for 2 cameras
                 self.cam_thread[index] = SocketVideoThread(NetworkSettings("192.168.121.57", 2005))
                 if index == 0:
                     self.cam_thread[index].change_pixmap_signal.connect(self.update_image)

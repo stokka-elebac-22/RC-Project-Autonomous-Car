@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 """car_stepper_communication.py: Communication module to handle Raspberry pi HW PWM with Pi-HAT."""
+import time
+import math
+
 from car_communication.abstract_communication import AbstractCommunication
 
 try:
@@ -104,6 +107,40 @@ class CarStepperCommunication(AbstractCommunication):
         '''Depending on angle/speed make a calculation on motor speeds
         ### Should this be moved outside of the communication?'''
         self.set_motor_speed( 1, 100, 1, 100)
+
+    def turn_number_degrees(self, speed: int, angle: int):
+        '''Function to turn a set number of degrees
+            LOCKS the logic until finished'''
+        A = 0
+        frequency = MAX_PWM / 100 * speed
+        B = frequency  # 1/8 mm per sec for ytterhjul
+
+        if angle > 0:
+            motor1 = A
+            motor2 = B
+        else:
+            motor1 = B
+            motor2 = A
+
+        radius = 34
+        distance = 2*math.pi*radius*math.abs(angle)/360
+        time_go = distance / frequency
+        time_stop = round(time.time()*1000) + time_go*1000
+        self.set_motor_speed( 1, motor1, 1, motor2)
+        while round(time.time()*1000) < time_stop:
+            pass
+        self.set_motor_speed( 1, 0, 1, 0)
+
+    def drive_set_distance_forward(self, speed: int, distance: int, direction: int):
+        '''Drive a set distance forward
+            LOCKS the logic until finished!'''
+        frequency = MAX_PWM / 100 * speed
+        steps = distance * 8
+        time_stop = round(time.time()*1000) + steps/frequency * 1000
+        self.set_motor_speed( direction, speed, direction, speed)
+        while round(time.time()*1000) < time_stop:
+            pass
+        self.set_motor_speed( 1, 0, 1, 0)
 
     def get_next_data(self):
         '''Get next available piece of data'''

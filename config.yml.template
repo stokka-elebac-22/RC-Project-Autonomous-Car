@@ -69,7 +69,7 @@
       logitech: !!seq [1920, 1080]
       pi_cam: !!seq [1920, 1080]
   spline:
-    tension: !!int 0
+    tension: !!int 0.5
     velocity: !!float 100.0
   stereo:
     parameter_path: !!str 'computer_vision/stereoscopic_vision/data/stereo_parameters.xml'
@@ -77,4 +77,18 @@
     max_dist: !!int 2000
     min_dist: !!int 50
     blur: !!int 12
+  lane:
+    blur: !!int 12
+    canny: !!seq [75, 89]
+    morph: !!seq [2, 2]
+    hough: !!seq [61, 59, 49]
+  parking:
+    blur: !!int 12
+    canny: !!seq [50, 100]
+    morph: !!seq [1, 1]
+    hough: !!seq [65, 70, 20]
+  sign_size:
+    px: !!int 153
+    mm: !!int 61
+    distance: !!int 538
 ...
